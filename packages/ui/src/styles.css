@@ -1466,8 +1466,13 @@ button.session-item:not(.active):hover {
 }
 
 .transport-info {
+  box-sizing: border-box;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   width: 17px;
   height: 17px;
+  padding: 0;
   border-radius: 50%;
   border: 1px solid var(--border);
   background: var(--canvas);

@@ -31,9 +31,10 @@
     "doctor": "npm run build --workspace @airp/core && npm run build --workspace @airp/store-sqlite && npm run build --workspace @airp/daemon && node packages/daemon/dist/doctor.js",
     "key-set-digest": "npm run build --workspace @airp/core && node tools/key-set-digest.mjs",
     "deploy:airp-sites": "bash deploy/setup-airp-sites.sh",
-    "kill:mocks": "pkill -f 'demo/dist/mock-servers.js' || true",
-    "kill:daemon": "pkill -f 'daemon/dist/server.js' || true",
+    "kill:mocks": "lsof -tiTCP:8811 -tiTCP:8812 -tiTCP:8813 -sTCP:LISTEN 2>/dev/null | xargs -r kill || true",
+    "kill:daemon": "lsof -tiTCP:8790 -sTCP:LISTEN 2>/dev/null | xargs -r kill || true",
     "restart:mocks": "npm run kill:mocks && npm run mocks",
+    "restart:mocks:fast": "npm run kill:mocks && node packages/demo/dist/mock-servers.js",
     "restart:daemon": "npm run kill:daemon && npm run daemon",
     "status": "lsof -nP -iTCP:8811 -iTCP:8812 -iTCP:8813 -iTCP:8790 -iTCP:5173 -sTCP:LISTEN || echo 'nothing listening'"
   },
