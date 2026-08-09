@@ -14,16 +14,22 @@ import { startMockProvider } from './mock-provider.js';
 const dataDir = join(dirname(fileURLToPath(import.meta.url)), '..', '..', '..', 'data');
 
 const HONEST_SCRIPT = [
-  'This is not a model answering your question. honestmodel.win is a public demo fixture: ' +
-    'every request gets this same fixed reply, sealed with the provider key listed in the ' +
-    'Serving Register. Use it to watch signature and register checks on a known-good seal. ' +
-    'For a real inference response, pick one of the OpenRouter-backed providers instead.',
+  [
+    '**This reply is sealed by honestmodel.win** with the provider key listed for it in the Serving Register. Signature and register checks should pass.',
+    '',
+    'It is not an answer to what you wrote. No model read your message; the endpoint returns this same fixed text every time.',
+    '',
+    'honestmodel.win is a public demo fixture so you can watch a known-good seal land in the status trail. For a real inference response, pick one of the OpenRouter-backed providers instead.',
+  ].join('\n'),
 ];
 const CHEAP_SCRIPT = [
-  'This is not a model answering your question. cheapai.win is a public demo fixture: ' +
-    'every request gets this same fixed reply, sealed with the provider key listed in the ' +
-    'Serving Register. Use it to watch signature and register checks on a known-good seal. ' +
-    'For a real inference response, pick one of the OpenRouter-backed providers instead.',
+  [
+    '**This reply is sealed by cheapai.win** with the provider key listed for it in the Serving Register. Signature and register checks should pass.',
+    '',
+    'It is not an answer to what you wrote. No model read your message; the endpoint returns this same fixed text every time.',
+    '',
+    'cheapai.win is a public demo fixture so you can watch a known-good seal land in the status trail. For a real inference response, pick one of the OpenRouter-backed providers instead.',
+  ].join('\n'),
 ];
 
 const running = await Promise.all([

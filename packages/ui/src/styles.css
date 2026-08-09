@@ -49,6 +49,7 @@
   --trail-active: oklch(0.34 0.008 70);
   --trail-done: oklch(0.52 0.15 250);
   --trail-skipped: oklch(0.72 0.07 85);
+  --trail-noted: oklch(0.58 0.12 55);
   --trail-stopped: oklch(0.52 0.19 25);
   --trail-bubble: oklch(0.52 0.15 250);
   --trail-bubble-out: oklch(0.62 0.11 310);
@@ -119,6 +120,7 @@
   --trail-active: oklch(0.88 0.003 55);
   --trail-done: oklch(0.72 0.12 250);
   --trail-skipped: oklch(0.78 0.07 85);
+  --trail-noted: oklch(0.78 0.11 55);
   --trail-stopped: oklch(0.70 0.16 25);
   --trail-bubble: oklch(0.70 0.12 250);
   --trail-bubble-out: oklch(0.74 0.10 310);
@@ -995,8 +997,28 @@ button.session-item:not(.active):hover {
   color: var(--trail-done);
 }
 
-.exchange-trail-record:hover {
+.exchange-trail-record.is-done {
+  color: var(--trail-done);
+}
+
+.exchange-trail-record.is-noted {
+  color: var(--trail-noted);
+}
+
+.exchange-trail-record.is-stopped {
+  color: var(--trail-stopped);
+}
+
+.exchange-trail-record.is-done:hover {
   border-color: var(--trail-done);
+}
+
+.exchange-trail-record.is-noted:hover {
+  border-color: var(--trail-noted);
+}
+
+.exchange-trail-record.is-stopped:hover {
+  border-color: var(--trail-stopped);
 }
 
 .exchange-trail-collapse {
@@ -1015,76 +1037,78 @@ button.session-item:not(.active):hover {
 .status-trail {
   display: flex;
   align-items: center;
-  gap: 3px;
+  gap: 4px;
   flex: none;
-  /* Fixed vertical footprint: hover widens slots horizontally only. */
+  /* Fixed vertical footprint; glyphs stay centered in equal cells. */
   min-height: 16px;
 }
 
-.status-trail-slot {
-  display: grid;
-  place-items: center;
-  width: 16px;
-  height: 16px;
-  flex: none;
-}
-
 /*
- * Settled: compact 4px dots at rest. Hover grows the slot to the right (flex start stays put)
- * and crossfades the stage glyph, so neighbors part instead of overlapping.
+ * Equal cells, modest gap. Resting dots sit in the center; open glyphs scale slightly above the
+ * cell. Hit targets use ::before so hover is easy without spreading the row.
  */
-.status-trail-settled {
+.status-trail-slot,
+.status-trail-settled,
+.status-trail-pending-slot {
   position: relative;
   display: grid;
   place-items: center;
-  width: 4px;
+  width: 8px;
   height: 16px;
+  margin: 0;
   flex: none;
+}
+
+.status-trail-settled {
   cursor: default;
-  transition:
-    width 0.28s cubic-bezier(0.33, 1.15, 0.64, 1),
-    gap 0.28s cubic-bezier(0.33, 1.15, 0.64, 1);
 }
 
 .status-trail-settled::before {
   content: '';
   position: absolute;
-  /* Enlarge the hit target without changing the resting layout. */
-  inset: -6px -5px;
+  inset: -6px -4px;
 }
 
-.status-trail-settled:hover,
-.status-trail-settled:focus-within {
-  width: 16px;
-}
-
-.status-trail-settled .status-trail-dot,
-.status-trail-settled .stage-mark {
-  grid-area: 1 / 1;
+.status-trail-glyph {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  display: grid;
+  place-items: center;
+  opacity: 0;
+  transform: translate(-50%, -50%) scale(0.4);
+  transform-origin: center;
+  pointer-events: none;
+  z-index: 1;
   transition:
     opacity 0.2s ease,
     transform 0.28s cubic-bezier(0.33, 1.15, 0.64, 1);
 }
 
-.status-trail-settled .stage-mark {
+.status-trail-glyph .stage-mark {
   width: 12px;
-  height: 13.5px;
-  opacity: 0;
-  transform: scale(0.35);
-  pointer-events: none;
-  z-index: 1;
+  height: 12px;
+}
+
+.status-trail-settled:hover .status-trail-glyph,
+.status-trail-settled:focus-within .status-trail-glyph,
+.status-trail-settled.is-noted .status-trail-glyph,
+.status-trail-glyph.is-open {
+  opacity: 1;
+  transform: translate(-50%, -50%) scale(1.1);
+}
+
+.status-trail-settled .status-trail-dot {
+  transition:
+    opacity 0.2s ease,
+    transform 0.28s cubic-bezier(0.33, 1.15, 0.64, 1);
 }
 
 .status-trail-settled:hover .status-trail-dot,
-.status-trail-settled:focus-within .status-trail-dot {
+.status-trail-settled:focus-within .status-trail-dot,
+.status-trail-settled.is-noted .status-trail-dot {
   opacity: 0;
-  transform: scale(0.35);
-}
-
-.status-trail-settled:hover .stage-mark,
-.status-trail-settled:focus-within .stage-mark {
-  opacity: 1;
-  transform: scale(1);
+  transform: scale(0.4);
 }
 
 .status-trail-dot {
@@ -1103,15 +1127,12 @@ button.session-item:not(.active):hover {
   background: var(--trail-skipped);
 }
 
-.status-trail-dot-pending {
-  background: var(--trail-pending);
+.status-trail-dot-noted {
+  background: var(--trail-noted);
 }
 
-.status-trail-pending {
-  display: flex;
-  align-items: center;
-  gap: 3px;
-  margin-left: 2px;
+.status-trail-dot-pending {
+  background: var(--trail-pending);
 }
 
 .status-trail-dot-in {
@@ -1135,15 +1156,15 @@ button.session-item:not(.active):hover {
 
 @keyframes trail-mark-in {
   0% {
-    transform: scale(0.35);
+    transform: translate(-50%, -50%) scale(0.35);
     opacity: 0;
   }
   70% {
-    transform: scale(1.06);
+    transform: translate(-50%, -50%) scale(1.15);
     opacity: 1;
   }
   100% {
-    transform: scale(1);
+    transform: translate(-50%, -50%) scale(1.1);
     opacity: 1;
   }
 }
@@ -1163,6 +1184,10 @@ button.session-item:not(.active):hover {
 
 .stage-mark-skipped {
   stroke: var(--trail-skipped);
+}
+
+.stage-mark-noted {
+  stroke: var(--trail-noted);
 }
 
 .stage-mark-stopped {
@@ -1553,9 +1578,8 @@ button.session-item:not(.active):hover {
     animation: none !important;
   }
 
-  .status-trail-settled,
-  .status-trail-settled .status-trail-dot,
-  .status-trail-settled .stage-mark {
+  .status-trail-glyph,
+  .status-trail-settled .status-trail-dot {
     transition: none !important;
   }
 

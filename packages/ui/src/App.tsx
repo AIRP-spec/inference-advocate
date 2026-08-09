@@ -19,9 +19,10 @@ import { ComposeActivity, isComposeWordBoundary } from './compose-activity';
 import { isStageId, type StageId } from './stages';
 import {
   emptyTrail,
+  sealNoteFromDeterministic,
+  sealNoteLabel,
   trailAfterResult,
   trailAfterStage,
-  trailIsHalted,
   type TrailMarks,
 } from './trail-state';
 import {
@@ -595,7 +596,10 @@ function AssistantTurn(props: {
   const showSelf = authority === 'self_release';
   const showCustodian = authority === 'self_release' || authority === 'custodial_release';
   const showRelease = kind === 'withhold' && authority && authority !== 'non_releasable' && authority !== 'escalating';
-  const halted = trail ? trailIsHalted(trail) : kind === 'withhold' || kind === 'refuse';
+  const sealNote =
+    kind === 'deliver' || kind === 'deliver_with_notice'
+      ? sealNoteFromDeterministic(result.deterministic)
+      : null;
 
   const deliveryNotices =
     kind === 'deliver_with_notice'
@@ -608,10 +612,11 @@ function AssistantTurn(props: {
         <ExchangeTrail
           marks={trail}
           stage={null}
+          label={sealNote ? sealNoteLabel(sealNote) : null}
           activity={0}
           held={heldTransport || result.transport === 'non_streamed'}
           settled
-          forceExpanded={halted}
+          sealNote={sealNote}
         />
       )}
 

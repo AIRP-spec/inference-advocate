@@ -1,9 +1,10 @@
-// One stage glyph in one of five states. Paths from the design handoff StageMark reference.
+// One stage glyph in one of six states. Paths from the design handoff StageMark reference.
 //
 // Paper: steps 3 through 12. Weight and shape carry the signal; colour confirms. Never distinguish
 // state by colour alone: pending is a dot (rendered by StatusTrail), active breathes, done is
 // heavy blue, skipped is light with a slash in faint yellow (deliberate, not pending or stopped),
-// stopped is heaviest red with a hold bar.
+// noted is medium with a gap dash (non-blocking finding, e.g. unsealed), stopped is heaviest red
+// with a hold bar.
 
 import {
   TRAIL_STAGE_LABELS,
@@ -24,6 +25,7 @@ const STROKE: Record<Exclude<MarkState, 'pending'>, number> = {
   active: 2.1,
   done: 2.9,
   skipped: 1.5,
+  noted: 2.2,
   stopped: 2.9,
 };
 
@@ -36,6 +38,7 @@ export function StageMark(props: {
   const paths = GLYPHS[stage];
   const sw = STROKE[state];
   const slash = state === 'skipped';
+  const gap = state === 'noted';
   const held = state === 'stopped';
   const pulse = state === 'active' && !reducedMotion;
 
@@ -56,6 +59,7 @@ export function StageMark(props: {
         <path key={d} d={d} />
       ))}
       {slash && <path d="M4 20 L20 4" strokeWidth={1.5} />}
+      {gap && <path d="M5.2 12 H18.8" strokeWidth={1.8} />}
       {held && <path d="M4.6 24.4 H19.4" />}
     </svg>
   );

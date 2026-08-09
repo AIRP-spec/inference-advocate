@@ -9,10 +9,13 @@ import {
 } from '../src/bubbles.js';
 import {
   emptyTrail,
+  sealNoteFromDeterministic,
+  sealNoteLabel,
   trailAfterResult,
   trailAfterStage,
   trailIsComplete,
   trailIsHalted,
+  trailSummaryMark,
 } from '../src/trail-state.js';
 
 describe('trailAfterStage', () => {
@@ -79,13 +82,50 @@ describe('trailAfterResult', () => {
     },
   };
 
-  it('marks every stage done on deliver', () => {
+  it('marks every stage done on sealed deliver', () => {
     const marks = trailAfterResult(
       trailAfterStage(emptyTrail(), 'delivering'),
       base,
     );
+    assert.deepEqual(marks, ['done', 'done', 'done', 'done', 'done', 'done']);
     assert.ok(trailIsComplete(marks));
     assert.equal(trailIsHalted(marks), false);
+    assert.deepEqual(trailSummaryMark(marks), { stage: 'deliver', state: 'done' });
+  });
+
+  it('notes verify on unsealed deliver and summarizes that finding', () => {
+    const det = {
+      ...base.deterministic,
+      sealPresent: false,
+      sealValid: false,
+      findings: [{ code: 'seal_absent', detail: 'unsealed', refuses: false }],
+    };
+    const marks = trailAfterResult(trailAfterStage(emptyTrail(), 'delivering'), {
+      ...base,
+      deterministic: det,
+    });
+    assert.deepEqual(marks, ['done', 'done', 'noted', 'done', 'done', 'done']);
+    assert.equal(trailIsComplete(marks), false);
+    assert.equal(trailIsHalted(marks), false);
+    assert.deepEqual(trailSummaryMark(marks), { stage: 'verify', state: 'noted' });
+    assert.equal(sealNoteFromDeterministic(det), 'unsealed');
+    assert.equal(sealNoteLabel('unsealed'), 'Unsealed');
+  });
+
+  it('notes verify when a delivered seal is present but invalid', () => {
+    const det = {
+      ...base.deterministic,
+      sealPresent: true,
+      sealValid: false,
+    };
+    const marks = trailAfterResult(trailAfterStage(emptyTrail(), 'delivering'), {
+      ...base,
+      deterministic: det,
+    });
+    assert.deepEqual(marks, ['done', 'done', 'noted', 'done', 'done', 'done']);
+    assert.deepEqual(trailSummaryMark(marks), { stage: 'verify', state: 'noted' });
+    assert.equal(sealNoteFromDeterministic(det), 'seal_invalid');
+    assert.equal(sealNoteLabel('seal_invalid'), 'Seal invalid');
   });
 
   it('stops at decide on withhold and leaves deliver undecided', () => {
@@ -99,6 +139,7 @@ describe('trailAfterResult', () => {
     });
     assert.deepEqual(marks, ['done', 'done', 'done', 'done', 'stopped', 'pending']);
     assert.ok(trailIsHalted(marks));
+    assert.deepEqual(trailSummaryMark(marks), { stage: 'decide', state: 'stopped' });
   });
 
   it('skips evaluate and stops at decide when provenance refuses', () => {

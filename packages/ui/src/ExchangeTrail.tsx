@@ -5,9 +5,9 @@
 // already run and which is running, without implying a percentage or a completion time the
 // client does not have.
 //
-// After a clean delivery the trail collapses to a single deliver mark (pill hit target); click
-// expands the record. A withheld or refused trail stays expanded: a held response must not look
-// casually dismissible.
+// Once settled, the trail collapses to a summary chip: deliver done (clean), verify noted
+// (unsealed / invalid seal), or the stopped stage (withhold / refuse). Click expands the full
+// ordered record; collapse again with Done.
 //
 // The hold remains a conformance property of this client, not a cryptographic one. Response text
 // is absent from the document before release because it has not crossed the progress channel.
@@ -17,8 +17,10 @@ import { StatusTrail } from './StatusTrail';
 import { StageMark } from './StageMark';
 import { TrailSwatch, animForTrail, type TrailAnimKind } from './TrailSwatch';
 import {
-  trailIsComplete,
+  markTitle,
   trailIsHalted,
+  trailSummaryMark,
+  type SealNote,
   type TrailMarks,
 } from './trail-state';
 import type { StageId } from './stages';
@@ -50,17 +52,16 @@ export function ExchangeTrail(props: {
   held: boolean;
   /** When true, the exchange has a final result attached to this trail. */
   settled: boolean;
-  /** Force expanded (withheld / refuse). */
-  forceExpanded?: boolean;
+  /** Settled seal note for verify tooltips (unsealed vs invalid). */
+  sealNote?: SealNote | null;
 }) {
-  const { marks, stage, label, activity, held, settled, forceExpanded = false } = props;
+  const { marks, stage, label, activity, held, settled, sealNote = null } = props;
   const reducedMotion = usePrefersReducedMotion();
   const halted = trailIsHalted(marks);
-  const complete = trailIsComplete(marks);
+  const summary = trailSummaryMark(marks);
   const [openRecord, setOpenRecord] = useState(false);
 
-  const collapsed =
-    settled && complete && !halted && !forceExpanded && !openRecord;
+  const collapsed = settled && !openRecord;
 
   const receiving =
     stage === 'receiving' || stage === 'awaiting_response' || stage === 'response_complete';
@@ -84,16 +85,23 @@ export function ExchangeTrail(props: {
     (stage ? STAGE_LABELS[stage] : settled ? null : 'Working');
 
   if (collapsed) {
+    const summaryTitle = markTitle(summary.stage, summary.state, sealNote);
+    const tone =
+      summary.state === 'stopped' ? 'stopped' : summary.state === 'noted' ? 'noted' : 'done';
     return (
       <button
         type="button"
-        className="exchange-trail-record"
+        className={`exchange-trail-record is-${tone}`}
         onClick={() => setOpenRecord(true)}
-        title="Show exchange status record"
-        aria-label="Show exchange status record"
+        title={`${summaryTitle}. Show exchange status record`}
+        aria-label={`${summaryTitle}. Show exchange status record`}
         data-walkthrough="status-trail"
       >
-        <StageMark stage="deliver" state="done" reducedMotion={reducedMotion} />
+        <StageMark
+          stage={summary.stage}
+          state={summary.state}
+          reducedMotion={reducedMotion}
+        />
       </button>
     );
   }
@@ -104,8 +112,8 @@ export function ExchangeTrail(props: {
       data-walkthrough="status-trail"
     >
       <div className="exchange-trail-row">
-        <StatusTrail marks={marks} reducedMotion={reducedMotion} />
-        {settled && complete && !halted && (
+        <StatusTrail marks={marks} reducedMotion={reducedMotion} sealNote={sealNote} />
+        {settled && (
           <button
             type="button"
             className="exchange-trail-collapse"
