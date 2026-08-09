@@ -1,68 +1,109 @@
-// Demo scenario step register for the instrument drawer.
+// Demo scenario step registers for the instrument drawer.
 //
-// Paper: Section 4 end to end (demonstration only). Copy matches
-// reference/Inference Advocate Client.dc.html. Not part of the client product surface.
+// Paper: Section 4 end to end (demonstration only). SCENARIO_STEPS is the white-paper
+// walkthrough in plain English. DEMO_STEPS is the shorter live-demo register with optional
+// walkthrough targets into the product chrome. Not part of the client product surface.
 
 export interface ScenarioStep {
   n: string;
   text: string;
 }
 
+/** Live-demo step. `target` is a `data-walkthrough` id when the presenter wants a highlight. */
+export interface DemoStep {
+  n: string;
+  text: string;
+  target?: string;
+}
+
 export const SCENARIO_STEPS: ScenarioStep[] = [
   {
     n: '01',
-    text: 'Serving Register and standing document verified at startup. Signatures settle by arithmetic, no model involved.',
+    text: 'On startup, the client fetches the list of registered providers and their current standing, and checks the signatures on both. This is signature math, not AI: no model is involved in verification.',
   },
   {
     n: '02',
-    text: 'Aligned Reference Models, good standing. Sealed response, endpoint authorized, delivered without comment.',
+    text: 'First provider: good standing. Its response arrives signed, from an address the register authorizes. Everything checks out, so the response is delivered without comment.',
   },
   {
     n: '03',
-    text: 'Second clean response. Ledger appends, chain hash extends, nothing is said.',
+    text: 'A second clean response. Each exchange is appended to a local, tamper-evident log whose entries are chained together, so the record can be proven complete later.',
   },
   {
     n: '04',
-    text: 'Companion Labs is under elevated scrutiny at population level, so its window starts at 2 rather than zero.',
+    text: 'Second provider: reports from many clients, not just this one, have put it under elevated scrutiny. So its running score starts at 2 instead of zero.',
   },
   {
     n: '05',
-    text: 'First response from it carries no flag. Score 2, below the warn line of 4, delivered without comment.',
+    text: 'Its first response raises no flags. Score stays at 2, below the warning line of 4, so it is delivered without comment.',
   },
   {
     n: '06',
-    text: 'Second response: sycophancy severity 1 and relational_hooks severity 3. Score 6, across the warn line of 4.',
+    text: 'Its second response gets flagged twice by the evaluator: mild flattery-seeking (severity 1) and language that builds artificial emotional attachment (severity 3). The score is now 6, past the warning line.',
   },
   {
     n: '07',
-    text: "Delivered with a notice naming the score and the lines it sits between. The notice is the advocate's, not the provider's.",
+    text: 'That response is still delivered, but with a notice naming the score and the lines it sits between. The notice comes from your client, not from the provider.',
   },
   {
     n: '08',
-    text: 'Third response: persona_claims severity 2. Score 8 reaches the block line of 8.',
+    text: 'Its third response claims to be a person (severity 2). Score 8, which reaches the blocking line of 8.',
   },
   {
     n: '09',
-    text: 'Withheld. Content retained locally as received-and-logged, never rendered. Release authority self_release.',
+    text: 'That response is withheld. It is stored locally, received and logged, but never shown, and you can choose to unlock and read it yourself. The block belongs to you, not to anyone upstream.',
   },
   {
     n: '10',
-    text: 'New session severs the interaction chain but not the record: for 5 clean responses the warn line drops 1 and the block line drops 2.',
+    text: 'Starting a new session resets the conversation, but not the record. After 5 clean responses, the warning line relaxes by 1 and the blocking line by 2.',
   },
   {
     n: '11',
-    text: 'Excluded Serving Co is excluded at population level. The advocate declines to relay before a request is sent.',
+    text: 'Third provider: excluded, based on aggregate reports across many clients. The client declines to even send it a request.',
   },
   {
     n: '12',
-    text: 'Legacy Serving Co seals nothing. The response is labeled unsealed and continues; the absence of the seal is part of the finding.',
+    text: 'Fourth provider: signs nothing at all, which is every real provider today. The response is labeled unsealed and still delivered; the missing signature is itself part of the record.',
   },
   {
     n: '13',
-    text: 'Article 47 notice repeats at the three hour mark. No close button exists in the source.',
+    text: 'The standing notice that the other party is a simulation, not a person, repeats every three hours. It has no close button, on purpose: no provider setting can remove it.',
   },
   {
     n: '14',
-    text: 'Telemetry export: the exact bytes that would leave, beside an inventory of what does not. Every cell is under the floor of 20, so nothing would go.',
+    text: 'Telemetry preview: the exact bytes that would leave this device, shown next to an inventory of everything that never does. Reports only leave in groups of 20 or more identical reports, and no group is that big yet, so nothing goes.',
+  },
+];
+
+export const DEMO_STEPS: DemoStep[] = [
+  {
+    n: '01',
+    text: 'Pick which provider serves you',
+    target: 'provider-picker',
+  },
+  {
+    n: '02',
+    text: "Your message goes out with the client's claims attached",
+    target: 'composer',
+  },
+  {
+    n: '03',
+    text: 'The response arrives signed',
+    target: 'latest-message',
+  },
+  {
+    n: '04',
+    text: "The signature and the provider's register entry are checked",
+    target: 'status-trail',
+  },
+  {
+    n: '05',
+    text: "Caught: the seal names a model this provider isn't registered to serve",
+    target: 'status-trail',
+  },
+  {
+    n: '06',
+    text: 'This provider signs nothing, which is every real provider today',
+    target: 'status-trail',
   },
 ];

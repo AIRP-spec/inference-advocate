@@ -44,7 +44,11 @@ export function ProviderPicker(props: {
   if (providers.length === 0) return null;
 
   return (
-    <div className={`provider-picker ${open ? 'open' : ''}`} ref={rootRef}>
+    <div
+      className={`provider-picker ${open ? 'open' : ''}`}
+      ref={rootRef}
+      data-walkthrough="provider-picker"
+    >
       <button
         type="button"
         className="provider-picker-trigger"

@@ -18,8 +18,8 @@ packages/store-sqlite  SQLite StoreBackend adapter (Node). The only shipped pers
 packages/daemon        local HTTP server on 127.0.0.1, and HostSession (HTTP + desktop loopback RPC)
 packages/ui            React chat surface. Product chrome is ordinary chat; the monitor
                        (including a demo-only reputation reset), export view, scenario
-                       register, gaps, and attributes sit in a bottom instrument drawer
-                       (demonstration only).
+                       register (live demo nests startup gaps under the steps), and
+                       attributes sit in a bottom instrument drawer (demonstration only).
 packages/desktop       Tauri shell (HostSession in the Node launcher over loopback RPC, no HTTP for the core API)
 packages/demo          mock providers and the scripted end-to-end scenario
 data/                  taxonomy, policy, jurisdictions, register, standing: documents, not code

@@ -91,6 +91,7 @@ export function ExchangeTrail(props: {
         onClick={() => setOpenRecord(true)}
         title="Show exchange status record"
         aria-label="Show exchange status record"
+        data-walkthrough="status-trail"
       >
         <StageMark stage="deliver" state="done" reducedMotion={reducedMotion} />
       </button>
@@ -98,7 +99,10 @@ export function ExchangeTrail(props: {
   }
 
   return (
-    <div className={`exchange-trail${halted ? ' exchange-trail-halted' : ''}`}>
+    <div
+      className={`exchange-trail${halted ? ' exchange-trail-halted' : ''}`}
+      data-walkthrough="status-trail"
+    >
       <div className="exchange-trail-row">
         <StatusTrail marks={marks} reducedMotion={reducedMotion} />
         {settled && complete && !halted && (

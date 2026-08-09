@@ -414,14 +414,19 @@ export function App() {
                     </p>
                   )}
 
-                  {turns.map((turn, i) =>
-                    turn.role === 'user' ? (
+                  {turns.map((turn, i) => {
+                    const latestAttrs =
+                      i === turns.length - 1
+                        ? ({ 'data-walkthrough': 'latest-message' } as const)
+                        : undefined;
+                    return turn.role === 'user' ? (
                       <div
                         key={i}
                         className="turn-user"
                         ref={
                           busy && i === turns.length - 1 ? liveExchangeRef : undefined
                         }
+                        {...latestAttrs}
                       >
                         <div className="bubble-user">{turn.text}</div>
                       </div>
@@ -432,6 +437,7 @@ export function App() {
                         ref={
                           resolvedTurn === turn.result.responseId ? responseStartRef : undefined
                         }
+                        {...latestAttrs}
                       >
                         <AssistantTurn
                           result={turn.result}
@@ -450,11 +456,11 @@ export function App() {
                         />
                       </div>
                     ) : (
-                      <div key={i} className="turn-assistant">
+                      <div key={i} className="turn-assistant" {...latestAttrs}>
                         <MarkdownBody className="assistant-body" text={turn.text} />
                       </div>
-                    ),
-                  )}
+                    );
+                  })}
 
                   {busy && (
                     <div className="exchange-live">
@@ -488,7 +494,7 @@ export function App() {
 
               <div className="composer-wrap">
                 <div className="composer-col">
-                  <div className="composer">
+                  <div className="composer" data-walkthrough="composer">
                     <ComposeGlass activity={composeActivity} idle={busy} />
                     <textarea
                       value={input}

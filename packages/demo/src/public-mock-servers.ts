@@ -14,10 +14,16 @@ import { startMockProvider } from './mock-provider.js';
 const dataDir = join(dirname(fileURLToPath(import.meta.url)), '..', '..', '..', 'data');
 
 const HONEST_SCRIPT = [
-  'This response is sealed by honestmodel.win through the public API endpoint.',
+  'This is not a model answering your question. honestmodel.win is a public demo fixture: ' +
+    'every request gets this same fixed reply, sealed with the provider key listed in the ' +
+    'Serving Register. Use it to watch signature and register checks on a known-good seal. ' +
+    'For a real inference response, pick one of the OpenRouter-backed providers instead.',
 ];
 const CHEAP_SCRIPT = [
-  'This response is sealed by cheapai.win through the public API endpoint.',
+  'This is not a model answering your question. cheapai.win is a public demo fixture: ' +
+    'every request gets this same fixed reply, sealed with the provider key listed in the ' +
+    'Serving Register. Use it to watch signature and register checks on a known-good seal. ' +
+    'For a real inference response, pick one of the OpenRouter-backed providers instead.',
 ];
 
 const running = await Promise.all([

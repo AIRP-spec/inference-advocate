@@ -2664,6 +2664,50 @@ button.session-item:not(.active):hover {
   gap: 8px;
 }
 
+.scenario-register {
+  max-width: 100%;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  padding: 5px 8px;
+  border-radius: 5px;
+  border: 1px solid var(--drawer-border);
+  background: var(--drawer-inset);
+  color: oklch(0.84 0.008 255);
+}
+
+.scenario-highlight {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  white-space: nowrap;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--drawer-secondary);
+  cursor: pointer;
+}
+
+.scenario-highlight.disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  color: var(--drawer-tertiary);
+}
+
+.scenario-highlight input {
+  margin: 0;
+  accent-color: var(--drawer-tab-active);
+}
+
+.scenario-highlight.disabled input {
+  cursor: not-allowed;
+}
+
+/* Walkthrough spotlight: outline / glow only, no layout shift. */
+.walkthrough-highlight {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+  box-shadow: 0 0 0 4px color-mix(in oklch, var(--accent) 28%, transparent);
+}
+
 .scenario-btn {
   white-space: nowrap;
   font-family: var(--font-mono);
@@ -2735,6 +2779,26 @@ button.session-item:not(.active):hover {
   line-height: 1.5;
   color: oklch(0.82 0.008 255);
   text-wrap: pretty;
+}
+
+/* Live-demo only: startup gaps sit under the steps, separated from the walkthrough. */
+.scenario-gaps {
+  margin-top: 6px;
+  padding-top: 16px;
+  border-top: 1px solid var(--drawer-hairline);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.scenario-gaps-title {
+  margin: 0;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--drawer-tertiary);
 }
 
 /* Export */
@@ -2872,14 +2936,7 @@ button.session-item:not(.active):hover {
   color: var(--drawer-amber);
 }
 
-/* Gaps */
-
-.gaps-pane {
-  padding: 14px 16px;
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
+/* Gaps (nested under live-demo scenario) */
 
 .gaps-intro {
   margin: 0;

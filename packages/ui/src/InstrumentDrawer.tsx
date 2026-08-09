@@ -3,14 +3,27 @@
 //
 // Paper: steps 1 and 12 (presentation of the apparatus). Not a product surface.
 // Values and layout from reference/Inference Advocate Client.dc.html.
+// Scenario tab: white-paper register or live-demo register; optional UI walkthrough highlight.
+// Live demo also shows the build's startup gaps under the steps (no separate Gaps tab).
 
+import { useEffect, useState } from 'react';
 import type { AdvocateState } from './types';
 import { MonitorPanel } from './MonitorPanel';
 import { ExportView } from './ExportView';
-import { SCENARIO_STEPS } from './scenario-steps';
+import { DEMO_STEPS, SCENARIO_STEPS, type DemoStep, type ScenarioStep } from './scenario-steps';
 import { IconAirp } from './icons';
 
-export type DrawerTab = 'monitor' | 'scenario' | 'export' | 'gaps' | 'attrs';
+export type DrawerTab = 'monitor' | 'scenario' | 'export' | 'attrs';
+
+type ScenarioRegister = 'paper' | 'demo';
+
+const WALKTHROUGH_CLASS = 'walkthrough-highlight';
+
+function clearWalkthroughHighlights(): void {
+  document.querySelectorAll(`.${WALKTHROUGH_CLASS}`).forEach((el) => {
+    el.classList.remove(WALKTHROUGH_CLASS);
+  });
+}
 
 export function InstrumentDrawer(props: {
   open: boolean;
@@ -37,9 +50,12 @@ export function InstrumentDrawer(props: {
     onScenarioStep,
   } = props;
 
+  const [scenarioRegister, setScenarioRegister] = useState<ScenarioRegister>('paper');
+  const steps = scenarioRegister === 'demo' ? DEMO_STEPS : SCENARIO_STEPS;
+
   const withheld = state?.providers.reduce((n, p) => n + p.openBlocks.length, 0) ?? 0;
   const providerCount = state?.providers.length ?? 0;
-  const stepLabel = `${scenarioStep + 1}/${SCENARIO_STEPS.length}`;
+  const stepLabel = `${scenarioStep + 1}/${steps.length}`;
 
   if (!open) {
     return (
@@ -75,7 +91,6 @@ export function InstrumentDrawer(props: {
             ['monitor', 'Monitor'],
             ['scenario', 'Scenario'],
             ['export', 'What leaves'],
-            ['gaps', 'Gaps in this build'],
             ['attrs', 'Attributes'],
           ] as const
         ).map(([id, label]) => (
@@ -99,11 +114,17 @@ export function InstrumentDrawer(props: {
           <ScenarioTab
             step={scenarioStep}
             providerCount={providerCount}
+            warnings={state?.warnings ?? []}
+            register={scenarioRegister}
+            onRegister={(next) => {
+              clearWalkthroughHighlights();
+              setScenarioRegister(next);
+              onScenarioStep(0);
+            }}
             onStep={onScenarioStep}
           />
         )}
         {tab === 'export' && <ExportView floorFromPolicy={state?.policy.telemetry.granularityFloor ?? null} />}
-        {tab === 'gaps' && <GapsTab warnings={state?.warnings ?? []} />}
         {tab === 'attrs' && (
           <AttributesTab state={state} onChildMode={onChildMode} />
         )}
@@ -115,14 +136,77 @@ export function InstrumentDrawer(props: {
 function ScenarioTab(props: {
   step: number;
   providerCount: number;
+  warnings: string[];
+  register: ScenarioRegister;
+  onRegister: (register: ScenarioRegister) => void;
   onStep: (step: number) => void;
 }) {
-  const { step, providerCount, onStep } = props;
-  const last = SCENARIO_STEPS.length - 1;
+  const { step, providerCount, warnings, register, onRegister, onStep } = props;
+  const [highlightUi, setHighlightUi] = useState(false);
+  const steps: Array<ScenarioStep | DemoStep> =
+    register === 'demo' ? DEMO_STEPS : SCENARIO_STEPS;
+  const last = steps.length - 1;
+  const active = steps[step];
+  const target = active && 'target' in active ? active.target : undefined;
+  // White-paper steps have no walkthrough targets; keep the control off and inert.
+  const highlightEnabled = register === 'demo';
+  const highlightOn = highlightEnabled && highlightUi;
+
+  useEffect(() => {
+    if (!highlightEnabled && highlightUi) setHighlightUi(false);
+  }, [highlightEnabled, highlightUi]);
+
+  useEffect(() => {
+    clearWalkthroughHighlights();
+    if (!highlightOn || !target) return;
+
+    const matches = document.querySelectorAll(`[data-walkthrough="${target}"]`);
+    // Prefer the last match: newest message / newest trail in document order.
+    const el = matches[matches.length - 1] as HTMLElement | undefined;
+    if (!el) return;
+
+    el.classList.add(WALKTHROUGH_CLASS);
+    el.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+
+    return () => {
+      el.classList.remove(WALKTHROUGH_CLASS);
+    };
+  }, [highlightOn, step, register, target]);
 
   return (
     <div className="scenario-pane">
       <div className="scenario-controls">
+        <select
+          className="scenario-register"
+          value={register}
+          aria-label="Scenario register"
+          onChange={(e) => {
+            setHighlightUi(false);
+            onRegister(e.target.value as ScenarioRegister);
+          }}
+        >
+          <option value="paper">White paper scenario (the full design)</option>
+          <option value="demo">Live demo (what runs today)</option>
+        </select>
+        <label
+          className={`scenario-highlight${highlightEnabled ? '' : ' disabled'}`}
+          title={
+            highlightEnabled
+              ? undefined
+              : 'Highlight UI is only available in the live demo register'
+          }
+        >
+          <input
+            type="checkbox"
+            checked={highlightOn}
+            disabled={!highlightEnabled}
+            onChange={(e) => {
+              if (!e.target.checked) clearWalkthroughHighlights();
+              setHighlightUi(e.target.checked);
+            }}
+          />
+          Highlight UI
+        </label>
         <button
           type="button"
           className="scenario-btn"
@@ -132,7 +216,7 @@ function ScenarioTab(props: {
           ← back
         </button>
         <span className="scenario-step-label">
-          step {step + 1} of {SCENARIO_STEPS.length}
+          step {step + 1} of {steps.length}
         </span>
         <button
           type="button"
@@ -150,20 +234,22 @@ function ScenarioTab(props: {
         </span>
       </div>
       <div className="scenario-steps">
-        {SCENARIO_STEPS.map((s, i) => (
+        {steps.map((s, i) => (
           <div key={s.n} className={`scenario-step ${i === step ? 'current' : ''}`}>
             <span className="n">{s.n}</span>
             <span className="t">{s.text}</span>
           </div>
         ))}
       </div>
+      {register === 'demo' && <GapsSection warnings={warnings} />}
     </div>
   );
 }
 
-function GapsTab({ warnings }: { warnings: string[] }) {
+function GapsSection({ warnings }: { warnings: string[] }) {
   return (
-    <div className="gaps-pane">
+    <section className="scenario-gaps" aria-label="Gaps in this build">
+      <h3 className="scenario-gaps-title">Gaps in this build</h3>
       <p className="gaps-intro">
         The advocate reports these about itself at startup. A reference implementation that
         overstates itself is worse than none.
@@ -180,7 +266,7 @@ function GapsTab({ warnings }: { warnings: string[] }) {
           ))}
         </div>
       )}
-    </div>
+    </section>
   );
 }
 
