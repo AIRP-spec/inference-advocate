@@ -32,6 +32,7 @@ import {
 } from './theme';
 import { InstrumentDrawer, type DrawerTab } from './InstrumentDrawer';
 import { ProviderPicker } from './ProviderPicker';
+import { MarkdownBody } from './MarkdownBody';
 import { IconDeliveryPolicy, IconInferenceAdvocate, IconRuleEvaluator } from './icons';
 
 interface Turn {
@@ -450,7 +451,7 @@ export function App() {
                       </div>
                     ) : (
                       <div key={i} className="turn-assistant">
-                        <p className="assistant-body">{turn.text}</p>
+                        <MarkdownBody className="assistant-body" text={turn.text} />
                       </div>
                     ),
                   )}
@@ -668,7 +669,7 @@ function AssistantTurn(props: {
         </div>
       )}
 
-      {text && <p className="assistant-body">{text}</p>}
+      {text && <MarkdownBody className="assistant-body" text={text} />}
 
       <div className="action-row">
         <button
