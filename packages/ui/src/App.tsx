@@ -78,15 +78,35 @@ export function App() {
     () => (typeof window !== 'undefined' ? window.innerWidth < NARROW_BP : false),
   );
   const [theme, setTheme] = useState<ThemePreference>(() => readThemePreference());
+  // Fresh loads and bfcache restores both need the file's first provider, not whatever the
+  // tab last had selected. After that bootstrap, the user's pick sticks for the session.
+  const providerBootstrapped = useRef(false);
 
   const refresh = useCallback(async () => {
     const next = (await hostCall('state')) as AdvocateState;
     setState(next);
-    setProvider((p) => p || next.providers[0]?.id || '');
+    const first = next.providers[0]?.id || '';
+    setProvider((p) => {
+      if (!providerBootstrapped.current) {
+        providerBootstrapped.current = true;
+        return first;
+      }
+      return next.providers.some((x) => x.id === p) ? p : first;
+    });
   }, []);
 
   useEffect(() => {
     refresh().catch((e: unknown) => setError(String(e)));
+  }, [refresh]);
+
+  useEffect(() => {
+    const onPageShow = (e: PageTransitionEvent) => {
+      if (!e.persisted) return;
+      providerBootstrapped.current = false;
+      refresh().catch((err: unknown) => setError(String(err)));
+    };
+    window.addEventListener('pageshow', onPageShow);
+    return () => window.removeEventListener('pageshow', onPageShow);
   }, [refresh]);
 
   useEffect(() => {
