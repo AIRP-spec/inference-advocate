@@ -43,6 +43,15 @@ export class ProviderRegistry {
     this.#byId.delete(id);
   }
 
+  /**
+   * Replace the whole set, keeping the caller's order. Map.set on an existing key does not
+   * move it, so hot-reload cannot rebuild by add/remove alone: the file order is the list.
+   */
+  replaceAll(providers: ProviderConfig[]): void {
+    this.#byId.clear();
+    for (const p of providers) this.add(p);
+  }
+
   get(id: string): ProviderConfig | undefined {
     return this.#byId.get(id);
   }

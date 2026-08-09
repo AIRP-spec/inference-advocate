@@ -54,6 +54,54 @@ test('progress frames carry a stage name or a scalar and nothing else', () => {
   assert.equal(line, '{"kind":"arrival","activity":0.25}\n');
 });
 
+test('state reload preserves providers.json order', () => {
+  const runDir = mkdtempSync(join(tmpdir(), 'airp-providers-order-'));
+  try {
+    const path = join(runDir, 'providers.json');
+    writeFileSync(
+      path,
+      JSON.stringify({
+        version: 1,
+        providers: [
+          { id: 'a', label: 'A', baseUrl: 'http://127.0.0.1:1/v1', model: 'a' },
+          { id: 'b', label: 'B', baseUrl: 'http://127.0.0.1:2/v1', model: 'b' },
+          { id: 'c', label: 'C', baseUrl: 'http://127.0.0.1:3/v1', model: 'c' },
+        ],
+      }),
+    );
+    const host = new HostSession({
+      dataDir: join(repoRoot, 'data'),
+      runDir,
+      providersPath: path,
+      storePath: join(runDir, 'advocate.sqlite'),
+      devKeyfile: join(runDir, 'dev.key'),
+      jurisdictionId: 'us-ny',
+    });
+    assert.deepEqual(
+      host.state().providers.map((p) => p.id),
+      ['a', 'b', 'c'],
+    );
+
+    writeFileSync(
+      path,
+      JSON.stringify({
+        version: 1,
+        providers: [
+          { id: 'c', label: 'C', baseUrl: 'http://127.0.0.1:3/v1', model: 'c' },
+          { id: 'a', label: 'A', baseUrl: 'http://127.0.0.1:1/v1', model: 'a' },
+        ],
+      }),
+    );
+    assert.deepEqual(
+      host.state().providers.map((p) => p.id),
+      ['c', 'a'],
+      'hot reload must follow the file sequence, not the original Map insertion order',
+    );
+  } finally {
+    rmSync(runDir, { recursive: true, force: true });
+  }
+});
+
 test('listenHostRpc answers state over loopback without HTTP or a stdio child', async () => {
   const runDir = mkdtempSync(join(tmpdir(), 'airp-rpc-'));
   const prevDesktop = process.env['AIRP_DESKTOP'];

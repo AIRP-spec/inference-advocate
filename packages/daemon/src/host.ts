@@ -129,17 +129,15 @@ export class HostSession {
   }
 
   /**
-   * Re-read the provider file on every state poll. Configuration that only takes effect on
-   * restart is a trap in a reference implementation people are supposed to be able to poke at.
+   * Re-read the provider file on every state poll, including order. Configuration that only
+   * takes effect on restart is a trap in a reference implementation people are supposed to be
+   * able to poke at. replaceAll, not add/remove: Map insertion order is the dropdown order.
    */
   reloadProviders(): void {
     if (!existsSync(this.paths.providersPath)) return;
     try {
       const fresh = ProviderRegistry.load(this.paths.providersPath);
-      for (const p of fresh.list()) this.opened.providers.add(p);
-      for (const existing of this.opened.providers.list()) {
-        if (!fresh.get(existing.id)) this.opened.providers.remove(existing.id);
-      }
+      this.opened.providers.replaceAll(fresh.list());
     } catch {
       // A half-written file during an edit is not worth taking the host down for.
     }
