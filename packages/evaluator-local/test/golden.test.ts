@@ -1,9 +1,10 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
+import { execSync } from 'node:child_process';
 import { existsSync, readdirSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { Taxonomy } from '@airp/core';
-import { createLocalEvaluator, PROMPT_TEMPLATE_VERSION } from '@airp/evaluator-local';
+import { createLocalEvaluator, looksLikeThinking, PROMPT_TEMPLATE_VERSION } from '@airp/evaluator-local';
 import { dataPath, repoRoot } from './helpers.js';
 import { goldenCases } from './fixtures.js';
 
@@ -33,6 +34,28 @@ const EXPECTED_MENTION_FP = new Map<string, string>([
   ['hate', 'named-class'],
   ['relational_hooks', 'counter-example / mention-versus-use'],
 ]);
+
+function hardwareStatement(): string {
+  let lscpu = '';
+  try {
+    lscpu = execSync('lscpu', { encoding: 'utf8' });
+  } catch {
+    return 'lscpu unavailable';
+  }
+  const pick = (label: string) => {
+    const line = lscpu.split('\n').find((l) => l.startsWith(label));
+    return line ? line.split(':').slice(1).join(':').trim() : 'unknown';
+  };
+  const flags = pick('Flags');
+  const has = (name: string) => (flags.split(/\s+/).includes(name) ? 'present' : 'absent');
+  return [
+    `CPU ${pick('Model name')}`,
+    `${pick('CPU(s)')} cores`,
+    `avx2 ${has('avx2')}`,
+    `avx512f ${has('avx512f')}`,
+    `fma ${has('fma')}`,
+  ].join(', ');
+}
 
 test('golden fixtures cover every class in the current taxonomy file', () => {
   const cases = goldenCases(taxonomy);
@@ -80,49 +103,63 @@ test('pinned model verdicts against golden fixtures', { timeout: 1_800_000 }, as
   assert.equal(evaluator.id, 'local-llm');
   assert.equal(evaluator.version, `${pin.sha256.slice(0, 12)}+${pin.promptTemplateVersion}`);
 
+  console.log(`hardware: ${hardwareStatement()}`);
+  console.log(`llama.cpp: ${evaluator.systemInfo || '(empty system-info)'}`);
+
   const cases = goldenCases(taxonomy);
   const rows: Array<{
     type: string;
     shouldFlag: boolean;
     pass: boolean;
-    got: string;
+    got: string[];
+    extras: string[];
     expectedFix: string | null;
   }> = [];
   const times: number[] = [];
+  const suiteStarted = Date.now();
+  let thoughtHits = 0;
 
   for (const c of cases) {
     const flags = await evaluator.evaluate({ providerId: 'fixture', content: c.content });
     times.push(evaluator.lastEvalMs);
-    const hit = flags.some((f) => f.type === c.type);
+    if (evaluator.lastThoughtDetected) thoughtHits += 1;
+    const got = flags.map((f) => f.type);
+    const hit = got.includes(c.type);
     const pass = hit === c.shouldFlag;
+    const extras = c.shouldFlag ? got.filter((type) => type !== c.type) : [];
     let expectedFix: string | null = null;
     if (!pass && c.shouldFlag && EXPECTED_ATTRACTOR_FN.has(c.type)) {
       expectedFix = 'attractor FN (v2 decomposition was expected to clear this)';
     } else if (!pass && !c.shouldFlag && EXPECTED_MENTION_FP.has(c.type)) {
       expectedFix = `${EXPECTED_MENTION_FP.get(c.type)} (v2 mention-versus-use was expected to clear this)`;
     }
-    rows.push({
-      type: c.type,
-      shouldFlag: c.shouldFlag,
-      pass,
-      got: flags.map((f) => f.type).join(', ') || 'none',
-      expectedFix,
-    });
+    rows.push({ type: c.type, shouldFlag: c.shouldFlag, pass, got, extras, expectedFix });
     const raw = (evaluator.lastRawByClass[c.type] ?? '').replace(/\s+/g, ' ').slice(0, 180);
     const mark = pass ? 'pass' : 'FAIL';
     const dir = c.shouldFlag ? 'positive' : 'counter';
+    const extraNote = extras.length > 0 ? ` extras=[${extras.join(', ')}]` : '';
     console.log(
-      `  ${c.type.padEnd(28)} ${dir.padEnd(10)} ${mark}  got=[${rows[rows.length - 1]!.got}]  ${evaluator.lastEvalMs}ms` +
+      `  ${c.type.padEnd(28)} ${dir.padEnd(10)} ${mark}  got=[${got.join(', ') || 'none'}]  ${evaluator.lastEvalMs}ms` +
+        extraNote +
         (expectedFix ? `  [${expectedFix}]` : '') +
         (pass ? '' : `  raw=${JSON.stringify(raw)}`),
     );
+    if (looksLikeThinking(raw)) {
+      console.log(`    THINK TAG IN RAW VERDICT for ${c.type}`);
+    }
   }
 
+  const suiteMs = Date.now() - suiteStarted;
   const meanMs = Math.round(times.reduce((a, b) => a + b, 0) / times.length);
   const maxMs = Math.max(...times);
+  const extraOnPositives = rows.filter((r) => r.shouldFlag).reduce((n, r) => n + r.extras.length, 0);
   console.log(
-    `wall time: mean ${meanMs}ms per response (${taxonomy.flags.length} sequential class calls), max ${maxMs}ms, n=${times.length}`,
+    `wall time: mean ${meanMs}ms per response, max ${maxMs}ms, suite ${suiteMs}ms, n=${times.length}`,
   );
+  console.log(
+    `precision (reported, not gating): ${extraOnPositives} extra classes fired across ${rows.filter((r) => r.shouldFlag).length} positives`,
+  );
+  console.log(`thinking tags in raw generations: ${thoughtHits} of ${cases.length} responses`);
 
   const failures = rows.filter((r) => !r.pass);
   if (failures.length === 0) return;
@@ -131,12 +168,11 @@ test('pinned model verdicts against golden fixtures', { timeout: 1_800_000 }, as
   const novel = failures.filter((r) => !r.expectedFix);
   const lines = failures.map((r) => {
     const dir = r.shouldFlag ? 'positive FN' : 'counter FP';
-    return `${r.type} ${dir}: got [${r.got}]. ${r.expectedFix ?? 'not on the v2 expected-fix list (fine-tune candidate)'}`;
+    return `${r.type} ${dir}: got [${r.got.join(', ')}]. ${r.expectedFix ?? 'not on the v2 expected-fix list (fine-tune candidate)'}`;
   });
   assert.fail(
     `pinned Qwen3-0.6B ${pin.promptTemplateVersion} failed golden fixtures (${failures.length}/${rows.length}). ` +
       `${uncleared.length} remaining from the v2 expected-fix list, ${novel.length} novel. ` +
-      `Do not iterate the template again in this task. Do not substitute a larger model. ` +
-      `Mean wall time ${meanMs}ms.\n${lines.join('\n')}`,
+      `Mean wall time ${meanMs}ms, suite ${suiteMs}ms. One decode pass, then stop.\n${lines.join('\n')}`,
   );
 });

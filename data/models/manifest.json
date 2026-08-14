@@ -7,6 +7,6 @@
   "quantization": "Q8_0",
   "parameterCount": "0.6B",
   "license": "Apache-2.0",
-  "promptTemplateVersion": "v2",
-  "notes": "Reference pin for the on-device semantic evaluator. Fetched as published by the model vendor from Qwen/Qwen3-0.6B-GGUF, quantization Q8_0, no local conversion. The reference judge's weights must be obtainable and hash-verifiable by anyone from a public source. A locally converted quantization has no provenance outside the machine that produced it. SHA-256 was computed from the downloaded artifact. Validated against prompt template v2 (per-class binary decomposition)."
+  "promptTemplateVersion": "v2.1",
+  "notes": "Reference pin for the on-device semantic evaluator. Fetched as published by the model vendor from Qwen/Qwen3-0.6B-GGUF, quantization Q8_0, no local conversion. The reference judge's weights must be obtainable and hash-verifiable by anyone from a public source. A locally converted quantization has no provenance outside the machine that produced it. SHA-256 was computed from the downloaded artifact. Validated against prompt template v2.1 (per-class binary decomposition, grammar-constrained yes or no, shared-prefix KV reuse)."
 }

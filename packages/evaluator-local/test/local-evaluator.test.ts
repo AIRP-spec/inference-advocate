@@ -8,7 +8,11 @@ import { Taxonomy } from '@airp/core';
 import { dataPath } from './helpers.js';
 import {
   buildClassEvaluationPrompt,
-  parseBinaryVerdict,
+  buildClassVerdictQuestion,
+  buildSharedPrefix,
+  looksLikeThinking,
+  parseEvidenceSpan,
+  parseVerdict,
   sha256FileHex,
   verifyModelSha256,
 } from '@airp/evaluator-local';
@@ -63,6 +67,8 @@ test('a per-class prompt contains only that class, plus counter-examples and men
   assert.ok(prompt.includes('discussing, naming, quoting, or refusing'));
   assert.ok(prompt.includes('User turn:'));
   assert.ok(prompt.includes('hello'));
+  assert.ok(prompt.includes('Answer yes or no'));
+  assert.equal(prompt.includes('{'), false);
   assert.equal(prompt.includes(sycophancy.type), false);
   assert.equal(prompt.includes(sycophancy.definition), false);
   for (const other of taxonomy.flags) {
@@ -75,34 +81,37 @@ test('a per-class prompt contains only that class, plus counter-examples and men
   }
 });
 
-test('unparseable binary output is not fired', () => {
-  const parsed = parseBinaryVerdict('I am sorry, I cannot help with that.', 'hello there');
-  assert.equal(parsed.unparseable, true);
-  assert.equal(parsed.fired, false);
-  assert.equal(parsed.evidence, null);
+test('the shared prefix carries the evaluated text and no class titles', () => {
+  const prefix = buildSharedPrefix({ providerId: 'p', content: 'hello there', prompt: 'hi' });
+  assert.ok(prefix.includes('hello there'));
+  assert.ok(prefix.includes('discussing, naming, quoting, or refusing'));
+  assert.ok(prefix.includes('User turn:'));
+  for (const def of taxonomy.flags) {
+    assert.equal(prefix.includes(`Class: ${def.title}`), false);
+  }
+  const persona = taxonomy.definition('persona_claims')!;
+  const question = buildClassVerdictQuestion(persona);
+  assert.equal(question.includes('hello there'), false);
+  assert.ok(question.includes(persona.definition));
 });
 
-test('truncated JSON is not fired', () => {
-  const parsed = parseBinaryVerdict('{"fired":true,"evidence":', 'What a brilliant question!');
-  assert.equal(parsed.unparseable, true);
-  assert.equal(parsed.fired, false);
+test('verdict parse accepts only yes or no', () => {
+  assert.deepEqual(parseVerdict('yes'), { fired: true, unparseable: false });
+  assert.deepEqual(parseVerdict('no'), { fired: false, unparseable: false });
+  assert.deepEqual(parseVerdict('YES\n'), { fired: true, unparseable: false });
+  assert.deepEqual(parseVerdict('{"fired":true}'), { fired: false, unparseable: true });
+  assert.deepEqual(parseVerdict(''), { fired: false, unparseable: true });
 });
 
-test('fired with verbatim evidence keeps the span; invented evidence is dropped', () => {
+test('evidence that is not a verbatim span is dropped', () => {
   const text = 'What a brilliant question!';
-  const hit = parseBinaryVerdict(
-    '{"fired":true,"evidence":"brilliant question"}',
-    text,
-  );
-  assert.equal(hit.unparseable, false);
-  assert.equal(hit.fired, true);
-  assert.equal(hit.evidence, 'brilliant question');
+  assert.equal(parseEvidenceSpan('brilliant question', text), 'brilliant question');
+  assert.equal(parseEvidenceSpan('"brilliant question"', text), 'brilliant question');
+  assert.equal(parseEvidenceSpan('not in the source', text), null);
+  assert.equal(parseEvidenceSpan('<verbatim>brilliant question</verbatim>', text), null);
+});
 
-  const miss = parseBinaryVerdict('{"fired":true,"evidence":"not in the source"}', text);
-  assert.equal(miss.fired, true);
-  assert.equal(miss.evidence, null);
-
-  const quiet = parseBinaryVerdict('{"fired":false,"evidence":null}', text);
-  assert.equal(quiet.fired, false);
-  assert.equal(quiet.evidence, null);
+test('think tags are detected for debug logging', () => {
+  assert.equal(looksLikeThinking('yes'), false);
+  assert.equal(looksLikeThinking('<think>\nreasoning\n</think>\nyes'), true);
 });

@@ -11,8 +11,12 @@ export {
   type LocalEvaluatorOptions,
 } from './local-evaluator.js';
 export {
+  buildSharedPrefix,
+  buildClassVerdictQuestion,
+  buildClassEvidenceQuestion,
   buildClassEvaluationPrompt,
-  parseBinaryVerdict,
-  type ParsedBinaryVerdict,
+  parseVerdict,
+  parseEvidenceSpan,
+  looksLikeThinking,
 } from './prompt-v2.js';
 export { verifyModelSha256, sha256FileHex, normalizeDigest } from './digest.js';
