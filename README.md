@@ -88,7 +88,21 @@ basis, and provenance independent of any audited provider, and it has no judgmen
 cannot tell a relational hook from innocent warmth, which is the determination the semantic
 layer exists to make. That is stated here rather than discovered later.
 
-To run a real evaluator, point the advocate at any OpenAI-compatible endpoint:
+To run the on-device evaluator (preferred tier, provisional Section 3.4):
+
+```bash
+npm run fetch:evaluator-model
+cp data/evaluator.local.example.json .advocate/evaluator.json
+export AIRP_EVALUATOR_CONFIG=.advocate/evaluator.json
+npm run daemon
+```
+
+That path loads a pinned GGUF in-process. Response content does not leave the device. The
+advocate prints `local-llm@<digest>+<template-version>` at startup and reports zero outbound
+content paths. Temperature 0 and a fixed seed give stable verdicts on a given build and
+machine; bit-identical verdicts across differing hardware are not promised.
+
+To run a hosted OpenAI-compatible endpoint instead:
 
 ```bash
 cp data/evaluator.example.json .advocate/evaluator.json   # then edit it
@@ -106,9 +120,15 @@ $env:AIRP_EVALUATOR_CONFIG = ".advocate\evaluator.json"
 npm run demo
 ```
 
-A local server is the preferred deployment: set `baseUrl` to `http://127.0.0.1:11434/v1` for
-Ollama and drop `apiKeyEnv`. Decoding is pinned to temperature 0 and a fixed seed, because
-reproducible verdicts are a required property rather than a nicety.
+A local server is still a valid `kind: "model"` deployment: set `baseUrl` to
+`http://127.0.0.1:11434/v1` for Ollama and drop `apiKeyEnv`. The in-process `kind: "local"`
+path above is the one that occupies the preferred tier without an extra server. Decoding is
+pinned to temperature 0 and a fixed seed, because reproducible verdicts are a required
+property rather than a nicety.
+
+A hosted evaluator of this reference model, where a device cannot run the GGUF, runs the same
+pinned model as the local tier, never a larger one. Hosting changes where the judge runs, not
+who the judge is.
 
 Two costs of a hosted evaluator, both surfaced by the advocate rather than buried:
 
@@ -124,6 +144,7 @@ Two costs of a hosted evaluator, both surfaced by the advocate rather than burie
 ```
 packages/core          the advocate itself. Provider agnostic, no UI dependencies.
 packages/store-sqlite  SQLite StoreBackend adapter (Node). The only shipped persistence implementation.
+packages/evaluator-local  on-device GGUF semantic evaluator. Hosts inject it; core does not import it.
 packages/daemon        local HTTP server on 127.0.0.1 for the browser tab, and HostSession (also loopback RPC for desktop).
 packages/ui            React chat surface. Client shell is ordinary chat; monitor, export,
                        scenario, gaps, and attributes live in a bottom instrument drawer.

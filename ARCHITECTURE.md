@@ -15,6 +15,7 @@ at `https://tryairp.com`.
 ```
 packages/core          provider-agnostic library, no UI dependencies, no network beyond providers
 packages/store-sqlite  SQLite StoreBackend adapter (Node). The only shipped persistence implementation
+packages/evaluator-local  on-device GGUF semantic evaluator (node-llama-cpp). Hosts inject it; core does not import it
 packages/daemon        local HTTP server on 127.0.0.1, and HostSession (HTTP + desktop loopback RPC)
 packages/ui            React chat surface. Product chrome is ordinary chat; the monitor
                        (including a demo-only reputation reset), export view, scenario
@@ -64,7 +65,7 @@ it is discussed below.
 | 5 | the provider seals | `core/src/crypto/seal.ts` (`signSeal`) |
 | 6 | the sealed response returns | `core/src/interchange/openai-adapter.ts` |
 | 7 | deterministic layer | `core/src/monitor/deterministic.ts`, `core/src/monitor/register.ts`, `core/src/crypto/seal.ts` |
-| 8 | semantic layer | `core/src/monitor/semantic.ts`, `core/src/monitor/taxonomy.ts`, `core/src/monitor/evaluators/` |
+| 8 | semantic layer | `core/src/monitor/semantic.ts`, `core/src/monitor/taxonomy.ts`, `core/src/monitor/evaluators/`, `evaluator-local` |
 | 9 | the ledger | `core/src/store/ledger.ts`, `core/src/store/port.ts`, adapter: `store-sqlite` |
 | 10 | the score | `core/src/policy/score.ts`, `core/src/policy/config.ts` |
 | 11 | the resolution | `core/src/policy/delivery.ts`, `core/src/policy/jurisdiction.ts` |
@@ -153,20 +154,63 @@ test that reads the raw SQLite rows and asserts the words are not in them.
 **The default semantic evaluator is a rule evaluator, not a model.** The paper's preferred
 evaluator is a commons-maintained reference evaluation model, defined by three properties:
 reproducible verdicts, inspectable basis, and provenance independent of any audited provider.
-No such model exists. The shipped rule evaluator satisfies all three properties completely and
-has no judgment at all, which is the opposite failure from the one a hosted frontier model
-would have. A demo that quietly used a frontier model to police frontier models would be
-arguing against its own paper.
+No certified commons model exists. The shipped rule evaluator satisfies all three properties
+completely and has no judgment at all, which is the opposite failure from the one a hosted
+frontier model would have. A demo that quietly used a frontier model to police frontier models
+would be arguing against its own paper.
 
 The evaluator is chosen by configuration rather than by code: an evaluator config file, or the
-`AIRP_EVALUATOR_CONFIG` environment variable, selects between the rule evaluator and any
-OpenAI-compatible endpoint. `packages/core/src/monitor/evaluator-config.ts` is where the two
-costs of that choice are made visible rather than buried. A hosted evaluator receives response
-content, so its origin appears in the export view as an outbound content path and the advocate
-names it at startup; an evaluator on the loopback interface does not, because nothing left. And
-an evaluator served from the same origin as a provider under evaluation is reported as the
-self-audit conflict of the provisional's Section 3.4. The origin check catches the obvious case
-and cannot catch the subtle ones, which the code says in its own comments.
+`AIRP_EVALUATOR_CONFIG` environment variable, selects among the rule evaluator, an on-device
+local model, and any OpenAI-compatible endpoint. `packages/core/src/monitor/evaluator-config.ts`
+is where the costs of that choice are made visible rather than buried. A hosted evaluator
+receives response content, so its origin appears in the export view as an outbound content
+path and the advocate names it at startup; an evaluator on the loopback interface, or an
+in-process local model, does not, because nothing left. And an evaluator served from the
+same origin as a provider under evaluation is reported as the self-audit conflict of the
+provisional's Section 3.4. The origin check catches the obvious case and cannot catch the
+subtle ones, which the code says in its own comments.
+
+### Evaluator tiers (provisional Section 3.4)
+
+Three implementations occupy the hierarchy the provisional names.
+
+**Rule.** Default when no config is present. Reproducible and inspectable, and it has no
+judgment. It exists so the gate is observable end to end without a model file and without
+content leaving the device.
+
+**Local (`kind: "local"`, `@airp/evaluator-local`).** The preferred tier: a pinned small
+language model running in-process through `node-llama-cpp`, so semantic evaluation has zero
+outbound content paths and no external server. The evaluator id is `local-llm`. Its version
+binds the model SHA-256 (first 12 hex characters) and the prompt template version, and
+nothing else. Construction refuses to load if the GGUF file does not match the configured
+digest. Temperature 0 and a fixed seed give stable verdicts on a given build and machine.
+Bit-identical verdicts across differing hardware are not promised.
+
+The golden fixtures under `packages/evaluator-local/test/` are the acceptance gate for
+this pin. They are generated from the current taxonomy file so a new class cannot ship
+untested. At the time this evaluator landed, Qwen3-0.6B Q4_K_M did not pass them: it
+collapses formation flags into `persona_claims` and harm flags into `profanity`, and it
+flags some taxonomy counter-examples that mention a class without matching it. A larger
+model is not the next step. A better prompt template or a fine-tune is, and that decision
+is outside the reference wiring.
+
+This is one member of what the protocol expects to become a small certified evaluator family.
+At reference stage there is no population and no pooled rate. Diversity across that family is
+an ecosystem design problem and is not solved by shipping a ladder of sizes here.
+
+**Hosted (`kind: "model"`).** An OpenAI-compatible endpoint. Where a device cannot run the
+model, a hosted evaluator runs the same pinned reference model as the local tier, never a
+larger one. Hosting changes where the judge runs, not who the judge is. Evaluator variation
+happens only deliberately, as a distinct version-attributed member of the certified family,
+never as a side effect of deployment. A hosted endpoint that is not loopback is an outbound
+content path, and the advocate says so.
+
+The native runtime lives in `@airp/evaluator-local`. Core never imports it. Hosts inject a
+factory through `resolveEvaluator`, the same port pattern as `StoreBackend`. If config kind is
+`local` and no factory was injected, core throws naming that obligation.
+
+The GGUF itself is not in git. `npm run fetch:evaluator-model` downloads the pin recorded in
+`data/models/manifest.json` and verifies SHA-256 before installing.
 
 **`npm run doctor` prints the configuration that actually resolved.** It exists because of a
 real failure: someone set an evaluator config, ran the demo, and could not tell from the output
@@ -246,7 +290,9 @@ real custodial grant.
 runtime attestation, verdict signatures chaining to an attested build, and the statistical
 cross-check of each monitor against the population of monitors observing the same provider are
 Mechanism 3 and are not built. Verdicts do carry binding version attribution, which is the piece
-the rest hangs from.
+the rest hangs from. The on-device evaluator occupies the preferred deployment tier with a
+pinned small model; it is not a certified commons evaluator, and a divergent verdict on the
+same pin is not yet cross-checked against a population.
 
 **The admission gate for telemetry.** Certification, hardware-attested instance uniqueness,
 issuance rate limiting, coordination detection, and contribution caps are the four layers that
