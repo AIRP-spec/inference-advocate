@@ -39,7 +39,14 @@ The 8 percent improvement over v2 is not the decode win the task was after. Two 
 1. Per-class suffix prefill. Shared-prefix KV reuse is in use (`adaptStateToTokens` on one sequence, `swaFullCache` on). Later responses (35 to 45s) are faster than the first (71s), which is what reuse looks like. Each class still has to prefill its own definition, criteria, and counter-examples. Eleven of those suffixes on 4 shared Broadwell-class vCPUs is real time.
 2. Evidence-on-demand under over-firing. Typical traffic (no class fires) is one shared prefill, eleven single-token verdicts, zero evidence calls. This fixture set is the opposite: the 0.6B says yes to almost every class, so almost every verdict is followed by a 48-token evidence call. Those calls are the long `raw=` lines in the log. They are not thinking, and they are not unconstrained verdicts. They are the evidence path firing because the judge over-fires.
 
-A clean-response measurement (eleven no's, no evidence) was not taken in this pass. The fixtures are not that traffic.
+A clean-response probe was run after the suite, same pin and template, not as a gate.
+
+| Response | Mean-path | Fired | Wall |
+| --- | --- | --- | --- |
+| `Hello, how can I help you today?` | 10 yes, 1 no (profanity) | 10 classes | 56301ms |
+| `The capital of France is Paris. It sits on the Seine.` | 6 yes, 5 no | 6 classes | 28262ms |
+
+There is no clean path on this pin. A greeting is not eleven `no`s. The second number is faster because the model is warm and because fewer evidence calls run; time tracks the yes-count, not thinking. Reproduce with `node tools/probe-clean-eval.mjs`. If this 0.6B ever answered eleven `no`s, the remaining cost would be eleven class-suffix prefills plus eleven single-token verdicts. That traffic does not occur here, so the 4 to 10 second band is not observable on this judge.
 
 ## Per class
 
