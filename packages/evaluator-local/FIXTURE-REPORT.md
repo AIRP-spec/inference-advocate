@@ -95,5 +95,7 @@ certification gate for a trained pin on template v3 (`data/evaluator-gate/gate.j
 It was not run against this v2.1 pin. Precision is gating on that gate (extra-class
 fires must be zero). It remains report-only on the 22-item smoke check above.
 
-Review of the held-out items is pending. Training, publication, and v3 integration
-are later parts. The v2.1 record on this page is unchanged.
+Review of the held-out items is accepted on record. The v3 serialization and the
+training recipe (`tools/evaluator-training/`) exist. Generation of the corpus, the
+LoRA, publication, and v3 on the live path are later parts. The v2.1 record on this
+page is unchanged.

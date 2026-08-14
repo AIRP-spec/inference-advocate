@@ -10,8 +10,9 @@
 // is closed in the chat-template prefix, each verdict is a grammar-constrained yes or no,
 // evidence is a second call only when a class fires, and the shared prefix is reused on one
 // sequence via adaptStateToTokens. v1's eleven-way call is not kept live. The 22 smoke
-// identities remain the live-pin check. The expanded held-out gate under
-// data/evaluator-gate/ applies to a trained pin on template v3, which is not this build.
+// identities remain the live-pin check. Template v3 (compact multi-label line) is
+// defined in prompt-v3.ts for training. The live path stays v2.1 until a trained
+// pin passes the held-out gate under data/evaluator-gate/.
 //
 // Core never imports this file. The host injects a factory through resolveEvaluator.
 

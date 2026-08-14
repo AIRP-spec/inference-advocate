@@ -26,7 +26,7 @@ packages/demo          mock providers and the scripted end-to-end scenario
 data/                  taxonomy, policy, jurisdictions, register, standing: documents, not code.
                        The held-out evaluator gate lives under data/evaluator-gate/
 tools/                 demo key minting, additive public-entry re-sign, key set digests,
-                       substituted-keys register fixture
+                       substituted-keys register fixture, evaluator-training recipe
 deploy/                idempotent Apache/TLS/PM2 setup for the public AIRP domains
 ```
 
@@ -190,18 +190,24 @@ Bit-identical verdicts across differing hardware are not promised.
 The held-out suite under `data/evaluator-gate/` is the acceptance gate for a trained
 pin. It is a versioned document, not constants in TypeScript. The original 22 smoke
 identities (`v0-positive-*`, `v0-counter-*`) live inside it and remain the live-pin
-check under template v2.1. The live pin is Qwen's published Qwen3-0.6B GGUF at Q8_0.
-Template v2.1 asks one grammar-constrained yes or no per taxonomy class, with a shared
-prefix reused on one sequence. v2 cleared the attractor false negatives. v2.1 confirmed
-that thinking was already off in v2, constrained the verdict to `yes`/`no`, and did not
-hit the 4 to 10 second mean on this droplet (mean 42712ms). It also worsened
-counter-example over-firing (11 of 11 counters fail). The report is
+check under template v2.1. Human review of the suite is accepted on record. The live
+pin is Qwen's published Qwen3-0.6B GGUF at Q8_0. Template v2.1 asks one
+grammar-constrained yes or no per taxonomy class, with a shared prefix reused on one
+sequence. v2 cleared the attractor false negatives. v2.1 confirmed that thinking was
+already off in v2, constrained the verdict to `yes`/`no`, and did not hit the 4 to 10
+second mean on this droplet (mean 42712ms). It also worsened counter-example
+over-firing (11 of 11 counters fail). The report is
 `packages/evaluator-local/FIXTURE-REPORT.md`. A larger model is not the next step. The
-zero-shot 0.6B is not a judge in any decode configuration. The trained artifact, its
-recipe, and template v3 are not in this build. The expanded gate (roughly 15 items per
-class, plus clean traffic at zero fires, precision gating at zero extra-class fires)
-exists and is pending human review. The rule evaluator remains the default until a
-trained pin passes that gate. Do not weaken the items to match the zero-shot model.
+zero-shot 0.6B is not a judge in any decode configuration.
+
+Template v3 (one compact yes/no line in taxonomy order, grammar-constrained, roughly
+twenty tokens) is defined in `packages/evaluator-local/src/prompt-v3.ts` and is the
+training target. The live path still uses v2.1. The training recipe lives under
+`tools/evaluator-training/` (not a runtime package). The corpus has to be generated
+from that recipe against a pinned writer model, leak-checked against the held-out
+suite, and sampled for review before any LoRA run. The trained GGUF is not in this
+build. The rule evaluator remains the default until a trained pin passes the held-out
+gate. Do not weaken the items to match the zero-shot model.
 
 This is one member of what the protocol expects to become a small certified evaluator family.
 At reference stage there is no population and no pooled rate. Diversity across that family is
@@ -304,9 +310,11 @@ pinned small model; it is not a certified commons evaluator, a divergent verdict
 same pin is not yet cross-checked against a population, and the smoke identities still fail
 (11 of 22 under template v2.1, all counter-example false positives). Mean evaluation wall
 time on the reference droplet is still tens of seconds per response. The expanded held-out
-gate at `data/evaluator-gate/` is the certification set for a trained pin. Training data
-generation, the LoRA, the published GGUF, and template v3 integration are not in this
-build. Review of the held-out items is pending.
+gate at `data/evaluator-gate/` is the certification set for a trained pin. Human
+review of that suite is accepted. The v3 serialization and the training recipe
+(`tools/evaluator-training/`) are in the tree. The generated corpus, the LoRA, the
+published GGUF, and template v3 on the live path are not. The rule evaluator remains
+the default until a trained pin passes the gate.
 
 **The admission gate for telemetry.** Certification, hardware-attested instance uniqueness,
 issuance rate limiting, coordination detection, and contribution caps are the four layers that

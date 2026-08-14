@@ -1,0 +1,78 @@
+{
+  "recipeVersion": "1",
+  "paper": "step 8. Provisional Section 3.3. The commons reference evaluation model is a trained artifact.",
+  "adr": "Training lives under tools/evaluator-training/, not packages/. It is a recipe for producing an artifact, not a runtime the advocate loads. packages/evaluator-local holds the v3 serialization this recipe imports, so training and inference cannot drift by editing one copy.",
+  "taxonomyVersion": "v0.3.0",
+  "taxonomyFile": "data/taxonomy/flags.v0.json",
+  "promptTemplateVersion": "v3",
+  "onTaxonomyContentChange": "A change to taxonomy definitions, criteria, or counter-examples (not a policy-layer change to delivery, jurisdiction, or notices) invalidates this corpus and the trained pin. Regenerate and retrain. Until retrained, the evaluator declares itself validated against the taxonomyVersion recorded here.",
+  "heldOutSuite": "data/evaluator-gate/held-out-suite.v1.json",
+  "separation": {
+    "heldOutWas": "handwritten, 2026-08-14, no generation prompt, accepted review on the same date",
+    "trainingIs": "LLM-generated from tools/evaluator-training/prompts.json with the seeds and counts in this file",
+    "checks": [
+      "normalized exact content match against the held-out suite",
+      "substring containment when either side is at least 40 characters",
+      "word 4-gram Jaccard at or above 0.5",
+      "in-corpus duplicate contents"
+    ],
+    "note": "No training example may be derived from, paraphrase, or answer a held-out item. The generator is never shown held-out contents. Labels come from the slot spec, not from asking the generator to judge."
+  },
+  "generator": {
+    "model": "Qwen/Qwen2.5-32B-Instruct",
+    "license": "Apache-2.0",
+    "api": "openai-compatible",
+    "baseUrlEnv": "AIRP_GENERATOR_BASE_URL",
+    "apiKeyEnv": "AIRP_GENERATOR_API_KEY",
+    "modelEnv": "AIRP_GENERATOR_MODEL",
+    "temperature": 0.9,
+    "topP": 0.95,
+    "seed": 20260815,
+    "maxTokens": 900,
+    "batchSize": 8,
+    "maxRetries": 4,
+    "maxChars": 500
+  },
+  "counts": {
+    "clean": {
+      "greeting": 200,
+      "fact": 400,
+      "helpful": 600,
+      "refusal": 200,
+      "crisis-redirect": 150
+    },
+    "hardNegative": {
+      "mentionVersusUsePerClass": 50,
+      "classRefusalPerClass": 40,
+      "denialPersona": 80,
+      "denialMachine": 80,
+      "sensitiveDiscussionPerHarmClass": 40
+    },
+    "positive": {
+      "singlePerClass": 80,
+      "multi": 140
+    }
+  },
+  "harmClasses": [
+    "profanity",
+    "self_harm",
+    "sexual_content",
+    "child_sexual_exploitation",
+    "violence",
+    "hate",
+    "criminal_assistance"
+  ],
+  "multiPairs": [
+    ["child_sexual_exploitation", "sexual_content"],
+    ["sexual_content", "profanity"],
+    ["persona_claims", "simulation_obscured"],
+    ["persona_claims", "relational_hooks"],
+    ["violence", "criminal_assistance"]
+  ],
+  "reviewSampleSize": 320,
+  "outputs": {
+    "corpus": "data/evaluator-training/corpus.jsonl",
+    "sft": "data/evaluator-training/sft.jsonl",
+    "reviewSample": "data/evaluator-training/review-sample.json"
+  }
+}

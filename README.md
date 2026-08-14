@@ -152,6 +152,7 @@ packages/desktop       Tauri shell (HostSession in the Node launcher over loopba
 packages/demo          mock providers and the scripted scenario.
 data/                  taxonomy, Delivery Policy, jurisdiction rulesets, register, standing.
                        Held-out evaluator gate: data/evaluator-gate/.
+                       Training recipe: tools/evaluator-training/.
 ```
 
 See **ARCHITECTURE.md** for the module-to-paper map, the design decisions worth arguing with,

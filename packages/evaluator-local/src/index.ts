@@ -19,4 +19,16 @@ export {
   parseEvidenceSpan,
   looksLikeThinking,
 } from './prompt-v2.js';
+export {
+  PROMPT_TEMPLATE_V3,
+  taxonomyTypes,
+  serializeCompactVerdict,
+  compactVerdictGbnf,
+  parseCompactVerdict,
+  buildV3System,
+  buildV3User,
+  buildV3ChatTurns,
+  buildV3EvaluationPrompt,
+  type ParsedCompactVerdict,
+} from './prompt-v3.js';
 export { verifyModelSha256, sha256FileHex, normalizeDigest } from './digest.js';

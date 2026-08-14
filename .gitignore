@@ -31,5 +31,12 @@ tsconfig.tsbuildinfo
 data/models/*.gguf
 data/models/*.gguf.partial
 
+# Evaluator-training generator outputs. Recipe and prompts stay in tools/.
+data/evaluator-training/corpus.jsonl
+data/evaluator-training/sft.jsonl
+data/evaluator-training/slot-plan.json
+data/evaluator-training/review-sample.json
+data/evaluator-training/*.log
+
 # Host-local deploy paths and operator email. Templates stay in deploy/apache/.
 deploy/local.env
