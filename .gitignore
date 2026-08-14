@@ -26,5 +26,10 @@ tsconfig.tsbuildinfo
 .private/*
 !.private/README.md
 
+# Pinned on-device evaluator GGUF. Fetch with npm run fetch:evaluator-model.
+# The manifest stays committed so the pin is inspectable without the weights.
+data/models/*.gguf
+data/models/*.gguf.partial
+
 # Host-local deploy paths and operator email. Templates stay in deploy/apache/.
 deploy/local.env

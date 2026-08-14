@@ -16,7 +16,7 @@ export type SqliteSetupOptions = Omit<SetupOptions, 'store'> & {
   storePath: string;
 };
 
-export function openAdvocate(opts: SqliteSetupOptions): OpenedAdvocate {
+export async function openAdvocate(opts: SqliteSetupOptions): Promise<OpenedAdvocate> {
   const { storePath, ...rest } = opts;
   return openAdvocateCore({ ...rest, store: openSqliteStore(storePath) });
 }

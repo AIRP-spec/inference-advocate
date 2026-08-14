@@ -22,7 +22,7 @@ const runDir = process.env['AIRP_RUN_DIR'] ?? join(repoRoot, '.advocate');
 const uiDist = join(repoRoot, 'packages', 'ui', 'dist');
 const PORT = Number(process.env['AIRP_PORT'] ?? 8790);
 
-const host = new HostSession({
+const host = await HostSession.create({
   dataDir,
   runDir,
   providersPath: join(runDir, 'providers.json'),

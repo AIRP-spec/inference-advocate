@@ -1,0 +1,9 @@
+{
+  "kind": "local",
+  "modelPath": "data/models/Qwen3-0.6B-Q4_K_M.gguf",
+  "modelSha256": "9acfc1e001311f34b4252001b626f2e466d592a42065f66571bff3790d4e1b14",
+  "contextSize": 4096,
+  "gpu": false,
+  "timeoutMs": 120000,
+  "note": "Copy this to .advocate/evaluator.json and set AIRP_EVALUATOR_CONFIG to that path. Fetch the GGUF first with npm run fetch:evaluator-model. The digest must match data/models/manifest.json; construction refuses to load on mismatch. Response content does not leave the device. Temperature 0 and a fixed seed are applied by the evaluator. GPU offload is optional and never required."
+}

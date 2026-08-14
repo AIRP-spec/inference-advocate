@@ -6,20 +6,20 @@ import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { openAdvocate } from '@airp/store-sqlite';
 import { dataPath } from './helpers.js';
-import { discoverEvaluatorConfig, resolveEvaluator, Taxonomy } from '@airp/core';
+import { discoverEvaluatorConfig, loadEvaluatorConfig, resolveEvaluator, Taxonomy } from '@airp/core';
 
 const taxonomy = Taxonomy.loadFromFile(dataPath('taxonomy', 'flags.v0.json'));
 
-test('no config means the rule evaluator, and it says so', () => {
-  const resolved = resolveEvaluator({ taxonomy });
+test('no config means the rule evaluator, and it says so', async () => {
+  const resolved = await resolveEvaluator({ taxonomy });
   assert.equal(resolved.evaluator.id, 'airp-rule-evaluator');
   assert.equal(resolved.outboundContentPaths.length, 0);
   assert.ok(resolved.warnings.some((w) => w.includes('airp-rule-evaluator@')));
   assert.ok(resolved.warnings.some((w) => w.includes('has no judgment')));
 });
 
-test('a hosted evaluator is reported as an outbound content path', () => {
-  const resolved = resolveEvaluator({
+test('a hosted evaluator is reported as an outbound content path', async () => {
+  const resolved = await resolveEvaluator({
     taxonomy,
     config: { kind: 'model', baseUrl: 'https://api.example.com/v1', model: 'm' },
   });
@@ -29,8 +29,8 @@ test('a hosted evaluator is reported as an outbound content path', () => {
   assert.ok(resolved.warnings.some((w) => w.includes('leaves this device')));
 });
 
-test('a local evaluator is not reported as outbound', () => {
-  const resolved = resolveEvaluator({
+test('a local evaluator is not reported as outbound', async () => {
+  const resolved = await resolveEvaluator({
     taxonomy,
     config: { kind: 'model', baseUrl: 'http://127.0.0.1:11434/v1', model: 'm' },
   });
@@ -40,8 +40,8 @@ test('a local evaluator is not reported as outbound', () => {
   assert.ok(resolved.warnings[0]?.includes('airp-model-evaluator@'));
 });
 
-test('an evaluator served by a provider under evaluation is flagged as a self audit conflict', () => {
-  const resolved = resolveEvaluator({
+test('an evaluator served by a provider under evaluation is flagged as a self audit conflict', async () => {
+  const resolved = await resolveEvaluator({
     taxonomy,
     config: { kind: 'model', baseUrl: 'https://api.example.com/v1', model: 'm' },
     providerBaseUrls: ['https://api.example.com/v1'],
@@ -49,8 +49,8 @@ test('an evaluator served by a provider under evaluation is flagged as a self au
   assert.ok(resolved.warnings.some((w) => w.includes('SELF AUDIT CONFLICT')));
 });
 
-test('a config naming a key variable that is not set fails loudly rather than silently', () => {
-  assert.throws(
+test('a config naming a key variable that is not set fails loudly rather than silently', async () => {
+  await assert.rejects(
     () =>
       resolveEvaluator({
         taxonomy,
@@ -93,7 +93,7 @@ test('the model evaluator flags a response against a live OpenAI-compatible endp
   const port = (server.address() as { port: number }).port;
 
   try {
-    const { evaluator } = resolveEvaluator({
+    const { evaluator } = await resolveEvaluator({
       taxonomy,
       config: { kind: 'model', baseUrl: `http://127.0.0.1:${port}/v1`, model: 'test-evaluator' },
     });
@@ -110,7 +110,7 @@ test('the model evaluator flags a response against a live OpenAI-compatible endp
   }
 });
 
-test('openAdvocate picks up an evaluator config and reports the outbound path in the export view', () => {
+test('openAdvocate picks up an evaluator config and reports the outbound path in the export view', async () => {
   const dir = mkdtempSync(join(tmpdir(), 'airp-eval-'));
   try {
     const configPath = join(dir, 'evaluator.json');
@@ -120,7 +120,7 @@ test('openAdvocate picks up an evaluator config and reports the outbound path in
     );
     assert.ok(discoverEvaluatorConfig(configPath));
 
-    const opened = openAdvocate({
+    const opened = await openAdvocate({
       dataDir: dataPath(),
       storePath: join(dir, 'advocate.sqlite'),
       evaluatorPath: configPath,
@@ -133,4 +133,60 @@ test('openAdvocate picks up an evaluator config and reports the outbound path in
   } finally {
     rmSync(dir, { recursive: true, force: true });
   }
+});
+
+test('loadEvaluatorConfig accepts kind local', () => {
+  const dir = mkdtempSync(join(tmpdir(), 'airp-eval-local-'));
+  try {
+    const configPath = join(dir, 'evaluator.json');
+    writeFileSync(
+      configPath,
+      JSON.stringify({
+        kind: 'local',
+        modelPath: 'Qwen3-0.6B-Q4_K_M.gguf',
+        modelSha256: 'ab'.repeat(32),
+        contextSize: 4096,
+        gpu: false,
+      }),
+    );
+    const cfg = loadEvaluatorConfig(configPath);
+    assert.equal(cfg.kind, 'local');
+    if (cfg.kind !== 'local') return;
+    assert.equal(cfg.modelPath, 'Qwen3-0.6B-Q4_K_M.gguf');
+    assert.equal(cfg.gpu, false);
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+test('kind local without a factory names the host obligation', async () => {
+  await assert.rejects(
+    () =>
+      resolveEvaluator({
+        taxonomy,
+        config: { kind: 'local', modelPath: 'model.gguf', modelSha256: 'ab'.repeat(32) },
+      }),
+    /localEvaluatorFactory/,
+  );
+});
+
+test('kind local with a factory has no outbound content path and names the file', async () => {
+  const resolved = await resolveEvaluator({
+    taxonomy,
+    config: {
+      kind: 'local',
+      modelPath: 'Qwen3-0.6B-Q4_K_M.gguf',
+      modelSha256: 'ab'.repeat(32),
+    },
+    localEvaluatorFactory: () => ({
+      id: 'local-llm',
+      version: 'deadbeefcafe+v1',
+      evaluate: () => [],
+    }),
+  });
+  assert.equal(resolved.evaluator.id, 'local-llm');
+  assert.equal(resolved.outboundContentPaths.length, 0);
+  assert.ok(resolved.warnings[0]?.includes('local-llm@deadbeefcafe+v1'));
+  assert.ok(resolved.warnings[0]?.includes('Qwen3-0.6B-Q4_K_M.gguf'));
+  assert.ok(resolved.warnings[0]?.includes('on-device'));
 });

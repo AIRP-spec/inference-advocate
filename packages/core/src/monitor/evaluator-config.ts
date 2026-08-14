@@ -4,10 +4,11 @@
 // (required properties, and the deployment hierarchy).
 //
 // The provisional's deployment hierarchy is: the reference model on the device where the device
-// permits, an accredited monitor operator otherwise, and never the provider under audit. A
-// hosted evaluator is the second tier without the accreditation, which does not exist yet. It
-// is a legitimate way to run this today and it has two costs that have to be visible rather
-// than buried in a config file:
+// permits, an accredited monitor operator otherwise, and never the provider under audit.
+// kind: 'local' is the first of those tiers, injected by the host because core stays free of
+// native runtimes. A hosted evaluator is the second tier without the accreditation, which does
+// not exist yet. It is a legitimate way to run this today and it has two costs that have to be
+// visible rather than buried in a config file:
 //
 //   1. Response content leaves the device to be evaluated. The export view lists the endpoint
 //      as an outbound content path for exactly this reason.
@@ -16,6 +17,7 @@
 //      and says so loudly. It cannot detect the non-obvious cases, and does not pretend to.
 
 import { readFileSync, existsSync } from 'node:fs';
+import { basename } from 'node:path';
 import type { Evaluator } from './semantic.js';
 import type { Taxonomy } from './taxonomy.js';
 import { RuleEvaluator } from './evaluators/rule-evaluator.js';
@@ -39,7 +41,28 @@ export interface ModelEvaluatorConfig {
   note?: string;
 }
 
-export type EvaluatorConfig = RuleEvaluatorConfig | ModelEvaluatorConfig;
+/**
+ * On-device GGUF evaluator. Core never loads the native runtime: the host injects a factory
+ * that constructs `@airp/evaluator-local`. Same port pattern as StoreBackend.
+ */
+export interface LocalEvaluatorConfig {
+  kind: 'local';
+  modelPath: string;
+  /** Hex SHA-256 of the GGUF file. Construction refuses to load on mismatch. */
+  modelSha256: string;
+  contextSize?: number;
+  /** GPU offload is optional and never required. CPU-only must work. */
+  gpu?: boolean;
+  timeoutMs?: number;
+  note?: string;
+}
+
+export type EvaluatorConfig = RuleEvaluatorConfig | ModelEvaluatorConfig | LocalEvaluatorConfig;
+
+export type LocalEvaluatorFactory = (
+  cfg: LocalEvaluatorConfig,
+  taxonomy: Taxonomy,
+) => Evaluator | Promise<Evaluator>;
 
 export interface ResolvedEvaluator {
   evaluator: Evaluator;
@@ -66,9 +89,14 @@ export interface ResolveEvaluatorInput {
   /** Base URLs of the providers this advocate is configured to front, for the conflict check. */
   providerBaseUrls?: string[];
   env?: NodeJS.ProcessEnv;
+  /**
+   * Host-injected constructor for kind: 'local'. Core does not import the native runtime.
+   * Required when config.kind is 'local'; ignored otherwise.
+   */
+  localEvaluatorFactory?: LocalEvaluatorFactory;
 }
 
-export function resolveEvaluator(input: ResolveEvaluatorInput): ResolvedEvaluator {
+export async function resolveEvaluator(input: ResolveEvaluatorInput): Promise<ResolvedEvaluator> {
   const warnings: string[] = [];
   const config = input.config ?? { kind: 'rule' };
 
@@ -76,6 +104,25 @@ export function resolveEvaluator(input: ResolveEvaluatorInput): ResolvedEvaluato
     const evaluator = new RuleEvaluator(input.taxonomy);
     warnings.push(
       `the semantic layer is running ${evaluator.id}@${evaluator.version}, which is reproducible and inspectable and has no judgment. See ARCHITECTURE.md`,
+    );
+    return { evaluator, outboundContentPaths: [], warnings };
+  }
+
+  if (config.kind === 'local') {
+    if (!input.localEvaluatorFactory) {
+      throw new Error(
+        'evaluator config kind is local and no localEvaluatorFactory was injected. ' +
+          'The host (daemon or desktop launcher) must construct the on-device evaluator. ' +
+          '@airp/core does not load native model runtimes.',
+      );
+    }
+    if (!config.modelPath || !config.modelSha256) {
+      throw new Error('local evaluator config requires modelPath and modelSha256');
+    }
+    const evaluator = await input.localEvaluatorFactory(config, input.taxonomy);
+    // Basename only: startup warnings reach the UI, and an absolute path would publish host layout.
+    warnings.unshift(
+      `the semantic layer is running ${evaluator.id}@${evaluator.version} on-device against ${basename(config.modelPath)}`,
     );
     return { evaluator, outboundContentPaths: [], warnings };
   }

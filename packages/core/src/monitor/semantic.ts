@@ -3,10 +3,13 @@
 // Paper: step 8. Provisional: Mechanism 3.
 // The paper's preferred evaluator is a commons-maintained reference evaluation model, defined
 // by properties rather than by openness: reproducible verdicts, inspectable basis, provenance
-// independent of any audited provider. No such model exists yet. So the interface is written
-// to the properties, and two implementations are shipped: a rule evaluator that satisfies
-// reproducibility and inspectability completely and semantic judgment only crudely, and a
-// model evaluator that calls an OpenAI-compatible endpoint and satisfies the reverse.
+// independent of any audited provider. No certified commons model exists yet. The interface is
+// written to the properties, and three implementations are shipped: a rule evaluator that
+// satisfies reproducibility and inspectability completely and semantic judgment only crudely,
+// an on-device local evaluator (preferred deployment tier, provisional Section 3.4) that runs
+// a pinned small model in-process with no outbound content path, and a model evaluator that
+// calls an OpenAI-compatible endpoint. A hosted deployment of the same pinned model is still
+// that model, running elsewhere. Variation across the certified family is a later problem.
 //
 // The rule evaluator is the default. That is a deliberate choice for a reference
 // implementation: a demo that quietly depends on a frontier model to police frontier models

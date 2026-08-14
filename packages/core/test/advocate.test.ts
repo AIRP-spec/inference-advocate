@@ -280,10 +280,10 @@ test('an excluded provider is refused before the request is sent', async () => {
   assert.equal(seen.length, 0, 'nothing was sent');
 });
 
-test('openAdvocate loads the shipped documents and reports its own gaps', () => {
+test('openAdvocate loads the shipped documents and reports its own gaps', async () => {
   const dir = mkdtempSync(join(tmpdir(), 'airp-'));
   try {
-    const opened = openAdvocate({
+    const opened = await openAdvocate({
       dataDir: dataPath(),
       storePath: join(dir, 'advocate.sqlite'),
       jurisdictionId: 'us-ny',

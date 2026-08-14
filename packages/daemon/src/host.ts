@@ -19,6 +19,7 @@ import {
   type OpenedAdvocate,
 } from '@airp/core';
 import { openAdvocate } from '@airp/store-sqlite';
+import { localEvaluatorFactory } from './local-evaluator-factory.js';
 
 export interface HostPaths {
   dataDir: string;
@@ -112,16 +113,22 @@ export class HostSession {
   readonly pinned: PinnedNotice[] = [];
   private readonly packaging: string[];
 
-  constructor(paths: HostPaths, packaging: string[] = packagingWarnings()) {
+  constructor(paths: HostPaths, packaging: string[], opened: OpenedAdvocate) {
     this.paths = paths;
     this.packaging = packaging;
-    this.opened = openAdvocate({
+    this.opened = opened;
+  }
+
+  static async create(paths: HostPaths, packaging: string[] = packagingWarnings()): Promise<HostSession> {
+    const opened = await openAdvocate({
       dataDir: paths.dataDir,
       storePath: paths.storePath,
       providersPath: paths.providersPath,
       jurisdictionId: paths.jurisdictionId,
       devKeyfile: paths.devKeyfile,
+      localEvaluatorFactory,
     });
+    return new HostSession(paths, packaging, opened);
   }
 
   get warnings(): string[] {

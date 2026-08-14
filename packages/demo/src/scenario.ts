@@ -131,7 +131,7 @@ async function main(): Promise<void> {
     ]);
     providers.save(join(runDir, 'providers.json'));
 
-    const opened = openAdvocate({
+    const opened = await openAdvocate({
       dataDir,
       storePath: join(runDir, 'advocate.sqlite'),
       providersPath: join(runDir, 'providers.json'),
@@ -203,7 +203,7 @@ async function main(): Promise<void> {
     console.log(`      > requests actually sent to that provider: 0`);
 
     scene('SCENE 6  An unsealed response, under a jurisdiction that wants provenance noticed');
-    const euOpened = openAdvocate({
+    const euOpened = await openAdvocate({
       dataDir,
       storePath: join(runDir, 'advocate-eu.sqlite'),
       providersPath: join(runDir, 'providers.json'),

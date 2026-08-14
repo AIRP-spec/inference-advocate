@@ -60,7 +60,7 @@ if (mode === 'build') {
   process.env['AIRP_DESKTOP'] = '1';
   process.env['AIRP_REPO_ROOT'] = repoRoot;
 
-  const host = new HostSession({
+  const host = await HostSession.create({
     dataDir,
     runDir,
     providersPath: join(runDir, 'providers.json'),

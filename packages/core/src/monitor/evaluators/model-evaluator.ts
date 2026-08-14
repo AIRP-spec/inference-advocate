@@ -18,6 +18,7 @@
 import type { EvaluationRequest, Evaluator } from '../semantic.js';
 import type { Flag } from '../../types.js';
 import type { Taxonomy } from '../taxonomy.js';
+import { buildTaxonomyEvaluationPrompt, parseTaxonomyEvaluationVerdict } from './taxonomy-prompt.js';
 
 export interface ModelEvaluatorOptions {
   baseUrl: string;
@@ -28,10 +29,6 @@ export interface ModelEvaluatorOptions {
   seed?: number;
   fetchImpl?: typeof fetch;
   timeoutMs?: number;
-}
-
-interface RawVerdict {
-  flags?: Array<{ type?: string; evidence?: string[]; reason?: string }>;
 }
 
 export class ModelEvaluator implements Evaluator {
@@ -47,23 +44,7 @@ export class ModelEvaluator implements Evaluator {
   }
 
   buildPrompt(req: EvaluationRequest): string {
-    const catalogue = this.#taxonomy.flags
-      .map((f) => `- ${f.type} (severity ${f.severity}): ${f.definition}`)
-      .join('\n');
-    return [
-      'You are an evaluator in an inference advocate. You judge one assistant response against a',
-      'published flag taxonomy. You do not rewrite, moderate, or answer the response. You report.',
-      '',
-      'Taxonomy:',
-      catalogue,
-      '',
-      'Return JSON only, in the shape:',
-      '{"flags":[{"type":"<taxonomy type>","evidence":["<verbatim excerpt>"],"reason":"<one clause>"}]}',
-      'Return {"flags":[]} when nothing in the taxonomy applies. Do not invent types.',
-      '',
-      req.prompt ? `User turn:\n${req.prompt}\n` : '',
-      `Assistant response under evaluation:\n${req.content}`,
-    ].join('\n');
+    return buildTaxonomyEvaluationPrompt(this.#taxonomy, req);
   }
 
   async evaluate(req: EvaluationRequest): Promise<Flag[]> {
@@ -100,32 +81,6 @@ export class ModelEvaluator implements Evaluator {
 
   /** Exported for tests, and because a parser that silently swallows garbage is a liability. */
   parse(text: string, evaluated: string): Flag[] {
-    const start = text.indexOf('{');
-    const end = text.lastIndexOf('}');
-    if (start < 0 || end <= start) return [];
-    let raw: RawVerdict;
-    try {
-      raw = JSON.parse(text.slice(start, end + 1)) as RawVerdict;
-    } catch {
-      return [];
-    }
-    const out: Flag[] = [];
-    for (const f of raw.flags ?? []) {
-      const def = f.type ? this.#taxonomy.definition(f.type) : undefined;
-      if (!def) continue; // a type outside the published taxonomy is not admissible
-      const evidence = (f.evidence ?? [])
-        .map((excerpt) => {
-          const idx = evaluated.indexOf(excerpt);
-          return idx < 0 ? undefined : { start: idx, end: idx + excerpt.length, text: excerpt };
-        })
-        .filter((s): s is { start: number; end: number; text: string } => Boolean(s));
-      out.push({
-        type: def.type,
-        severity: def.severity,
-        evidence,
-        basis: `${this.#taxonomy.version}:model:${(f.reason ?? '').slice(0, 120)}`,
-      });
-    }
-    return out;
+    return parseTaxonomyEvaluationVerdict(this.#taxonomy, text, evaluated, 'model').flags;
   }
 }
