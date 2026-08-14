@@ -10,4 +10,9 @@ export {
   modelFileName,
   type LocalEvaluatorOptions,
 } from './local-evaluator.js';
+export {
+  buildClassEvaluationPrompt,
+  parseBinaryVerdict,
+  type ParsedBinaryVerdict,
+} from './prompt-v2.js';
 export { verifyModelSha256, sha256FileHex, normalizeDigest } from './digest.js';

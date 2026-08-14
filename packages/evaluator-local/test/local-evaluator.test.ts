@@ -4,9 +4,14 @@ import { mkdtempSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { createHash } from 'node:crypto';
-import { parseTaxonomyEvaluationVerdict, Taxonomy } from '@airp/core';
+import { Taxonomy } from '@airp/core';
 import { dataPath } from './helpers.js';
-import { sha256FileHex, verifyModelSha256 } from '@airp/evaluator-local';
+import {
+  buildClassEvaluationPrompt,
+  parseBinaryVerdict,
+  sha256FileHex,
+  verifyModelSha256,
+} from '@airp/evaluator-local';
 
 const taxonomy = Taxonomy.loadFromFile(dataPath('taxonomy', 'flags.v0.json'));
 
@@ -43,37 +48,61 @@ test('digest verification accepts a matching pin', () => {
   }
 });
 
-test('unparseable model text yields zero flags rather than invented ones', () => {
-  const parsed = parseTaxonomyEvaluationVerdict(
-    taxonomy,
-    'I am sorry, I cannot help with that.',
-    'hello there',
-    'local',
-  );
-  assert.equal(parsed.unparseable, true);
-  assert.equal(parsed.flags.length, 0);
+test('a per-class prompt contains only that class, plus counter-examples and mention-versus-use', () => {
+  const persona = taxonomy.definition('persona_claims');
+  const sycophancy = taxonomy.definition('sycophancy');
+  assert.ok(persona && sycophancy);
+  const prompt = buildClassEvaluationPrompt(persona, {
+    providerId: 'p',
+    content: 'hello',
+    prompt: 'how are you',
+  });
+  assert.ok(prompt.includes(persona.definition));
+  assert.ok(prompt.includes(persona.criteria[0]!.description));
+  assert.ok(prompt.includes(persona.counterExamples![0]!));
+  assert.ok(prompt.includes('discussing, naming, quoting, or refusing'));
+  assert.ok(prompt.includes('User turn:'));
+  assert.ok(prompt.includes('hello'));
+  assert.equal(prompt.includes(sycophancy.type), false);
+  assert.equal(prompt.includes(sycophancy.definition), false);
+  for (const other of taxonomy.flags) {
+    if (other.type === persona.type) continue;
+    assert.equal(
+      prompt.includes(`Class: ${other.title}`),
+      false,
+      `prompt for persona_claims must not name ${other.type}`,
+    );
+  }
 });
 
-test('truncated JSON yields zero flags', () => {
-  const parsed = parseTaxonomyEvaluationVerdict(
-    taxonomy,
-    '{"flags":[{"type":"sycophancy"',
-    'What a brilliant question!',
-    'local',
-  );
+test('unparseable binary output is not fired', () => {
+  const parsed = parseBinaryVerdict('I am sorry, I cannot help with that.', 'hello there');
   assert.equal(parsed.unparseable, true);
-  assert.equal(parsed.flags.length, 0);
+  assert.equal(parsed.fired, false);
+  assert.equal(parsed.evidence, null);
 });
 
-test('a type outside the taxonomy is dropped', () => {
-  const parsed = parseTaxonomyEvaluationVerdict(
-    taxonomy,
-    '{"flags":[{"type":"invented_type","evidence":["hello"],"reason":"nope"},{"type":"sycophancy","evidence":["brilliant question"],"reason":"flattery"}]}',
-    'What a brilliant question!',
-    'local',
+test('truncated JSON is not fired', () => {
+  const parsed = parseBinaryVerdict('{"fired":true,"evidence":', 'What a brilliant question!');
+  assert.equal(parsed.unparseable, true);
+  assert.equal(parsed.fired, false);
+});
+
+test('fired with verbatim evidence keeps the span; invented evidence is dropped', () => {
+  const text = 'What a brilliant question!';
+  const hit = parseBinaryVerdict(
+    '{"fired":true,"evidence":"brilliant question"}',
+    text,
   );
-  assert.equal(parsed.unparseable, false);
-  assert.equal(parsed.flags.length, 1);
-  assert.equal(parsed.flags[0]?.type, 'sycophancy');
-  assert.equal(parsed.flags[0]?.severity, 1);
+  assert.equal(hit.unparseable, false);
+  assert.equal(hit.fired, true);
+  assert.equal(hit.evidence, 'brilliant question');
+
+  const miss = parseBinaryVerdict('{"fired":true,"evidence":"not in the source"}', text);
+  assert.equal(miss.fired, true);
+  assert.equal(miss.evidence, null);
+
+  const quiet = parseBinaryVerdict('{"fired":false,"evidence":null}', text);
+  assert.equal(quiet.fired, false);
+  assert.equal(quiet.evidence, null);
 });

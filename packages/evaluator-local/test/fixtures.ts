@@ -3,8 +3,8 @@
 // Paper: step 8. Cases are generated from the taxonomy file so a new flag class without a
 // positive here, or without a counter-example in the taxonomy, fails the suite instead of
 // shipping untested. Positives are written to the published definition, not to the lexical
-// criteria, because this evaluator is a judge rather than a regex. The current pin does not
-// yet pass these cases. The test is the gate, not a skip.
+// criteria, because this evaluator is a judge rather than a regex. Template v2 is the live
+// gate. Remaining failures after v2 are fine-tune candidates, not a reason to weaken cases.
 
 import type { Taxonomy } from '@airp/core';
 

@@ -4,28 +4,25 @@
 // deployment tier). This is the preferred tier of the hierarchy, occupied here by one small
 // universal model rather than a ladder. Temperature 0 and a fixed seed give stable verdicts
 // on a given build and machine. Bit-identical verdicts across differing hardware are not
-// promised. Do not claim more. The golden fixtures are the acceptance gate for this pin;
-// Qwen3-0.6B does not yet pass them. See ARCHITECTURE.md. This file still loads and
-// attributes the pin. It does not claim the judge is adequate.
+// promised. Do not claim more.
+//
+// Template v2 asks one binary judgment per taxonomy class, sequentially, against a single
+// loaded model. v1's eleven-way call is not kept live. The golden fixtures remain the
+// acceptance gate.
 //
 // Core never imports this file. The host injects a factory through resolveEvaluator.
 
 import { basename } from 'node:path';
-import {
-  parseTaxonomyEvaluationVerdict,
-  taxonomyEvaluationInstructions,
-  TAXONOMY_EVALUATION_PROMPT_VERSION,
-  type EvaluationRequest,
-  type Evaluator,
-  type Flag,
-  type LocalEvaluatorConfig,
-  type ParsedTaxonomyVerdict,
-  type Taxonomy,
-} from '@airp/core';
+import type { EvaluationRequest, Evaluator, Flag, LocalEvaluatorConfig, Taxonomy } from '@airp/core';
 import { getLlama, LlamaChatSession, LlamaGrammar, LlamaLogLevel, QwenChatWrapper } from 'node-llama-cpp';
 import { verifyModelSha256 } from './digest.js';
+import {
+  buildClassEvaluationPrompt,
+  parseBinaryVerdict,
+  PROMPT_TEMPLATE_VERSION,
+} from './prompt-v2.js';
 
-export const PROMPT_TEMPLATE_VERSION = TAXONOMY_EVALUATION_PROMPT_VERSION;
+export { PROMPT_TEMPLATE_VERSION };
 
 export interface LocalEvaluatorOptions {
   taxonomy: Taxonomy;
@@ -52,7 +49,10 @@ export class LocalEvaluator implements Evaluator {
   #loaded: LoadedRuntime | undefined;
   #queue: Promise<void> = Promise.resolve();
 
-  lastRawText = '';
+  /** Raw model text of the most recent per-class call, keyed by class type. */
+  lastRawByClass: Record<string, string> = {};
+  /** Wall time of the most recent evaluate() across every class, milliseconds. */
+  lastEvalMs = 0;
 
   constructor(opts: LocalEvaluatorOptions) {
     this.#taxonomy = opts.taxonomy;
@@ -75,39 +75,18 @@ export class LocalEvaluator implements Evaluator {
     });
     const session = new LlamaChatSession({
       contextSequence: context.getSequence(),
-      // The pinned reference is Qwen3. Discouraging thoughts keeps the completion in the JSON
-      // contract instead of a reasoning preamble the parser would have to strip.
       chatWrapper: new QwenChatWrapper({ thoughts: 'discourage', variation: '3' }),
-      systemPrompt: taxonomyEvaluationInstructions(this.#taxonomy),
     });
     const grammar = await llama.createGrammarForJsonSchema({
       type: 'object',
       additionalProperties: false,
       properties: {
-        flags: {
-          type: 'array',
-          items: {
-            type: 'object',
-            additionalProperties: false,
-            properties: {
-              type: {
-                type: 'string',
-                enum: this.#taxonomy.flags.map((f) => f.type),
-              },
-              evidence: { type: 'array', items: { type: 'string' } },
-              reason: { type: 'string' },
-            },
-            required: ['type', 'evidence', 'reason'],
-          },
-        },
+        fired: { type: 'boolean' },
+        evidence: { oneOf: [{ type: 'string' }, { type: 'null' }] },
       },
-      required: ['flags'],
+      required: ['fired', 'evidence'],
     });
     this.#loaded = { session, grammar };
-  }
-
-  parse(text: string, evaluated: string): ParsedTaxonomyVerdict {
-    return parseTaxonomyEvaluationVerdict(this.#taxonomy, text, evaluated, 'local');
   }
 
   async evaluate(req: EvaluationRequest): Promise<Flag[]> {
@@ -129,41 +108,63 @@ export class LocalEvaluator implements Evaluator {
     const loaded = this.#loaded;
     if (!loaded) throw new Error('local evaluator failed to load');
 
-    loaded.session.resetChatHistory();
-    const controller = new AbortController();
-    const timer = setTimeout(() => controller.abort(), this.#opts.timeoutMs ?? 120_000);
-    let text = '';
-    const userTurn = [
-      req.prompt ? `User turn:\n${req.prompt}\n` : '',
-      `Assistant response under evaluation:\n${req.content}`,
-    ].join('\n');
-    try {
-      text = await loaded.session.prompt(userTurn, {
-        temperature: this.#opts.temperature ?? 0,
-        seed: this.#opts.seed ?? 1,
-        grammar: loaded.grammar,
-        maxTokens: 512,
-        signal: controller.signal,
-        budgets: { thoughtTokens: 0 },
+    const started = Date.now();
+    const flags: Flag[] = [];
+    this.lastRawByClass = {};
+    const perClassMs = this.#opts.timeoutMs ?? 30_000;
+
+    for (const def of this.#taxonomy.flags) {
+      loaded.session.resetChatHistory();
+      const controller = new AbortController();
+      const timer = setTimeout(() => controller.abort(), perClassMs);
+      let text = '';
+      try {
+        text = await loaded.session.prompt(buildClassEvaluationPrompt(def, req), {
+          temperature: this.#opts.temperature ?? 0,
+          seed: this.#opts.seed ?? 1,
+          grammar: loaded.grammar,
+          maxTokens: 128,
+          signal: controller.signal,
+          budgets: { thoughtTokens: 0 },
+        });
+      } catch (err) {
+        console.warn(
+          `local-llm@${this.version}: generation failed for ${def.type} (${(err as Error).message}); treating as not fired`,
+        );
+        this.lastRawByClass[def.type] = '';
+        continue;
+      } finally {
+        clearTimeout(timer);
+      }
+
+      this.lastRawByClass[def.type] = text;
+      const parsed = parseBinaryVerdict(text, req.content);
+      if (parsed.unparseable) {
+        console.warn(
+          `local-llm@${this.version}: unparseable model response for ${def.type}; treating as not fired`,
+        );
+        continue;
+      }
+      if (!parsed.fired) continue;
+      const excerpt = parsed.evidence;
+      const idx = excerpt !== null ? req.content.indexOf(excerpt) : -1;
+      const evidence =
+        excerpt !== null && idx >= 0
+          ? [{ start: idx, end: idx + excerpt.length, text: excerpt }]
+          : [];
+      flags.push({
+        type: def.type,
+        severity: def.severity,
+        evidence,
+        basis: `${this.#taxonomy.version}:local:${def.type}`,
       });
-    } catch (err) {
-      this.lastRawText = '';
-      console.warn(
-        `local-llm@${this.version}: generation failed (${(err as Error).message}); recording zero flags`,
-      );
-      return [];
-    } finally {
-      clearTimeout(timer);
     }
 
-    this.lastRawText = text;
-    const parsed = this.parse(text, req.content);
-    if (parsed.unparseable) {
-      console.warn(
-        `local-llm@${this.version}: unparseable model response; recording zero flags`,
-      );
-    }
-    return parsed.flags;
+    this.lastEvalMs = Date.now() - started;
+    console.log(
+      `local-llm@${this.version}: evaluated ${this.#taxonomy.flags.length} classes in ${this.lastEvalMs}ms`,
+    );
+    return flags;
   }
 }
 
