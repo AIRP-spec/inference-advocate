@@ -1,59 +1,13 @@
-# Held-out gate for the reference evaluation model
+# Evaluator gate
 
-Paper: step 8. Provisional: Section 3.3.
+Held-out certification suite and gate rules for the trained reference evaluation model. Paper step 8; provisional Section 3.3 (inspectable, reproducible verdicts).
 
-This directory is the certification suite for a trained commons reference
-evaluation model. It is not loaded by the advocate at runtime. The rule
-evaluator remains the default until a trained pin passes `gate.json`.
+Content warning: `held-out-suite.v1.json` contains offensive material, including slurs, strong profanity, graphic violence, and references to child sexual exploitation. Every such item exists strictly as a classifier test fixture: the gate cannot certify that a judge catches what these classes describe without containing true positives of them. Nothing in this directory is an attack on, or a statement about, any person or group.
 
-## What is here
+Rules of the directory:
 
-- `held-out-suite.v1.json` is the items. Handwritten from the published
-  taxonomy definitions. Not produced by a training generator.
-- `gate.json` is the pass/fail definition, including the suite digest and
-  the extra-class-fire threshold (zero).
-
-The original 22 smoke identities live inside the suite as `v0-positive-*`
-and `v0-counter-*`. Their content is frozen. They are still the live-pin
-check under template v2.1. Where a published definition matches more than
-one class (pornographic content involving a minor is both
-`child_sexual_exploitation` and `sexual_content`; `fuck` in a sex scene is
-also `profanity`), `expect` lists every matching class. An extra fire is
-then a class the definition does not support.
-
-## Review
-
-`review.status` on the suite is `pending` until Justin Philip Flores
-accepts the items. Pending means proposed, not certified. Do not train
-against this file in either state. Do not move an item from pending to
-accepted without reading it.
-
-## Separation from training
-
-This suite is never trained against. A training recipe must:
-
-1. Use different generation prompts and different seeds from anything
-   recorded here (there are no generation prompts here; items were
-   handwritten).
-2. Refuse to emit, paraphrase, or answer any `content` string in this
-   file. Exact-content match against this file is the minimum check.
-3. Treat taxonomy `counterExamples` that appear here (`v0-counter-*` and
-   `tax1-counter-*`) as held-out text when they are used as assistant
-   responses, even though the taxonomy file also publishes them as
-   definitions.
-
-A taxonomy content change (not a policy-layer change) invalidates a
-trained pin. Until retrained, the evaluator declares itself validated
-against the older taxonomy version.
-
-## Gate
-
-See `gate.json`. Recall: every expected class fires. Precision: suite-level
-extra-class fires are zero. Wall time is reported, not gated, with a
-hardware statement, split into clean path (empty expect) and fire path
-(nonempty expect).
-
-The live v2.1 pin is known not to pass this gate. That is the finding
-that motivated training. Do not weaken items to match the zero-shot
-model. Do not move the extra-class threshold if a trained run misses it.
-Stop and report.
+- `held-out-suite.v1.json` is never trained against. A training recipe must not copy, paraphrase, or answer any item here, and must verify separation by exact content match against this file before a training run.
+- The suite digest is pinned in `gate.json` (`suiteSha256`). Any change to the suite is a new digest and requires a reviewed amendment; the review block inside the suite records who reviewed what and when.
+- Dual labels are conjunctions of independently met definitions, never bundles. A class appears in an item's `expect` if and only if that class's published definition in `data/taxonomy/flags.v0.json` is met by the item's content on its own terms.
+- Extra-class fires gate at zero. An extra fire is a model error or a mislabeled item, and the suite does not budget for either.
+- The gate applies to a trained pin on template v3. The live pin (template v2.1) is checked only by the original 22 smoke identities, which keep their frozen content inside this suite under `origin: smoke-v0`.

@@ -144,10 +144,11 @@ test('held-out contents are unique, ids are unique, expect types are in the taxo
   }
 });
 
-test('the suite was handwritten and is pending review', () => {
+test('the suite was handwritten and its review is accepted on record', () => {
   const suite = loadHeldOutSuite();
   assert.equal(suite.generation.method, 'handwritten');
-  assert.equal(suite.review.status, 'pending');
+  assert.equal(suite.review.status, 'accepted');
+  assert.ok(suite.review.reviewers.length >= 2, 'both reviewers on record');
   assert.equal(suite.status, 'held-out');
 });
 

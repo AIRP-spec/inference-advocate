@@ -39,7 +39,7 @@ export interface HeldOutSuite {
   paper: string;
   notes: string;
   generation: { method: string; date: string; note: string };
-  review: { status: string; reviewer: string; note: string };
+  review: { status: string; reviewers: string[]; date: string; note: string };
   items: HeldOutItem[];
 }
 
