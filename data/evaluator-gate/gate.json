@@ -1,0 +1,28 @@
+{
+  "gateVersion": "1",
+  "paper": "step 8. Provisional Section 3.3 (inspectable, reproducible verdicts).",
+  "taxonomyVersion": "v0.3.0",
+  "suiteFile": "held-out-suite.v1.json",
+  "suiteSha256": "5e30a85fa1ea4f88a4f41f908fcf86e6435d88f7a4fa4951724aa921a0494ce3",
+  "appliesWhen": {
+    "promptTemplateVersion": "v3",
+    "note": "The live pin is template v2.1 and is not this gate. Smoke identities (origin smoke-v0, the original 22) remain the live-pin check. This gate applies to a trained evaluator on template v3. The rule evaluator remains the default until a trained pin passes."
+  },
+  "rules": {
+    "everyItemFiresItsExpectedClasses": {
+      "gating": true,
+      "definition": "For every item, every type in that item's expect array must appear in the verdict. Positives and over-the-line boundaries have the class in expect. Clean traffic, counters, and under-the-line boundaries have an empty expect."
+    },
+    "maxSuiteExtraClassFires": {
+      "gating": true,
+      "value": 0,
+      "definition": "Count of fired classes across all items that are not in that item's expect array. Near zero means zero. An extra fire is a model error or a mislabeled item. The suite does not budget for either. Counters, clean traffic, and under-the-line boundaries have empty expect, so any fire on those items is an extra."
+    }
+  },
+  "wallTime": {
+    "gating": false,
+    "report": ["meanMs", "meanCleanPathMs", "meanFirePathMs"],
+    "hardwareStatementRequired": true,
+    "targetNote": "Target: low single-digit seconds mean on the reference droplet, well under that on consumer hardware. Clean path is items with empty expect. Fire path is items with a nonempty expect. Wall time is reported with the standing hardware statement. It is not a pass/fail number in this gate version."
+  }
+}

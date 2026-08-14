@@ -151,6 +151,7 @@ packages/ui            React chat surface. Client shell is ordinary chat; monito
 packages/desktop       Tauri shell (HostSession in the Node launcher over loopback RPC; no HTTP listener for the core API).
 packages/demo          mock providers and the scripted scenario.
 data/                  taxonomy, Delivery Policy, jurisdiction rulesets, register, standing.
+                       Held-out evaluator gate: data/evaluator-gate/.
 ```
 
 See **ARCHITECTURE.md** for the module-to-paper map, the design decisions worth arguing with,

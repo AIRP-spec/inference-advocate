@@ -7,6 +7,12 @@ import { Taxonomy } from '@airp/core';
 import { createLocalEvaluator, looksLikeThinking, PROMPT_TEMPLATE_VERSION } from '@airp/evaluator-local';
 import { dataPath, repoRoot } from './helpers.js';
 import { goldenCases } from './fixtures.js';
+import {
+  loadGateConfig,
+  loadHeldOutSuite,
+  scoreHeldOutGate,
+  type ItemVerdict,
+} from './held-out.js';
 
 const taxonomy = Taxonomy.loadFromFile(dataPath('taxonomy', 'flags.v0.json'));
 const modelsDir = join(repoRoot, 'data', 'models');
@@ -157,7 +163,7 @@ test('pinned model verdicts against golden fixtures', { timeout: 1_800_000 }, as
     `wall time: mean ${meanMs}ms per response, max ${maxMs}ms, suite ${suiteMs}ms, n=${times.length}`,
   );
   console.log(
-    `precision (reported, not gating): ${extraOnPositives} extra classes fired across ${rows.filter((r) => r.shouldFlag).length} positives`,
+    `precision on smoke (reported, not gating; the v3 held-out gate gates this): ${extraOnPositives} extra classes fired across ${rows.filter((r) => r.shouldFlag).length} positives`,
   );
   console.log(`thinking tags in raw generations: ${thoughtHits} of ${cases.length} responses`);
 
@@ -174,5 +180,82 @@ test('pinned model verdicts against golden fixtures', { timeout: 1_800_000 }, as
     `pinned Qwen3-0.6B ${pin.promptTemplateVersion} failed golden fixtures (${failures.length}/${rows.length}). ` +
       `${uncleared.length} remaining from the v2 expected-fix list, ${novel.length} novel. ` +
       `Mean wall time ${meanMs}ms, suite ${suiteMs}ms. One decode pass, then stop.\n${lines.join('\n')}`,
+  );
+});
+
+test('trained pin against the full held-out gate', { timeout: 3_600_000 }, async (t) => {
+  if (ggufFiles.length === 0 || !existsSync(manifestPath)) {
+    t.skip();
+    return;
+  }
+  const pin = JSON.parse(readFileSync(manifestPath, 'utf8')) as {
+    fileName: string;
+    sha256: string;
+    promptTemplateVersion: string;
+  };
+  const gate = loadGateConfig();
+  if (pin.promptTemplateVersion !== gate.appliesWhen.promptTemplateVersion) {
+    console.log(
+      `notice: skipping full held-out gate; live pin is ${pin.promptTemplateVersion}, gate applies at ${gate.appliesWhen.promptTemplateVersion}`,
+    );
+    t.skip();
+    return;
+  }
+  const modelPath = join(modelsDir, pin.fileName);
+  if (!existsSync(modelPath)) {
+    t.skip();
+    return;
+  }
+
+  assert.equal(pin.promptTemplateVersion, PROMPT_TEMPLATE_VERSION);
+  const evaluator = await createLocalEvaluator(
+    { kind: 'local', modelPath, modelSha256: pin.sha256, gpu: false },
+    taxonomy,
+  );
+  const suite = loadHeldOutSuite();
+  console.log(`hardware: ${hardwareStatement()}`);
+  console.log(`llama.cpp: ${evaluator.systemInfo || '(empty system-info)'}`);
+  console.log(`held-out gate: ${suite.items.length} items, extra-class limit ${gate.rules.maxSuiteExtraClassFires.value}`);
+
+  const verdicts: ItemVerdict[] = [];
+  for (const item of suite.items) {
+    const flags = await evaluator.evaluate({
+      providerId: 'held-out',
+      content: item.content,
+      prompt: item.prompt,
+    });
+    const got = flags.map((f) => f.type);
+    verdicts.push({ id: item.id, got, ms: evaluator.lastEvalMs });
+    const extra = got.filter((type) => !item.expect.includes(type));
+    const missing = item.expect.filter((type) => !got.includes(type));
+    const mark = missing.length === 0 && extra.length === 0 ? 'pass' : 'FAIL';
+    console.log(
+      `  ${item.id.padEnd(42)} ${item.kind.padEnd(10)} ${mark}  got=[${got.join(', ') || 'none'}]  ${evaluator.lastEvalMs}ms` +
+        (missing.length ? `  missing=[${missing.join(', ')}]` : '') +
+        (extra.length ? `  extra=[${extra.join(', ')}]` : ''),
+    );
+  }
+
+  const score = scoreHeldOutGate(suite, gate, verdicts);
+  console.log(
+    `wall time: mean ${score.meanMs}ms, clean-path mean ${score.meanCleanPathMs}ms, fire-path mean ${score.meanFirePathMs}ms, n=${score.n}`,
+  );
+  console.log(
+    `precision (gating): ${score.extraClassFires} extra-class fires, limit ${score.extraLimit}`,
+  );
+  console.log(`recall (gating): ${score.recallFailures.length} items missed an expected class`);
+  if (score.pass) return;
+
+  const lines = [
+    ...score.recallFailures.map(
+      (r) => `${r.id} missed [${r.missing.join(', ')}] extra=[${r.extra.join(', ')}]`,
+    ),
+    ...score.rows
+      .filter((r) => r.extra.length > 0 && r.missing.length === 0)
+      .map((r) => `${r.id} extra=[${r.extra.join(', ')}]`),
+  ];
+  assert.fail(
+    `trained pin failed the held-out gate (${score.recallFailures.length} recall failures, ${score.extraClassFires} extra-class fires, limit ${score.extraLimit}). ` +
+      `Mean ${score.meanMs}ms, clean ${score.meanCleanPathMs}ms, fire ${score.meanFirePathMs}ms.\n${lines.join('\n')}`,
   );
 });

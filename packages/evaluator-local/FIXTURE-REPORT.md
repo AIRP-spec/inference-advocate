@@ -86,3 +86,14 @@ That shift follows from constrained decode, not from disabling thinking. Thinkin
 Over-firing did not improve. It got worse: 8 counter FPs in v2, 11 in v2.1, including the three counters v2 had cleared. Persistence here is confirmation, not a surprise. The fine-tune target list is now every class's counter-example, plus the extra-class fires on positives. The 0.6B with this template cannot hold mention-versus-use as a yes-or-no.
 
 No third template pass. No larger model. No weakened fixtures.
+
+## Expanded held-out suite (not run against this pin)
+
+The 22 smoke identities now live inside `data/evaluator-gate/held-out-suite.v1.json`
+alongside roughly 15 items per class and a clean-traffic section. That suite is the
+certification gate for a trained pin on template v3 (`data/evaluator-gate/gate.json`).
+It was not run against this v2.1 pin. Precision is gating on that gate (extra-class
+fires must be zero). It remains report-only on the 22-item smoke check above.
+
+Review of the held-out items is pending. Training, publication, and v3 integration
+are later parts. The v2.1 record on this page is unchanged.

@@ -23,7 +23,8 @@ packages/ui            React chat surface. Product chrome is ordinary chat; the 
                        attributes sit in a bottom instrument drawer (demonstration only).
 packages/desktop       Tauri shell (HostSession in the Node launcher over loopback RPC, no HTTP for the core API)
 packages/demo          mock providers and the scripted end-to-end scenario
-data/                  taxonomy, policy, jurisdictions, register, standing: documents, not code
+data/                  taxonomy, policy, jurisdictions, register, standing: documents, not code.
+                       The held-out evaluator gate lives under data/evaluator-gate/
 tools/                 demo key minting, additive public-entry re-sign, key set digests,
                        substituted-keys register fixture
 deploy/                idempotent Apache/TLS/PM2 setup for the public AIRP domains
@@ -186,16 +187,21 @@ nothing else. Construction refuses to load if the GGUF file does not match the c
 digest. Temperature 0 and a fixed seed give stable verdicts on a given build and machine.
 Bit-identical verdicts across differing hardware are not promised.
 
-The golden fixtures under `packages/evaluator-local/test/` are the acceptance gate for
-this pin. They are generated from the current taxonomy file so a new class cannot ship
-untested. The live pin is Qwen's published Qwen3-0.6B GGUF at Q8_0. Template v2.1 asks one
-grammar-constrained yes or no per taxonomy class, with a shared prefix reused on one
-sequence. v2 cleared the attractor false negatives. v2.1 confirmed that thinking was
-already off in v2, constrained the verdict to `yes`/`no`, and did not hit the 4 to 10
-second mean on this droplet (mean 42712ms). It also worsened counter-example over-firing
-(11 of 11 counters fail). The report is `packages/evaluator-local/FIXTURE-REPORT.md`.
-A larger model is not the next step. Remaining failures are the candidate target list for
-a fine-tuned evaluator, which is a separately scoped effort.
+The held-out suite under `data/evaluator-gate/` is the acceptance gate for a trained
+pin. It is a versioned document, not constants in TypeScript. The original 22 smoke
+identities (`v0-positive-*`, `v0-counter-*`) live inside it and remain the live-pin
+check under template v2.1. The live pin is Qwen's published Qwen3-0.6B GGUF at Q8_0.
+Template v2.1 asks one grammar-constrained yes or no per taxonomy class, with a shared
+prefix reused on one sequence. v2 cleared the attractor false negatives. v2.1 confirmed
+that thinking was already off in v2, constrained the verdict to `yes`/`no`, and did not
+hit the 4 to 10 second mean on this droplet (mean 42712ms). It also worsened
+counter-example over-firing (11 of 11 counters fail). The report is
+`packages/evaluator-local/FIXTURE-REPORT.md`. A larger model is not the next step. The
+zero-shot 0.6B is not a judge in any decode configuration. The trained artifact, its
+recipe, and template v3 are not in this build. The expanded gate (roughly 15 items per
+class, plus clean traffic at zero fires, precision gating at zero extra-class fires)
+exists and is pending human review. The rule evaluator remains the default until a
+trained pin passes that gate. Do not weaken the items to match the zero-shot model.
 
 This is one member of what the protocol expects to become a small certified evaluator family.
 At reference stage there is no population and no pooled rate. Diversity across that family is
@@ -295,9 +301,12 @@ cross-check of each monitor against the population of monitors observing the sam
 Mechanism 3 and are not built. Verdicts do carry binding version attribution, which is the piece
 the rest hangs from. The on-device evaluator occupies the preferred deployment tier with a
 pinned small model; it is not a certified commons evaluator, a divergent verdict on the
-same pin is not yet cross-checked against a population, and the golden fixtures still fail
+same pin is not yet cross-checked against a population, and the smoke identities still fail
 (11 of 22 under template v2.1, all counter-example false positives). Mean evaluation wall
-time on the reference droplet is still tens of seconds per response.
+time on the reference droplet is still tens of seconds per response. The expanded held-out
+gate at `data/evaluator-gate/` is the certification set for a trained pin. Training data
+generation, the LoRA, the published GGUF, and template v3 integration are not in this
+build. Review of the held-out items is pending.
 
 **The admission gate for telemetry.** Certification, hardware-attested instance uniqueness,
 issuance rate limiting, coordination detection, and contribution caps are the four layers that
