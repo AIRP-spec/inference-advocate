@@ -12,6 +12,7 @@ import {
 import { assertGeneratorBaseUrl } from './endpoint.mjs';
 import { buildSlots, expectedTotal } from './slots.mjs';
 import { conformanceReason, profanityExpletiveRe } from './conformance.mjs';
+import { parseExamples } from './generate.mjs';
 
 const here = dirname(fileURLToPath(import.meta.url));
 const repoRoot = join(here, '..', '..');
@@ -36,8 +37,37 @@ test('slot counts sum to the recipe total and cover every class', () => {
   for (const type of writerTypes) {
     const singles = slots.filter((s) => s.family === 'positive-single' && s.class === type);
     assert.equal(singles.length, recipe.counts.positive.singlePerClass);
-    assert.ok(singles.every((s) => s.expect.length === 1 && s.expect[0] === type));
+    const split = recipe.positiveSingleSplits?.[type];
+    if (split) {
+      for (const spec of split.kinds) {
+        const rows = singles.filter((s) => s.kind === spec.kind);
+        assert.equal(rows.length, spec.count, `${type} kind ${spec.kind}`);
+        assert.ok(
+          rows.every(
+            (s) => s.expect.length === spec.expect.length && spec.expect.every((t) => s.expect.includes(t)),
+          ),
+          `${type} kind ${spec.kind} expect`,
+        );
+      }
+    } else {
+      assert.ok(singles.every((s) => !s.kind && s.expect.length === 1 && s.expect[0] === type));
+    }
   }
+  const violenceMethod = slots.filter((s) => s.kind === 'violence-method');
+  assert.equal(violenceMethod.length, 40);
+  assert.ok(
+    violenceMethod.every(
+      (s) => s.expect.includes('violence') && s.expect.includes('criminal_assistance'),
+    ),
+  );
+  const violenceDepiction = slots.filter((s) => s.kind === 'violence-depiction');
+  assert.equal(violenceDepiction.length, 40);
+  assert.ok(violenceDepiction.every((s) => s.expect.length === 1 && s.expect[0] === 'violence'));
+  const selfHarmMethod = slots.filter((s) => s.kind === 'self_harm-method');
+  assert.equal(selfHarmMethod.length, 40);
+  assert.ok(selfHarmMethod.every((s) => s.expect.length === 1 && s.expect[0] === 'self_harm'));
+  assert.equal(recipe.positiveSingleSplits.self_harm.methodMeetsCriminalAssistance, false);
+  assert.equal(recipe.generator.maxRetries, 8);
   const cseWriterPositives = slots.filter(
     (s) =>
       (s.family === 'positive-single' || s.family === 'positive-multi') &&
@@ -71,6 +101,12 @@ test('slot counts sum to the recipe total and cover every class', () => {
   assert.ok(clean.every((s) => s.expect.length === 0));
   const allNo = slots.filter((s) => s.expect.length === 0).length;
   assert.ok(allNo > total * 0.6, `all-no fraction ${allNo}/${total} should mirror mostly-clean traffic`);
+});
+
+test('a split that does not sum to singlePerClass fails closed', () => {
+  const bad = structuredClone(recipe);
+  bad.positiveSingleSplits.violence.kinds[0].count = 39;
+  assert.throws(() => buildSlots(bad, types), /sums to 79/);
 });
 
 test('leak checker flags held-out content and allows a novel greeting', () => {
@@ -121,6 +157,28 @@ test('generation prompts exist for every slot family and contain no em-dash', ()
   assert.equal(prompts.families['positive-composed'], undefined);
   assert.equal(prompts.sharedSystem.includes('\u2014'), false);
   assert.equal(JSON.stringify(recipe).includes('\u2014'), false);
+  assert.equal(JSON.stringify(prompts).includes('\u2014'), false);
+  const readme = readFileSync(join(here, 'README.md'), 'utf8');
+  assert.equal(readme.includes('\u2014'), false);
+  assert.match(readme, /methodMeetsCriminalAssistance/);
+  const kinds = ['violence-depiction', 'violence-method', 'self_harm-encouragement', 'self_harm-method'];
+  for (const kind of kinds) {
+    assert.ok(prompts.positiveSingleKinds[kind], `missing prompt for kind ${kind}`);
+    assert.equal(prompts.positiveSingleKinds[kind].includes('\u2014'), false);
+    assert.match(prompts.positiveSingleKinds[kind], /Target labels/);
+    assert.match(prompts.positiveSingleKinds[kind], /independently met/);
+  }
+  for (const [type, split] of Object.entries(recipe.positiveSingleSplits)) {
+    for (const spec of split.kinds) {
+      assert.ok(prompts.positiveSingleKinds[spec.kind], `recipe kind ${type}/${spec.kind} has no prompt`);
+    }
+  }
+  assert.match(prompts.families.greeting, /Vary tone/);
+  assert.match(prompts.families.greeting, /opening word/);
+  assert.match(prompts.families.fact, /horticulture/);
+  assert.match(prompts.profanityRequirement, /expletive/);
+  assert.match(prompts.families['positive-multi'], /profanityRequirement/);
+  assert.match(prompts.families['positive-single'], /targetLabels/);
 });
 
 test('no generation prompt for CSE-exhibiting text exists in the recipe', () => {
@@ -216,4 +274,16 @@ test('composed CSE scaffold is leak-free and large enough', () => {
   }
   assert.ok(uniqueSingles.size >= recipe.counts.positive.composedSingle, uniqueSingles.size);
   assert.ok(uniqueDuals.size >= recipe.counts.positive.composedDual, uniqueDuals.size);
+});
+
+test('parseExamples recovers control characters inside writer strings', () => {
+  const withNewline = `{"examples":["hello\nworld","second item"]}`;
+  const got = parseExamples(withNewline, 2);
+  assert.equal(got.length, 2);
+  assert.equal(got[0], 'hello\nworld');
+  assert.equal(got[1], 'second item');
+  const withTabAndBell = `{"examples":["a\tb\u0007c","d"]}`;
+  const got2 = parseExamples(withTabAndBell, 2);
+  assert.equal(got2[0], 'a\tbc');
+  assert.throws(() => parseExamples('{not-json', 1), /malformed-json/);
 });

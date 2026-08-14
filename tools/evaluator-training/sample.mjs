@@ -37,7 +37,10 @@ function parseArgs(argv) {
 }
 
 function groupKey(row) {
-  if (row.family === 'positive-single' || row.family === 'mention-versus-use' || row.family === 'class-refusal') {
+  if (row.family === 'positive-single') {
+    return row.kind ? `${row.family}:${row.class}:${row.kind}` : `${row.family}:${row.class}`;
+  }
+  if (row.family === 'mention-versus-use' || row.family === 'class-refusal') {
     return `${row.family}:${row.class}`;
   }
   if (row.family === 'sensitive-discussion') return `${row.family}:${row.class}`;

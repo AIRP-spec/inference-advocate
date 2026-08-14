@@ -3,6 +3,17 @@
 //
 // Paper: step 8. Labels are a property of the slot, not a second model call.
 // Dual-class slots are the published conjunction pairs, never bundles.
+//
+// Positive-single splits: when a class's published definition overlaps a
+// neighbor on the content a positive would produce, the 80 singles are split
+// by kind and the slot's expect is fixed to that kind. Violence-method is
+// violence plus criminal_assistance because attack how-to independently meets
+// both definitions. Self-harm method is self_harm only: criminal_assistance is
+// concrete assistance for crimes against others or the state (fraud, theft,
+// weapons, intrusion), and the accepted held-out method items are self_harm
+// only. That decision is recorded on the recipe as
+// methodMeetsCriminalAssistance: false. Do not infer a dual from the word
+// "method" alone.
 
 /**
  * @param {number} seed
@@ -42,6 +53,39 @@ export function writerPositiveTypes(recipe, types) {
 
 /**
  * @param {object} recipe
+ * @param {string} type
+ */
+export function positiveSingleKindsFor(recipe, type) {
+  const split = recipe.positiveSingleSplits?.[type];
+  if (!split) return null;
+  if (!Array.isArray(split.kinds) || split.kinds.length === 0) {
+    throw new Error(`positiveSingleSplits.${type} has no kinds`);
+  }
+  let sum = 0;
+  const seen = new Set();
+  for (const kind of split.kinds) {
+    if (!kind.kind || typeof kind.kind !== 'string') {
+      throw new Error(`positiveSingleSplits.${type} has a kind without a name`);
+    }
+    if (seen.has(kind.kind)) throw new Error(`duplicate kind ${kind.kind} on ${type}`);
+    seen.add(kind.kind);
+    if (!Number.isInteger(kind.count) || kind.count < 1) {
+      throw new Error(`kind ${kind.kind} on ${type} has invalid count`);
+    }
+    if (!Array.isArray(kind.expect) || kind.expect.length === 0) {
+      throw new Error(`kind ${kind.kind} on ${type} has empty expect`);
+    }
+    sum += kind.count;
+  }
+  const want = recipe.counts.positive.singlePerClass;
+  if (sum !== want) {
+    throw new Error(`split for ${type} sums to ${sum}, want ${want}`);
+  }
+  return split.kinds;
+}
+
+/**
+ * @param {object} recipe
  * @param {string[]} types taxonomy types in order
  */
 export function expectedTotal(recipe, types) {
@@ -69,11 +113,11 @@ export function expectedTotal(recipe, types) {
 /**
  * @param {object} recipe
  * @param {string[]} types
- * @returns {Array<{ id: string, family: string, class: string | null, expect: string[], pair?: string[] }>}
+ * @returns {Array<{ id: string, family: string, class: string | null, expect: string[], pair?: string[], kind?: string }>}
  */
 export function buildSlots(recipe, types) {
   const c = recipe.counts;
-  /** @type {Array<{ id: string, family: string, class: string | null, expect: string[], pair?: string[] }>} */
+  /** @type {Array<{ id: string, family: string, class: string | null, expect: string[], pair?: string[], kind?: string }>} */
   const slots = [];
   let n = 0;
   const add = (family, klass, expect, extra = {}) => {
@@ -111,10 +155,19 @@ export function buildSlots(recipe, types) {
       add('sensitive-discussion', type, []);
     }
   }
-  for (const type of writerPositiveTypes(recipe, types)) {
-    for (let i = 0; i < c.positive.singlePerClass; i++) add('positive-single', type, [type]);
-  }
   const cse = recipe.composedClass;
+  for (const type of writerPositiveTypes(recipe, types)) {
+    const kinds = positiveSingleKindsFor(recipe, type);
+    if (kinds) {
+      for (const spec of kinds) {
+        for (let i = 0; i < spec.count; i++) {
+          add('positive-single', type, [...spec.expect], { kind: spec.kind });
+        }
+      }
+    } else {
+      for (let i = 0; i < c.positive.singlePerClass; i++) add('positive-single', type, [type]);
+    }
+  }
   for (let i = 0; i < c.positive.composedSingle; i++) {
     add('positive-composed', cse, [cse]);
   }

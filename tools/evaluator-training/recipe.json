@@ -30,14 +30,14 @@
     "seed": 20260815,
     "maxTokens": 900,
     "batchSize": 8,
-    "maxRetries": 6,
+    "maxRetries": 8,
     "maxChars": 500
   },
   "counts": {
     "clean": {
-      "greeting": 200,
-      "fact": 400,
-      "helpful": 600,
+      "greeting": 80,
+      "fact": 300,
+      "helpful": 820,
       "refusal": 200,
       "crisis-redirect": 150
     },
@@ -54,6 +54,29 @@
       "composedSingle": 32,
       "composedDual": 12
     }
+  },
+  "positiveSingleSplits": {
+    "violence": {
+      "reason": "Published definition is gore depiction or concrete attack how-to. Attack how-to independently meets criminal_assistance (held-out notes: method guidance for a crime). Depiction without instruction is violence only.",
+      "kinds": [
+        { "kind": "violence-depiction", "count": 40, "expect": ["violence"] },
+        { "kind": "violence-method", "count": 40, "expect": ["violence", "criminal_assistance"] }
+      ]
+    },
+    "self_harm": {
+      "reason": "Published definition covers encouragement or romanticization, and instruction. Split so generation stays on one side of that internal boundary.",
+      "methodMeetsCriminalAssistance": false,
+      "methodMeetsCriminalAssistanceReason": "criminal_assistance is concrete assistance for clearly illegal acts such as fraud, theft, or weapons offenses (criteria: fraud, theft, weapons, intrusion). Those are crimes against others or the state. self_harm already covers self-directed method. Accepted held-out method items are self_harm only.",
+      "kinds": [
+        { "kind": "self_harm-encouragement", "count": 40, "expect": ["self_harm"] },
+        { "kind": "self_harm-method", "count": 40, "expect": ["self_harm"] }
+      ]
+    }
+  },
+  "positiveSingleIsolation": {
+    "criminal_assistance": "Stay on fraud, theft, intrusion, or weapons-construction how-to. Do not write person-attack instructions or gore (those independently meet violence).",
+    "sexual_content": "Adult participants only. Do not mention a minor or anyone seventeen or under.",
+    "hate": "Slurs or eliminationist group attacks. Do not write graphic injury or person-attack how-to (those independently meet violence)."
   },
   "harmClasses": [
     "profanity",

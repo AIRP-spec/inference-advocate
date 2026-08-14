@@ -20,6 +20,52 @@ positives, then a small multi-class slice. Hard negatives are deliberate:
 mention-versus-use, class-specific refusals, persona/machine denials,
 sensitive-topic discussion, greetings.
 
+## Positive-single neighbor boundaries
+
+Writer `positive-single` slots stay at 80 per writer class. When a class's
+published definition overlaps a neighbor on the content a positive would
+produce, those 80 are split by kind. The kind chooses the prompt. The slot
+spec chooses the labels. The writer is never asked to judge.
+
+### Split
+
+| Class | Kind | Count | Labels | Why |
+| --- | --- | --- | --- | --- |
+| violence | violence-depiction | 40 | violence | Gore, injury, or aftermath. No instruction. Held-out gore items are violence only. |
+| violence | violence-method | 40 | violence, criminal_assistance | Concrete attack how-to independently meets both definitions. Held-out instruction items carry both. |
+| self_harm | self_harm-encouragement | 40 | self_harm | Encouragement or romanticization, no method. |
+| self_harm | self_harm-method | 40 | self_harm | Concrete self-directed method. criminal_assistance is not met (see below). |
+
+self_harm-method is not dual-labeled. The published criminal_assistance
+definition is concrete assistance for clearly illegal acts such as fraud,
+theft, or weapons offenses (criteria: fraud, theft, weapons, intrusion).
+Those are crimes against others or the state. self_harm already names
+instruction as part of its own definition. Accepted held-out method items
+(cut yourself, here's how you can commit suicide) are self_harm only. The
+recipe records this as `methodMeetsCriminalAssistance: false`.
+
+Kind prompts name the target label set and say what to include and exclude
+so the writer stays on the intended side of the boundary. Register follows
+the held-out suite (classifier fixture, not a scene) the same way the CSE
+scaffold does. Held-out contents are never copied into a generation prompt.
+
+### Left single
+
+| Class | Why not split |
+| --- | --- |
+| persona_claims | Feeling or inner-life claims. A positive need not also meet relational_hooks or simulation_obscured. |
+| relational_hooks | Return, dependence, or exclusivity. Can be met without a feeling claim or a humanity claim. |
+| sycophancy | Flattery untethered to content. No neighbor whose definition is independently met by ordinary sycophancy text. |
+| simulation_obscured | Undermining nonhuman status. Distinct from persona_claims (feelings) and relational_hooks. |
+| profanity | A strong expletive. Hate and sexual_content need slurs or erotic framing; an expletive alone does not meet them. |
+| sexual_content | Explicit adult sexual content. Conjunction with a minor is CSE, which is the composed path, not this prompt. Isolation: adult participants only. |
+| hate | Slurs or eliminationist group attacks. Held-out eliminationist items are hate only (no gore, no person-attack how-to). Isolation: do not write graphic injury or attack how-to. |
+| criminal_assistance | Fraud, theft, intrusion, or weapons-construction how-to. Person-attack how-to is the violence-method kind plus the multi pair. Isolation: stay off person-attack and gore. Held-out bomb-making without person-attack is criminal_assistance only. |
+| child_sexual_exploitation | Not a writer positive. Composed locally. Dual with sexual_content is the composed dual path. |
+
+The shared conjunction rule stays: a neighbor class appears only if its own
+definition is independently met.
+
 ## Held-out separation
 
 `data/evaluator-gate/held-out-suite.v1.json` is never trained against. It was

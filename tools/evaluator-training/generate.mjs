@@ -2,11 +2,12 @@
 // Generate the training corpus from the committed recipe and prompts.
 //
 // Paper: step 8. Labels come from the slot spec. The generator writes assistant
-// text only. Held-out contents are never in the prompt. Run locally or on RunPod
+// text only. Held-out contents are never in the prompt. Positive-single kinds
+// pick the prompt; the slot still owns the labels. Run locally or on RunPod
 // against an OpenAI-compatible endpoint serving the recipe's generator model.
 
 import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
-import { dirname, join } from 'node:path';
+import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { conformanceReason, profanityExpletiveRe } from './conformance.mjs';
 
@@ -37,9 +38,15 @@ function parseArgs(argv) {
   return out;
 }
 
-function fillPrompt(prompts, family, vars) {
-  const template = prompts.families[family];
-  if (!template) throw new Error(`no prompt for family ${family}`);
+function fillPrompt(prompts, family, vars, kind) {
+  let template;
+  if (kind) {
+    template = prompts.positiveSingleKinds?.[kind];
+    if (!template) throw new Error(`no prompt for kind ${kind}`);
+  } else {
+    template = prompts.families[family];
+    if (!template) throw new Error(`no prompt for family ${family}`);
+  }
   const constraints = prompts.sharedConstraints.map((c) => `- ${c}`).join('\n');
   return `${interpolate(template, vars)}\n\nConstraints:\n${constraints}`;
 }
@@ -57,6 +64,7 @@ function classVars(taxDoc, type) {
 
 function batchKey(slot) {
   if (slot.family === 'positive-multi') return `positive-multi:${slot.expect.join('+')}`;
+  if (slot.kind) return `${slot.family}:${slot.class}:${slot.kind}`;
   return `${slot.family}:${slot.class ?? '_'}`;
 }
 
@@ -72,12 +80,62 @@ function stripFence(text) {
   return m ? m[1].trim() : trimmed;
 }
 
-function parseExamples(text, n) {
+/**
+ * Escape raw C0 controls that appear inside JSON strings so a truncated or
+ * messy writer payload can still parse. Other controls are dropped. This is
+ * tolerance for malformed writer JSON, not a rewrite of the example text.
+ *
+ * @param {string} text
+ */
+export function escapeControlCharsInJsonStrings(text) {
+  let out = '';
+  let inString = false;
+  let escaped = false;
+  for (const ch of text) {
+    const code = ch.charCodeAt(0);
+    if (inString) {
+      if (escaped) {
+        out += ch;
+        escaped = false;
+        continue;
+      }
+      if (ch === '\\') {
+        out += ch;
+        escaped = true;
+        continue;
+      }
+      if (ch === '"') {
+        out += ch;
+        inString = false;
+        continue;
+      }
+      if (code < 32) {
+        if (ch === '\n') out += '\\n';
+        else if (ch === '\r') out += '\\r';
+        else if (ch === '\t') out += '\\t';
+        continue;
+      }
+      out += ch;
+      continue;
+    }
+    if (ch === '"') inString = true;
+    out += ch;
+  }
+  return out;
+}
+
+export function parseExamples(text, n) {
   const cleaned = stripFence(text);
   const start = cleaned.indexOf('[');
   const end = cleaned.lastIndexOf(']');
   const jsonText = start >= 0 && end > start ? cleaned.slice(start, end + 1) : cleaned;
-  const raw = JSON.parse(jsonText);
+  const sanitized = escapeControlCharsInJsonStrings(jsonText);
+  let raw;
+  try {
+    raw = JSON.parse(sanitized);
+  } catch (err) {
+    throw new Error(`malformed-json: ${err.message}`);
+  }
   const list = Array.isArray(raw) ? raw : raw.examples;
   if (!Array.isArray(list)) throw new Error('generator JSON has no examples array');
   const strings = list.map((x) => (typeof x === 'string' ? x.trim() : '')).filter(Boolean);
@@ -221,6 +279,16 @@ async function main() {
     for (const [family, n] of [...byFamily.entries()].sort()) {
       console.log(`  ${family}: ${n}`);
     }
+    /** @type {Map<string, number>} */
+    const byKind = new Map();
+    for (const slot of slots.filter((s) => s.family === 'positive-single')) {
+      const key = slot.kind ? `${slot.class}:${slot.kind}` : `${slot.class}:unsplit`;
+      byKind.set(key, (byKind.get(key) ?? 0) + 1);
+    }
+    console.log('by positive-single kind:');
+    for (const [key, n] of [...byKind.entries()].sort()) {
+      console.log(`  ${key}: ${n}`);
+    }
     const cseWriter = slots.filter(
       (s) =>
         (s.family === 'positive-single' || s.family === 'positive-multi') &&
@@ -308,6 +376,7 @@ async function main() {
       id: slot.id,
       family: slot.family,
       class: slot.class,
+      ...(slot.kind ? { kind: slot.kind } : {}),
       expect: slot.expect,
       content,
       taxonomyVersion: recipe.taxonomyVersion,
@@ -382,8 +451,24 @@ async function main() {
           `refusing to prompt the writer for CSE-exhibiting text (${head.id}). Composed family only.`,
         );
       }
-      const vars = { n: String(batch.length) };
+      const vars = {
+        n: String(batch.length),
+        targetLabels: head.expect.join(', '),
+        isolation: 'Exhibit this class and only this class.',
+        profanityRequirement: '',
+        neighborType: '',
+        neighborDefinition: '',
+      };
       if (head.class && head.family !== 'positive-multi') Object.assign(vars, classVars(taxDoc, head.class));
+      if (head.family === 'positive-single') {
+        vars.isolation =
+          recipe.positiveSingleIsolation?.[head.class] ?? 'Exhibit this class and only this class.';
+        if (head.kind === 'violence-method') {
+          const ca = classVars(taxDoc, 'criminal_assistance');
+          vars.neighborType = 'criminal_assistance';
+          vars.neighborDefinition = ca.definition;
+        }
+      }
       if (head.family === 'positive-multi') {
         const [a, b] = head.pair;
         const va = classVars(taxDoc, a);
@@ -392,8 +477,11 @@ async function main() {
         vars.defA = va.definition;
         vars.classB = b;
         vars.defB = vb.definition;
+        if (head.expect.includes('profanity')) {
+          vars.profanityRequirement = prompts.profanityRequirement;
+        }
       }
-      const user = fillPrompt(prompts, head.family, vars);
+      const user = fillPrompt(prompts, head.family, vars, head.kind);
       const seed = recipe.generator.seed + attempt * 10007 + written;
       const raw = await chat(baseUrl, apiKey, {
         model,
@@ -465,7 +553,11 @@ async function main() {
   console.log(`sft ${sftPath}`);
 }
 
-main().catch((err) => {
-  console.error(err.message || err);
-  process.exit(1);
-});
+const isDirectRun =
+  Boolean(process.argv[1]) && resolve(process.argv[1]) === fileURLToPath(import.meta.url);
+if (isDirectRun) {
+  main().catch((err) => {
+    console.error(err.message || err);
+    process.exit(1);
+  });
+}
