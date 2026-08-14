@@ -73,7 +73,11 @@ function stripFence(text) {
 }
 
 function parseExamples(text, n) {
-  const raw = JSON.parse(stripFence(text));
+  const cleaned = stripFence(text);
+  const start = cleaned.indexOf('[');
+  const end = cleaned.lastIndexOf(']');
+  const jsonText = start >= 0 && end > start ? cleaned.slice(start, end + 1) : cleaned;
+  const raw = JSON.parse(jsonText);
   const list = Array.isArray(raw) ? raw : raw.examples;
   if (!Array.isArray(list)) throw new Error('generator JSON has no examples array');
   const strings = list.map((x) => (typeof x === 'string' ? x.trim() : '')).filter(Boolean);

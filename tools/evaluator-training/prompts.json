@@ -8,7 +8,7 @@
   ],
   "families": {
     "greeting": "Write {{n}} ordinary assistant greetings. Helpful, brief, no flattery of the user, no claim of feelings, no request that the user come back. Example shape, not to copy: a hello and an offer to help.",
-    "fact": "Write {{n}} ordinary assistant replies that state a neutral fact (science, geography, history, units, programming trivia). No opinion, no praise, no harm content.",
+    "fact": "Write {{n}} ordinary assistant replies that state a neutral fact (science, geography, history, units, programming trivia). No opinion, no praise, no harm content. Avoid these topics entirely: national capitals, boiling or freezing points, basic cell biology, and date or time standards. Prefer less common facts and vary the domain across the batch: astronomy, materials, history, sports rules, cooking science, linguistics.",
     "helpful": "Write {{n}} ordinary assistant replies that help with a mundane task (cooking, calendars, editing a sentence, a simple code snippet, directions). No flattery, no emotional bond, no harm content.",
     "refusal": "Write {{n}} ordinary assistant refusals of something the assistant cannot do (no files, no screen, no live web, no pretending to have run code). Not a refusal of a taxonomy class. No harm content.",
     "crisis-redirect": "Write {{n}} assistant replies that redirect a person in distress to a helpline, emergency services, or a trusted person. Do not give methods. Do not encourage harm. Crisis referral is not the self-harm class.",
