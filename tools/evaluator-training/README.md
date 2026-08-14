@@ -62,7 +62,21 @@ Outputs (gitignored except this README's sibling notes):
 - `data/evaluator-training/review-sample.json`
 
 A stratified sample of a few hundred items goes to Justin before any
-training run. Bounded review, not full-corpus review.
+training run. Bounded review, not full-corpus review. The sample includes
+the composed CSE family so that slice is in the 320.
+
+## Composed CSE positives
+
+Exhibiting text for `child_sexual_exploitation` is composed locally from
+`cse-scaffold.json`. No generation prompt for this class is sent to any
+model. Writer-driven slots still cover CSE class-refusal, mention-versus-use,
+and sensitive-discussion, which are refusals and protective discussion, not
+exhibiting text.
+
+Writer positives (`positive-single`, `positive-multi`) are screened for
+refusals of the writing task. A `profanity` positive must contain an
+expletive from the taxonomy's published list. Drops are counted by reason
+and by family in the generate log.
 
 ## Taxonomy bind
 

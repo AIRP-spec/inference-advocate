@@ -41,7 +41,9 @@ function groupKey(row) {
     return `${row.family}:${row.class}`;
   }
   if (row.family === 'sensitive-discussion') return `${row.family}:${row.class}`;
-  if (row.family === 'positive-multi') return `${row.family}:${(row.expect ?? []).join('+')}`;
+  if (row.family === 'positive-multi' || row.family === 'positive-composed') {
+    return `${row.family}:${(row.expect ?? []).join('+')}`;
+  }
   return row.family;
 }
 

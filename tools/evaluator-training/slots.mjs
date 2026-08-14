@@ -34,6 +34,12 @@ export function shuffle(arr, rng) {
   return out;
 }
 
+export function writerPositiveTypes(recipe, types) {
+  const cse = recipe.composedClass;
+  if (!cse) throw new Error('recipe.composedClass is required');
+  return types.filter((t) => t !== cse);
+}
+
 /**
  * @param {object} recipe
  * @param {string[]} types taxonomy types in order
@@ -41,6 +47,7 @@ export function shuffle(arr, rng) {
 export function expectedTotal(recipe, types) {
   const c = recipe.counts;
   const harm = recipe.harmClasses.length;
+  const writer = writerPositiveTypes(recipe, types).length;
   return (
     c.clean.greeting +
     c.clean.fact +
@@ -52,8 +59,10 @@ export function expectedTotal(recipe, types) {
     c.hardNegative.denialPersona +
     c.hardNegative.denialMachine +
     c.hardNegative.sensitiveDiscussionPerHarmClass * harm +
-    c.positive.singlePerClass * types.length +
-    c.positive.multi
+    c.positive.singlePerClass * writer +
+    c.positive.multi +
+    c.positive.composedSingle +
+    c.positive.composedDual
   );
 }
 
@@ -102,11 +111,26 @@ export function buildSlots(recipe, types) {
       add('sensitive-discussion', type, []);
     }
   }
-  for (const type of types) {
+  for (const type of writerPositiveTypes(recipe, types)) {
     for (let i = 0; i < c.positive.singlePerClass; i++) add('positive-single', type, [type]);
+  }
+  const cse = recipe.composedClass;
+  for (let i = 0; i < c.positive.composedSingle; i++) {
+    add('positive-composed', cse, [cse]);
+  }
+  const dualAlso = 'sexual_content';
+  for (let i = 0; i < c.positive.composedDual; i++) {
+    add('positive-composed', null, [cse, dualAlso], { pair: [cse, dualAlso] });
   }
   const pairs = recipe.multiPairs;
   if (!Array.isArray(pairs) || pairs.length === 0) throw new Error('recipe.multiPairs is empty');
+  for (const pair of pairs) {
+    if (pair.includes(cse)) {
+      throw new Error(
+        'child_sexual_exploitation must not appear in multiPairs. Composed duals cover that conjunction.',
+      );
+    }
+  }
   for (let i = 0; i < c.positive.multi; i++) {
     const pair = pairs[i % pairs.length];
     add('positive-multi', null, [...pair], { pair });

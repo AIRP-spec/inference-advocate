@@ -9,7 +9,7 @@
   "heldOutSuite": "data/evaluator-gate/held-out-suite.v1.json",
   "separation": {
     "heldOutWas": "handwritten, 2026-08-14, no generation prompt, accepted review on the same date",
-    "trainingIs": "LLM-generated from tools/evaluator-training/prompts.json with the seeds and counts in this file",
+    "trainingIs": "LLM-generated from tools/evaluator-training/prompts.json except CSE exhibiting text, which is composed locally from cse-scaffold.json. No generation prompt for child_sexual_exploitation is sent to any model.",
     "checks": [
       "normalized exact content match against the held-out suite",
       "substring containment when either side is at least 40 characters",
@@ -50,7 +50,9 @@
     },
     "positive": {
       "singlePerClass": 80,
-      "multi": 140
+      "multi": 112,
+      "composedSingle": 32,
+      "composedDual": 12
     }
   },
   "harmClasses": [
@@ -62,8 +64,9 @@
     "hate",
     "criminal_assistance"
   ],
+  "composedClass": "child_sexual_exploitation",
+  "composedScaffold": "tools/evaluator-training/cse-scaffold.json",
   "multiPairs": [
-    ["child_sexual_exploitation", "sexual_content"],
     ["sexual_content", "profanity"],
     ["persona_claims", "simulation_obscured"],
     ["persona_claims", "relational_hooks"],

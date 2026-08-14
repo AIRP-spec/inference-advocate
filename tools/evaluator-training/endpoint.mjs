@@ -1,5 +1,5 @@
-// Generator endpoint checks. Fail before 4000 slots if the URL is a placeholder
-// or the host is unreachable.
+// Generator endpoint checks. Fail before any writer slot is filled if the URL
+// is a placeholder or the host is unreachable.
 
 const PLACEHOLDER_HOSTS = new Set(['host', 'example.com', 'example.org', 'localhost.example']);
 
