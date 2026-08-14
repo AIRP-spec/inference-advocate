@@ -188,11 +188,12 @@ Bit-identical verdicts across differing hardware are not promised.
 
 The golden fixtures under `packages/evaluator-local/test/` are the acceptance gate for
 this pin. They are generated from the current taxonomy file so a new class cannot ship
-untested. At the time this evaluator landed, Qwen3-0.6B Q4_K_M did not pass them: it
-collapses formation flags into `persona_claims` and harm flags into `profanity`, and it
-flags some taxonomy counter-examples that mention a class without matching it. A larger
-model is not the next step. A better prompt template or a fine-tune is, and that decision
-is outside the reference wiring.
+untested. The live pin is Qwen's published Qwen3-0.6B GGUF at Q8_0. Template v2 asks one
+binary judgment per taxonomy class rather than one eleven-way call. That cleared the v1
+attractor false negatives. It did not clear the suite: 8 of 22 still fail, all
+counter-example false positives. The report is `packages/evaluator-local/FIXTURE-REPORT.md`.
+A larger model is not the next step. Remaining failures are the candidate target list for
+a fine-tuned evaluator, which is a separately scoped effort.
 
 This is one member of what the protocol expects to become a small certified evaluator family.
 At reference stage there is no population and no pooled rate. Diversity across that family is
@@ -291,8 +292,9 @@ runtime attestation, verdict signatures chaining to an attested build, and the s
 cross-check of each monitor against the population of monitors observing the same provider are
 Mechanism 3 and are not built. Verdicts do carry binding version attribution, which is the piece
 the rest hangs from. The on-device evaluator occupies the preferred deployment tier with a
-pinned small model; it is not a certified commons evaluator, and a divergent verdict on the
-same pin is not yet cross-checked against a population.
+pinned small model; it is not a certified commons evaluator, a divergent verdict on the
+same pin is not yet cross-checked against a population, and the golden fixtures still fail
+(8 of 22 under template v2, all counter-example false positives).
 
 **The admission gate for telemetry.** Certification, hardware-attested instance uniqueness,
 issuance rate limiting, coordination detection, and contribution caps are the four layers that
