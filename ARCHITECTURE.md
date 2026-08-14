@@ -188,10 +188,12 @@ Bit-identical verdicts across differing hardware are not promised.
 
 The golden fixtures under `packages/evaluator-local/test/` are the acceptance gate for
 this pin. They are generated from the current taxonomy file so a new class cannot ship
-untested. The live pin is Qwen's published Qwen3-0.6B GGUF at Q8_0. Template v2 asks one
-binary judgment per taxonomy class rather than one eleven-way call. That cleared the v1
-attractor false negatives. It did not clear the suite: 8 of 22 still fail, all
-counter-example false positives. The report is `packages/evaluator-local/FIXTURE-REPORT.md`.
+untested. The live pin is Qwen's published Qwen3-0.6B GGUF at Q8_0. Template v2.1 asks one
+grammar-constrained yes or no per taxonomy class, with a shared prefix reused on one
+sequence. v2 cleared the attractor false negatives. v2.1 confirmed that thinking was
+already off in v2, constrained the verdict to `yes`/`no`, and did not hit the 4 to 10
+second mean on this droplet (mean 42712ms). It also worsened counter-example over-firing
+(11 of 11 counters fail). The report is `packages/evaluator-local/FIXTURE-REPORT.md`.
 A larger model is not the next step. Remaining failures are the candidate target list for
 a fine-tuned evaluator, which is a separately scoped effort.
 
@@ -294,7 +296,8 @@ Mechanism 3 and are not built. Verdicts do carry binding version attribution, wh
 the rest hangs from. The on-device evaluator occupies the preferred deployment tier with a
 pinned small model; it is not a certified commons evaluator, a divergent verdict on the
 same pin is not yet cross-checked against a population, and the golden fixtures still fail
-(8 of 22 under template v2, all counter-example false positives).
+(11 of 22 under template v2.1, all counter-example false positives). Mean evaluation wall
+time on the reference droplet is still tens of seconds per response.
 
 **The admission gate for telemetry.** Certification, hardware-attested instance uniqueness,
 issuance rate limiting, coordination detection, and contribution caps are the four layers that
