@@ -1,12 +1,12 @@
 {
   "name": "Qwen3-0.6B",
-  "fileName": "Qwen3-0.6B-Q4_K_M.gguf",
-  "sourceUrl": "https://huggingface.co/bartowski/Qwen_Qwen3-0.6B-GGUF/resolve/main/Qwen_Qwen3-0.6B-Q4_K_M.gguf",
-  "sha256": "9acfc1e001311f34b4252001b626f2e466d592a42065f66571bff3790d4e1b14",
-  "bytes": 484220320,
-  "quantization": "Q4_K_M",
+  "fileName": "Qwen3-0.6B-Q8_0.gguf",
+  "sourceUrl": "https://huggingface.co/Qwen/Qwen3-0.6B-GGUF/resolve/main/Qwen3-0.6B-Q8_0.gguf",
+  "sha256": "9465e63a22add5354d9bb4b99e90117043c7124007664907259bd16d043bb031",
+  "bytes": 639446688,
+  "quantization": "Q8_0",
   "parameterCount": "0.6B",
   "license": "Apache-2.0",
-  "promptTemplateVersion": "v1",
-  "notes": "Least-common-denominator reference for the on-device semantic evaluator: small enough for phone-class devices, Apache-2.0. Qwen's official GGUF repository (Qwen/Qwen3-0.6B-GGUF) ships Q8_0 only. This pin is the llama.cpp Q4_K_M conversion of the official Qwen3-0.6B weights. SHA-256 was computed from the downloaded artifact."
+  "promptTemplateVersion": "v2",
+  "notes": "Reference pin for the on-device semantic evaluator. Fetched as published by the model vendor from Qwen/Qwen3-0.6B-GGUF, quantization Q8_0, no local conversion. The reference judge's weights must be obtainable and hash-verifiable by anyone from a public source. A locally converted quantization has no provenance outside the machine that produced it. SHA-256 was computed from the downloaded artifact. Validated against prompt template v2 (per-class binary decomposition)."
 }

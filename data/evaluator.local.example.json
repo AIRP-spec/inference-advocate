@@ -1,7 +1,7 @@
 {
   "kind": "local",
-  "modelPath": "data/models/Qwen3-0.6B-Q4_K_M.gguf",
-  "modelSha256": "9acfc1e001311f34b4252001b626f2e466d592a42065f66571bff3790d4e1b14",
+  "modelPath": "data/models/Qwen3-0.6B-Q8_0.gguf",
+  "modelSha256": "9465e63a22add5354d9bb4b99e90117043c7124007664907259bd16d043bb031",
   "contextSize": 4096,
   "gpu": false,
   "timeoutMs": 120000,
