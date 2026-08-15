@@ -34,8 +34,8 @@
     }
   },
   "lora": {
-    "r": 16,
-    "alpha": 32,
+    "r": 32,
+    "alpha": 64,
     "dropout": 0.05,
     "bias": "none",
     "taskType": "CAUSAL_LM",
@@ -50,11 +50,11 @@
     ]
   },
   "train": {
-    "epochs": 6,
+    "epochs": 3,
     "perDeviceBatchSize": 8,
     "gradientAccumulationSteps": 4,
     "effectiveBatchSize": 32,
-    "learningRate": 0.0002,
+    "learningRate": 0.0001,
     "warmupRatio": 0.03,
     "lrScheduler": "cosine",
     "maxSeqLen": 4096,
