@@ -109,7 +109,7 @@ def sft_config_kwargs(recipe, adapter_dir: Path, seed: int) -> dict:
         kwargs["max_seq_length"] = t["maxSeqLen"]
     if t.get("assistantOnlyLoss"):
         if "assistant_only_loss" in params:
-            kwargs["assistant_only_loss"] = True
+            kwargs["assistant_only_loss"] = False
         elif "completion_only_loss" in params:
             kwargs["completion_only_loss"] = True
     return kwargs
