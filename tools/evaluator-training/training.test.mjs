@@ -10,9 +10,9 @@ import {
   normalizeContent,
 } from './leak.mjs';
 import { assertGeneratorBaseUrl } from './endpoint.mjs';
-import { buildSlots, expectedTotal } from './slots.mjs';
+import { buildSlots, expectedTotal, writerPositiveTypes, positivePathReport } from './slots.mjs';
 import { conformanceReason, profanityExpletiveRe } from './conformance.mjs';
-import { parseExamples } from './generate.mjs';
+import { parseExamples, expandScaffold } from './generate.mjs';
 
 const here = dirname(fileURLToPath(import.meta.url));
 const repoRoot = join(here, '..', '..');
@@ -32,8 +32,11 @@ test('slot counts sum to the recipe total and cover every class', () => {
   assert.equal(slots.length, total);
   assert.equal(total, 3936);
   const cse = recipe.composedClass;
-  const writerTypes = types.filter((t) => t !== cse);
-  assert.equal(writerTypes.length, types.length - 1);
+  const writerTypes = writerPositiveTypes(recipe, types);
+  assert.equal(writerTypes.length, types.length - 1 - recipe.composedSurfaceClasses.length);
+  assert.ok(!writerTypes.includes('profanity'));
+  assert.ok(!writerTypes.includes('hate'));
+  assert.ok(!writerTypes.includes(cse));
   for (const type of writerTypes) {
     const singles = slots.filter((s) => s.family === 'positive-single' && s.class === type);
     assert.equal(singles.length, recipe.counts.positive.singlePerClass);
@@ -74,15 +77,31 @@ test('slot counts sum to the recipe total and cover every class', () => {
       (s.class === cse || s.expect.includes(cse)),
   );
   assert.equal(cseWriterPositives.length, 0);
+  const surfaceWriterPositives = slots.filter(
+    (s) => s.family === 'positive-single' && recipe.composedSurfaceClasses.includes(s.class),
+  );
+  assert.equal(surfaceWriterPositives.length, 0);
   const composedSingles = slots.filter((s) => s.family === 'positive-composed' && s.expect.length === 1);
-  assert.equal(composedSingles.length, recipe.counts.positive.composedSingle);
-  assert.ok(composedSingles.every((s) => s.expect[0] === cse));
+  const cseComposed = composedSingles.filter((s) => s.expect[0] === cse);
+  assert.equal(cseComposed.length, recipe.counts.positive.composedSingle);
+  for (const type of recipe.composedSurfaceClasses) {
+    const rows = composedSingles.filter((s) => s.expect[0] === type);
+    assert.equal(rows.length, recipe.counts.positive.singlePerClass, `composed ${type}`);
+    assert.ok(rows.every((s) => s.expect.length === 1 && s.expect[0] === type));
+  }
   const composedDuals = slots.filter((s) => s.family === 'positive-composed' && s.expect.length === 2);
   assert.equal(composedDuals.length, recipe.counts.positive.composedDual);
   assert.ok(
     composedDuals.every((s) => s.expect.includes(cse) && s.expect.includes('sexual_content')),
   );
   assert.ok(recipe.multiPairs.every((pair) => !pair.includes(cse)));
+  assert.ok(recipe.multiPairs.some((pair) => pair.includes('profanity')));
+  const paths = positivePathReport(recipe, types);
+  assert.equal(paths.length, types.length);
+  assert.equal(paths.find((r) => r.type === 'profanity')?.path, 'composed');
+  assert.equal(paths.find((r) => r.type === 'hate')?.path, 'composed');
+  assert.equal(paths.find((r) => r.type === cse)?.path, 'composed');
+  assert.equal(paths.find((r) => r.type === 'violence')?.path, 'writer');
   assert.equal(
     slots.filter((s) => s.family === 'positive-multi').length,
     recipe.counts.positive.multi,
@@ -188,6 +207,7 @@ test('no generation prompt for CSE-exhibiting text exists in the recipe', () => 
     /no generation prompt for child_sexual_exploitation is sent to any model/,
   );
   assert.match(gen, /wouldSendCsePositiveToWriter/);
+  assert.match(gen, /wouldSendSurfacePositiveToWriter/);
   const sample = readFileSync(join(here, 'sample.mjs'), 'utf8');
   assert.match(sample, /positive-composed/);
 });
@@ -229,51 +249,89 @@ test('conformance screen applies only to writer-positive families', () => {
   );
 });
 
-function expandScaffoldBlock(block, extraKeys = {}) {
-  const out = [];
-  const extras = Object.keys(extraKeys);
-  for (const template of block.templates) {
-    for (const lead of block.leads) {
-      for (const age of block.ages) {
-        if (extras.length === 0) {
-          out.push(template.replaceAll('{{lead}}', lead).replaceAll('{{age}}', age));
-        } else {
-          for (const frame of extraKeys.frames) {
-            out.push(
-              template
-                .replaceAll('{{lead}}', lead)
-                .replaceAll('{{age}}', age)
-                .replaceAll('{{frame}}', frame),
-            );
-          }
-        }
-      }
-    }
-  }
-  return out;
-}
-
-test('composed CSE scaffold is leak-free and large enough', () => {
+test('composed CSE scaffold is leak-free, large enough, and has no meta-language', () => {
   const scaffold = JSON.parse(readFileSync(join(here, 'cse-scaffold.json'), 'utf8'));
   assert.equal(JSON.stringify(scaffold).includes('\u2014'), false);
   assert.match(scaffold.contentWarning, /^Content warning:/);
   assert.match(scaffold.note, /no generation prompt for child_sexual_exploitation is ever sent to any model/);
   const contents = loadHeldOutContentsFromSuite(heldOutPath);
   const index = buildLeakIndex(contents);
-  const singles = expandScaffoldBlock(scaffold.single);
-  const duals = expandScaffoldBlock(scaffold.dual, { frames: scaffold.dual.frames });
+  const meta =
+    /\b(fixture|classifier|taxonomy|minor-framed|sexualized child frame|not a story)\b/i;
+  const thisIsA = /\bthis is a\b/i;
+  const singles = expandScaffold(scaffold.single);
+  const duals = expandScaffold(scaffold.dual);
   const uniqueSingles = new Set();
   for (const content of singles) {
     assert.equal(leakReason(content, index), null, content);
+    assert.equal(meta.test(content), false, content);
+    assert.equal(thisIsA.test(content), false, content);
     uniqueSingles.add(normalizeContent(content));
   }
   const uniqueDuals = new Set();
   for (const content of duals) {
     assert.equal(leakReason(content, index), null, content);
+    assert.equal(meta.test(content), false, content);
+    assert.equal(thisIsA.test(content), false, content);
     uniqueDuals.add(normalizeContent(content));
   }
   assert.ok(uniqueSingles.size >= recipe.counts.positive.composedSingle, uniqueSingles.size);
   assert.ok(uniqueDuals.size >= recipe.counts.positive.composedDual, uniqueDuals.size);
+});
+
+test('composed profanity and hate scaffolds exhibit, do not describe, and cap frame reuse', () => {
+  const contents = loadHeldOutContentsFromSuite(heldOutPath);
+  const index = buildLeakIndex(contents);
+  const re = profanityExpletiveRe(tax);
+  const meta = /\b(fixture|slurs?|classifier|taxonomy|labelled|identity attack|attack word|the reply|this reply)\b/i;
+
+  /**
+   * @param {object} block
+   * @param {{ templates: string[], arities: number[] }} acc
+   */
+  function walk(block, acc) {
+    if (Array.isArray(block.blocks)) {
+      for (const inner of block.blocks) walk(inner, acc);
+      return;
+    }
+    const keys = Object.keys(block).filter(
+      (k) => k !== 'templates' && k !== 'note' && k !== 'blocks' && Array.isArray(block[k]),
+    );
+    let arity = 1;
+    for (const k of keys) arity *= block[k].length;
+    for (const t of block.templates) {
+      acc.templates.push(t);
+      acc.arities.push(arity);
+    }
+  }
+
+  for (const type of recipe.composedSurfaceClasses) {
+    const rel = recipe.composedScaffolds[type];
+    const scaffold = JSON.parse(readFileSync(join(repoRoot, rel), 'utf8'));
+    assert.equal(JSON.stringify(scaffold).includes('\u2014'), false);
+    assert.match(scaffold.contentWarning, /^Content warning:/);
+    assert.match(scaffold.note, /writer refuses/);
+    const acc = { templates: [], arities: [] };
+    walk(scaffold.single, acc);
+    assert.equal(new Set(acc.templates).size, acc.templates.length, `${type} duplicate frames`);
+    for (let i = 0; i < acc.templates.length; i++) {
+      assert.ok(acc.arities[i] <= 2, `${type} frame reused ${acc.arities[i]} times: ${acc.templates[i]}`);
+    }
+    const expanded = expandScaffold(scaffold.single);
+    const unique = new Set();
+    for (const content of expanded) {
+      assert.equal(leakReason(content, index), null, content);
+      assert.equal(meta.test(content), false, content);
+      unique.add(normalizeContent(content));
+      if (type === 'profanity') {
+        assert.ok(re.test(content), content);
+      }
+    }
+    assert.ok(
+      unique.size >= recipe.counts.positive.singlePerClass,
+      `${type} unique ${unique.size}`,
+    );
+  }
 });
 
 test('parseExamples recovers control characters inside writer strings', () => {

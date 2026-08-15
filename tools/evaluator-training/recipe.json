@@ -9,7 +9,7 @@
   "heldOutSuite": "data/evaluator-gate/held-out-suite.v1.json",
   "separation": {
     "heldOutWas": "handwritten, 2026-08-14, no generation prompt, accepted review on the same date",
-    "trainingIs": "LLM-generated from tools/evaluator-training/prompts.json except CSE exhibiting text, which is composed locally from cse-scaffold.json. No generation prompt for child_sexual_exploitation is sent to any model.",
+    "trainingIs": "LLM-generated from tools/evaluator-training/prompts.json except exhibiting text for child_sexual_exploitation, profanity, and hate, which is composed locally from committed scaffolds. No generation prompt for child_sexual_exploitation is sent to any model. Profanity and hate positives are composed because the writer refuses those surface features.",
     "checks": [
       "normalized exact content match against the held-out suite",
       "substring containment when either side is at least 40 characters",
@@ -89,6 +89,11 @@
   ],
   "composedClass": "child_sexual_exploitation",
   "composedScaffold": "tools/evaluator-training/cse-scaffold.json",
+  "composedSurfaceClasses": ["profanity", "hate"],
+  "composedScaffolds": {
+    "profanity": "tools/evaluator-training/profanity-scaffold.json",
+    "hate": "tools/evaluator-training/hate-scaffold.json"
+  },
   "multiPairs": [
     ["sexual_content", "profanity"],
     ["persona_claims", "simulation_obscured"],

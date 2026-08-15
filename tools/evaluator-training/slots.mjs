@@ -3,6 +3,10 @@
 //
 // Paper: step 8. Labels are a property of the slot, not a second model call.
 // Dual-class slots are the published conjunction pairs, never bundles.
+// Profanity and hate positive-singles are composed locally: the writer refuses
+// those surface features, and the conformance screen is binary, so a refusal
+// leaves the slot unfillable. CSE remains composedClass. Writer hard-negatives
+// and writer multi-pairs are unchanged.
 //
 // Positive-single splits: when a class's published definition overlaps a
 // neighbor on the content a positive would produce, the 80 singles are split
@@ -48,7 +52,78 @@ export function shuffle(arr, rng) {
 export function writerPositiveTypes(recipe, types) {
   const cse = recipe.composedClass;
   if (!cse) throw new Error('recipe.composedClass is required');
-  return types.filter((t) => t !== cse);
+  const surface = new Set(composedSurfaceTypes(recipe));
+  return types.filter((t) => t !== cse && !surface.has(t));
+}
+
+/**
+ * Classes whose positive-singles are composed locally because the writer
+ * refuses their surface features (expletives, slurs). CSE is composedClass,
+ * not this list. Hard-negatives and writer multi-pairs are unaffected.
+ *
+ * @param {object} recipe
+ * @returns {string[]}
+ */
+export function composedSurfaceTypes(recipe) {
+  const extra = recipe.composedSurfaceClasses ?? [];
+  if (!Array.isArray(extra)) throw new Error('composedSurfaceClasses must be an array');
+  const cse = recipe.composedClass;
+  const seen = new Set();
+  for (const type of extra) {
+    if (typeof type !== 'string' || type.length === 0) {
+      throw new Error('composedSurfaceClasses has an empty entry');
+    }
+    if (type === cse) {
+      throw new Error('composedSurfaceClasses must not include composedClass');
+    }
+    if (seen.has(type)) throw new Error(`duplicate composedSurfaceClass ${type}`);
+    seen.add(type);
+  }
+  return extra;
+}
+
+/**
+ * Preflight: every taxonomy class that has a positive path is writer or composed.
+ *
+ * @param {object} recipe
+ * @param {string[]} types
+ * @returns {Array<{ type: string, path: 'writer' | 'composed', family: string, count: number, dual: number }>}
+ */
+export function positivePathReport(recipe, types) {
+  const writer = new Set(writerPositiveTypes(recipe, types));
+  const surface = new Set(composedSurfaceTypes(recipe));
+  const cse = recipe.composedClass;
+  const c = recipe.counts.positive;
+  /** @type {Array<{ type: string, path: 'writer' | 'composed', family: string, count: number, dual: number }>} */
+  const rows = [];
+  for (const type of types) {
+    if (type === cse) {
+      rows.push({
+        type,
+        path: 'composed',
+        family: 'positive-composed',
+        count: c.composedSingle,
+        dual: c.composedDual,
+      });
+    } else if (surface.has(type)) {
+      rows.push({
+        type,
+        path: 'composed',
+        family: 'positive-composed',
+        count: c.singlePerClass,
+        dual: 0,
+      });
+    } else if (writer.has(type)) {
+      rows.push({
+        type,
+        path: 'writer',
+        family: 'positive-single',
+        count: c.singlePerClass,
+        dual: 0,
+      });
+    }
+  }
+  return rows;
 }
 
 /**
@@ -92,6 +167,7 @@ export function expectedTotal(recipe, types) {
   const c = recipe.counts;
   const harm = recipe.harmClasses.length;
   const writer = writerPositiveTypes(recipe, types).length;
+  const surface = composedSurfaceTypes(recipe).length;
   return (
     c.clean.greeting +
     c.clean.fact +
@@ -106,7 +182,8 @@ export function expectedTotal(recipe, types) {
     c.positive.singlePerClass * writer +
     c.positive.multi +
     c.positive.composedSingle +
-    c.positive.composedDual
+    c.positive.composedDual +
+    c.positive.singlePerClass * surface
   );
 }
 
@@ -174,6 +251,14 @@ export function buildSlots(recipe, types) {
   const dualAlso = 'sexual_content';
   for (let i = 0; i < c.positive.composedDual; i++) {
     add('positive-composed', null, [cse, dualAlso], { pair: [cse, dualAlso] });
+  }
+  for (const type of composedSurfaceTypes(recipe)) {
+    if (!types.includes(type)) throw new Error(`composed surface class ${type} is not in the taxonomy`);
+    const scaffold = recipe.composedScaffolds?.[type];
+    if (!scaffold) throw new Error(`no composedScaffolds path for ${type}`);
+    for (let i = 0; i < c.positive.singlePerClass; i++) {
+      add('positive-composed', type, [type]);
+    }
   }
   const pairs = recipe.multiPairs;
   if (!Array.isArray(pairs) || pairs.length === 0) throw new Error('recipe.multiPairs is empty');

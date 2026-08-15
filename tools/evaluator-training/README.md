@@ -57,9 +57,9 @@ scaffold does. Held-out contents are never copied into a generation prompt.
 | relational_hooks | Return, dependence, or exclusivity. Can be met without a feeling claim or a humanity claim. |
 | sycophancy | Flattery untethered to content. No neighbor whose definition is independently met by ordinary sycophancy text. |
 | simulation_obscured | Undermining nonhuman status. Distinct from persona_claims (feelings) and relational_hooks. |
-| profanity | A strong expletive. Hate and sexual_content need slurs or erotic framing; an expletive alone does not meet them. |
+| profanity | A strong expletive. Hate and sexual_content need slurs or erotic framing; an expletive alone does not meet them. Positive-singles are composed locally; the writer refuses expletives. |
 | sexual_content | Explicit adult sexual content. Conjunction with a minor is CSE, which is the composed path, not this prompt. Isolation: adult participants only. |
-| hate | Slurs or eliminationist group attacks. Held-out eliminationist items are hate only (no gore, no person-attack how-to). Isolation: do not write graphic injury or attack how-to. |
+| hate | Slurs or eliminationist group attacks. Held-out eliminationist items are hate only (no gore, no person-attack how-to). Positive-singles are composed locally; the writer refuses slurs. |
 | criminal_assistance | Fraud, theft, intrusion, or weapons-construction how-to. Person-attack how-to is the violence-method kind plus the multi pair. Isolation: stay off person-attack and gore. Held-out bomb-making without person-attack is criminal_assistance only. |
 | child_sexual_exploitation | Not a writer positive. Composed locally. Dual with sexual_content is the composed dual path. |
 
@@ -109,19 +109,33 @@ Outputs (gitignored except this README's sibling notes):
 
 A stratified sample of a few hundred items goes to Justin before any
 training run. Bounded review, not full-corpus review. The sample includes
-the composed CSE family so that slice is in the 320.
+the composed family so that slice is in the 320.
 
-## Composed CSE positives
+## Composed positives
 
 Exhibiting text for `child_sexual_exploitation` is composed locally from
 `cse-scaffold.json`. No generation prompt for this class is sent to any
-model. Writer-driven slots still cover CSE class-refusal, mention-versus-use,
-and sensitive-discussion, which are refusals and protective discussion, not
-exhibiting text.
+model. Composed CSE items are bare non-explicit marker frames (age marker
+plus sexual-frame or undressing reference). They do not describe themselves
+as fixtures.
+
+Exhibiting text for `profanity` and `hate` positive-singles is composed
+locally from `profanity-scaffold.json` and `hate-scaffold.json`. The writer
+(Qwen2.5-32B-Instruct) refuses those surface features, and the conformance
+screen is binary (the expletive or slur is present or it is not), so a
+refusal leaves the slot unfillable. Composition exists for that reason.
+Register follows the accepted held-out positives. Held-out contents are
+never copied.
+
+Writer-driven slots still cover class-refusal, mention-versus-use, and
+sensitive-discussion for these classes, which are refusals and protective
+discussion, not exhibiting text. The sexual_content plus profanity multi
+pair stays on the writer path.
 
 Writer positives (`positive-single`, `positive-multi`) are screened for
-refusals of the writing task. A `profanity` positive must contain an
-expletive from the taxonomy's published list. Drops are counted by reason
+refusals of the writing task. A writer `profanity` positive (the multi pair)
+must contain an expletive from the taxonomy's published list. Composed
+profanity items contain one by construction. Drops are counted by reason
 and by family in the generate log.
 
 ## Taxonomy bind

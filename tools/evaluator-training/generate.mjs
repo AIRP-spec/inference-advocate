@@ -3,8 +3,9 @@
 //
 // Paper: step 8. Labels come from the slot spec. The generator writes assistant
 // text only. Held-out contents are never in the prompt. Positive-single kinds
-// pick the prompt; the slot still owns the labels. Run locally or on RunPod
-// against an OpenAI-compatible endpoint serving the recipe's generator model.
+// pick the prompt; the slot still owns the labels. CSE, profanity, and hate
+// positives are composed locally. Run locally or on RunPod against an
+// OpenAI-compatible endpoint serving the recipe's generator model.
 
 import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { dirname, join, resolve } from 'node:path';
@@ -173,30 +174,57 @@ function wouldSendCsePositiveToWriter(slot) {
   return slot.class === 'child_sexual_exploitation' || slot.expect.includes('child_sexual_exploitation');
 }
 
+function wouldSendSurfacePositiveToWriter(slot, recipe) {
+  const surface = new Set(recipe.composedSurfaceClasses ?? []);
+  if (surface.size === 0) return false;
+  if (slot.family === 'positive-composed') return false;
+  if (slot.family !== 'positive-single') return false;
+  return surface.has(slot.class) || slot.expect.some((t) => surface.has(t));
+}
+
+function placeholderName(key) {
+  if (key === 'leads') return 'lead';
+  if (key === 'ages') return 'age';
+  if (key === 'frames') return 'frame';
+  return key;
+}
+
 /**
- * Expand scaffold templates. Shape matches held-out CSE items (age marker plus
- * sexual-frame reference, one or two sentences) without copying their content.
+ * Cartesian expansion of a scaffold block. Array fields other than templates
+ * and note are placeholders. CSE uses leads/ages/frames; surface scaffolds
+ * may use named fields or a blocks array.
+ *
+ * @param {object} block
+ * @returns {string[]}
  */
-function expandScaffold(block, extraKeys = {}) {
+export function expandScaffold(block) {
+  if (Array.isArray(block.blocks)) {
+    return block.blocks.flatMap((inner) => expandScaffold(inner));
+  }
+  const templates = block.templates;
+  if (!Array.isArray(templates) || templates.length === 0) {
+    throw new Error('scaffold block has no templates');
+  }
+  const keys = Object.keys(block).filter(
+    (k) => k !== 'templates' && k !== 'note' && k !== 'blocks' && Array.isArray(block[k]),
+  );
+  if (keys.length === 0) return templates.slice();
+  /** @type {string[][]} */
+  let combos = [[]];
+  for (const key of keys) {
+    const next = [];
+    for (const combo of combos) {
+      for (const value of block[key]) next.push([...combo, value]);
+    }
+    combos = next;
+  }
   const out = [];
-  const extras = Object.keys(extraKeys);
-  for (const template of block.templates) {
-    for (const lead of block.leads) {
-      for (const age of block.ages) {
-        if (extras.length === 0) {
-          out.push(template.replaceAll('{{lead}}', lead).replaceAll('{{age}}', age));
-        } else {
-          const frames = extraKeys.frames;
-          for (const frame of frames) {
-            out.push(
-              template
-                .replaceAll('{{lead}}', lead)
-                .replaceAll('{{age}}', age)
-                .replaceAll('{{frame}}', frame),
-            );
-          }
-        }
-      }
+  for (const combo of combos) {
+    const vars = Object.fromEntries(keys.map((k, i) => [placeholderName(k), combo[i]]));
+    for (const template of templates) {
+      let s = template;
+      for (const [k, v] of Object.entries(vars)) s = s.replaceAll(`{{${k}}}`, v);
+      out.push(s);
     }
   }
   return out;
@@ -205,15 +233,17 @@ function expandScaffold(block, extraKeys = {}) {
 function pickComposedContent(slot, scaffold, rng, shuffle, accept) {
   const kind = slot.expect.length > 1 ? 'dual' : 'single';
   const block = scaffold[kind];
-  const extra = kind === 'dual' ? { frames: block.frames } : {};
-  const order = shuffle(expandScaffold(block, extra), rng);
+  if (!block) {
+    throw new Error(`scaffold missing ${kind} for ${slot.id}`);
+  }
+  const order = shuffle(expandScaffold(block), rng);
   for (const content of order) {
     const reason = accept(content, slot);
     if (reason) continue;
     return content;
   }
   throw new Error(
-    `composed CSE exhausted unique leak-free strings for ${slot.id}. Stop and report.`,
+    `composed positives exhausted unique leak-free strings for ${slot.id}. Stop and report.`,
   );
 }
 
@@ -239,7 +269,9 @@ async function main() {
   }
   const types = taxDoc.flags.map((f) => f.type);
 
-  const { buildSlots, expectedTotal, mulberry32, shuffle } = await import('./slots.mjs');
+  const { buildSlots, expectedTotal, mulberry32, shuffle, positivePathReport } = await import(
+    './slots.mjs'
+  );
   const { buildLeakIndex, leakReason, loadHeldOutContentsFromSuite, normalizeContent } = await import(
     './leak.mjs'
   );
@@ -295,7 +327,27 @@ async function main() {
         s.expect.includes('child_sexual_exploitation'),
     );
     console.log(`CSE writer positives: ${cseWriter.length}`);
-    console.log(`composed CSE: ${slots.filter((s) => s.family === 'positive-composed').length}`);
+    const surfaceWriter = slots.filter(
+      (s) =>
+        s.family === 'positive-single' &&
+        (recipe.composedSurfaceClasses ?? []).includes(s.class),
+    );
+    console.log(`surface writer positives: ${surfaceWriter.length}`);
+    /** @type {Map<string, number>} */
+    const composedByClass = new Map();
+    for (const slot of slots.filter((s) => s.family === 'positive-composed')) {
+      const key = slot.expect.join('+');
+      composedByClass.set(key, (composedByClass.get(key) ?? 0) + 1);
+    }
+    console.log('composed positives:');
+    for (const [key, n] of [...composedByClass.entries()].sort()) {
+      console.log(`  ${key}: ${n}`);
+    }
+    console.log('positive compose/generate split:');
+    for (const row of positivePathReport(recipe, types)) {
+      const dual = row.dual > 0 ? ` + ${row.dual} dual` : '';
+      console.log(`  ${row.type}: ${row.path} (${row.family}, ${row.count}${dual})`);
+    }
     return;
   }
 
@@ -405,16 +457,40 @@ async function main() {
         `slot ${slot.id} would send a CSE-exhibiting prompt to the writer. Composed family only.`,
       );
     }
+    if (wouldSendSurfacePositiveToWriter(slot, recipe)) {
+      throw new Error(
+        `slot ${slot.id} would send a ${slot.class} positive to the writer. Composed family only.`,
+      );
+    }
   }
 
   // Invariant: no generation prompt for child_sexual_exploitation is sent to any model, under any family, in any code path. Exhibiting text for this class is composed locally from cse-scaffold.json. Writer families never receive a CSE-positive slot.
   if (composedSlots.length > 0) {
-    const scaffold = loadJson(join(repoRoot, recipe.composedScaffold));
+    /** @type {Map<string, object>} */
+    const scaffolds = new Map();
+    scaffolds.set(recipe.composedClass, loadJson(join(repoRoot, recipe.composedScaffold)));
+    for (const type of recipe.composedSurfaceClasses ?? []) {
+      const rel = recipe.composedScaffolds?.[type];
+      if (!rel) throw new Error(`no composedScaffolds path for ${type}`);
+      scaffolds.set(type, loadJson(join(repoRoot, rel)));
+    }
+    /** @type {Map<string, number>} */
+    const composedWritten = new Map();
     for (const slot of composedSlots) {
+      const key = slot.expect.includes(recipe.composedClass)
+        ? recipe.composedClass
+        : slot.class;
+      const scaffold = scaffolds.get(key);
+      if (!scaffold) throw new Error(`no loaded scaffold for composed slot ${slot.id}`);
       const content = pickComposedContent(slot, scaffold, rng, shuffle, accept);
       writeExample(slot, content);
+      composedWritten.set(key, (composedWritten.get(key) ?? 0) + 1);
     }
-    console.log(`composed ${composedSlots.length} CSE positives locally (no writer call)`);
+    const breakdown = [...composedWritten.entries()]
+      .sort()
+      .map(([k, n]) => `${k}:${n}`)
+      .join(', ');
+    console.log(`composed ${composedSlots.length} positives locally (no writer call) [${breakdown}]`);
   }
 
   if (writerSlots.length > 0) {
@@ -446,9 +522,13 @@ async function main() {
      */
     async function generateBatch(batch, attempt) {
       const head = batch[0];
-      if (head.family === 'positive-composed' || wouldSendCsePositiveToWriter(head)) {
+      if (
+        head.family === 'positive-composed' ||
+        wouldSendCsePositiveToWriter(head) ||
+        wouldSendSurfacePositiveToWriter(head, recipe)
+      ) {
         throw new Error(
-          `refusing to prompt the writer for CSE-exhibiting text (${head.id}). Composed family only.`,
+          `refusing to prompt the writer for composed-class exhibiting text (${head.id}). Composed family only.`,
         );
       }
       const vars = {
