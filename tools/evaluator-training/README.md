@@ -134,6 +134,44 @@ node tools/evaluator-training/publish.mjs --execute --pin-manifest
 `publish.mjs` records a `trainedCandidate` on the model manifest. It does not
 replace the live vendor GGUF and it does not change the default evaluator.
 
+## Checkpoint sweep (diagnostic)
+
+Five endpoint runs showed two opposite failures: overtraining (loss 0.003
+to 0.0003) fires extra adjacent classes, and one epoch (loss 0.05) misses
+classes. The band between those losses has not been sampled. `sweep-recipe.json`
+trains the same 0.6B, same accepted `sft.jsonl`, same seed, dropout 0.1,
+LoRA rank 16, for three epochs, and keeps a LoRA checkpoint every half
+epoch. After training, each checkpoint is merged, converted to GGUF Q8_0,
+and gated through the real `@airp/evaluator-local` v3 path. The gate
+harness is not reimplemented. Corpus, taxonomy, and gate thresholds do
+not change. The live pin does not change. This run does not decide the
+published model; it produces the curve that decides whether a stopping
+point exists.
+
+```bash
+npm run build
+npm run evaluator-training:sweep          # leak-check, assert, train, gate each checkpoint, report
+# or, after a completed sweep train:
+node tools/evaluator-training/sweep-gate.mjs
+node tools/evaluator-training/sweep-report.mjs
+```
+
+The report writes `data/evaluator-training/artifacts/sweep/sweep-report.json`
+with extra-class fires, recall misses, clean-traffic fires, and per-class
+pass counts against training loss. A checkpoint is a publish candidate
+only if extra-class fires are 0 and recall misses are 0. If no checkpoint
+hits both, the sampled curve confirms a capacity ceiling for this 0.6B.
+
+Sweep artifacts (gitignored):
+
+- `data/evaluator-training/artifacts/sweep/lora/checkpoint-*`
+- `data/evaluator-training/artifacts/sweep/step-*.gguf`
+- `data/evaluator-training/artifacts/sweep/checkpoints.json`
+- `data/evaluator-training/artifacts/sweep/gate-report-step-*.json`
+- `data/evaluator-training/artifacts/sweep/sweep-report.json`
+
+## Composed positives
+
 Outputs (gitignored except this README's sibling notes):
 
 - `data/evaluator-training/corpus.jsonl`

@@ -5,6 +5,8 @@
 # model is a trained artifact. Labels already sit on the SFT assistant line
 # (the v3 compact verdict). This script does not read the held-out suite.
 # Base repo id comes from data/models/manifest.json, not from a guess here.
+# When the recipe has a sweep block, interval checkpoints are kept and each
+# is merged and converted so the gate can score the whole training curve.
 
 from __future__ import annotations
 
@@ -12,6 +14,7 @@ import argparse
 import hashlib
 import inspect
 import json
+import math
 import random
 import subprocess
 import sys
@@ -48,6 +51,7 @@ def parse_args():
     p = argparse.ArgumentParser(description="Train the AIRP reference evaluator LoRA")
     p.add_argument("--recipe", default=str(HERE / "train-recipe.json"))
     p.add_argument("--skip-gguf", action="store_true")
+    p.add_argument("--skip-export-checkpoints", action="store_true")
     p.add_argument("--out", default="")
     p.add_argument(
         "--check-template",
@@ -171,7 +175,66 @@ def install_generation_aware_template(tokenizer):
     return stock
 
 
-def sft_config_kwargs(recipe, adapter_dir: Path, seed: int) -> dict:
+def steps_per_epoch(n: int, recipe) -> int:
+    eff = recipe["train"]["effectiveBatchSize"]
+    if not eff:
+        raise SystemExit("train.effectiveBatchSize must be a positive integer")
+    return math.ceil(n / eff)
+
+
+def sweep_save_steps(n: int, recipe) -> int:
+    every = recipe["sweep"]["saveEveryEpoch"]
+    spe = steps_per_epoch(n, recipe)
+    return max(1, round(spe * every)), spe
+
+
+def loss_at_or_before(log_history, step):
+    last = None
+    for row in log_history or []:
+        if "loss" not in row:
+            continue
+        if int(row.get("step") or 0) <= step:
+            last = row["loss"]
+    return last
+
+
+def collect_checkpoint_rows(adapter_dir: Path, log_history, spe: int, final_step: int, final_dir: Path):
+    rows = []
+    seen = set()
+    paths = sorted(
+        adapter_dir.glob("checkpoint-*"),
+        key=lambda p: int(p.name.split("-")[1]) if p.name.split("-")[1].isdigit() else 10**12,
+    )
+    for p in paths:
+        suffix = p.name.split("-", 1)[1]
+        if not suffix.isdigit():
+            continue
+        step = int(suffix)
+        if not (p / "adapter_config.json").exists():
+            continue
+        seen.add(step)
+        rows.append(
+            {
+                "step": step,
+                "epoch": round(step / spe, 3),
+                "loss": loss_at_or_before(log_history, step),
+                "adapterDir": str(p),
+            }
+        )
+    if final_step and final_step not in seen and (final_dir / "adapter_config.json").exists():
+        rows.append(
+            {
+                "step": final_step,
+                "epoch": round(final_step / spe, 3),
+                "loss": loss_at_or_before(log_history, final_step),
+                "adapterDir": str(final_dir),
+            }
+        )
+    rows.sort(key=lambda r: r["step"])
+    return rows
+
+
+def sft_config_kwargs(recipe, adapter_dir: Path, seed: int, n_examples: int) -> dict:
     t = recipe["train"]
     kwargs = dict(
         output_dir=str(adapter_dir),
@@ -209,6 +272,16 @@ def sft_config_kwargs(recipe, adapter_dir: Path, seed: int) -> dict:
                 "TRL SFTConfig has neither assistant_only_loss nor completion_only_loss. "
                 "Refusing to train with full-sequence loss."
             )
+    if recipe.get("sweep"):
+        save_steps, spe = sweep_save_steps(n_examples, recipe)
+        kwargs["save_strategy"] = "steps"
+        kwargs["save_steps"] = save_steps
+        kwargs.pop("save_total_limit", None)
+        kwargs["logging_steps"] = 1
+        print(
+            f"sweep checkpointing every {save_steps} steps "
+            f"({recipe['sweep']['saveEveryEpoch']} epoch, {spe} steps/epoch, n={n_examples})"
+        )
     return kwargs
 
 
@@ -271,6 +344,31 @@ def convert_gguf(recipe, merged_dir: Path, gguf_path: Path, work: Path) -> str:
     gguf_path.parent.mkdir(parents=True, exist_ok=True)
     run([str(quantize), str(f16_path), str(gguf_path), recipe["gguf"]["quantization"]])
     return commit
+
+
+def export_adapter_gguf(recipe, base_id, tokenizer, adapter_dir: Path, merged_dir: Path, gguf_path: Path, work: Path):
+    import torch
+    from peft import PeftModel
+    from transformers import AutoModelForCausalLM
+
+    print(f"exporting adapter {adapter_dir} -> {gguf_path}")
+    base = AutoModelForCausalLM.from_pretrained(
+        base_id,
+        torch_dtype=torch.bfloat16 if recipe["train"]["bf16"] else torch.float32,
+        device_map="auto",
+        trust_remote_code=True,
+    )
+    merged = PeftModel.from_pretrained(base, str(adapter_dir))
+    merged = merged.merge_and_unload()
+    merged_dir.mkdir(parents=True, exist_ok=True)
+    merged.save_pretrained(str(merged_dir))
+    tokenizer.save_pretrained(str(merged_dir))
+    del merged
+    del base
+    if torch.cuda.is_available():
+        torch.cuda.empty_cache()
+    llama_commit = convert_gguf(recipe, merged_dir, gguf_path, work)
+    return llama_commit, sha256_file(gguf_path)
 
 
 def main():
@@ -367,7 +465,7 @@ def main():
     dataset = Dataset.from_list(rows)
     trainer_kwargs = dict(
         model=model,
-        args=SFTConfig(**sft_config_kwargs(recipe, adapter_dir, seed)),
+        args=SFTConfig(**sft_config_kwargs(recipe, adapter_dir, seed, len(rows))),
         train_dataset=dataset,
         peft_config=peft_config,
     )
@@ -385,19 +483,113 @@ def main():
     tokenizer.save_pretrained(str(adapter_dir))
     print(f"saved LoRA adapter to {adapter_dir} after {train_seconds}s")
 
-    print("merging LoRA into the base")
-    merged = PeftModel.from_pretrained(model, str(adapter_dir))
-    merged = merged.merge_and_unload()
-    merged_dir.mkdir(parents=True, exist_ok=True)
-    merged.save_pretrained(str(merged_dir))
-    tokenizer.save_pretrained(str(merged_dir))
-    print(f"saved merged model to {merged_dir}")
+    log_history = list(trainer.state.log_history)
+    final_step = int(trainer.state.global_step)
+    sweep = recipe.get("sweep")
+    checkpoint_rows = []
+    if sweep:
+        spe = steps_per_epoch(len(rows), recipe)
+        checkpoint_rows = collect_checkpoint_rows(
+            adapter_dir, log_history, spe, final_step, adapter_dir
+        )
+        min_ck = int(sweep.get("minCheckpoints") or 0)
+        if len(checkpoint_rows) < min_ck:
+            raise SystemExit(
+                f"sweep produced {len(checkpoint_rows)} checkpoints, need at least {min_ck}"
+            )
+        print(f"sweep collected {len(checkpoint_rows)} checkpoints")
+        for row in checkpoint_rows:
+            print(
+                f"  step {row['step']} epoch {row['epoch']} loss {row['loss']} {row['adapterDir']}"
+            )
+
+    del trainer
+    del model
+    import gc
+
+    gc.collect()
+    if torch.cuda.is_available():
+        torch.cuda.empty_cache()
 
     llama_commit = None
     gguf_sha = None
-    if args.skip_gguf:
+    if sweep:
+        if (
+            not args.skip_export_checkpoints
+            and sweep.get("exportGguf")
+            and not args.skip_gguf
+        ):
+            import shutil
+
+            for row in checkpoint_rows:
+                step = row["step"]
+                adapter = Path(row["adapterDir"])
+                if not (adapter / "adapter_config.json").exists():
+                    raise SystemExit(f"checkpoint {adapter} has no adapter_config.json")
+                merged_step = out_dir / f"merged-step-{step}"
+                gguf_step = out_dir / f"step-{step}.gguf"
+                llama_commit, sha = export_adapter_gguf(
+                    recipe,
+                    base_id,
+                    tokenizer,
+                    Path(row["adapterDir"]),
+                    merged_step,
+                    gguf_step,
+                    out_dir,
+                )
+                row["ggufPath"] = str(gguf_step)
+                row["ggufSha256"] = sha
+                row["llamaCppCommit"] = llama_commit
+                shutil.rmtree(merged_step, ignore_errors=True)
+                print(f"GGUF {gguf_step} sha256 {sha} llama.cpp {llama_commit}")
+        ckpt_name = recipe["outputs"].get("checkpoints") or "checkpoints.json"
+        save_steps, spe = sweep_save_steps(len(rows), recipe)
+        payload = {
+            "paper": recipe["paper"],
+            "adr": recipe.get("adr"),
+            "seed": seed,
+            "baseRepoId": base_id,
+            "promptTemplateVersion": recipe["promptTemplateVersion"],
+            "sft": str(sft_path.relative_to(REPO)),
+            "n": len(rows),
+            "trainSeconds": train_seconds,
+            "stepsPerEpoch": spe,
+            "saveEveryEpoch": sweep["saveEveryEpoch"],
+            "saveSteps": save_steps,
+            "finalStep": final_step,
+            "logHistory": log_history,
+            "checkpoints": checkpoint_rows,
+        }
+        (out_dir / ckpt_name).write_text(
+            json.dumps(payload, indent=2) + "\n", encoding="utf-8"
+        )
+        print(f"wrote {out_dir / ckpt_name}")
+        last = checkpoint_rows[-1] if checkpoint_rows else {}
+        if last.get("ggufPath"):
+            gguf_path = Path(last["ggufPath"])
+            gguf_sha = last.get("ggufSha256")
+            llama_commit = last.get("llamaCppCommit")
+    elif args.skip_gguf:
         print("skipping GGUF conversion (--skip-gguf)")
     else:
+        print("merging LoRA into the base")
+        merged = PeftModel.from_pretrained(
+            AutoModelForCausalLM.from_pretrained(
+                base_id,
+                torch_dtype=torch.bfloat16 if recipe["train"]["bf16"] else torch.float32,
+                device_map="auto",
+                trust_remote_code=True,
+            ),
+            str(adapter_dir),
+        )
+        merged = merged.merge_and_unload()
+        merged_dir.mkdir(parents=True, exist_ok=True)
+        merged.save_pretrained(str(merged_dir))
+        tokenizer.save_pretrained(str(merged_dir))
+        print(f"saved merged model to {merged_dir}")
+        del merged
+        if torch.cuda.is_available():
+            torch.cuda.empty_cache()
         llama_commit = convert_gguf(recipe, merged_dir, gguf_path, out_dir)
         gguf_sha = sha256_file(gguf_path)
         print(f"GGUF {gguf_path} sha256 {gguf_sha} llama.cpp {llama_commit}")
@@ -411,7 +603,7 @@ def main():
         "n": len(rows),
         "trainSeconds": train_seconds,
         "adapterDir": str(adapter_dir),
-        "mergedDir": str(merged_dir),
+        "mergedDir": str(merged_dir) if merged_dir.exists() else None,
         "ggufPath": str(gguf_path) if gguf_path.exists() else None,
         "ggufSha256": gguf_sha,
         "ggufFileName": recipe["gguf"]["fileName"],
@@ -419,6 +611,7 @@ def main():
         "llamaCppCommit": llama_commit,
         "lora": lora,
         "train": recipe["train"],
+        "sweep": sweep,
         "frameworkPins": recipe["framework"]["pins"],
         "pinString": None,
     }
@@ -427,12 +620,21 @@ def main():
     (out_dir / recipe["outputs"]["manifest"]).write_text(
         json.dumps(artifacts, indent=2) + "\n", encoding="utf-8"
     )
-    log = {"trainSeconds": train_seconds, "n": len(rows), "seed": seed, "baseRepoId": base_id}
+    log = {
+        "trainSeconds": train_seconds,
+        "n": len(rows),
+        "seed": seed,
+        "baseRepoId": base_id,
+        "finalStep": final_step,
+        "logHistory": log_history,
+    }
     (out_dir / recipe["outputs"]["trainLog"]).write_text(
         json.dumps(log, indent=2) + "\n", encoding="utf-8"
     )
     print(f"wrote {out_dir / recipe['outputs']['manifest']}")
-    if artifacts["pinString"]:
+    if sweep:
+        print("sweep next: node tools/evaluator-training/sweep-gate.mjs")
+    elif artifacts["pinString"]:
         print(f"candidate pin {artifacts['pinString']}")
         print("gate next: node tools/evaluator-training/gate.mjs")
 

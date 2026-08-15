@@ -206,7 +206,10 @@ training target. The live path still uses v2.1. The training recipe lives under
 `tools/evaluator-training/` (not a runtime package). The corpus has to be generated
 from that recipe against a pinned writer model, leak-checked against the held-out
 suite, and sampled for review before any LoRA run. The LoRA script, GGUF convert,
-and held-out gate harness are in that directory. The trained GGUF is not in this
+and held-out gate harness are in that directory. A checkpoint-sweep recipe
+samples the training curve on the same 0.6B and the same held-out gate; it
+is a diagnostic, not a second publication criterion and not live v3. The
+trained GGUF is not in this
 build. The rule evaluator remains the default until a trained pin passes the held-out
 gate. Do not weaken the items to match the zero-shot model.
 
@@ -316,6 +319,9 @@ review of that suite is accepted. The v3 serialization and the training recipe
 (`tools/evaluator-training/`) are in the tree. The generated corpus, the LoRA, the
 published GGUF, and template v3 on the live path are not. Training scripts
 (LoRA, GGUF convert, held-out gate harness) live under `tools/evaluator-training/`.
+A checkpoint sweep of the 0.6B training curve is diagnostic only: it does
+not change labels, the corpus, or the gate, and it does not put v3 on the
+live path. The sweep report is not a second gate.
 A v3 evaluate path exists on `LocalEvaluator` for that harness only;
 `createLocalEvaluator` still constructs v2.1. The v3 path records empty
 evidence: the trained task is the compact verdict line. The rule evaluator remains

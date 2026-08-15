@@ -343,8 +343,6 @@ test('train recipe pins the manifest base, a fixed seed, and no held-out input',
   assert.equal(trainRecipe.seed, recipe.generator.seed);
   assert.equal(trainRecipe.seed, 20260815);
   assert.equal(trainRecipe.promptTemplateVersion, 'v3');
-  assert.equal(trainRecipe.train.epochs, 3);
-  assert.equal(trainRecipe.train.learningRate, 0.0002);
   assert.equal(trainRecipe.train.evalDataset, 'none');
   assert.equal(trainRecipe.train.enableThinking, false);
   assert.equal(trainRecipe.train.assistantOnlyLoss, true);
@@ -372,6 +370,114 @@ test('train recipe pins the manifest base, a fixed seed, and no held-out input',
   }
   assert.equal(JSON.stringify(trainRecipe).includes('\u2014'), false);
   assert.equal(trainPy.includes('\u2014'), false);
+});
+
+test('sweep recipe is a diagnostic curve on the same 0.6B, corpus, and gate', () => {
+  const sweepRecipe = JSON.parse(readFileSync(join(here, 'sweep-recipe.json'), 'utf8'));
+  const trainRecipe = JSON.parse(readFileSync(join(here, 'train-recipe.json'), 'utf8'));
+  const manifest = JSON.parse(readFileSync(join(repoRoot, 'data/models/manifest.json'), 'utf8'));
+  const trainPy = readFileSync(join(here, 'train.py'), 'utf8');
+  const gate = readFileSync(join(here, 'gate.mjs'), 'utf8');
+  const sweepGate = readFileSync(join(here, 'sweep-gate.mjs'), 'utf8');
+  const sweepReport = readFileSync(join(here, 'sweep-report.mjs'), 'utf8');
+  const runSweep = readFileSync(join(here, 'run-sweep.mjs'), 'utf8');
+  const readme = readFileSync(join(here, 'README.md'), 'utf8');
+
+  assert.equal(sweepRecipe.seed, 20260815);
+  assert.equal(sweepRecipe.promptTemplateVersion, 'v3');
+  assert.equal(sweepRecipe.base.repoId, manifest.baseRepoId);
+  assert.equal(manifest.baseRepoId, 'Qwen/Qwen3-0.6B');
+  assert.equal(sweepRecipe.sft, trainRecipe.sft);
+  assert.equal(sweepRecipe.sft.includes('held-out'), false);
+  assert.equal(sweepRecipe.train.evalDataset, 'none');
+  assert.equal(sweepRecipe.train.assistantOnlyLoss, true);
+  assert.equal(sweepRecipe.train.enableThinking, false);
+  assert.equal(sweepRecipe.train.epochs, 3);
+  assert.equal(sweepRecipe.train.learningRate, 0.0001);
+  assert.equal(sweepRecipe.lora.r, 16);
+  assert.equal(sweepRecipe.lora.alpha, 32);
+  assert.equal(sweepRecipe.lora.dropout, 0.1);
+  assert.equal(sweepRecipe.sweep.saveEveryEpoch, 0.5);
+  assert.equal(sweepRecipe.sweep.minCheckpoints, 6);
+  assert.equal(sweepRecipe.outputs.dir.includes('sweep'), true);
+  assert.notEqual(sweepRecipe.outputs.dir, trainRecipe.outputs.dir);
+
+  assert.match(trainPy, /save_strategy.*= "steps"/);
+  assert.match(trainPy, /sweep_save_steps/);
+  assert.match(trainPy, /collect_checkpoint_rows/);
+  assert.match(trainPy, /export_adapter_gguf/);
+  assert.equal(trainPy.includes('assistant_only_loss"] = False'), false);
+  assert.match(gate, /--allow-fail/);
+  assert.match(gate, /args\.sha256 \|\| sha256FileHex\(ggufPath\)/);
+  assert.match(sweepGate, /gate\.mjs/);
+  assert.match(sweepGate, /--allow-fail/);
+  assert.equal(sweepGate.includes('scoreHeldOutGate'), false);
+  assert.match(runSweep, /sweep-recipe\.json/);
+  assert.match(readme, /evaluator-training:sweep/);
+
+  for (const text of [
+    JSON.stringify(sweepRecipe),
+    trainPy,
+    gate,
+    sweepGate,
+    sweepReport,
+    runSweep,
+    readme,
+  ]) {
+    assert.equal(text.includes('\u2014'), false);
+  }
+});
+
+test('sweep save interval yields at least six checkpoints on 3936 examples', () => {
+  const py = `
+import json, math
+from pathlib import Path
+recipe = json.loads(Path(${JSON.stringify(join(here, 'sweep-recipe.json'))}).read_text())
+n = 3936
+eff = recipe["train"]["effectiveBatchSize"]
+spe = math.ceil(n / eff)
+save_steps = max(1, round(spe * recipe["sweep"]["saveEveryEpoch"]))
+total = spe * recipe["train"]["epochs"]
+ticks = list(range(save_steps, total + 1, save_steps))
+if total not in ticks:
+    ticks.append(total)
+if len(ticks) < recipe["sweep"]["minCheckpoints"]:
+    raise SystemExit(f"ticks={ticks}")
+print(spe, save_steps, total, len(ticks), ",".join(str(t) for t in ticks))
+`;
+  const result = spawnSync('python3', ['-c', py], { encoding: 'utf8' });
+  assert.equal(result.status, 0, result.stderr || result.stdout);
+  const [spe, saveSteps, total, count] = result.stdout.trim().split(' ');
+  assert.equal(Number(spe), 123);
+  assert.equal(Number(saveSteps), 62);
+  assert.equal(Number(total), 369);
+  assert.ok(Number(count) >= 6, result.stdout);
+});
+
+test('sweep verdict names a publish candidate only on a clean gate', async () => {
+  const { pickVerdict, fmtLoss, formatTable } = await import('./sweep-report.mjs');
+  const candidate = pickVerdict([
+    { epoch: 0.5, loss: 0.05, extraClassFires: 40, recallMisses: 12, cleanFires: 0, perClassPass: 4, perClassTotal: 11, pass: false },
+    { epoch: 1.5, loss: 0.01, extraClassFires: 0, recallMisses: 0, cleanFires: 0, perClassPass: 11, perClassTotal: 11, pass: true },
+    { epoch: 3, loss: 0.0003, extraClassFires: 17, recallMisses: 0, cleanFires: 0, perClassPass: 8, perClassTotal: 11, pass: false },
+  ]);
+  assert.equal(candidate.kind, 'candidate');
+  assert.equal(candidate.best.epoch, 1.5);
+  assert.match(candidate.text, /candidate for publish gate/);
+  const ceiling = pickVerdict([
+    { epoch: 0.5, loss: 0.05, extraClassFires: 40, recallMisses: 20, cleanFires: 1, perClassPass: 2, perClassTotal: 11, pass: false },
+    { epoch: 2, loss: 0.004, extraClassFires: 12, recallMisses: 3, cleanFires: 0, perClassPass: 6, perClassTotal: 11, pass: false },
+    { epoch: 3, loss: 0.0003, extraClassFires: 27, recallMisses: 0, cleanFires: 0, perClassPass: 8, perClassTotal: 11, pass: false },
+  ]);
+  assert.equal(ceiling.kind, 'ceiling');
+  assert.equal(ceiling.nearest.epoch, 2);
+  assert.match(ceiling.text, /capacity ceiling confirmed/);
+  assert.equal(fmtLoss(0.003), '0.0030');
+  const table = formatTable([
+    { epoch: 1, loss: 0.02, extraClassFires: 5, recallMisses: 2, cleanFires: 0, perClassPass: 9, perClassTotal: 11, pass: false },
+  ]);
+  assert.match(table, /extra-fires/);
+  assert.equal(table.includes('\u2014'), false);
 });
 
 test('generation-aware jinja emits the same text as stock Qwen3 for a single-turn example', () => {

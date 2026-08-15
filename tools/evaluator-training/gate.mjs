@@ -17,10 +17,11 @@ const trainRecipe = JSON.parse(readFileSync(join(here, 'train-recipe.json'), 'ut
 const genRecipe = JSON.parse(readFileSync(join(here, 'recipe.json'), 'utf8'));
 
 function parseArgs(argv) {
-  const out = { gguf: '', sha256: '', gpu: false, report: '' };
+  const out = { gguf: '', sha256: '', gpu: false, report: '', allowFail: false };
   for (let i = 2; i < argv.length; i++) {
     const a = argv[i];
     if (a === '--gpu') out.gpu = true;
+    else if (a === '--allow-fail') out.allowFail = true;
     else if (a === '--gguf') out.gguf = argv[++i];
     else if (a === '--sha256') out.sha256 = argv[++i];
     else if (a === '--report') out.report = argv[++i];
@@ -90,8 +91,12 @@ if (PROMPT_TEMPLATE_V3 !== trainRecipe.promptTemplateVersion) {
   process.exit(1);
 }
 
-const digest = args.sha256 || artifacts.ggufSha256 || sha256FileHex(ggufPath);
-if (artifacts.ggufSha256 && digest !== artifacts.ggufSha256) {
+const digest = args.sha256 || sha256FileHex(ggufPath);
+if (args.sha256 && digest !== sha256FileHex(ggufPath)) {
+  console.error(`GGUF digest ${sha256FileHex(ggufPath)} != --sha256 ${args.sha256}`);
+  process.exit(1);
+}
+if (!args.gguf && artifacts.ggufSha256 && digest !== artifacts.ggufSha256) {
   console.error(`GGUF digest ${digest} != artifacts ${artifacts.ggufSha256}`);
   process.exit(1);
 }
@@ -204,11 +209,17 @@ const report = {
   cleanFires: cleanFires.map((item) => item.id),
   evidence: 'empty on v3; compact verdict only',
 };
-const reportPath = args.report || join(repoRoot, trainRecipe.outputs.dir, trainRecipe.outputs.gateReport);
+const reportPath =
+  args.report ||
+  (args.gguf
+    ? join(dirname(ggufPath), `gate-report-step.json`)
+    : join(repoRoot, trainRecipe.outputs.dir, trainRecipe.outputs.gateReport));
 writeFileSync(reportPath, JSON.stringify(report, null, 2) + '\n');
 console.log(`wrote ${reportPath}`);
 if (!score.pass) {
   console.error('gate failed. Do not publish. Paste this report (or gate-report.json) for the failure pattern.');
-  process.exit(2);
+  if (!args.allowFail) process.exit(2);
+  console.error('--allow-fail: report written, continuing.');
+} else {
+  console.log('gate passed. Publish is a separate step: node tools/evaluator-training/publish.mjs');
 }
-console.log('gate passed. Publish is a separate step: node tools/evaluator-training/publish.mjs');

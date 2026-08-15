@@ -34,6 +34,7 @@
     "evaluator-training:assert-sft": "node tools/evaluator-training/assert-sft-v3.mjs",
     "evaluator-training:train": "node tools/evaluator-training/run-train.mjs",
     "evaluator-training:gate": "node tools/evaluator-training/gate.mjs",
+    "evaluator-training:sweep": "node tools/evaluator-training/run-sweep.mjs",
     "evaluator-training:publish": "node tools/evaluator-training/publish.mjs",
     "mocks": "npm run build --workspace @airp/demo && node packages/demo/dist/mock-servers.js",
     "mocks:public": "npm run build --workspace @airp/demo && node packages/demo/dist/public-mock-servers.js",
