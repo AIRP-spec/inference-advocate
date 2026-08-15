@@ -1,7 +1,7 @@
 {
   "recipeVersion": "1",
   "paper": "step 8. Provisional Section 3.3. The commons reference evaluation model is a trained artifact.",
-  "adr": "Diagnostic checkpoint sweep. Same corpus, taxonomy, and gate as the training recipe. This run does not decide the published pin; it samples the loss curve so a sweet spot or a capacity ceiling is a measured fact.",
+  "adr": "Diagnostic checkpoint sweep. Same corpus, taxonomy, and gate as the training recipe. Training base is SmolLM3-3B after a measured 0.6B capacity ceiling. This run does not decide the published pin; it samples the loss curve so a sweet spot or a capacity ceiling is a measured fact. The live pin is unchanged.",
   "promptTemplateVersion": "v3",
   "taxonomyVersion": "v0.3.0",
   "taxonomyFile": "data/taxonomy/flags.v0.json",
@@ -10,13 +10,13 @@
   "seed": 20260815,
   "base": {
     "source": "data/models/manifest.json",
-    "field": "baseRepoId",
-    "repoId": "Qwen/Qwen3-0.6B",
-    "note": "Read at run time from the manifest. repoId here is a pin that must match. Do not train Qwen3-0.6B-Base. Do not swap the base in this diagnostic."
+    "field": "trainBaseRepoId",
+    "repoId": "HuggingFaceTB/SmolLM3-3B",
+    "note": "Read at run time from the manifest. repoId here is a pin that must match. This is the training base. Do not change the live evaluator pin in this diagnostic."
   },
   "framework": {
     "stack": "transformers + peft + trl SFTTrainer",
-    "whyNotUnsloth": "0.6B plus 3936 short examples does not need Unsloth's memory path. The standard stack is the one a reader can follow without a third training runtime.",
+    "whyNotUnsloth": "3B plus 3936 short examples on an 80GB card does not need Unsloth's memory path. The standard stack is the one a reader can follow without a third training runtime. SmolLM3 modeling code requires transformers >= 4.53.0; the pin below is that version or newer.",
     "reportTo": "none",
     "torch": "supplied by the GPU image; not pinned here so a CUDA wheel is not overwritten",
     "python": ">=3.10",
@@ -29,7 +29,8 @@
       "gguf": "0.17.1",
       "sentencepiece": "0.2.0",
       "protobuf": "5.29.5",
-      "huggingface_hub": "0.34.4"
+      "huggingface_hub": "0.34.4",
+      "jinja2": "3.1.6"
     }
   },
   "lora": {
@@ -61,12 +62,12 @@
     "assistantOnlyLoss": true,
     "bf16": true,
     "enableThinking": false,
-    "chatTemplate": "tools/evaluator-training/qwen3-chat-template.jinja",
+    "chatTemplate": "tools/evaluator-training/smollm3-chat-template.jinja",
     "evalDataset": "none",
     "evalDatasetNote": "The held-out suite is the final gate, never a training or hyperparameter split. The sweep gates after the fact. It does not train against the suite."
   },
   "sweep": {
-    "purpose": "Sample the training curve between the underfit (loss ~0.05, recall collapse) and overfit (loss ~0.003, extra-class fires) endpoints. One GPU run, many gated checkpoints. Not a second gate, not a label change, not a model swap.",
+    "purpose": "First SmolLM3-3B run. Sample the training curve the same way the 0.6B ceiling was measured. One GPU run, many gated checkpoints. Not a second gate, not a label change, not a live-pin swap.",
     "saveEveryEpoch": 0.5,
     "minCheckpoints": 6,
     "exportGguf": true
@@ -74,7 +75,7 @@
   "gguf": {
     "quantization": "Q8_0",
     "outtype": "f16",
-    "fileName": "Qwen3-0.6B-airp-v3-Q8_0.gguf",
+    "fileName": "SmolLM3-3B-airp-v3-Q8_0.gguf",
     "llamaCpp": {
       "repo": "https://github.com/ggml-org/llama.cpp",
       "fallbackRepo": "https://github.com/ggerganov/llama.cpp",
@@ -95,6 +96,6 @@
   },
   "time": {
     "budgetHours": 3,
-    "estimate": "Training three epochs of 0.6B LoRA is minutes on an 80GB card. Six merge-plus-Q8_0 exports and six 187-item CPU gates dominate the wall time and should still finish well under three hours. If the train loop itself is still running after 90 minutes, stop and report."
+    "estimate": "Training three epochs of 3B LoRA is tens of minutes on an 80GB card. Six merge-plus-Q8_0 exports of 3B and six 187-item CPU gates dominate the wall time. If the train loop itself is still running after 90 minutes, stop and report."
   }
 }

@@ -197,8 +197,12 @@ sequence. v2 cleared the attractor false negatives. v2.1 confirmed that thinking
 already off in v2, constrained the verdict to `yes`/`no`, and did not hit the 4 to 10
 second mean on this droplet (mean 42712ms). It also worsened counter-example
 over-firing (11 of 11 counters fail). The report is
-`packages/evaluator-local/FIXTURE-REPORT.md`. A larger model is not the next step. The
-zero-shot 0.6B is not a judge in any decode configuration.
+`packages/evaluator-local/FIXTURE-REPORT.md`. The zero-shot 0.6B is not a
+judge in any decode configuration. A later LoRA of the same 0.6B hit a
+capacity ceiling on the held-out gate across six gated checkpoints (no
+per-class pass). The training base is now HuggingFaceTB/SmolLM3-3B
+(`trainBaseRepoId`). The live pin remains the vendor Qwen3-0.6B GGUF at
+template v2.1.
 
 Template v3 (one compact yes/no line in taxonomy order, grammar-constrained, roughly
 twenty tokens) is defined in `packages/evaluator-local/src/prompt-v3.ts` and is the
@@ -207,7 +211,7 @@ training target. The live path still uses v2.1. The training recipe lives under
 from that recipe against a pinned writer model, leak-checked against the held-out
 suite, and sampled for review before any LoRA run. The LoRA script, GGUF convert,
 and held-out gate harness are in that directory. A checkpoint-sweep recipe
-samples the training curve on the same 0.6B and the same held-out gate; it
+samples the training curve on SmolLM3-3B and the same held-out gate; it
 is a diagnostic, not a second publication criterion and not live v3. The
 trained GGUF is not in this
 build. The rule evaluator remains the default until a trained pin passes the held-out
@@ -319,9 +323,11 @@ review of that suite is accepted. The v3 serialization and the training recipe
 (`tools/evaluator-training/`) are in the tree. The generated corpus, the LoRA, the
 published GGUF, and template v3 on the live path are not. Training scripts
 (LoRA, GGUF convert, held-out gate harness) live under `tools/evaluator-training/`.
-A checkpoint sweep of the 0.6B training curve is diagnostic only: it does
+A checkpoint sweep of the training curve is diagnostic only: it does
 not change labels, the corpus, or the gate, and it does not put v3 on the
-live path. The sweep report is not a second gate.
+live path. The sweep report is not a second gate. The 0.6B sweep is a
+measured capacity ceiling. The training base is SmolLM3-3B; the live pin
+is still Qwen3-0.6B Q8_0 at v2.1.
 A v3 evaluate path exists on `LocalEvaluator` for that harness only;
 `createLocalEvaluator` still constructs v2.1. The v3 path records empty
 evidence: the trained task is the compact verdict line. The rule evaluator remains

@@ -1,7 +1,7 @@
 {
   "recipeVersion": "1",
   "paper": "step 8. Provisional Section 3.3. The commons reference evaluation model is a trained artifact.",
-  "adr": "Training lives under tools/evaluator-training/. This file is the LoRA run: base, hyperparameters, framework pins, seed. The generation recipe is recipe.json. The held-out suite is not an input.",
+  "adr": "Training lives under tools/evaluator-training/. This file is the LoRA run: base, hyperparameters, framework pins, seed. The generation recipe is recipe.json. The held-out suite is not an input. The training base is SmolLM3-3B after a measured 0.6B capacity ceiling. The live pin is unchanged.",
   "promptTemplateVersion": "v3",
   "taxonomyVersion": "v0.3.0",
   "taxonomyFile": "data/taxonomy/flags.v0.json",
@@ -10,13 +10,13 @@
   "seed": 20260815,
   "base": {
     "source": "data/models/manifest.json",
-    "field": "baseRepoId",
-    "repoId": "Qwen/Qwen3-0.6B",
-    "note": "Read at run time from the manifest. repoId here is a pin that must match. Do not train Qwen3-0.6B-Base."
+    "field": "trainBaseRepoId",
+    "repoId": "HuggingFaceTB/SmolLM3-3B",
+    "note": "Read at run time from the manifest. repoId here is a pin that must match. This is the training base. The live evaluator pin stays baseRepoId/fileName (Qwen3-0.6B Q8_0 at v2.1) until a trained SmolLM3 passes the gate."
   },
   "framework": {
     "stack": "transformers + peft + trl SFTTrainer",
-    "whyNotUnsloth": "0.6B plus 3936 short examples does not need Unsloth's memory path. The standard stack is the one a reader can follow without a third training runtime.",
+    "whyNotUnsloth": "3B plus 3936 short examples on an 80GB card does not need Unsloth's memory path. The standard stack is the one a reader can follow without a third training runtime. SmolLM3 modeling code requires transformers >= 4.53.0; the pin below is that version or newer.",
     "reportTo": "none",
     "reportToNote": "No cloud metric sink. Loss logs to stdout and artifacts/train-log.json. Trackio would be a Hub side channel this run does not need.",
     "torch": "supplied by the GPU image; not pinned here so a CUDA wheel is not overwritten",
@@ -30,7 +30,8 @@
       "gguf": "0.17.1",
       "sentencepiece": "0.2.0",
       "protobuf": "5.29.5",
-      "huggingface_hub": "0.34.4"
+      "huggingface_hub": "0.34.4",
+      "jinja2": "3.1.6"
     }
   },
   "lora": {
@@ -62,16 +63,16 @@
     "assistantOnlyLoss": true,
     "bf16": true,
     "enableThinking": false,
-    "enableThinkingNote": "Qwen3 thinking must stay off. Inference uses QwenChatWrapper thoughts=discourage. Training applies enable_thinking=False so the assistant target is the compact verdict line.",
-    "chatTemplate": "tools/evaluator-training/qwen3-chat-template.jinja",
-    "chatTemplateNote": "Stock Qwen3-0.6B template plus {% generation %} around assistant content. TRL assistant_only_loss needs those spans. Rendered text must match stock; train.py refuses to start if it does not, or if the assistant mask is empty. Epochs and learning rate are unchanged in this masking fix.",
+    "enableThinkingNote": "SmolLM3 thinking must stay off. No-think is enable_thinking=False, which writes Reasoning Mode: /no_think in the system metadata. train.py wraps apply_chat_template so TRL cannot drop the kwarg. Do not use Qwen's empty-think-block wrapper. Do not set assistant_only_loss to false.",
+    "chatTemplate": "tools/evaluator-training/smollm3-chat-template.jinja",
+    "chatTemplateNote": "Stock SmolLM3-3B ChatML-with-metadata template, with {% generation %} around the verdict and im_end only. The empty think block is prefix (stock no-think) and sits outside the mask. Rendered text must match stock; train.py refuses to start if it does not, or if the assistant mask is empty, or if no-think is not active.",
     "evalDataset": "none",
     "evalDatasetNote": "The held-out suite is the final gate, never a training or hyperparameter split. Epochs are fixed. Loss is logged. There is no early stopping."
   },
   "gguf": {
     "quantization": "Q8_0",
     "outtype": "f16",
-    "fileName": "Qwen3-0.6B-airp-v3-Q8_0.gguf",
+    "fileName": "SmolLM3-3B-airp-v3-Q8_0.gguf",
     "llamaCpp": {
       "repo": "https://github.com/ggml-org/llama.cpp",
       "fallbackRepo": "https://github.com/ggerganov/llama.cpp",
@@ -83,19 +84,19 @@
     "dir": "data/evaluator-training/artifacts",
     "adapter": "lora",
     "merged": "merged",
-    "gguf": "Qwen3-0.6B-airp-v3-Q8_0.gguf",
+    "gguf": "SmolLM3-3B-airp-v3-Q8_0.gguf",
     "manifest": "artifacts.json",
     "gateReport": "gate-report.json",
     "trainLog": "train-log.json"
   },
   "time": {
-    "budgetHours": 2,
-    "estimate": "Well under two hours on a single 80GB card. 0.6B LoRA, 3936 examples, 3 epochs, sequences around 2k tokens, then merge, llama.cpp convert, and 187 compact-verdict gate items. If a run is still training after 90 minutes, stop and report: that is a hang, not the expected duration."
+    "budgetHours": 3,
+    "estimate": "Well under three hours on a single 80GB card. 3B LoRA, 3936 examples, 3 epochs, sequences around 2k tokens, then merge, llama.cpp convert, and 187 compact-verdict gate items. If a run is still training after 90 minutes, stop and report: that is a hang, not the expected duration."
   },
   "publish": {
     "when": "only after gate-report.json pass is true",
     "hubOrg": "AIRP-spec",
-    "repoName": "evaluator-qwen3-0.6B-v3",
+    "repoName": "evaluator-smollm3-3B-v3",
     "license": "Apache-2.0",
     "flipLivePin": false,
     "note": "Publication writes a trainedCandidate on the model manifest. It does not replace the live v2.1 vendor GGUF and it does not change the default evaluator."

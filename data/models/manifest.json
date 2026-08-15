@@ -1,7 +1,9 @@
 {
   "name": "Qwen3-0.6B",
   "baseRepoId": "Qwen/Qwen3-0.6B",
-  "baseRepoNote": "Transformers id of the post-trained instruct checkpoint the published GGUF was converted from. Training reads this field. Qwen3-0.6B-Base is the pretrained checkpoint and is not this pin.",
+  "baseRepoNote": "Transformers id of the post-trained instruct checkpoint the published live GGUF was converted from. This is the live pin's source, not the training base. Qwen3-0.6B-Base is the pretrained checkpoint and is not this pin.",
+  "trainBaseRepoId": "HuggingFaceTB/SmolLM3-3B",
+  "trainBaseRepoNote": "Training base only. Apache-2.0, fully open weights plus public training data mixture and configs. The live evaluator pin remains fileName/sha256 below (Qwen3-0.6B Q8_0 at template v2.1). Do not treat this field as the published pin. A LoRA of Qwen3-0.6B hit a capacity ceiling on the held-out gate across six gated checkpoints.",
   "fileName": "Qwen3-0.6B-Q8_0.gguf",
   "sourceUrl": "https://huggingface.co/Qwen/Qwen3-0.6B-GGUF/resolve/main/Qwen3-0.6B-Q8_0.gguf",
   "sha256": "9465e63a22add5354d9bb4b99e90117043c7124007664907259bd16d043bb031",

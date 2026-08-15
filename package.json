@@ -32,6 +32,7 @@
     "evaluator-training:leak-check": "node tools/evaluator-training/leak-check.mjs",
     "evaluator-training:sample": "node tools/evaluator-training/sample.mjs",
     "evaluator-training:assert-sft": "node tools/evaluator-training/assert-sft-v3.mjs",
+    "evaluator-training:check-template": "python3 tools/evaluator-training/train.py --check-template",
     "evaluator-training:train": "node tools/evaluator-training/run-train.mjs",
     "evaluator-training:gate": "node tools/evaluator-training/gate.mjs",
     "evaluator-training:sweep": "node tools/evaluator-training/run-sweep.mjs",

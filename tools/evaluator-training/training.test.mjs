@@ -335,7 +335,7 @@ test('composed profanity and hate scaffolds exhibit, do not describe, and cap fr
   }
 });
 
-test('train recipe pins the manifest base, a fixed seed, and no held-out input', () => {
+test('train recipe pins the SmolLM3 training base, a fixed seed, and no held-out input', () => {
   const trainRecipe = JSON.parse(readFileSync(join(here, 'train-recipe.json'), 'utf8'));
   const manifest = JSON.parse(readFileSync(join(repoRoot, 'data/models/manifest.json'), 'utf8'));
   const req = readFileSync(join(here, 'requirements-train.txt'), 'utf8');
@@ -346,33 +346,45 @@ test('train recipe pins the manifest base, a fixed seed, and no held-out input',
   assert.equal(trainRecipe.train.evalDataset, 'none');
   assert.equal(trainRecipe.train.enableThinking, false);
   assert.equal(trainRecipe.train.assistantOnlyLoss, true);
-  assert.equal(trainRecipe.train.chatTemplate, 'tools/evaluator-training/qwen3-chat-template.jinja');
+  assert.equal(trainRecipe.train.chatTemplate, 'tools/evaluator-training/smollm3-chat-template.jinja');
   assert.equal(trainRecipe.framework.reportTo, 'none');
   assert.equal(trainRecipe.publish.flipLivePin, false);
   assert.equal(trainRecipe.base.source, 'data/models/manifest.json');
-  assert.equal(trainRecipe.base.field, 'baseRepoId');
+  assert.equal(trainRecipe.base.field, 'trainBaseRepoId');
+  assert.equal(manifest.trainBaseRepoId, 'HuggingFaceTB/SmolLM3-3B');
+  assert.equal(trainRecipe.base.repoId, manifest.trainBaseRepoId);
   assert.equal(manifest.baseRepoId, 'Qwen/Qwen3-0.6B');
-  assert.equal(trainRecipe.base.repoId, manifest.baseRepoId);
+  assert.equal(manifest.fileName, 'Qwen3-0.6B-Q8_0.gguf');
+  assert.equal(manifest.promptTemplateVersion, 'v2.1');
+  assert.equal(manifest.sha256, '9465e63a22add5354d9bb4b99e90117043c7124007664907259bd16d043bb031');
   assert.equal(trainRecipe.sft, recipe.outputs.sft);
   assert.equal(trainRecipe.sft.includes('held-out'), false);
   assert.match(trainPy, /manifest\.get\(field\)/);
   assert.match(trainPy, /enable_thinking/);
+  assert.match(trainPy, /wrap_tokenizer_enable_thinking/);
+  assert.equal(trainPy.includes('wrap_tokenizer_no_think'), false);
   assert.match(trainPy, /assert_generation_aware_template/);
+  assert.match(trainPy, /MIN_TRANSFORMERS = \(4, 53, 0\)/);
   assert.match(trainPy, /assistant_only_loss.*= True/);
   assert.equal(trainPy.includes('assistant_only_loss"] = False'), false);
   assert.match(trainPy, /training input must not be the held-out suite/);
-  const jinja = readFileSync(join(here, 'qwen3-chat-template.jinja'), 'utf8');
-  assert.match(jinja, /\{%- generation %\}/);
-  assert.match(jinja, /\{%- endgeneration %\}/);
+  const jinja = readFileSync(join(here, 'smollm3-chat-template.jinja'), 'utf8');
+  assert.match(jinja, /\{%-? generation -?%\}/);
+  assert.match(jinja, /\{%-? endgeneration -?%\}/);
+  assert.match(jinja, /\/no_think/);
+  assert.match(jinja, /Reasoning Mode/);
   assert.equal(jinja.includes('\u2014'), false);
+  const [maj, min] = trainRecipe.framework.pins.transformers.split('.').map(Number);
+  assert.ok(maj > 4 || (maj === 4 && min >= 53), trainRecipe.framework.pins.transformers);
   for (const [pkg, ver] of Object.entries(trainRecipe.framework.pins)) {
     assert.match(req, new RegExp(`^${pkg}==${ver}$`, 'm'), pkg);
   }
+  assert.match(req, /transformers >= 4\.53\.0/);
   assert.equal(JSON.stringify(trainRecipe).includes('\u2014'), false);
   assert.equal(trainPy.includes('\u2014'), false);
 });
 
-test('sweep recipe is a diagnostic curve on the same 0.6B, corpus, and gate', () => {
+test('sweep recipe is a diagnostic curve on SmolLM3-3B, same corpus and gate', () => {
   const sweepRecipe = JSON.parse(readFileSync(join(here, 'sweep-recipe.json'), 'utf8'));
   const trainRecipe = JSON.parse(readFileSync(join(here, 'train-recipe.json'), 'utf8'));
   const manifest = JSON.parse(readFileSync(join(repoRoot, 'data/models/manifest.json'), 'utf8'));
@@ -385,9 +397,12 @@ test('sweep recipe is a diagnostic curve on the same 0.6B, corpus, and gate', ()
 
   assert.equal(sweepRecipe.seed, 20260815);
   assert.equal(sweepRecipe.promptTemplateVersion, 'v3');
-  assert.equal(sweepRecipe.base.repoId, manifest.baseRepoId);
+  assert.equal(sweepRecipe.base.field, 'trainBaseRepoId');
+  assert.equal(sweepRecipe.base.repoId, manifest.trainBaseRepoId);
+  assert.equal(manifest.trainBaseRepoId, 'HuggingFaceTB/SmolLM3-3B');
   assert.equal(manifest.baseRepoId, 'Qwen/Qwen3-0.6B');
   assert.equal(sweepRecipe.sft, trainRecipe.sft);
+  assert.equal(sweepRecipe.train.chatTemplate, trainRecipe.train.chatTemplate);
   assert.equal(sweepRecipe.sft.includes('held-out'), false);
   assert.equal(sweepRecipe.train.evalDataset, 'none');
   assert.equal(sweepRecipe.train.assistantOnlyLoss, true);
@@ -414,6 +429,7 @@ test('sweep recipe is a diagnostic curve on the same 0.6B, corpus, and gate', ()
   assert.equal(sweepGate.includes('scoreHeldOutGate'), false);
   assert.match(runSweep, /sweep-recipe\.json/);
   assert.match(readme, /evaluator-training:sweep/);
+  assert.match(readme, /--check-template/);
 
   for (const text of [
     JSON.stringify(sweepRecipe),
@@ -514,6 +530,56 @@ expected = (
 )
 if text != expected:
     raise SystemExit(repr(text))
+print("ok")
+`;
+  const result = spawnSync('python3', ['-c', py], { encoding: 'utf8' });
+  assert.equal(result.status, 0, result.stderr || result.stdout);
+  assert.match(result.stdout, /ok/);
+});
+
+test('generation-aware jinja emits stock SmolLM3 no-think text for a single-turn example', () => {
+  const py = `
+from jinja2 import Environment, nodes
+from jinja2.ext import Extension
+from pathlib import Path
+
+class GenerationExtension(Extension):
+    tags = {'generation'}
+    def parse(self, parser):
+        lineno = next(parser.stream).lineno
+        body = parser.parse_statements(['name:endgeneration'], drop_needle=True)
+        return nodes.CallBlock(self.call_method('_gen', []), [], [], body).set_lineno(lineno)
+    def _gen(self, caller):
+        return caller()
+
+ours = Path(${JSON.stringify(join(here, 'smollm3-chat-template.jinja'))}).read_text()
+env = Environment(extensions=[GenerationExtension])
+env.globals['strftime_now'] = lambda fmt: '16 August 2026'
+text = env.from_string(ours).render(
+    messages=[
+        {"role": "system", "content": "SYS"},
+        {"role": "user", "content": "USER"},
+        {"role": "assistant", "content": "no yes no"},
+    ],
+    add_generation_prompt=False,
+    tools=None,
+    xml_tools=None,
+    python_tools=None,
+    enable_thinking=False,
+)
+expected = (
+    "<|im_start|>system\\n## Metadata\\n\\n"
+    "Knowledge Cutoff Date: June 2025\\n"
+    "Today Date: 16 August 2026\\n"
+    "Reasoning Mode: /no_think\\n\\n"
+    "## Custom Instructions\\n\\nSYS\\n\\n"
+    "<|im_start|>user\\nUSER<|im_end|>\\n"
+    "<|im_start|>assistant\\n<think>\\n\\n</think>\\nno yes no<|im_end|>\\n"
+)
+if text != expected:
+    raise SystemExit(repr(text))
+if "<think>" in text.split("assistant")[-1] and "no yes no" not in text.split("</think>")[-1]:
+    raise SystemExit("verdict is not after the empty think block")
 print("ok")
 `;
   const result = spawnSync('python3', ['-c', py], { encoding: 'utf8' });

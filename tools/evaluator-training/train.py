@@ -4,7 +4,8 @@
 # Paper: step 8. Provisional Section 3.3. The commons reference evaluation
 # model is a trained artifact. Labels already sit on the SFT assistant line
 # (the v3 compact verdict). This script does not read the held-out suite.
-# Base repo id comes from data/models/manifest.json, not from a guess here.
+# Training base repo id comes from data/models/manifest.json trainBaseRepoId.
+# The live pin (baseRepoId / fileName) is not read here and is not changed.
 # When the recipe has a sweep block, interval checkpoints are kept and each
 # is merged and converted so the gate can score the whole training curve.
 
@@ -24,7 +25,12 @@ from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
 REPO = HERE.parent.parent
-CHAT_TEMPLATE = HERE / "qwen3-chat-template.jinja"
+MIN_TRANSFORMERS = (4, 53, 0)
+SAMPLE_MESSAGES = [
+    {"role": "system", "content": "AIRP evaluator sample system."},
+    {"role": "user", "content": "hello"},
+    {"role": "assistant", "content": "no yes no"},
+]
 
 
 def load_json(path: Path):
@@ -56,9 +62,39 @@ def parse_args():
     p.add_argument(
         "--check-template",
         action="store_true",
-        help="Load the tokenizer, verify render equality and a non-empty assistant mask, then exit.",
+        help="Load the tokenizer, verify render equality, a non-empty assistant mask, verdict-in-mask, and no-think, then exit.",
     )
     return p.parse_args()
+
+
+def parse_version(v: str):
+    core = v.split("+")[0].split(".dev")[0]
+    nums = []
+    for part in core.split("."):
+        digits = ""
+        for ch in part:
+            if ch.isdigit():
+                digits += ch
+            else:
+                break
+        nums.append(int(digits or 0))
+    while len(nums) < 3:
+        nums.append(0)
+    return tuple(nums[:3])
+
+
+def assert_transformers_supports_base(base_id: str, recipe) -> str:
+    import transformers
+
+    ver = transformers.__version__
+    pinned = recipe["framework"]["pins"]["transformers"]
+    print(f"transformers {ver} (recipe pin {pinned}; SmolLM3 modeling needs >= 4.53.0)")
+    if "SmolLM3" in base_id and parse_version(ver) < MIN_TRANSFORMERS:
+        raise SystemExit(
+            f"transformers {ver} cannot load SmolLM3 (needs >= 4.53.0). "
+            f"Upgrade to the recipe pin {pinned} before training."
+        )
+    return ver
 
 
 def set_seeds(seed: int):
@@ -76,9 +112,12 @@ def set_seeds(seed: int):
         torch.cuda.manual_seed_all(seed)
 
 
-def wrap_tokenizer_no_think(tokenizer, enable_thinking: bool):
-    # Qwen3 defaults thinking on. Inference uses thoughts=discourage. The
-    # assistant target is the compact yes/no line, not a think block.
+def wrap_tokenizer_enable_thinking(tokenizer, enable_thinking: bool):
+    # SmolLM3 defaults enable_thinking to true. TRL's apply_chat_template
+    # calls do not pass the kwarg, so without this wrap the metadata line
+    # becomes Reasoning Mode: /think and the target is no longer the compact
+    # verdict. The wrap is how no-think stays on for every call, including
+    # the trainer's. It is not Qwen's empty-think-block trick.
     original = tokenizer.apply_chat_template
 
     def apply_chat_template(*args, **kwargs):
@@ -108,7 +147,7 @@ def flatten_ids(encoded):
 
 
 def assert_generation_aware_template(tokenizer, stock_template, messages, enable_thinking: bool):
-    """Fail before any GPU work if the mask is empty or the render drifted from stock."""
+    """Fail before any GPU work if the mask is empty, think is on, or render drifted from stock."""
     current = tokenizer.chat_template
     tokenizer.chat_template = stock_template
     stock_text = tokenizer.apply_chat_template(
@@ -126,10 +165,20 @@ def assert_generation_aware_template(tokenizer, stock_template, messages, enable
     )
     if stock_text != ours_text:
         raise SystemExit(
-            "generation-aware chat template does not render identically to the stock Qwen3 template. "
+            "generation-aware chat template does not render identically to the stock template. "
             f"stock_len={len(stock_text)} ours_len={len(ours_text)}. "
-            "Update qwen3-chat-template.jinja; do not train."
+            "Update the recipe chatTemplate; do not train."
         )
+    if not enable_thinking:
+        if "Reasoning Mode: /no_think" not in ours_text:
+            raise SystemExit(
+                "no-think is not active: rendered text is missing 'Reasoning Mode: /no_think'. "
+                "SmolLM3 no-think is that metadata line, not a Qwen empty-think wrapper. Do not train."
+            )
+        if "Reasoning Mode: /think" in ours_text:
+            raise SystemExit(
+                "no-think is not active: rendered text still has 'Reasoning Mode: /think'. Do not train."
+            )
     encoded = tokenizer.apply_chat_template(
         messages,
         tokenize=True,
@@ -159,20 +208,49 @@ def assert_generation_aware_template(tokenizer, stock_template, messages, enable
             "assistant mask does not cover the compact verdict line "
             f"(decoded mask {decoded!r}). Do not train."
         )
+    if not enable_thinking and "<think>" in decoded:
+        raise SystemExit(
+            "assistant mask includes think tags. Those are the no-think prefix, not the verdict. "
+            "Move {% generation %} so the empty think block sits outside the mask. Do not train."
+        )
     print(
-        f"chat template ok: render matches stock, assistant mask {n} tokens, verdict inside mask"
+        f"chat template ok: render matches stock, assistant mask {n} tokens, "
+        f"verdict inside mask, no-think {'active' if not enable_thinking else 'off (thinking enabled)'}"
     )
+    return n
 
 
-def install_generation_aware_template(tokenizer):
+def install_generation_aware_template(tokenizer, template_path: Path):
     stock = tokenizer.chat_template
-    if not CHAT_TEMPLATE.exists():
-        raise SystemExit(f"missing {CHAT_TEMPLATE}")
-    ours = CHAT_TEMPLATE.read_text(encoding="utf-8")
-    if "{% generation %}" not in ours and "{%- generation %}" not in ours:
-        raise SystemExit(f"{CHAT_TEMPLATE} has no {{% generation %}} span")
+    if not template_path.exists():
+        raise SystemExit(f"missing {template_path}")
+    ours = template_path.read_text(encoding="utf-8")
+    if "{% generation" not in ours and "{%- generation" not in ours:
+        raise SystemExit(f"{template_path} has no {{% generation %}} span")
     tokenizer.chat_template = ours
     return stock
+
+
+def load_sft_rows(sft_path: Path, first_only: bool):
+    rows = []
+    with sft_path.open(encoding="utf-8") as f:
+        for line in f:
+            line = line.strip()
+            if not line:
+                continue
+            rec = json.loads(line)
+            messages = rec.get("messages")
+            if not isinstance(messages, list) or len(messages) != 3:
+                raise SystemExit(f"SFT row {rec.get('id')} is not three chat turns")
+            roles = [m.get("role") for m in messages]
+            if roles != ["system", "user", "assistant"]:
+                raise SystemExit(f"SFT row {rec.get('id')} roles {roles} are not system/user/assistant")
+            rows.append({"messages": messages})
+            if first_only:
+                break
+    if len(rows) == 0:
+        raise SystemExit("SFT file is empty")
+    return rows
 
 
 def steps_per_epoch(n: int, recipe) -> int:
@@ -381,59 +459,63 @@ def main():
         raise SystemExit(f"manifest {recipe['base']['source']} has no {field}")
     if base_id != recipe["base"]["repoId"]:
         raise SystemExit(
-            f"train-recipe base.repoId {recipe['base']['repoId']} does not match manifest {field} {base_id}"
+            f"recipe base.repoId {recipe['base']['repoId']} does not match manifest {field} {base_id}"
         )
     if "held-out" in recipe["sft"]:
         raise SystemExit("training input must not be the held-out suite")
+    if "SmolLM3" in base_id and "smollm3" not in recipe["train"]["chatTemplate"].lower():
+        raise SystemExit(
+            f"SmolLM3 base requires a SmolLM3 chat template, not {recipe['train']['chatTemplate']}"
+        )
+    tf_ver = assert_transformers_supports_base(base_id, recipe)
 
     sft_path = REPO / recipe["sft"]
-    if not sft_path.exists():
-        raise SystemExit(f"no SFT file at {sft_path}. Generate the corpus first.")
+    template_path = REPO / recipe["train"]["chatTemplate"]
+    if args.check_template:
+        if sft_path.exists():
+            rows = load_sft_rows(sft_path, first_only=True)
+            print(f"template check sample: first row of {sft_path}")
+        else:
+            rows = [{"messages": SAMPLE_MESSAGES}]
+            print("template check sample: built-in three-turn example (no SFT file)")
+    else:
+        if not sft_path.exists():
+            raise SystemExit(f"no SFT file at {sft_path}. Generate the corpus first.")
+        rows = load_sft_rows(sft_path, first_only=False)
+        print(f"loaded {len(rows)} SFT rows")
 
     out_dir = Path(args.out) if args.out else REPO / recipe["outputs"]["dir"]
-    out_dir.mkdir(parents=True, exist_ok=True)
+    if not args.check_template:
+        out_dir.mkdir(parents=True, exist_ok=True)
     adapter_dir = out_dir / recipe["outputs"]["adapter"]
     merged_dir = out_dir / recipe["outputs"]["merged"]
     gguf_path = out_dir / recipe["outputs"]["gguf"]
     seed = recipe["seed"]
 
-    print(f"base {base_id} from {recipe['base']['source']}")
+    print(f"base {base_id} from {recipe['base']['source']} field {field}")
     print(f"sft {sft_path}")
     print(f"seed {seed}")
-    print(recipe["time"]["estimate"])
-
-    rows = []
-    with sft_path.open(encoding="utf-8") as f:
-        for line in f:
-            line = line.strip()
-            if not line:
-                continue
-            rec = json.loads(line)
-            messages = rec.get("messages")
-            if not isinstance(messages, list) or len(messages) != 3:
-                raise SystemExit(f"SFT row {rec.get('id')} is not three chat turns")
-            roles = [m.get("role") for m in messages]
-            if roles != ["system", "user", "assistant"]:
-                raise SystemExit(f"SFT row {rec.get('id')} roles {roles} are not system/user/assistant")
-            rows.append({"messages": messages})
-    if len(rows) == 0:
-        raise SystemExit("SFT file is empty")
-    print(f"loaded {len(rows)} SFT rows")
+    if not args.check_template:
+        print(recipe["time"]["estimate"])
 
     from transformers import AutoTokenizer
 
     tokenizer = AutoTokenizer.from_pretrained(base_id, trust_remote_code=True)
-    stock_template = install_generation_aware_template(tokenizer)
-    tokenizer = wrap_tokenizer_no_think(tokenizer, recipe["train"]["enableThinking"])
+    stock_template = install_generation_aware_template(tokenizer, template_path)
+    tokenizer = wrap_tokenizer_enable_thinking(tokenizer, recipe["train"]["enableThinking"])
     if tokenizer.pad_token is None:
         tokenizer.pad_token = tokenizer.eos_token
-    assert_generation_aware_template(
+    mask_n = assert_generation_aware_template(
         tokenizer,
         stock_template,
         rows[0]["messages"],
         recipe["train"]["enableThinking"],
     )
     if args.check_template:
+        print(f"base {base_id}")
+        print(f"transformers {tf_ver} (pin {recipe['framework']['pins']['transformers']})")
+        print(f"chatTemplate {recipe['train']['chatTemplate']}")
+        print(f"assistant mask tokens {mask_n}")
         print("template check only; not training")
         return
 
