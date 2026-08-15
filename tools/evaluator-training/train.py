@@ -21,6 +21,7 @@ from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
 REPO = HERE.parent.parent
+CHAT_TEMPLATE = HERE / "qwen3-chat-template.jinja"
 
 
 def load_json(path: Path):
@@ -48,6 +49,11 @@ def parse_args():
     p.add_argument("--recipe", default=str(HERE / "train-recipe.json"))
     p.add_argument("--skip-gguf", action="store_true")
     p.add_argument("--out", default="")
+    p.add_argument(
+        "--check-template",
+        action="store_true",
+        help="Load the tokenizer, verify render equality and a non-empty assistant mask, then exit.",
+    )
     return p.parse_args()
 
 
@@ -77,6 +83,92 @@ def wrap_tokenizer_no_think(tokenizer, enable_thinking: bool):
 
     tokenizer.apply_chat_template = apply_chat_template
     return tokenizer
+
+
+def flatten_mask(encoded):
+    mask = encoded.get("assistant_masks")
+    if mask is None:
+        mask = encoded.get("assistant_mask")
+    if mask is None:
+        return None
+    if len(mask) > 0 and isinstance(mask[0], (list, tuple)):
+        return list(mask[0])
+    return list(mask)
+
+
+def flatten_ids(encoded):
+    ids = encoded["input_ids"]
+    if len(ids) > 0 and isinstance(ids[0], (list, tuple)):
+        return list(ids[0])
+    return list(ids)
+
+
+def assert_generation_aware_template(tokenizer, stock_template, messages, enable_thinking: bool):
+    """Fail before any GPU work if the mask is empty or the render drifted from stock."""
+    current = tokenizer.chat_template
+    tokenizer.chat_template = stock_template
+    stock_text = tokenizer.apply_chat_template(
+        messages,
+        tokenize=False,
+        add_generation_prompt=False,
+        enable_thinking=enable_thinking,
+    )
+    tokenizer.chat_template = current
+    ours_text = tokenizer.apply_chat_template(
+        messages,
+        tokenize=False,
+        add_generation_prompt=False,
+        enable_thinking=enable_thinking,
+    )
+    if stock_text != ours_text:
+        raise SystemExit(
+            "generation-aware chat template does not render identically to the stock Qwen3 template. "
+            f"stock_len={len(stock_text)} ours_len={len(ours_text)}. "
+            "Update qwen3-chat-template.jinja; do not train."
+        )
+    encoded = tokenizer.apply_chat_template(
+        messages,
+        tokenize=True,
+        add_generation_prompt=False,
+        enable_thinking=enable_thinking,
+        return_assistant_tokens_mask=True,
+        return_dict=True,
+    )
+    mask = flatten_mask(encoded)
+    if mask is None:
+        raise SystemExit(
+            "tokenizer did not return an assistant mask. The chat template is missing {% generation %} "
+            "or this transformers version cannot build the mask. Refusing to train with full-sequence loss."
+        )
+    n = sum(int(x) for x in mask)
+    if n == 0:
+        raise SystemExit(
+            "assistant token mask is empty. assistant_only_loss would crash or train nothing. "
+            "The {% generation %} span is not covering the verdict. Do not train."
+        )
+    ids = flatten_ids(encoded)
+    asst_ids = [tid for tid, m in zip(ids, mask) if int(m)]
+    decoded = tokenizer.decode(asst_ids)
+    verdict = messages[-1]["content"]
+    if verdict not in decoded:
+        raise SystemExit(
+            "assistant mask does not cover the compact verdict line "
+            f"(decoded mask {decoded!r}). Do not train."
+        )
+    print(
+        f"chat template ok: render matches stock, assistant mask {n} tokens, verdict inside mask"
+    )
+
+
+def install_generation_aware_template(tokenizer):
+    stock = tokenizer.chat_template
+    if not CHAT_TEMPLATE.exists():
+        raise SystemExit(f"missing {CHAT_TEMPLATE}")
+    ours = CHAT_TEMPLATE.read_text(encoding="utf-8")
+    if "{% generation %}" not in ours and "{%- generation %}" not in ours:
+        raise SystemExit(f"{CHAT_TEMPLATE} has no {{% generation %}} span")
+    tokenizer.chat_template = ours
+    return stock
 
 
 def sft_config_kwargs(recipe, adapter_dir: Path, seed: int) -> dict:
@@ -112,6 +204,11 @@ def sft_config_kwargs(recipe, adapter_dir: Path, seed: int) -> dict:
             kwargs["assistant_only_loss"] = True
         elif "completion_only_loss" in params:
             kwargs["completion_only_loss"] = True
+        else:
+            raise SystemExit(
+                "TRL SFTConfig has neither assistant_only_loss nor completion_only_loss. "
+                "Refusing to train with full-sequence loss."
+            )
     return kwargs
 
 
@@ -207,16 +304,6 @@ def main():
     print(f"seed {seed}")
     print(recipe["time"]["estimate"])
 
-    import torch
-    from datasets import Dataset
-    from peft import LoraConfig, PeftModel
-    from transformers import AutoModelForCausalLM, AutoTokenizer
-    from trl import SFTConfig, SFTTrainer
-
-    if not torch.cuda.is_available():
-        print("warning: CUDA is not visible. This will be slow on CPU. Continuing because the script is the run.")
-    set_seeds(seed)
-
     rows = []
     with sft_path.open(encoding="utf-8") as f:
         for line in f:
@@ -235,10 +322,32 @@ def main():
         raise SystemExit("SFT file is empty")
     print(f"loaded {len(rows)} SFT rows")
 
+    from transformers import AutoTokenizer
+
     tokenizer = AutoTokenizer.from_pretrained(base_id, trust_remote_code=True)
+    stock_template = install_generation_aware_template(tokenizer)
     tokenizer = wrap_tokenizer_no_think(tokenizer, recipe["train"]["enableThinking"])
     if tokenizer.pad_token is None:
         tokenizer.pad_token = tokenizer.eos_token
+    assert_generation_aware_template(
+        tokenizer,
+        stock_template,
+        rows[0]["messages"],
+        recipe["train"]["enableThinking"],
+    )
+    if args.check_template:
+        print("template check only; not training")
+        return
+
+    import torch
+    from datasets import Dataset
+    from peft import LoraConfig, PeftModel
+    from transformers import AutoModelForCausalLM
+    from trl import SFTConfig, SFTTrainer
+
+    if not torch.cuda.is_available():
+        print("warning: CUDA is not visible. This will be slow on CPU. Continuing because the script is the run.")
+    set_seeds(seed)
 
     model = AutoModelForCausalLM.from_pretrained(
         base_id,

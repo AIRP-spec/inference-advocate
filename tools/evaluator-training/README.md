@@ -109,7 +109,10 @@ hours of generation at most, not days. If it is not, stop and report.
 `data/models/manifest.json` (`baseRepoId`: Qwen/Qwen3-0.6B). Seed 20260815.
 Three epochs. No eval split: the held-out suite is the gate, not a training
 input. Thinking is off (`enable_thinking=False`) so the assistant target is
-the compact verdict line.
+the compact verdict line. The chat template is the stock Qwen3-0.6B
+template with `{% generation %}` around assistant content so TRL can
+mask the verdict. Full-sequence loss is refused: it trains the model to
+reproduce the long taxonomy prompt and under-learns the short line.
 
 On a single 80GB card this is well under two hours (0.6B, 3936 short
 examples, then merge, GGUF Q8_0, 187 compact-verdict items). If training is

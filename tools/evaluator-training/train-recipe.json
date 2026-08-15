@@ -63,6 +63,8 @@
     "bf16": true,
     "enableThinking": false,
     "enableThinkingNote": "Qwen3 thinking must stay off. Inference uses QwenChatWrapper thoughts=discourage. Training applies enable_thinking=False so the assistant target is the compact verdict line.",
+    "chatTemplate": "tools/evaluator-training/qwen3-chat-template.jinja",
+    "chatTemplateNote": "Stock Qwen3-0.6B template plus {% generation %} around assistant content. TRL assistant_only_loss needs those spans. Rendered text must match stock; train.py refuses to start if it does not, or if the assistant mask is empty. Epochs and learning rate are unchanged in this masking fix.",
     "evalDataset": "none",
     "evalDatasetNote": "The held-out suite is the final gate, never a training or hyperparameter split. Epochs are fixed. Loss is logged. There is no early stopping."
   },

@@ -3,6 +3,7 @@ import assert from 'node:assert/strict';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { readFileSync, existsSync } from 'node:fs';
+import { spawnSync } from 'node:child_process';
 import {
   buildLeakIndex,
   leakReason,
@@ -343,8 +344,11 @@ test('train recipe pins the manifest base, a fixed seed, and no held-out input',
   assert.equal(trainRecipe.seed, 20260815);
   assert.equal(trainRecipe.promptTemplateVersion, 'v3');
   assert.equal(trainRecipe.train.epochs, 3);
+  assert.equal(trainRecipe.train.learningRate, 0.0002);
   assert.equal(trainRecipe.train.evalDataset, 'none');
   assert.equal(trainRecipe.train.enableThinking, false);
+  assert.equal(trainRecipe.train.assistantOnlyLoss, true);
+  assert.equal(trainRecipe.train.chatTemplate, 'tools/evaluator-training/qwen3-chat-template.jinja');
   assert.equal(trainRecipe.framework.reportTo, 'none');
   assert.equal(trainRecipe.publish.flipLivePin, false);
   assert.equal(trainRecipe.base.source, 'data/models/manifest.json');
@@ -355,12 +359,60 @@ test('train recipe pins the manifest base, a fixed seed, and no held-out input',
   assert.equal(trainRecipe.sft.includes('held-out'), false);
   assert.match(trainPy, /manifest\.get\(field\)/);
   assert.match(trainPy, /enable_thinking/);
+  assert.match(trainPy, /assert_generation_aware_template/);
+  assert.match(trainPy, /assistant_only_loss.*= True/);
+  assert.equal(trainPy.includes('assistant_only_loss"] = False'), false);
   assert.match(trainPy, /training input must not be the held-out suite/);
+  const jinja = readFileSync(join(here, 'qwen3-chat-template.jinja'), 'utf8');
+  assert.match(jinja, /\{%- generation %\}/);
+  assert.match(jinja, /\{%- endgeneration %\}/);
+  assert.equal(jinja.includes('\u2014'), false);
   for (const [pkg, ver] of Object.entries(trainRecipe.framework.pins)) {
     assert.match(req, new RegExp(`^${pkg}==${ver}$`, 'm'), pkg);
   }
   assert.equal(JSON.stringify(trainRecipe).includes('\u2014'), false);
   assert.equal(trainPy.includes('\u2014'), false);
+});
+
+test('generation-aware jinja emits the same text as stock Qwen3 for a single-turn example', () => {
+  const py = `
+from jinja2 import Environment, nodes
+from jinja2.ext import Extension
+from pathlib import Path
+
+class GenerationExtension(Extension):
+    tags = {'generation'}
+    def parse(self, parser):
+        lineno = next(parser.stream).lineno
+        body = parser.parse_statements(['name:endgeneration'], drop_needle=True)
+        return nodes.CallBlock(self.call_method('_gen', []), [], [], body).set_lineno(lineno)
+    def _gen(self, caller):
+        return caller()
+
+ours = Path(${JSON.stringify(join(here, 'qwen3-chat-template.jinja'))}).read_text()
+env = Environment(extensions=[GenerationExtension])
+text = env.from_string(ours).render(
+    messages=[
+        {"role": "system", "content": "SYS"},
+        {"role": "user", "content": "USER"},
+        {"role": "assistant", "content": "no yes no"},
+    ],
+    add_generation_prompt=False,
+    tools=None,
+    enable_thinking=False,
+)
+expected = (
+    "<|im_start|>system\\nSYS<|im_end|>\\n"
+    "<|im_start|>user\\nUSER<|im_end|>\\n"
+    "<|im_start|>assistant\\n<think>\\n\\n</think>\\n\\nno yes no<|im_end|>\\n"
+)
+if text != expected:
+    raise SystemExit(repr(text))
+print("ok")
+`;
+  const result = spawnSync('python3', ['-c', py], { encoding: 'utf8' });
+  assert.equal(result.status, 0, result.stderr || result.stdout);
+  assert.match(result.stdout, /ok/);
 });
 
 test('sft rows equal prompt-v3 rendering when the corpus is present', async (t) => {
