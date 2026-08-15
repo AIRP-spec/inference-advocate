@@ -15,6 +15,9 @@ import {
   parseVerdict,
   sha256FileHex,
   verifyModelSha256,
+  LocalEvaluator,
+  PROMPT_TEMPLATE_VERSION,
+  PROMPT_TEMPLATE_V3,
 } from '@airp/evaluator-local';
 
 const taxonomy = Taxonomy.loadFromFile(dataPath('taxonomy', 'flags.v0.json'));
@@ -114,4 +117,38 @@ test('evidence that is not a verbatim span is dropped', () => {
 test('think tags are detected for debug logging', () => {
   assert.equal(looksLikeThinking('yes'), false);
   assert.equal(looksLikeThinking('<think>\nreasoning\n</think>\nyes'), true);
+});
+
+test('v3 construction binds digest plus v3 and does not change the live default', () => {
+  assert.equal(PROMPT_TEMPLATE_VERSION, 'v2.1');
+  assert.equal(PROMPT_TEMPLATE_V3, 'v3');
+  const dir = mkdtempSync(join(tmpdir(), 'airp-local-eval-'));
+  try {
+    const path = join(dir, 'toy.gguf');
+    writeFileSync(path, 'not-a-real-model');
+    const digest = createHash('sha256').update('not-a-real-model').digest('hex');
+    const v21 = new LocalEvaluator({ taxonomy, modelPath: path, modelSha256: digest });
+    assert.equal(v21.version, `${digest.slice(0, 12)}+v2.1`);
+    assert.equal(v21.promptTemplateVersion, 'v2.1');
+    const v3 = new LocalEvaluator({
+      taxonomy,
+      modelPath: path,
+      modelSha256: digest,
+      promptTemplateVersion: 'v3',
+    });
+    assert.equal(v3.version, `${digest.slice(0, 12)}+v3`);
+    assert.equal(v3.promptTemplateVersion, 'v3');
+    assert.throws(
+      () =>
+        new LocalEvaluator({
+          taxonomy,
+          modelPath: path,
+          modelSha256: digest,
+          promptTemplateVersion: 'v2',
+        }),
+      /unsupported promptTemplateVersion/,
+    );
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
 });

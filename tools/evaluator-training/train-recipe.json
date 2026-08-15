@@ -1,0 +1,101 @@
+{
+  "recipeVersion": "1",
+  "paper": "step 8. Provisional Section 3.3. The commons reference evaluation model is a trained artifact.",
+  "adr": "Training lives under tools/evaluator-training/. This file is the LoRA run: base, hyperparameters, framework pins, seed. The generation recipe is recipe.json. The held-out suite is not an input.",
+  "promptTemplateVersion": "v3",
+  "taxonomyVersion": "v0.3.0",
+  "taxonomyFile": "data/taxonomy/flags.v0.json",
+  "generationRecipe": "tools/evaluator-training/recipe.json",
+  "sft": "data/evaluator-training/sft.jsonl",
+  "seed": 20260815,
+  "base": {
+    "source": "data/models/manifest.json",
+    "field": "baseRepoId",
+    "repoId": "Qwen/Qwen3-0.6B",
+    "note": "Read at run time from the manifest. repoId here is a pin that must match. Do not train Qwen3-0.6B-Base."
+  },
+  "framework": {
+    "stack": "transformers + peft + trl SFTTrainer",
+    "whyNotUnsloth": "0.6B plus 3936 short examples does not need Unsloth's memory path. The standard stack is the one a reader can follow without a third training runtime.",
+    "reportTo": "none",
+    "reportToNote": "No cloud metric sink. Loss logs to stdout and artifacts/train-log.json. Trackio would be a Hub side channel this run does not need.",
+    "torch": "supplied by the GPU image; not pinned here so a CUDA wheel is not overwritten",
+    "python": ">=3.10",
+    "pins": {
+      "transformers": "4.55.2",
+      "peft": "0.17.1",
+      "trl": "0.21.0",
+      "datasets": "3.6.0",
+      "accelerate": "1.10.1",
+      "gguf": "0.17.1",
+      "sentencepiece": "0.2.0",
+      "protobuf": "5.29.5",
+      "huggingface_hub": "0.34.4"
+    }
+  },
+  "lora": {
+    "r": 16,
+    "alpha": 32,
+    "dropout": 0.05,
+    "bias": "none",
+    "taskType": "CAUSAL_LM",
+    "targetModules": [
+      "q_proj",
+      "k_proj",
+      "v_proj",
+      "o_proj",
+      "gate_proj",
+      "up_proj",
+      "down_proj"
+    ]
+  },
+  "train": {
+    "epochs": 3,
+    "perDeviceBatchSize": 8,
+    "gradientAccumulationSteps": 4,
+    "effectiveBatchSize": 32,
+    "learningRate": 0.0002,
+    "warmupRatio": 0.03,
+    "lrScheduler": "cosine",
+    "maxSeqLen": 4096,
+    "packing": false,
+    "assistantOnlyLoss": true,
+    "bf16": true,
+    "enableThinking": false,
+    "enableThinkingNote": "Qwen3 thinking must stay off. Inference uses QwenChatWrapper thoughts=discourage. Training applies enable_thinking=False so the assistant target is the compact verdict line.",
+    "evalDataset": "none",
+    "evalDatasetNote": "The held-out suite is the final gate, never a training or hyperparameter split. Epochs are fixed. Loss is logged. There is no early stopping."
+  },
+  "gguf": {
+    "quantization": "Q8_0",
+    "outtype": "f16",
+    "fileName": "Qwen3-0.6B-airp-v3-Q8_0.gguf",
+    "llamaCpp": {
+      "repo": "https://github.com/ggml-org/llama.cpp",
+      "fallbackRepo": "https://github.com/ggerganov/llama.cpp",
+      "ref": "HEAD",
+      "note": "convert_hf_to_gguf.py then llama-quantize Q8_0. The run records the resolved commit in artifacts.json. Q8_0 matches the live vendor pin's quantization."
+    }
+  },
+  "outputs": {
+    "dir": "data/evaluator-training/artifacts",
+    "adapter": "lora",
+    "merged": "merged",
+    "gguf": "Qwen3-0.6B-airp-v3-Q8_0.gguf",
+    "manifest": "artifacts.json",
+    "gateReport": "gate-report.json",
+    "trainLog": "train-log.json"
+  },
+  "time": {
+    "budgetHours": 2,
+    "estimate": "Well under two hours on a single 80GB card. 0.6B LoRA, 3936 examples, 3 epochs, sequences around 2k tokens, then merge, llama.cpp convert, and 187 compact-verdict gate items. If a run is still training after 90 minutes, stop and report: that is a hang, not the expected duration."
+  },
+  "publish": {
+    "when": "only after gate-report.json pass is true",
+    "hubOrg": "AIRP-spec",
+    "repoName": "evaluator-qwen3-0.6B-v3",
+    "license": "Apache-2.0",
+    "flipLivePin": false,
+    "note": "Publication writes a trainedCandidate on the model manifest. It does not replace the live v2.1 vendor GGUF and it does not change the default evaluator."
+  }
+}

@@ -32,3 +32,20 @@ export {
   type ParsedCompactVerdict,
 } from './prompt-v3.js';
 export { verifyModelSha256, sha256FileHex, normalizeDigest } from './digest.js';
+export {
+  HELD_OUT_GATE_FILE,
+  HELD_OUT_SUITE_FILE,
+  loadGateConfigFromFile,
+  loadHeldOutSuiteFromFile,
+  mean,
+  scoreHeldOutGate,
+  smokeIdentities,
+  type GateConfig,
+  type GateItemResult,
+  type GateScore,
+  type HeldOutItem,
+  type HeldOutKind,
+  type HeldOutOrigin,
+  type HeldOutSuite,
+  type ItemVerdict,
+} from './held-out-gate.js';

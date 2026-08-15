@@ -11,8 +11,11 @@
 // evidence is a second call only when a class fires, and the shared prefix is reused on one
 // sequence via adaptStateToTokens. v1's eleven-way call is not kept live. The 22 smoke
 // identities remain the live-pin check. Template v3 (compact multi-label line) is
-// defined in prompt-v3.ts for training. The live path stays v2.1 until a trained
-// pin passes the held-out gate under data/evaluator-gate/.
+// defined in prompt-v3.ts. This class can evaluate at v3 when constructed with
+// promptTemplateVersion: 'v3' (the training gate). createLocalEvaluator does not
+// pass that option, so the live path stays v2.1 until a trained pin passes the
+// held-out gate. The v3 path records empty evidence: the trained task is the
+// compact verdict line, not span extraction.
 //
 // Core never imports this file. The host injects a factory through resolveEvaluator.
 
@@ -40,6 +43,13 @@ import {
   parseVerdict,
   PROMPT_TEMPLATE_VERSION,
 } from './prompt-v2.js';
+import {
+  buildV3ChatTurns,
+  compactVerdictGbnf,
+  parseCompactVerdict,
+  PROMPT_TEMPLATE_V3,
+  taxonomyTypes,
+} from './prompt-v3.js';
 
 export { PROMPT_TEMPLATE_VERSION };
 
@@ -57,6 +67,11 @@ export interface LocalEvaluatorOptions {
   timeoutMs?: number;
   temperature?: number;
   seed?: number;
+  /**
+   * Decode template. Default is the live pin (v2.1). Pass v3 only for a trained
+   * candidate against the held-out gate. This does not change the default evaluator.
+   */
+  promptTemplateVersion?: string;
 }
 
 type LoadedRuntime = {
@@ -65,6 +80,7 @@ type LoadedRuntime = {
   wrapper: QwenChatWrapper;
   verdictGrammar: LlamaGrammar;
   evidenceGrammar: LlamaGrammar;
+  compactGrammar: LlamaGrammar;
   systemInfo: string;
 };
 
@@ -90,7 +106,15 @@ export class LocalEvaluator implements Evaluator {
     this.#taxonomy = opts.taxonomy;
     this.#opts = opts;
     this.#digest = verifyModelSha256(opts.modelPath, opts.modelSha256);
-    this.version = `${this.#digest.slice(0, 12)}+${PROMPT_TEMPLATE_VERSION}`;
+    const template = opts.promptTemplateVersion ?? PROMPT_TEMPLATE_VERSION;
+    if (template !== PROMPT_TEMPLATE_VERSION && template !== PROMPT_TEMPLATE_V3) {
+      throw new Error(`unsupported promptTemplateVersion ${template}`);
+    }
+    this.version = `${this.#digest.slice(0, 12)}+${template}`;
+  }
+
+  get promptTemplateVersion(): string {
+    return this.#opts.promptTemplateVersion ?? PROMPT_TEMPLATE_VERSION;
   }
 
   async load(): Promise<void> {
@@ -116,7 +140,18 @@ export class LocalEvaluator implements Evaluator {
     const wrapper = new QwenChatWrapper({ thoughts: 'discourage', variation: '3' });
     const verdictGrammar = await llama.createGrammar({ grammar: VERDICT_GBNF });
     const evidenceGrammar = await llama.createGrammar({ grammar: EVIDENCE_GBNF });
-    this.#loaded = { model, sequence, wrapper, verdictGrammar, evidenceGrammar, systemInfo: this.systemInfo };
+    const compactGrammar = await llama.createGrammar({
+      grammar: compactVerdictGbnf(this.#taxonomy.flags.length),
+    });
+    this.#loaded = {
+      model,
+      sequence,
+      wrapper,
+      verdictGrammar,
+      evidenceGrammar,
+      compactGrammar,
+      systemInfo: this.systemInfo,
+    };
   }
 
   async evaluate(req: EvaluationRequest): Promise<Flag[]> {
@@ -142,6 +177,9 @@ export class LocalEvaluator implements Evaluator {
     const flags: Flag[] = [];
     this.lastRawByClass = {};
     this.lastThoughtDetected = false;
+    if (this.promptTemplateVersion === PROMPT_TEMPLATE_V3) {
+      return this.#evaluateV3(req, loaded, started);
+    }
     const perCallMs = this.#opts.timeoutMs ?? 30_000;
     const shared = buildSharedPrefix(req);
 
@@ -204,6 +242,57 @@ export class LocalEvaluator implements Evaluator {
     console.log(
       `local-llm@${this.version}: evaluated ${this.#taxonomy.flags.length} classes in ${this.lastEvalMs}ms`,
     );
+    return flags;
+  }
+
+  async #evaluateV3(req: EvaluationRequest, loaded: LoadedRuntime, started: number): Promise<Flag[]> {
+    const types = taxonomyTypes(this.#taxonomy);
+    const { system, user } = buildV3ChatTurns(this.#taxonomy, req);
+    const promptTokens = this.#tokenizeHistory(loaded, [
+      { type: 'system', text: system },
+      { type: 'user', text: user },
+      { type: 'model', response: [] },
+    ]);
+    const perCallMs = this.#opts.timeoutMs ?? 30_000;
+    const maxTokens = 4 * types.length + 8;
+    let raw = '';
+    try {
+      raw = await this.#generate(loaded, promptTokens, loaded.compactGrammar, maxTokens, perCallMs);
+    } catch (err) {
+      console.warn(
+        `local-llm@${this.version}: compact generation failed (${(err as Error).message}); treating as no fires`,
+      );
+      this.lastEvalMs = Date.now() - started;
+      return [];
+    }
+    this.lastRawByClass = { compact: raw };
+    if (looksLikeThinking(raw)) {
+      this.lastThoughtDetected = true;
+      console.warn(`local-llm@${this.version}: think tag in compact verdict: ${JSON.stringify(raw)}`);
+    }
+    const parsed = parseCompactVerdict(raw, types);
+    if (parsed.unparseable) {
+      console.warn(
+        `local-llm@${this.version}: unparseable compact verdict (${JSON.stringify(raw)}); treating as no fires`,
+      );
+      this.lastEvalMs = Date.now() - started;
+      return [];
+    }
+    const byType = new Map(this.#taxonomy.flags.map((def) => [def.type, def]));
+    const flags: Flag[] = [];
+    for (const type of parsed.fired) {
+      const def = byType.get(type);
+      if (!def) continue;
+      this.lastRawByClass[type] = 'yes';
+      flags.push({
+        type: def.type,
+        severity: def.severity,
+        evidence: [],
+        basis: `${this.#taxonomy.version}:local:${def.type}`,
+      });
+    }
+    this.lastEvalMs = Date.now() - started;
+    console.log(`local-llm@${this.version}: compact verdict ${raw.trim()} in ${this.lastEvalMs}ms`);
     return flags;
   }
 

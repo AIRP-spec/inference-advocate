@@ -2,7 +2,7 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { readFileSync } from 'node:fs';
+import { readFileSync, existsSync } from 'node:fs';
 import {
   buildLeakIndex,
   leakReason,
@@ -332,6 +332,75 @@ test('composed profanity and hate scaffolds exhibit, do not describe, and cap fr
       `${type} unique ${unique.size}`,
     );
   }
+});
+
+test('train recipe pins the manifest base, a fixed seed, and no held-out input', () => {
+  const trainRecipe = JSON.parse(readFileSync(join(here, 'train-recipe.json'), 'utf8'));
+  const manifest = JSON.parse(readFileSync(join(repoRoot, 'data/models/manifest.json'), 'utf8'));
+  const req = readFileSync(join(here, 'requirements-train.txt'), 'utf8');
+  const trainPy = readFileSync(join(here, 'train.py'), 'utf8');
+  assert.equal(trainRecipe.seed, recipe.generator.seed);
+  assert.equal(trainRecipe.seed, 20260815);
+  assert.equal(trainRecipe.promptTemplateVersion, 'v3');
+  assert.equal(trainRecipe.train.epochs, 3);
+  assert.equal(trainRecipe.train.evalDataset, 'none');
+  assert.equal(trainRecipe.train.enableThinking, false);
+  assert.equal(trainRecipe.framework.reportTo, 'none');
+  assert.equal(trainRecipe.publish.flipLivePin, false);
+  assert.equal(trainRecipe.base.source, 'data/models/manifest.json');
+  assert.equal(trainRecipe.base.field, 'baseRepoId');
+  assert.equal(manifest.baseRepoId, 'Qwen/Qwen3-0.6B');
+  assert.equal(trainRecipe.base.repoId, manifest.baseRepoId);
+  assert.equal(trainRecipe.sft, recipe.outputs.sft);
+  assert.equal(trainRecipe.sft.includes('held-out'), false);
+  assert.match(trainPy, /manifest\.get\(field\)/);
+  assert.match(trainPy, /enable_thinking/);
+  assert.match(trainPy, /training input must not be the held-out suite/);
+  for (const [pkg, ver] of Object.entries(trainRecipe.framework.pins)) {
+    assert.match(req, new RegExp(`^${pkg}==${ver}$`, 'm'), pkg);
+  }
+  assert.equal(JSON.stringify(trainRecipe).includes('\u2014'), false);
+  assert.equal(trainPy.includes('\u2014'), false);
+});
+
+test('sft rows equal prompt-v3 rendering when the corpus is present', async (t) => {
+  const trainRecipe = JSON.parse(readFileSync(join(here, 'train-recipe.json'), 'utf8'));
+  const sftPath = join(repoRoot, trainRecipe.sft);
+  const corpusPath = join(repoRoot, recipe.outputs.corpus);
+  if (!existsSync(sftPath) || !existsSync(corpusPath)) {
+    t.skip();
+    return;
+  }
+  let buildV3ChatTurns;
+  let serializeCompactVerdict;
+  let taxonomyTypes;
+  let Taxonomy;
+  try {
+    ({ Taxonomy } = await import('@airp/core'));
+    ({ buildV3ChatTurns, serializeCompactVerdict, taxonomyTypes } = await import('@airp/evaluator-local'));
+  } catch {
+    t.skip();
+    return;
+  }
+  const taxonomy = Taxonomy.loadFromFile(join(repoRoot, recipe.taxonomyFile));
+  const taxTypes = taxonomyTypes(taxonomy);
+  const corpus = JSON.parse(
+    readFileSync(corpusPath, 'utf8')
+      .split('\n')
+      .find((line) => line.trim()) || 'null',
+  );
+  const sft = JSON.parse(
+    readFileSync(sftPath, 'utf8')
+      .split('\n')
+      .find((line) => line.trim()) || 'null',
+  );
+  assert.ok(corpus && sft);
+  assert.equal(corpus.id, sft.id);
+  const turns = buildV3ChatTurns(taxonomy, { providerId: 'train', content: corpus.content });
+  const verdict = serializeCompactVerdict(taxTypes, corpus.expect);
+  assert.equal(sft.messages[0].content, turns.system);
+  assert.equal(sft.messages[1].content, turns.user);
+  assert.equal(sft.messages[2].content, verdict);
 });
 
 test('parseExamples recovers control characters inside writer strings', () => {

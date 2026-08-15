@@ -6,7 +6,9 @@ ADR: this directory is a recipe for producing an artifact, not a runtime the
 advocate loads. It lives under `tools/`, not `packages/`. The v3 compact
 verdict serialization lives in `@airp/evaluator-local` (`prompt-v3.ts`) so
 training and inference cannot drift. The live evaluator path is still
-template v2.1. Do not switch it here.
+template v2.1. Do not switch it here. The v3 evaluate path on LocalEvaluator
+exists so the gate harness can load a trained GGUF; createLocalEvaluator still
+builds v2.1.
 
 ## What this is
 
@@ -101,6 +103,34 @@ RunPod: serve the recipe's generator model with vLLM (or equivalent) as
 `/v1/chat/completions`, then run the commands above against that URL. This is
 hours of generation at most, not days. If it is not, stop and report.
 
+## Train (Part C)
+
+`train-recipe.json` is the LoRA run. Base id is read from
+`data/models/manifest.json` (`baseRepoId`: Qwen/Qwen3-0.6B). Seed 20260815.
+Three epochs. No eval split: the held-out suite is the gate, not a training
+input. Thinking is off (`enable_thinking=False`) so the assistant target is
+the compact verdict line.
+
+On a single 80GB card this is well under two hours (0.6B, 3936 short
+examples, then merge, GGUF Q8_0, 187 compact-verdict items). If training is
+still running after 90 minutes, stop and report.
+
+```bash
+npm run build
+pip install -r tools/evaluator-training/requirements-train.txt
+# torch comes from the GPU image
+npm run evaluator-training:assert-sft
+npm run evaluator-training:train          # leak-check, assert, train, gate
+# or, after a completed train:
+npm run evaluator-training:gate           # add --gpu if the card should offload
+# only after gate-report.json pass is true:
+node tools/evaluator-training/publish.mjs # dry run
+node tools/evaluator-training/publish.mjs --execute --pin-manifest
+```
+
+`publish.mjs` records a `trainedCandidate` on the model manifest. It does not
+replace the live vendor GGUF and it does not change the default evaluator.
+
 Outputs (gitignored except this README's sibling notes):
 
 - `data/evaluator-training/corpus.jsonl`
@@ -110,6 +140,14 @@ Outputs (gitignored except this README's sibling notes):
 A stratified sample of a few hundred items goes to Justin before any
 training run. Bounded review, not full-corpus review. The sample includes
 the composed family so that slice is in the 320.
+
+Training artifacts (also gitignored):
+
+- `data/evaluator-training/artifacts/lora/`
+- `data/evaluator-training/artifacts/merged/`
+- `data/evaluator-training/artifacts/Qwen3-0.6B-airp-v3-Q8_0.gguf`
+- `data/evaluator-training/artifacts/artifacts.json`
+- `data/evaluator-training/artifacts/gate-report.json`
 
 ## Composed positives
 
@@ -147,6 +185,7 @@ the evaluator declares itself validated against the older taxonomy version.
 
 ## What this is not
 
-Not the LoRA. Not the GGUF. Not template v3 on the live path. Those are
-later parts. The rule evaluator remains the default until a trained pin
+The trained GGUF is not in git. Template v3 is not on the live path.
+Publication does not flip the default evaluator. Those stay later
+integration. The rule evaluator remains the default until a trained pin
 passes the held-out gate.

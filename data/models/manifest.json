@@ -1,5 +1,7 @@
 {
   "name": "Qwen3-0.6B",
+  "baseRepoId": "Qwen/Qwen3-0.6B",
+  "baseRepoNote": "Transformers id of the post-trained instruct checkpoint the published GGUF was converted from. Training reads this field. Qwen3-0.6B-Base is the pretrained checkpoint and is not this pin.",
   "fileName": "Qwen3-0.6B-Q8_0.gguf",
   "sourceUrl": "https://huggingface.co/Qwen/Qwen3-0.6B-GGUF/resolve/main/Qwen3-0.6B-Q8_0.gguf",
   "sha256": "9465e63a22add5354d9bb4b99e90117043c7124007664907259bd16d043bb031",
