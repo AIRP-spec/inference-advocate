@@ -34,9 +34,9 @@
     }
   },
   "lora": {
-    "r": 32,
-    "alpha": 64,
-    "dropout": 0.05,
+    "r": 16,
+    "alpha": 32,
+    "dropout": 0.1,
     "bias": "none",
     "taskType": "CAUSAL_LM",
     "targetModules": [
@@ -50,7 +50,7 @@
     ]
   },
   "train": {
-    "epochs": 3,
+    "epochs": 1,
     "perDeviceBatchSize": 8,
     "gradientAccumulationSteps": 4,
     "effectiveBatchSize": 32,
