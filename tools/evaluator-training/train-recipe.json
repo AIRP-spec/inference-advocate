@@ -62,6 +62,8 @@
     "packing": false,
     "assistantOnlyLoss": true,
     "bf16": true,
+    "gradientCheckpointing": true,
+    "gradientCheckpointingNote": "Recompute activations instead of storing them so SmolLM3-3B LoRA fits at the current batch and sequence length. Trainer sets use_reentrant false. The training model sets use_cache false so checkpointing does not conflict with KV cache.",
     "enableThinking": false,
     "enableThinkingNote": "SmolLM3 thinking must stay off. No-think is enable_thinking=False, which writes Reasoning Mode: /no_think in the system metadata. train.py wraps apply_chat_template so TRL cannot drop the kwarg. Do not use Qwen's empty-think-block wrapper. Do not set assistant_only_loss to false.",
     "chatTemplate": "tools/evaluator-training/smollm3-chat-template.jinja",

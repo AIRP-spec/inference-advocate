@@ -61,6 +61,7 @@
     "packing": false,
     "assistantOnlyLoss": true,
     "bf16": true,
+    "gradientCheckpointing": true,
     "enableThinking": false,
     "chatTemplate": "tools/evaluator-training/smollm3-chat-template.jinja",
     "evalDataset": "none",

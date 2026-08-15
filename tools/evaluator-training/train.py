@@ -350,6 +350,11 @@ def sft_config_kwargs(recipe, adapter_dir: Path, seed: int, n_examples: int) -> 
                 "TRL SFTConfig has neither assistant_only_loss nor completion_only_loss. "
                 "Refusing to train with full-sequence loss."
             )
+    if t.get("gradientCheckpointing", True):
+        kwargs["gradient_checkpointing"] = True
+        if "gradient_checkpointing_kwargs" in params:
+            kwargs["gradient_checkpointing_kwargs"] = {"use_reentrant": False}
+        print("gradient checkpointing on (use_reentrant=False)")
     if recipe.get("sweep"):
         save_steps, spe = sweep_save_steps(n_examples, recipe)
         kwargs["save_strategy"] = "steps"
@@ -535,6 +540,8 @@ def main():
         device_map="auto",
         trust_remote_code=True,
     )
+    if recipe["train"].get("gradientCheckpointing", True):
+        model.config.use_cache = False
     lora = recipe["lora"]
     peft_config = LoraConfig(
         r=lora["r"],

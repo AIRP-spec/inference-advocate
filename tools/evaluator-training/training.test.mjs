@@ -346,6 +346,7 @@ test('train recipe pins the SmolLM3 training base, a fixed seed, and no held-out
   assert.equal(trainRecipe.train.evalDataset, 'none');
   assert.equal(trainRecipe.train.enableThinking, false);
   assert.equal(trainRecipe.train.assistantOnlyLoss, true);
+  assert.equal(trainRecipe.train.gradientCheckpointing, true);
   assert.equal(trainRecipe.train.chatTemplate, 'tools/evaluator-training/smollm3-chat-template.jinja');
   assert.equal(trainRecipe.framework.reportTo, 'none');
   assert.equal(trainRecipe.publish.flipLivePin, false);
@@ -366,6 +367,9 @@ test('train recipe pins the SmolLM3 training base, a fixed seed, and no held-out
   assert.match(trainPy, /assert_generation_aware_template/);
   assert.match(trainPy, /MIN_TRANSFORMERS = \(4, 53, 0\)/);
   assert.match(trainPy, /assistant_only_loss.*= True/);
+  assert.match(trainPy, /gradient_checkpointing.*= True/);
+  assert.match(trainPy, /use_reentrant/);
+  assert.match(trainPy, /use_cache = False/);
   assert.equal(trainPy.includes('assistant_only_loss"] = False'), false);
   assert.match(trainPy, /training input must not be the held-out suite/);
   const jinja = readFileSync(join(here, 'smollm3-chat-template.jinja'), 'utf8');
@@ -406,6 +410,7 @@ test('sweep recipe is a diagnostic curve on SmolLM3-3B, same corpus and gate', (
   assert.equal(sweepRecipe.sft.includes('held-out'), false);
   assert.equal(sweepRecipe.train.evalDataset, 'none');
   assert.equal(sweepRecipe.train.assistantOnlyLoss, true);
+  assert.equal(sweepRecipe.train.gradientCheckpointing, true);
   assert.equal(sweepRecipe.train.enableThinking, false);
   assert.equal(sweepRecipe.train.epochs, 3);
   assert.equal(sweepRecipe.train.learningRate, 0.0001);
