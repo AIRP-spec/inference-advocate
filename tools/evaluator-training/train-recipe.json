@@ -50,7 +50,7 @@
     ]
   },
   "train": {
-    "epochs": 3,
+    "epochs": 6,
     "perDeviceBatchSize": 8,
     "gradientAccumulationSteps": 4,
     "effectiveBatchSize": 32,
