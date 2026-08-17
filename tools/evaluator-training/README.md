@@ -181,7 +181,24 @@ Sweep artifacts (gitignored):
 - `data/evaluator-training/artifacts/sweep/step-*.gguf`
 - `data/evaluator-training/artifacts/sweep/checkpoints.json`
 - `data/evaluator-training/artifacts/sweep/gate-report-step-*.json`
-- `data/evaluator-training/artifacts/sweep/sweep-report.json`
+- `data/evaluator-training/artifacts/sweep/adapter-gate-table.json`
+
+## Gate from saved adapters
+
+If the sweep already wrote `lora/checkpoint-*` and exporting every GGUF at
+once filled the disk, do not retrain. `gate-from-adapters.py` merges one
+adapter into HuggingFaceTB/SmolLM3-3B, converts Q8_0, runs `gate.mjs` at
+template v3, records the 187-item report, then deletes the merged model
+and the GGUF before the next checkpoint. The f16 intermediate is deleted
+too. It does not train. The live pin does not change.
+
+```bash
+npm run build
+python3 tools/evaluator-training/gate-from-adapters.py
+```
+
+The table is printed and written to
+`data/evaluator-training/artifacts/sweep/adapter-gate-table.txt`.
 
 Outputs (gitignored except this README's sibling notes):
 

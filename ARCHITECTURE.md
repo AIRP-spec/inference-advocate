@@ -327,7 +327,9 @@ A checkpoint sweep of the training curve is diagnostic only: it does
 not change labels, the corpus, or the gate, and it does not put v3 on the
 live path. The sweep report is not a second gate. The 0.6B sweep is a
 measured capacity ceiling. The training base is SmolLM3-3B; the live pin
-is still Qwen3-0.6B Q8_0 at v2.1.
+is still Qwen3-0.6B Q8_0 at v2.1. `gate-from-adapters.py` gates saved
+LoRA folders one at a time and deletes the merged weights and GGUF after
+each checkpoint so disk does not accumulate. It does not train.
 A v3 evaluate path exists on `LocalEvaluator` for that harness only;
 `createLocalEvaluator` still constructs v2.1. The v3 path records empty
 evidence: the trained task is the compact verdict line. The rule evaluator remains

@@ -435,6 +435,7 @@ test('sweep recipe is a diagnostic curve on SmolLM3-3B, same corpus and gate', (
   assert.match(runSweep, /sweep-recipe\.json/);
   assert.match(readme, /evaluator-training:sweep/);
   assert.match(readme, /--check-template/);
+  assert.match(readme, /gate-from-adapters/);
 
   for (const text of [
     JSON.stringify(sweepRecipe),
@@ -447,6 +448,20 @@ test('sweep recipe is a diagnostic curve on SmolLM3-3B, same corpus and gate', (
   ]) {
     assert.equal(text.includes('\u2014'), false);
   }
+});
+
+test('gate-from-adapters does not train and deletes merged weights and GGUF', () => {
+  const src = readFileSync(join(here, 'gate-from-adapters.py'), 'utf8');
+  assert.match(src, /Does not train/);
+  assert.match(src, /checkpoint-\*/);
+  assert.match(src, /export_adapter_gguf/);
+  assert.match(src, /gate\.mjs/);
+  assert.match(src, /--allow-fail/);
+  assert.match(src, /HuggingFaceTB\/SmolLM3-3B/);
+  assert.match(src, /rm_if_exists\(merged_dir\)/);
+  assert.match(src, /rm_if_exists\(gguf_path\)/);
+  assert.equal(src.includes('trainer.train'), false);
+  assert.equal(src.includes('\u2014'), false);
 });
 
 test('sweep save interval yields at least six checkpoints on 3936 examples', () => {
