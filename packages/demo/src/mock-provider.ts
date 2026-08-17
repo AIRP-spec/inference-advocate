@@ -48,10 +48,24 @@ export interface MockProviderOptions {
   streamChunkDelayMs?: number;
 }
 
+export interface MockScriptState {
+  served: number;
+  substituteFrom: number | null;
+  substitutingNext: boolean;
+}
+
 export interface RunningMockProvider {
   server: Server;
   baseUrl: string;
   requestCount: () => number;
+  /** Return the substitution counter to zero so the next response is the honest seal. */
+  resetScript: () => MockScriptState;
+  /**
+   * Make the next response the substituted one, without restarting the process. False when
+   * this mock was not configured to substitute.
+   */
+  armMismatch: () => MockScriptState | false;
+  scriptState: () => MockScriptState;
   close: () => Promise<void>;
 }
 
@@ -83,12 +97,62 @@ function writeSse(res: ServerResponse, eventType: string | undefined, data: stri
   res.write('\n');
 }
 
+function sendJson(res: ServerResponse, status: number, body: unknown): void {
+  res.writeHead(status, { 'content-type': 'application/json; charset=utf-8' });
+  res.end(JSON.stringify(body));
+}
+
+function drain(req: { on: (event: string, fn: () => void) => void }, then: () => void): void {
+  req.on('data', () => undefined);
+  req.on('end', then);
+}
+
 export function startMockProvider(opts: MockProviderOptions): Promise<RunningMockProvider> {
   let served = 0;
   const chunkDelayMs = opts.streamChunkDelayMs ?? 15;
 
+  const scriptState = (): MockScriptState => {
+    const substituteFrom = opts.substituteFrom?.response ?? null;
+    return {
+      served,
+      substituteFrom,
+      substitutingNext: substituteFrom !== null && served + 1 >= substituteFrom,
+    };
+  };
+
+  const resetScript = (): MockScriptState => {
+    served = 0;
+    return scriptState();
+  };
+
+  const armMismatch = (): MockScriptState | false => {
+    if (!opts.substituteFrom) return false;
+    served = Math.max(0, opts.substituteFrom.response - 1);
+    return scriptState();
+  };
+
   const server = createServer((req, res) => {
-    if (req.method !== 'POST' || !req.url?.endsWith('/chat/completions')) {
+    const url = req.url ?? '';
+    if (url.endsWith('/demo/state') && req.method === 'GET') {
+      sendJson(res, 200, scriptState());
+      return;
+    }
+    if (url.endsWith('/demo/reset') && req.method === 'POST') {
+      drain(req, () => sendJson(res, 200, { ok: true, ...resetScript() }));
+      return;
+    }
+    if (url.endsWith('/demo/arm-mismatch') && req.method === 'POST') {
+      drain(req, () => {
+        const next = armMismatch();
+        if (next === false) {
+          sendJson(res, 400, { ok: false, reason: 'this mock is not configured to substitute' });
+          return;
+        }
+        sendJson(res, 200, { ok: true, ...next });
+      });
+      return;
+    }
+    if (req.method !== 'POST' || !url.endsWith('/chat/completions')) {
       res.writeHead(404).end();
       return;
     }
@@ -227,10 +291,15 @@ export function startMockProvider(opts: MockProviderOptions): Promise<RunningMoc
       rejectStart(err);
     });
     server.listen(opts.port, '127.0.0.1', () => {
+      const addr = server.address();
+      const port = typeof addr === 'object' && addr ? addr.port : opts.port;
       resolveStart({
         server,
-        baseUrl: `http://127.0.0.1:${opts.port}/v1`,
+        baseUrl: `http://127.0.0.1:${port}/v1`,
         requestCount: () => served,
+        resetScript,
+        armMismatch,
+        scriptState,
         close: () =>
           new Promise<void>((done) => {
             server.close(() => done());

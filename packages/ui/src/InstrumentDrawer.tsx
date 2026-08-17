@@ -5,13 +5,15 @@
 // Values and layout from reference/Inference Advocate Client.dc.html.
 // Scenario tab: white-paper register or live-demo register; optional UI walkthrough highlight.
 // Live demo also shows the build's startup gaps under the steps (no separate Gaps tab).
+// The What is this? pill reopens the intro dialog without opening the drawer.
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, type Ref } from 'react';
 import type { AdvocateState } from './types';
 import { MonitorPanel } from './MonitorPanel';
 import { ExportView } from './ExportView';
 import { DEMO_STEPS, SCENARIO_STEPS, type DemoStep, type ScenarioStep } from './scenario-steps';
 import { IconAirp } from './icons';
+import { WhatIsThisButton } from './IntroDialog';
 
 export type DrawerTab = 'monitor' | 'scenario' | 'export' | 'attrs';
 
@@ -34,6 +36,14 @@ export function InstrumentDrawer(props: {
   onTab: (tab: DrawerTab) => void;
   onChildMode: (child: boolean) => void;
   onResetReputation: (providerId?: string) => void;
+  onResetSubstitution: () => void;
+  onOpenIntro: () => void;
+  introButtonRef: Ref<HTMLButtonElement>;
+  introTabButtonRef: Ref<HTMLButtonElement>;
+  onWrongModel: () => void;
+  onUnsealed: () => void;
+  onSwitchJurisdiction: () => void;
+  onJurisdiction: (id: string) => void;
   scenarioStep: number;
   onScenarioStep: (step: number) => void;
 }) {
@@ -46,6 +56,14 @@ export function InstrumentDrawer(props: {
     onTab,
     onChildMode,
     onResetReputation,
+    onResetSubstitution,
+    onOpenIntro,
+    introButtonRef,
+    introTabButtonRef,
+    onWrongModel,
+    onUnsealed,
+    onSwitchJurisdiction,
+    onJurisdiction,
     scenarioStep,
     onScenarioStep,
   } = props;
@@ -60,22 +78,27 @@ export function InstrumentDrawer(props: {
   if (!open) {
     return (
       <div className="instrument-drawer shut">
-        <button type="button" className="drawer-strip" onClick={onOpen}>
-          <IconAirp className="drawer-strip-icon" />
-          <span className="label">▲ Instruments</span>
-          <span className="aside">demonstration only · not part of the client</span>
-          <span className="chips">
-            {withheld > 0 && (
-              <span className="chip alert">
-                {withheld} withheld
+        <div className="drawer-strip">
+          <button type="button" className="drawer-strip-open" onClick={onOpen}>
+            <IconAirp className="drawer-strip-icon" />
+            <span className="label">▲ Instruments</span>
+          </button>
+          <WhatIsThisButton onClick={onOpenIntro} buttonRef={introButtonRef} />
+          <button type="button" className="drawer-strip-rest" onClick={onOpen}>
+            <span className="aside">demonstration only · not part of the client</span>
+            <span className="chips">
+              {withheld > 0 && (
+                <span className="chip alert">
+                  {withheld} withheld
+                </span>
+              )}
+              <span className="chip">step {stepLabel}</span>
+              <span className="chip">
+                {providerCount} provider{providerCount === 1 ? '' : 's'}
               </span>
-            )}
-            <span className="chip">step {stepLabel}</span>
-            <span className="chip">
-              {providerCount} provider{providerCount === 1 ? '' : 's'}
             </span>
-          </span>
-        </button>
+          </button>
+        </div>
       </div>
     );
   }
@@ -86,6 +109,7 @@ export function InstrumentDrawer(props: {
         <button type="button" className="drawer-close" onClick={onClose}>
           ▼
         </button>
+        <WhatIsThisButton onClick={onOpenIntro} buttonRef={introTabButtonRef} />
         {(
           [
             ['monitor', 'Monitor'],
@@ -108,7 +132,11 @@ export function InstrumentDrawer(props: {
 
       <div className="drawer-body">
         {tab === 'monitor' && (
-          <MonitorPanel state={state} onResetReputation={onResetReputation} />
+          <MonitorPanel
+            state={state}
+            onResetReputation={onResetReputation}
+            onResetSubstitution={onResetSubstitution}
+          />
         )}
         {tab === 'scenario' && (
           <ScenarioTab
@@ -122,11 +150,18 @@ export function InstrumentDrawer(props: {
               onScenarioStep(0);
             }}
             onStep={onScenarioStep}
+            onWrongModel={onWrongModel}
+            onUnsealed={onUnsealed}
+            onSwitchJurisdiction={onSwitchJurisdiction}
           />
         )}
         {tab === 'export' && <ExportView floorFromPolicy={state?.policy.telemetry.granularityFloor ?? null} />}
         {tab === 'attrs' && (
-          <AttributesTab state={state} onChildMode={onChildMode} />
+          <AttributesTab
+            state={state}
+            onChildMode={onChildMode}
+            onJurisdiction={onJurisdiction}
+          />
         )}
       </div>
     </div>
@@ -140,8 +175,11 @@ function ScenarioTab(props: {
   register: ScenarioRegister;
   onRegister: (register: ScenarioRegister) => void;
   onStep: (step: number) => void;
+  onWrongModel: () => void;
+  onUnsealed: () => void;
+  onSwitchJurisdiction: () => void;
 }) {
-  const { step, providerCount, warnings, register, onRegister, onStep } = props;
+  const { step, providerCount, warnings, register, onRegister, onStep, onWrongModel, onUnsealed, onSwitchJurisdiction } = props;
   const [highlightUi, setHighlightUi] = useState(false);
   const steps: Array<ScenarioStep | DemoStep> =
     register === 'demo' ? DEMO_STEPS : SCENARIO_STEPS;
@@ -233,6 +271,17 @@ function ScenarioTab(props: {
           {providerCount} mock providers on 127.0.0.1:8811–8814
         </span>
       </div>
+      <div className="scenario-live">
+        <button type="button" className="intro-chip" onClick={onWrongModel}>
+          Wrong-model scenario
+        </button>
+        <button type="button" className="intro-chip" onClick={onUnsealed}>
+          Unsealed scenario
+        </button>
+        <button type="button" className="intro-chip" onClick={onSwitchJurisdiction}>
+          Switch jurisdiction
+        </button>
+      </div>
       <div className="scenario-steps">
         {steps.map((s, i) => (
           <div key={s.n} className={`scenario-step ${i === step ? 'current' : ''}`}>
@@ -273,8 +322,9 @@ function GapsSection({ warnings }: { warnings: string[] }) {
 function AttributesTab(props: {
   state: AdvocateState | null;
   onChildMode: (child: boolean) => void;
+  onJurisdiction: (id: string) => void;
 }) {
-  const { state, onChildMode } = props;
+  const { state, onChildMode, onJurisdiction } = props;
   const child = state ? !state.attestations.isAdult : false;
   const release = state?.policy.releaseAuthority;
   const nonReleasable = Object.entries(release?.byFlagType ?? {})
@@ -298,6 +348,26 @@ function AttributesTab(props: {
         </button>
         <span className="attrs-caveat">locally asserted, not verified, reference demo only</span>
       </div>
+
+      {state && (state.availableJurisdictions?.length ?? 0) > 0 && (
+        <div className="jurisdiction-switch">
+          <label>
+            <span className="attrs-caveat">Jurisdiction ruleset · demo only</span>
+            <select
+              className="scenario-register"
+              aria-label="Jurisdiction ruleset"
+              value={state.jurisdiction.id}
+              onChange={(e) => onJurisdiction(e.target.value)}
+            >
+              {state.availableJurisdictions!.map((j) => (
+                <option key={j.id} value={j.id}>
+                  {j.name}
+                </option>
+              ))}
+            </select>
+          </label>
+        </div>
+      )}
 
       {child && (
         <div className="attrs-consequence">

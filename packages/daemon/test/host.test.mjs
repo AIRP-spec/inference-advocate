@@ -11,7 +11,7 @@ import { tmpdir } from 'node:os';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { createInterface } from 'node:readline';
-import { packagingWarnings, HostSession } from '../dist/host.js';
+import { packagingWarnings, HostSession, dispatchHostMethod } from '../dist/host.js';
 import { listenHostRpc } from '../dist/host-rpc.js';
 import { encodeProgressFrame, progressFrame } from '../dist/progress.js';
 
@@ -170,6 +170,66 @@ test('listenHostRpc answers state over loopback without HTTP or a stdio child', 
   } finally {
     if (prevDesktop === undefined) delete process.env['AIRP_DESKTOP'];
     else process.env['AIRP_DESKTOP'] = prevDesktop;
+    rmSync(runDir, { recursive: true, force: true });
+  }
+});
+
+test('jurisdiction.set reloads a ruleset from data/', async () => {
+  const runDir = mkdtempSync(join(tmpdir(), 'airp-jurisdiction-'));
+  try {
+    writeFileSync(join(runDir, 'providers.json'), JSON.stringify({ version: 1, providers: [] }));
+    const host = await HostSession.create({
+      dataDir: join(repoRoot, 'data'),
+      runDir,
+      providersPath: join(runDir, 'providers.json'),
+      storePath: join(runDir, 'advocate.sqlite'),
+      devKeyfile: join(runDir, 'dev.key'),
+      jurisdictionId: 'us-ny',
+    });
+    assert.equal(host.state().jurisdiction.id, 'us-ny');
+    assert.ok(host.state().availableJurisdictions.some((j) => j.id === 'eu'));
+    const next = await dispatchHostMethod(host, 'jurisdiction.set', { jurisdictionId: 'eu' });
+    assert.equal(next.jurisdiction.id, 'eu');
+    assert.equal(host.state().jurisdiction.id, 'eu');
+    assert.equal(host.state().attestations.jurisdiction, 'eu');
+  } finally {
+    rmSync(runDir, { recursive: true, force: true });
+  }
+});
+
+test('demo.script refuses a non-loopback provider', async () => {
+  const runDir = mkdtempSync(join(tmpdir(), 'airp-demo-script-'));
+  try {
+    writeFileSync(
+      join(runDir, 'providers.json'),
+      JSON.stringify({
+        version: 1,
+        providers: [
+          {
+            id: 'aligned',
+            label: 'Aligned Reference Models',
+            baseUrl: 'https://example.invalid/v1',
+            model: 'aligned-1',
+            registerEntryId: 'demo.aligned',
+          },
+        ],
+      }),
+    );
+    const host = await HostSession.create({
+      dataDir: join(repoRoot, 'data'),
+      runDir,
+      providersPath: join(runDir, 'providers.json'),
+      storePath: join(runDir, 'advocate.sqlite'),
+      devKeyfile: join(runDir, 'dev.key'),
+      jurisdictionId: 'us-ny',
+    });
+    const result = await dispatchHostMethod(host, 'demo.script', {
+      action: 'reset',
+      providerId: 'aligned',
+    });
+    assert.equal(result.ok, false);
+    assert.match(result.reason, /loopback/);
+  } finally {
     rmSync(runDir, { recursive: true, force: true });
   }
 });

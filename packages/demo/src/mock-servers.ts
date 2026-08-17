@@ -17,8 +17,9 @@ const dataDir = join(dirname(fileURLToPath(import.meta.url)), '..', '..', '..', 
  * interactive path is driven by someone typing and the deterministic refusal is the thing
  * worth reaching quickly: one verified delivery, then the same provider caught substituting.
  *
- * The count is per process. Restart the mocks between runs or the first response of the
- * second run is already past the line.
+ * The count is per process, and it is shared by every visitor on a public demo host.
+ * The UI can reset or arm it through POST /v1/demo/reset and POST /v1/demo/arm-mismatch
+ * on this loopback server, so a demo does not need a process restart.
  */
 const ALIGNED_SUBSTITUTES_FROM = 2;
 

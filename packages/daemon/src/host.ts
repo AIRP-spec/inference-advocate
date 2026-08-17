@@ -10,13 +10,15 @@
 // operations as library calls. Extracting the session means the HTTP server and the desktop
 // RPC bridge share one implementation.
 
-import { existsSync, readFileSync } from 'node:fs';
+import { existsSync, readFileSync, readdirSync } from 'node:fs';
 import { join } from 'node:path';
 import {
+  Jurisdiction,
   ProviderRegistry,
   type ExchangeResult,
   type ExchangeStage,
   type OpenedAdvocate,
+  type ProviderConfig,
 } from '@airp/core';
 import { openAdvocate } from '@airp/store-sqlite';
 import { localEvaluatorFactory } from './local-evaluator-factory.js';
@@ -93,6 +95,16 @@ export async function dispatchHostMethod(
     case 'reputation.reset': {
       const providerId = params['providerId'];
       return host.resetReputation(
+        typeof providerId === 'string' && providerId.length > 0 ? providerId : undefined,
+      );
+    }
+    case 'jurisdiction.set':
+      return host.setJurisdiction(String(params['jurisdictionId'] ?? ''));
+    case 'demo.script': {
+      const action = params['action'] === 'arm' ? 'arm' : 'reset';
+      const providerId = params['providerId'];
+      return host.controlDemoScript(
+        action,
         typeof providerId === 'string' && providerId.length > 0 ? providerId : undefined,
       );
     }
@@ -223,6 +235,7 @@ export class HostSession {
       providers: this.monitorState(),
       warnings: this.warnings,
       pinned: this.pinned,
+      availableJurisdictions: this.listJurisdictions(),
     };
   }
 
@@ -306,6 +319,122 @@ export class HostSession {
       : this.opened.providers.list().map((p) => p.id);
     for (const id of ids) this.opened.advocate.resetProviderReputation(id);
     return { reset: ids, providers: this.monitorState() };
+  }
+
+  /**
+   * Demo-only jurisdiction swap. Reloads a ruleset from data/jurisdictions and starts a new
+   * session so pinned notices match the new file. Not persisted: a daemon restart restores
+   * AIRP_JURISDICTION. The files themselves remain illustrative encodings.
+   */
+  setJurisdiction(jurisdictionId: string) {
+    const path = join(this.paths.dataDir, 'jurisdictions', `${jurisdictionId}.json`);
+    if (!existsSync(path)) {
+      throw new Error(`no ruleset found for jurisdiction ${jurisdictionId}`);
+    }
+    const jurisdiction = Jurisdiction.loadFromFile(path);
+    this.opened.jurisdiction = jurisdiction;
+    const attestations = this.opened.advocate.setJurisdiction(jurisdiction);
+    const session = this.newSession();
+    return {
+      jurisdiction: jurisdiction.ruleset,
+      pendingProvisions: jurisdiction.pendingProvisions(),
+      attestations: {
+        isAdult: attestations.isAdult,
+        jurisdiction: attestations.jurisdiction,
+        issuer: attestations.issuer ?? 'unverified-local-assertion',
+      },
+      sessionId: session.sessionId,
+      providers: this.monitorState(),
+      availableJurisdictions: this.listJurisdictions(),
+    };
+  }
+
+  listJurisdictions(): Array<{ id: string; name: string }> {
+    const dir = join(this.paths.dataDir, 'jurisdictions');
+    if (!existsSync(dir)) return [];
+    const out: Array<{ id: string; name: string }> = [];
+    for (const file of readdirSync(dir)) {
+      if (!file.endsWith('.json')) continue;
+      const loaded = Jurisdiction.loadFromFile(join(dir, file));
+      out.push({ id: loaded.ruleset.id, name: loaded.ruleset.name });
+    }
+    return out;
+  }
+
+  /**
+   * Reset or arm the aligned mock's model-substitution counter. The mock is a separate
+   * loopback process; this is a POST to its /v1/demo/* control path, not a process restart.
+   * The counter is shared by every visitor. Reference demo only.
+   */
+  async controlDemoScript(
+    action: 'reset' | 'arm',
+    providerId?: string,
+  ): Promise<{
+    ok: boolean;
+    reason?: string;
+    served?: number;
+    substitutingNext?: boolean;
+    providerId?: string;
+  }> {
+    const provider = this.demoScriptProvider(providerId);
+    if (!provider) {
+      return {
+        ok: false,
+        reason: 'no loopback mock provider is configured for the substitution script',
+      };
+    }
+    let hostname: string;
+    try {
+      hostname = new URL(provider.baseUrl).hostname;
+    } catch {
+      return { ok: false, reason: 'the substitution mock has an unreadable base URL' };
+    }
+    if (hostname !== '127.0.0.1' && hostname !== 'localhost') {
+      return {
+        ok: false,
+        reason: 'substitution script reset only talks to loopback mock providers',
+      };
+    }
+    const path = action === 'arm' ? 'demo/arm-mismatch' : 'demo/reset';
+    const base = provider.baseUrl.endsWith('/') ? provider.baseUrl : `${provider.baseUrl}/`;
+    const target = new URL(path, base);
+    try {
+      const res = await fetch(target, { method: 'POST', signal: AbortSignal.timeout(2000) });
+      const body = (await res.json()) as {
+        ok?: boolean;
+        reason?: string;
+        served?: number;
+        substitutingNext?: boolean;
+      };
+      if (!res.ok || body.ok === false) {
+        return {
+          ok: false,
+          reason: body.reason ?? `the mock provider returned ${res.status}`,
+          providerId: provider.id,
+        };
+      }
+      return {
+        ok: true,
+        served: body.served,
+        substitutingNext: body.substitutingNext,
+        providerId: provider.id,
+      };
+    } catch {
+      return {
+        ok: false,
+        reason: 'the mock provider did not answer. Is npm run mocks running?',
+        providerId: provider.id,
+      };
+    }
+  }
+
+  private demoScriptProvider(providerId?: string): ProviderConfig | undefined {
+    const list = this.opened.providers.list();
+    if (providerId) return list.find((p) => p.id === providerId);
+    return (
+      list.find((p) => p.id === 'aligned') ??
+      list.find((p) => p.registerEntryId === 'demo.aligned')
+    );
   }
 
   exportView(floor?: number) {

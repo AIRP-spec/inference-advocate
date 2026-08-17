@@ -18,9 +18,11 @@ packages/store-sqlite  SQLite StoreBackend adapter (Node). The only shipped pers
 packages/evaluator-local  on-device GGUF semantic evaluator (node-llama-cpp). Hosts inject it; core does not import it
 packages/daemon        local HTTP server on 127.0.0.1, and HostSession (HTTP + desktop loopback RPC)
 packages/ui            React chat surface. Product chrome is ordinary chat; the monitor
-                       (including a demo-only reputation reset), export view, scenario
+                       (including a demo-only reputation reset and a reset of the
+                       wrong-model substitution script), export view, scenario
                        register (live demo nests startup gaps under the steps), and
                        attributes sit in a bottom instrument drawer (demonstration only).
+                       A first-run intro dialog names the protocol and how to demo it.
 packages/desktop       Tauri shell (HostSession in the Node launcher over loopback RPC, no HTTP for the core API)
 packages/demo          mock providers and the scripted end-to-end scenario
 data/                  taxonomy, policy, jurisdictions, register, standing: documents, not code.
@@ -289,6 +291,18 @@ through clean responses. The instrument drawer's Monitor tab exposes a reference
 that clears a provider's ledger accumulation and carryover so a demo can continue without five
 paid clean exchanges. It does not release withheld content and it is not a product path. The
 paper's recovery mechanism remains decay (Provisional Section 1.8).
+
+**Demo substitution-script reset.** The aligned mock starts sealing as a model its register
+entry does not list from the second response onward. That counter is per process and is
+shared by every visitor on a public host. The intro dialog and the Monitor tab can reset or
+arm it through a loopback POST to the mock (`/v1/demo/reset`, `/v1/demo/arm-mismatch`) so a
+demo does not need `pm2 restart airp-mocks`. It is not per visitor, and it will not ship.
+
+**Demo jurisdiction switch.** The advocate loads one jurisdiction ruleset at setup. The intro
+dialog and the Attributes tab can swap the loaded file for the rest of the process so a demo
+can show New York notices and the EU unsealed notice without restarting the daemon. The swap
+is not persisted: a restart restores `AIRP_JURISDICTION`. The rulesets remain illustrative
+encodings.
 
 **Hardware-backed keys, recovery, and the wallet.** `MasterSecret.fromPassphrase` is real
 scrypt and the per-store derivation is real HKDF, but the demo and the daemon use a development
