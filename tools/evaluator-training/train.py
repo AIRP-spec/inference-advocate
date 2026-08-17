@@ -411,6 +411,8 @@ def collect_checkpoint_rows(adapter_dir: Path, log_history, spe: int, final_step
 
 
 def sft_config_kwargs(recipe, adapter_dir: Path, seed: int, n_examples: int) -> dict:
+    # Pinned TRL SFTConfig does not accept warmup_ratio. Warmup is optional
+    # on this short LoRA run, so it is omitted rather than forwarded.
     t = recipe["train"]
     kwargs = dict(
         output_dir=str(adapter_dir),
@@ -419,7 +421,6 @@ def sft_config_kwargs(recipe, adapter_dir: Path, seed: int, n_examples: int) -> 
         gradient_accumulation_steps=t["gradientAccumulationSteps"],
         learning_rate=t["learningRate"],
         lr_scheduler_type=t["lrScheduler"],
-        warmup_ratio=t["warmupRatio"],
         logging_steps=10,
         save_strategy="epoch",
         save_total_limit=1,
