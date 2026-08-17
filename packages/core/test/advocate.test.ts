@@ -313,3 +313,16 @@ test('openAdvocate loads the shipped documents and reports its own gaps', () => 
     rmSync(dir, { recursive: true, force: true });
   }
 });
+
+test('setJurisdiction switches the ruleset applied at delivery', async () => {
+  const { advocate } = build({ script: [CLEAN] });
+  assert.equal(advocate.attestations.jurisdiction, 'none');
+  const eu = Jurisdiction.loadFromFile(dataPath('jurisdictions', 'eu.json'));
+  advocate.setJurisdiction(eu);
+  assert.equal(advocate.attestations.jurisdiction, 'eu');
+  const r = await advocate.ask({ providerId: 'test', text: 'hello' });
+  assert.ok(
+    r.decision.notices.some((n) => n.id.startsWith('provenance-unsealed')),
+    'EU ruleset notices an unsealed response after the switch',
+  );
+});

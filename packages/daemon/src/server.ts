@@ -161,6 +161,18 @@ const server = createServer(async (req, res) => {
       return;
     }
 
+    if (url.pathname === '/api/jurisdiction' && req.method === 'POST') {
+      const body = await readBody<{ jurisdictionId?: string }>(req);
+      json(res, 200, await dispatchHostMethod(host, 'jurisdiction.set', { ...body }));
+      return;
+    }
+
+    if (url.pathname === '/api/demo/script' && req.method === 'POST') {
+      const body = await readBody<{ action?: string; providerId?: string }>(req);
+      json(res, 200, await dispatchHostMethod(host, 'demo.script', { ...body }));
+      return;
+    }
+
     if (url.pathname === '/api/export') {
       const floor = url.searchParams.get('floor');
       json(res, 200, await dispatchHostMethod(host, 'export', floor ? { floor } : {}));

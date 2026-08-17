@@ -6,7 +6,8 @@
 //
 // Client shell is light product UI. Demo-simulation and explanatory annotation live in the
 // instrument drawer. Notices are pinned with no close button anywhere in this file, which is
-// the entire implementation of non-dismissable.
+// the entire implementation of non-dismissable. The intro dialog is the one first-run
+// explanation that this is a protocol demonstration.
 //
 // Layout and styling from reference/Inference Advocate Client.dc.html.
 
@@ -32,6 +33,9 @@ import {
   type ThemePreference,
 } from './theme';
 import { InstrumentDrawer, type DrawerTab } from './InstrumentDrawer';
+import { IntroDialog } from './IntroDialog';
+import { readIntroDismissed } from './intro-storage';
+import { DEMO_PROMPTS, findDemoProvider, nextDemoJurisdiction } from './demo-scenarios';
 import { ProviderPicker } from './ProviderPicker';
 import { MarkdownBody } from './MarkdownBody';
 import { IconDeliveryPolicy, IconInferenceAdvocate, IconRuleEvaluator } from './icons';
@@ -78,6 +82,14 @@ export function App() {
     () => (typeof window !== 'undefined' ? window.innerWidth < NARROW_BP : false),
   );
   const [theme, setTheme] = useState<ThemePreference>(() => readThemePreference());
+  const [introOpen, setIntroOpen] = useState(() =>
+    typeof window === 'undefined' ? false : !readIntroDismissed(window.localStorage),
+  );
+  const [introDismissed, setIntroDismissed] = useState(() =>
+    typeof window === 'undefined' ? false : readIntroDismissed(window.localStorage),
+  );
+  const introStripRef = useRef<HTMLButtonElement | null>(null);
+  const introTabRef = useRef<HTMLButtonElement | null>(null);
   // Fresh loads and bfcache restores both need the file's first provider, not whatever the
   // tab last had selected. After that bootstrap, the user's pick sticks for the session.
   const providerBootstrapped = useRef(false);
@@ -313,6 +325,83 @@ export function App() {
     setError(null);
     try {
       await hostCall('reputation.reset', providerId ? { providerId } : {});
+      await refresh();
+    } catch (e) {
+      setError(String(e));
+    }
+  }
+
+  function closeIntro() {
+    setIntroOpen(false);
+    queueMicrotask(() => {
+      (drawerOpen ? introTabRef : introStripRef).current?.focus();
+    });
+  }
+
+  async function resetSubstitution() {
+    setError(null);
+    const id = findDemoProvider(state?.providers ?? [], 'aligned');
+    try {
+      const body = (await hostCall('demo.script', {
+        action: 'reset',
+        ...(id ? { providerId: id } : {}),
+      })) as { ok?: boolean; reason?: string };
+      if (body.ok === false) setError(body.reason ?? 'could not reset the substitution script');
+    } catch (e) {
+      setError(String(e));
+    }
+  }
+
+  async function runWrongModel() {
+    const id = findDemoProvider(state?.providers ?? [], 'aligned');
+    if (!id) {
+      setError('No Aligned Reference Models mock is configured.');
+      return;
+    }
+    setProvider(id);
+    setView('chat');
+    setError(null);
+    try {
+      const body = (await hostCall('demo.script', { action: 'arm', providerId: id })) as {
+        ok?: boolean;
+        reason?: string;
+      };
+      if (body.ok === false) {
+        setError(body.reason ?? 'could not arm the substitution script');
+        return;
+      }
+    } catch (e) {
+      setError(String(e));
+      return;
+    }
+    void send({ text: DEMO_PROMPTS.wrongModel, providerId: id });
+  }
+
+  async function runUnsealed() {
+    const id = findDemoProvider(state?.providers ?? [], 'legacy');
+    if (!id) {
+      setError('No Legacy Serving Co mock is configured.');
+      return;
+    }
+    setProvider(id);
+    setView('chat');
+    setError(null);
+    void send({ text: DEMO_PROMPTS.unsealed, providerId: id });
+  }
+
+  async function switchJurisdiction(id?: string) {
+    const next =
+      id ??
+      nextDemoJurisdiction(state?.jurisdiction.id ?? '', state?.availableJurisdictions ?? []);
+    if (!next) {
+      setError('No other jurisdiction ruleset is available.');
+      return;
+    }
+    setError(null);
+    try {
+      await hostCall('jurisdiction.set', { jurisdictionId: next });
+      setTurns([]);
+      setDetailFor(null);
       await refresh();
     } catch (e) {
       setError(String(e));
@@ -588,8 +677,26 @@ export function App() {
         onTab={setDrawerTab}
         onChildMode={(child) => void setChildMode(child)}
         onResetReputation={(providerId) => void resetReputation(providerId)}
+        onResetSubstitution={() => void resetSubstitution()}
+        onOpenIntro={() => setIntroOpen(true)}
+        introButtonRef={introStripRef}
+        introTabButtonRef={introTabRef}
+        onWrongModel={() => void runWrongModel()}
+        onUnsealed={() => void runUnsealed()}
+        onSwitchJurisdiction={() => void switchJurisdiction()}
+        onJurisdiction={(id) => void switchJurisdiction(id)}
         scenarioStep={scenarioStep}
         onScenarioStep={setScenarioStep}
+      />
+      <IntroDialog
+        open={introOpen}
+        dismissed={introDismissed}
+        onDismissedChange={setIntroDismissed}
+        onClose={closeIntro}
+        onWrongModel={() => void runWrongModel()}
+        onUnsealed={() => void runUnsealed()}
+        onSwitchJurisdiction={() => void switchJurisdiction()}
+        onResetSubstitution={() => void resetSubstitution()}
       />
     </div>
   );

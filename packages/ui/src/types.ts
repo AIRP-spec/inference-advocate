@@ -135,4 +135,5 @@ export interface AdvocateState {
   providers: ProviderState[];
   warnings: string[];
   pinned: Array<{ notice: Notice; raisedAt: string }>;
+  availableJurisdictions?: Array<{ id: string; name: string }>;
 }
