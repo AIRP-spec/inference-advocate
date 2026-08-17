@@ -1,11 +1,13 @@
 #!/usr/bin/env node
 // Kick off the diagnostic checkpoint sweep: leak-check, sft-v3 assert,
-// train with interval checkpoints, gate each, then write the curve report.
+// train with interval checkpoints, then merge-GGUF-gate-delete each
+// checkpoint and write the curve report.
 //
 // Paper: step 8. Commit this script before the GPU run so the run is a
 // reproduction of the tree, not an ad-hoc notebook. This sequence does not
 // publish. The live evaluator is not flipped. Corpus, taxonomy, and gate
-// thresholds are unchanged.
+// thresholds are unchanged. Large weights do not accumulate: after each
+// checkpoint is gated, the merged bf16 directory and that GGUF are deleted.
 
 import { spawnSync } from 'node:child_process';
 import { existsSync, readFileSync } from 'node:fs';
@@ -60,17 +62,19 @@ if (!args.skipTrain) {
   const py = process.env.AIRP_TRAIN_PYTHON || 'python3';
   const trainArgs = [join(here, 'train.py'), '--recipe', join(here, 'sweep-recipe.json')];
   if (args.skipGguf) trainArgs.push('--skip-gguf');
-  if (args.skipExport) trainArgs.push('--skip-export-checkpoints');
+  trainArgs.push('--skip-export-checkpoints');
   run('train-sweep', py, trainArgs);
 }
 if (!args.skipGate) {
   const ckptPath = join(repoRoot, sweepRecipe.outputs.dir, sweepRecipe.outputs.checkpoints);
-  if (!existsSync(ckptPath)) {
-    console.error(`no checkpoints at ${ckptPath}`);
+  const loraDir = join(repoRoot, sweepRecipe.outputs.dir, sweepRecipe.outputs.adapter);
+  if (!existsSync(ckptPath) && !existsSync(loraDir)) {
+    console.error(`no checkpoints at ${ckptPath} and no adapters at ${loraDir}`);
     process.exit(1);
   }
-  const gateArgs = [join(here, 'sweep-gate.mjs')];
+  const py = process.env.AIRP_TRAIN_PYTHON || 'python3';
+  const gateArgs = [join(here, 'gate-from-adapters.py')];
   if (args.gpu) gateArgs.push('--gpu');
-  run('sweep-gate', process.execPath, gateArgs);
+  run('sweep-gate', py, gateArgs);
   run('sweep-report', process.execPath, [join(here, 'sweep-report.mjs')]);
 }

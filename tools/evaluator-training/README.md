@@ -106,26 +106,27 @@ hours of generation at most, not days. If it is not, stop and report.
 ## Train (Part C)
 
 `train-recipe.json` is the LoRA run. Training base id is read from
-`data/models/manifest.json` (`trainBaseRepoId`: HuggingFaceTB/SmolLM3-3B).
+`data/models/manifest.json` (`trainBaseRepoId`: Qwen/Qwen3-1.7B).
 The live pin stays `baseRepoId` / `fileName` (Qwen3-0.6B Q8_0 at template
 v2.1). Seed 20260815. Three epochs. No eval split: the held-out suite is
 the gate, not a training input. Thinking is off (`enable_thinking=False`)
-so SmolLM3 writes `Reasoning Mode: /no_think` in the system metadata and
-the assistant target is the compact verdict line. The chat template is
-the stock SmolLM3-3B template with `{% generation %}` around the verdict
-and `im_end` only. The empty think block is prefix and is not in the
-mask. Full-sequence loss is refused: it trains the model to reproduce
-the long taxonomy prompt and under-learns the short line.
+so Qwen3 writes the stock empty think block as prefix and the assistant
+target is the compact verdict line. The chat template is the stock Qwen3
+template with `{% generation %}` around the verdict and `im_end`. The
+empty think block is prefix and is not in the mask. The SmolLM3 template
+file remains in the tree and is not used. Full-sequence loss is refused:
+it trains the model to reproduce the long taxonomy prompt and under-learns
+the short line.
 
 A LoRA of Qwen3-0.6B hit a capacity ceiling on the 187-item held-out
 gate (six gated checkpoints, no per-class pass). This recipe is the
-move to 3B, not a live-pin swap.
+within-family move to 1.7B, not a live-pin swap.
 
-transformers must be >= 4.53.0 (SmolLM3 modeling code). The pin in
-`requirements-train.txt` is 4.55.2. Run `--check-template` on the pod
-after that upgrade and before any training run.
+The pin in `requirements-train.txt` is transformers 4.55.2. Run
+`--check-template` on the pod after that install and before any training
+run. It must print a non-empty assistant mask and no-think active.
 
-On a single 80GB card this is well under three hours (3B LoRA, 3936 short
+On a single 80GB card this is well under three hours (1.7B LoRA, 3936 short
 examples, then merge, GGUF Q8_0, 187 compact-verdict items). If training is
 still running after 90 minutes, stop and report.
 
@@ -151,14 +152,17 @@ replace the live vendor GGUF and it does not change the default evaluator.
 
 The 0.6B sweep confirmed a capacity ceiling: no checkpoint passed the
 held-out gate. `sweep-recipe.json` is the same diagnostic on
-SmolLM3-3B: same accepted `sft.jsonl`, same seed, dropout 0.1, LoRA
-rank 16, three epochs, a LoRA checkpoint every half epoch. After
-training, each checkpoint is merged, converted to GGUF Q8_0, and gated
-through the real `@airp/evaluator-local` v3 path. The gate harness is
+Qwen3-1.7B: same accepted `sft.jsonl`, same seed, dropout 0.1, LoRA
+rank 16, three epochs, a LoRA checkpoint every half epoch, Qwen3
+template with generation spans. Only the base parameter count moves.
+After training, each checkpoint is merged, converted to GGUF Q8_0, and
+gated through the real `@airp/evaluator-local` v3 path, then the merged
+bf16 directory and that GGUF are deleted before the next checkpoint.
+Optimizer states are not kept on interval saves. The gate harness is
 not reimplemented. Corpus, taxonomy, and gate thresholds do not change.
 The live pin does not change. This run does not decide the published
 model; it produces the curve that decides whether a stopping point
-exists for 3B.
+exists for 1.7B.
 
 ```bash
 npm run build
@@ -169,28 +173,31 @@ node tools/evaluator-training/sweep-gate.mjs
 node tools/evaluator-training/sweep-report.mjs
 ```
 
-The report writes `data/evaluator-training/artifacts/sweep/sweep-report.json`
+The report writes `data/evaluator-training/artifacts/sweep-qwen3-1.7B/sweep-report.json`
 with extra-class fires, recall misses, clean-traffic fires, and per-class
 pass counts against training loss. A checkpoint is a publish candidate
 only if extra-class fires are 0 and recall misses are 0. If no checkpoint
-hits both, the sampled curve confirms a capacity ceiling for this 3B.
+hits both, the sampled curve confirms a capacity ceiling for this 1.7B.
 
 Sweep artifacts (gitignored):
 
-- `data/evaluator-training/artifacts/sweep/lora/checkpoint-*`
-- `data/evaluator-training/artifacts/sweep/step-*.gguf`
-- `data/evaluator-training/artifacts/sweep/checkpoints.json`
-- `data/evaluator-training/artifacts/sweep/gate-report-step-*.json`
-- `data/evaluator-training/artifacts/sweep/adapter-gate-table.json`
+- `data/evaluator-training/artifacts/sweep-qwen3-1.7B/lora/checkpoint-*`
+- `data/evaluator-training/artifacts/sweep-qwen3-1.7B/checkpoints.json`
+- `data/evaluator-training/artifacts/sweep-qwen3-1.7B/gate-report-step-*.json`
+- `data/evaluator-training/artifacts/sweep-qwen3-1.7B/adapter-gate-table.json`
+
+Merged bf16 directories and `step-*.gguf` files are deleted after each
+gated checkpoint. They must not accumulate.
 
 ## Gate from saved adapters
 
 If the sweep already wrote `lora/checkpoint-*` and exporting every GGUF at
 once filled the disk, do not retrain. `gate-from-adapters.py` merges one
-adapter into HuggingFaceTB/SmolLM3-3B, converts Q8_0, runs `gate.mjs` at
-template v3, records the 187-item report, then deletes the merged model
-and the GGUF before the next checkpoint. The f16 intermediate is deleted
-too. It does not train. The live pin does not change.
+adapter into the training base (`trainBaseRepoId`, currently Qwen3-1.7B),
+converts Q8_0, runs `gate.mjs` at template v3, records the 187-item
+report, then deletes the merged model and the GGUF before the next
+checkpoint. The f16 intermediate is deleted too. It does not train. The
+live pin does not change.
 
 ```bash
 npm run build
@@ -198,7 +205,7 @@ python3 tools/evaluator-training/gate-from-adapters.py
 ```
 
 The table is printed and written to
-`data/evaluator-training/artifacts/sweep/adapter-gate-table.txt`.
+`data/evaluator-training/artifacts/sweep-qwen3-1.7B/adapter-gate-table.txt`.
 
 Outputs (gitignored except this README's sibling notes):
 
@@ -214,7 +221,7 @@ Training artifacts (also gitignored):
 
 - `data/evaluator-training/artifacts/lora/`
 - `data/evaluator-training/artifacts/merged/`
-- `data/evaluator-training/artifacts/SmolLM3-3B-airp-v3-Q8_0.gguf`
+- `data/evaluator-training/artifacts/Qwen3-1.7B-airp-v3-Q8_0.gguf`
 - `data/evaluator-training/artifacts/artifacts.json`
 - `data/evaluator-training/artifacts/gate-report.json`
 

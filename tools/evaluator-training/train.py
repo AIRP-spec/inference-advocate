@@ -6,8 +6,10 @@
 # (the v3 compact verdict). This script does not read the held-out suite.
 # Training base repo id comes from data/models/manifest.json trainBaseRepoId.
 # The live pin (baseRepoId / fileName) is not read here and is not changed.
-# When the recipe has a sweep block, interval checkpoints are kept and each
-# is merged and converted so the gate can score the whole training curve.
+# When the recipe has a sweep block, interval checkpoints are adapter-only.
+# Merge, GGUF, and gate happen one checkpoint at a time, then those large
+# weights are deleted. The live pin (baseRepoId / fileName) is not read here
+# and is not changed.
 
 from __future__ import annotations
 
@@ -17,6 +19,7 @@ import inspect
 import json
 import math
 import random
+import shutil
 import subprocess
 import sys
 import time
@@ -88,7 +91,7 @@ def assert_transformers_supports_base(base_id: str, recipe) -> str:
 
     ver = transformers.__version__
     pinned = recipe["framework"]["pins"]["transformers"]
-    print(f"transformers {ver} (recipe pin {pinned}; SmolLM3 modeling needs >= 4.53.0)")
+    print(f"transformers {ver} (recipe pin {pinned})")
     if "SmolLM3" in base_id and parse_version(ver) < MIN_TRANSFORMERS:
         raise SystemExit(
             f"transformers {ver} cannot load SmolLM3 (needs >= 4.53.0). "
@@ -113,11 +116,11 @@ def set_seeds(seed: int):
 
 
 def wrap_tokenizer_enable_thinking(tokenizer, enable_thinking: bool):
-    # SmolLM3 defaults enable_thinking to true. TRL's apply_chat_template
-    # calls do not pass the kwarg, so without this wrap the metadata line
-    # becomes Reasoning Mode: /think and the target is no longer the compact
-    # verdict. The wrap is how no-think stays on for every call, including
-    # the trainer's. It is not Qwen's empty-think-block trick.
+    # Qwen3 and SmolLM3 both default enable_thinking to true. TRL's
+    # apply_chat_template calls do not pass the kwarg. The wrap keeps the
+    # recipe's enableThinking value on every call, including the trainer's.
+    # For Qwen3, false writes the empty think prefix. For SmolLM3, false
+    # writes Reasoning Mode: /no_think. This run uses the Qwen3 template.
     original = tokenizer.apply_chat_template
 
     def apply_chat_template(*args, **kwargs):
@@ -146,7 +149,110 @@ def flatten_ids(encoded):
     return list(ids)
 
 
-def assert_generation_aware_template(tokenizer, stock_template, messages, enable_thinking: bool):
+OPTIMIZER_NAMES = ("optimizer.pt", "scheduler.pt", "rng_state.pth", "scaler.pt")
+
+
+def template_family(template_path: Path | str) -> str:
+    name = Path(template_path).name.lower()
+    if "smollm" in name:
+        return "smollm3"
+    if "qwen" in name:
+        return "qwen3"
+    return "unknown"
+
+
+def assert_base_matches_template(base_id: str, template_rel: str):
+    family = template_family(template_rel)
+    if "Qwen" in base_id and family != "qwen3":
+        raise SystemExit(
+            f"Qwen3 base requires the Qwen3 chat template, not {template_rel}"
+        )
+    if "SmolLM3" in base_id and family != "smollm3":
+        raise SystemExit(
+            f"SmolLM3 base requires a SmolLM3 chat template, not {template_rel}"
+        )
+
+
+def rm_if_exists(path: Path):
+    if not path.exists():
+        return
+    if path.is_dir():
+        shutil.rmtree(path)
+    else:
+        path.unlink()
+    print(f"deleted {path}")
+
+
+def clean_stale_weight_artifacts(root: Path):
+    """Remove merged bf16 dirs and GGUFs. Keep adapters and gate reports."""
+    if not root.exists():
+        return
+    rm_if_exists(root / "model-f16.gguf")
+    rm_if_exists(root / "merged")
+    for p in sorted(root.glob("merged-step-*")):
+        rm_if_exists(p)
+    for p in sorted(root.glob("step-*.gguf")):
+        rm_if_exists(p)
+    for p in sorted(root.glob("*.gguf")):
+        rm_if_exists(p)
+
+
+def clean_stale_artifacts_tree(out_dir: Path):
+    artifacts_root = REPO / "data/evaluator-training/artifacts"
+    clean_stale_weight_artifacts(out_dir)
+    if artifacts_root.exists():
+        clean_stale_weight_artifacts(artifacts_root)
+        old_sweep = artifacts_root / "sweep"
+        if old_sweep.exists():
+            clean_stale_weight_artifacts(old_sweep)
+
+
+def strip_checkpoint_optimizer_files(adapter_dir: Path):
+    if not adapter_dir.exists():
+        return
+    for ckpt in adapter_dir.glob("checkpoint-*"):
+        if not ckpt.is_dir():
+            continue
+        for name in OPTIMIZER_NAMES:
+            rm_if_exists(ckpt / name)
+
+
+def assert_no_think_active(tokenizer, ours_text: str, messages, enable_thinking: bool, family: str):
+    if enable_thinking:
+        return
+    if family == "smollm3":
+        if "Reasoning Mode: /no_think" not in ours_text:
+            raise SystemExit(
+                "no-think is not active: rendered text is missing 'Reasoning Mode: /no_think'. "
+                "SmolLM3 no-think is that metadata line, not a Qwen empty-think wrapper. Do not train."
+            )
+        if "Reasoning Mode: /think" in ours_text:
+            raise SystemExit(
+                "no-think is not active: rendered text still has 'Reasoning Mode: /think'. Do not train."
+            )
+        return
+    if "<think>\n\n</think>" not in ours_text:
+        raise SystemExit(
+            "no-think is not active: Qwen3 empty think block is missing from the rendered text. "
+            "enable_thinking=False must leave <think>\\n\\n</think> before the verdict. Do not train."
+        )
+    prompt_messages = [m for m in messages if m.get("role") != "assistant"]
+    gen_text = tokenizer.apply_chat_template(
+        prompt_messages,
+        tokenize=False,
+        add_generation_prompt=True,
+        enable_thinking=False,
+    )
+    if "<think>\n\n</think>" not in gen_text:
+        raise SystemExit(
+            "no-think is not active: enable_thinking=False did not write the empty think prefix "
+            "on the generation prompt. Do not train."
+        )
+
+
+def assert_generation_aware_template(
+    tokenizer, stock_template, messages, enable_thinking: bool, template_path: Path
+):
     """Fail before any GPU work if the mask is empty, think is on, or render drifted from stock."""
     current = tokenizer.chat_template
     tokenizer.chat_template = stock_template
@@ -169,16 +275,8 @@ def assert_generation_aware_template(tokenizer, stock_template, messages, enable
             f"stock_len={len(stock_text)} ours_len={len(ours_text)}. "
             "Update the recipe chatTemplate; do not train."
         )
-    if not enable_thinking:
-        if "Reasoning Mode: /no_think" not in ours_text:
-            raise SystemExit(
-                "no-think is not active: rendered text is missing 'Reasoning Mode: /no_think'. "
-                "SmolLM3 no-think is that metadata line, not a Qwen empty-think wrapper. Do not train."
-            )
-        if "Reasoning Mode: /think" in ours_text:
-            raise SystemExit(
-                "no-think is not active: rendered text still has 'Reasoning Mode: /think'. Do not train."
-            )
+    family = template_family(template_path)
+    assert_no_think_active(tokenizer, ours_text, messages, enable_thinking, family)
     encoded = tokenizer.apply_chat_template(
         messages,
         tokenize=True,
@@ -359,11 +457,18 @@ def sft_config_kwargs(recipe, adapter_dir: Path, seed: int, n_examples: int) -> 
         save_steps, spe = sweep_save_steps(n_examples, recipe)
         kwargs["save_strategy"] = "steps"
         kwargs["save_steps"] = save_steps
-        kwargs.pop("save_total_limit", None)
+        min_ck = int(recipe["sweep"].get("minCheckpoints") or 6)
+        kwargs["save_total_limit"] = min_ck
         kwargs["logging_steps"] = 1
+        if "save_only_model" in params:
+            kwargs["save_only_model"] = True
         print(
             f"sweep checkpointing every {save_steps} steps "
             f"({recipe['sweep']['saveEveryEpoch']} epoch, {spe} steps/epoch, n={n_examples})"
+        )
+        print(
+            f"sweep disk hygiene: save_only_model, save_total_limit={min_ck} "
+            "(adapter weights only, no optimizer states)"
         )
     return kwargs
 
@@ -426,6 +531,7 @@ def convert_gguf(recipe, merged_dir: Path, gguf_path: Path, work: Path) -> str:
         raise SystemExit(f"llama-quantize missing after cmake build at {build_dir}")
     gguf_path.parent.mkdir(parents=True, exist_ok=True)
     run([str(quantize), str(f16_path), str(gguf_path), recipe["gguf"]["quantization"]])
+    rm_if_exists(f16_path)
     return commit
 
 
@@ -451,6 +557,7 @@ def export_adapter_gguf(recipe, base_id, tokenizer, adapter_dir: Path, merged_di
     if torch.cuda.is_available():
         torch.cuda.empty_cache()
     llama_commit = convert_gguf(recipe, merged_dir, gguf_path, work)
+    rm_if_exists(merged_dir)
     return llama_commit, sha256_file(gguf_path)
 
 
@@ -468,10 +575,7 @@ def main():
         )
     if "held-out" in recipe["sft"]:
         raise SystemExit("training input must not be the held-out suite")
-    if "SmolLM3" in base_id and "smollm3" not in recipe["train"]["chatTemplate"].lower():
-        raise SystemExit(
-            f"SmolLM3 base requires a SmolLM3 chat template, not {recipe['train']['chatTemplate']}"
-        )
+    assert_base_matches_template(base_id, recipe["train"]["chatTemplate"])
     tf_ver = assert_transformers_supports_base(base_id, recipe)
 
     sft_path = REPO / recipe["sft"]
@@ -492,6 +596,9 @@ def main():
     out_dir = Path(args.out) if args.out else REPO / recipe["outputs"]["dir"]
     if not args.check_template:
         out_dir.mkdir(parents=True, exist_ok=True)
+        if recipe.get("sweep"):
+            print("sweep disk hygiene: removing stale merged models and GGUFs")
+            clean_stale_artifacts_tree(out_dir)
     adapter_dir = out_dir / recipe["outputs"]["adapter"]
     merged_dir = out_dir / recipe["outputs"]["merged"]
     gguf_path = out_dir / recipe["outputs"]["gguf"]
@@ -515,6 +622,7 @@ def main():
         stock_template,
         rows[0]["messages"],
         recipe["train"]["enableThinking"],
+        template_path,
     )
     if args.check_template:
         print(f"base {base_id}")
@@ -591,6 +699,7 @@ def main():
             print(
                 f"  step {row['step']} epoch {row['epoch']} loss {row['loss']} {row['adapterDir']}"
             )
+        strip_checkpoint_optimizer_files(adapter_dir)
 
     del trainer
     del model
@@ -603,34 +712,13 @@ def main():
     llama_commit = None
     gguf_sha = None
     if sweep:
-        if (
-            not args.skip_export_checkpoints
-            and sweep.get("exportGguf")
-            and not args.skip_gguf
-        ):
-            import shutil
-
-            for row in checkpoint_rows:
-                step = row["step"]
-                adapter = Path(row["adapterDir"])
-                if not (adapter / "adapter_config.json").exists():
-                    raise SystemExit(f"checkpoint {adapter} has no adapter_config.json")
-                merged_step = out_dir / f"merged-step-{step}"
-                gguf_step = out_dir / f"step-{step}.gguf"
-                llama_commit, sha = export_adapter_gguf(
-                    recipe,
-                    base_id,
-                    tokenizer,
-                    Path(row["adapterDir"]),
-                    merged_step,
-                    gguf_step,
-                    out_dir,
-                )
-                row["ggufPath"] = str(gguf_step)
-                row["ggufSha256"] = sha
-                row["llamaCppCommit"] = llama_commit
-                shutil.rmtree(merged_step, ignore_errors=True)
-                print(f"GGUF {gguf_step} sha256 {sha} llama.cpp {llama_commit}")
+        # Sweep disk hygiene: do not keep six merged copies and six GGUFs at once.
+        # gate-from-adapters.py merges, converts, gates, and deletes one checkpoint
+        # at a time. Adapters and gate reports stay.
+        print(
+            "sweep disk hygiene: keeping LoRA adapters only. "
+            "Merge, GGUF, and gate happen one checkpoint at a time, then those weights are deleted."
+        )
         ckpt_name = recipe["outputs"].get("checkpoints") or "checkpoints.json"
         save_steps, spe = sweep_save_steps(len(rows), recipe)
         payload = {
@@ -653,11 +741,6 @@ def main():
             json.dumps(payload, indent=2) + "\n", encoding="utf-8"
         )
         print(f"wrote {out_dir / ckpt_name}")
-        last = checkpoint_rows[-1] if checkpoint_rows else {}
-        if last.get("ggufPath"):
-            gguf_path = Path(last["ggufPath"])
-            gguf_sha = last.get("ggufSha256")
-            llama_commit = last.get("llamaCppCommit")
     elif args.skip_gguf:
         print("skipping GGUF conversion (--skip-gguf)")
     else:
@@ -722,7 +805,7 @@ def main():
     )
     print(f"wrote {out_dir / recipe['outputs']['manifest']}")
     if sweep:
-        print("sweep next: node tools/evaluator-training/sweep-gate.mjs")
+        print("sweep next: python3 tools/evaluator-training/gate-from-adapters.py")
     elif artifacts["pinString"]:
         print(f"candidate pin {artifacts['pinString']}")
         print("gate next: node tools/evaluator-training/gate.mjs")

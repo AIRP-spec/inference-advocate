@@ -1,7 +1,7 @@
 # Pins matching tools/evaluator-training/train-recipe.json framework.pins.
 # Torch comes from the GPU image. Do not pip-install torch from this file.
-# SmolLM3 modeling code requires transformers >= 4.53.0. 4.55.2 satisfies that.
-# jinja2 is required for apply_chat_template (generation spans and no-think).
+# Qwen3-1.7B loads on the pinned transformers. jinja2 is required for
+# apply_chat_template (generation spans and no-think).
 transformers==4.55.2
 peft==0.17.1
 trl==0.21.0

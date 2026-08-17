@@ -1,13 +1,12 @@
 #!/usr/bin/env python3
 # Gate existing sweep LoRA folders. Does not train.
 #
-# Paper: step 8. Provisional Section 3.3. Last night's export kept every
-# merged 3B and every GGUF at once and filled the disk. This script walks
-# data/evaluator-training/artifacts/sweep/lora/checkpoint-*, merges one
-# adapter into HuggingFaceTB/SmolLM3-3B, converts Q8_0, runs gate.mjs
-# (the real LocalEvaluator v3 path), records the report, then deletes the
-# merged weights and the GGUF before the next folder. Scoring is not
-# reimplemented. The live pin is not flipped.
+# Paper: step 8. Provisional Section 3.3. Exporting every merged copy and
+# every GGUF at once fills the disk. This script walks the recipe's
+# lora/checkpoint-* folders, merges one adapter into the training base,
+# converts Q8_0, runs gate.mjs (the real LocalEvaluator v3 path), records
+# the report, then deletes the merged weights and the GGUF before the next
+# folder. Scoring is not reimplemented. The live pin is not flipped.
 
 from __future__ import annotations
 
@@ -170,8 +169,6 @@ def main():
         raise SystemExit(
             f"recipe base.repoId {recipe['base']['repoId']} does not match manifest {field} {base_id}"
         )
-    if base_id != "HuggingFaceTB/SmolLM3-3B":
-        raise SystemExit(f"gate-from-adapters expects HuggingFaceTB/SmolLM3-3B, got {base_id}")
 
     out_dir = airp_train.REPO / recipe["outputs"]["dir"]
     lora_dir = Path(args.lora_dir) if args.lora_dir else out_dir / recipe["outputs"]["adapter"]
@@ -190,11 +187,7 @@ def main():
     print("does not train")
 
     leftover_f16 = out_dir / "model-f16.gguf"
-    rm_if_exists(leftover_f16)
-    for p in out_dir.glob("merged-step-*"):
-        rm_if_exists(p)
-    for p in out_dir.glob("step-*.gguf"):
-        rm_if_exists(p)
+    airp_train.clean_stale_artifacts_tree(out_dir)
 
     from transformers import AutoTokenizer
 
@@ -273,7 +266,41 @@ def main():
     table_txt.write_text(table + "\n", encoding="utf-8")
     print(f"wrote {table_json}")
     print(f"wrote {table_txt}")
-    print("done. did not train.")
+
+    ckpt_name = recipe["outputs"].get("checkpoints") or "checkpoints.json"
+    ckpt_path = out_dir / ckpt_name
+    by_step = {r["step"]: r for r in rows}
+    if ckpt_path.exists():
+        ckpt_payload = json.loads(ckpt_path.read_text(encoding="utf-8"))
+    else:
+        ckpt_payload = {
+            "paper": recipe["paper"],
+            "adr": payload["adr"],
+            "seed": recipe.get("seed"),
+            "baseRepoId": base_id,
+            "checkpoints": [],
+        }
+    existing = {ck["step"]: ck for ck in ckpt_payload.get("checkpoints") or [] if "step" in ck}
+    merged_rows = []
+    for r in rows:
+        prev = existing.get(r["step"], {})
+        merged_rows.append(
+            {
+                **prev,
+                "step": r["step"],
+                "epoch": r.get("epoch") if r.get("epoch") is not None else prev.get("epoch"),
+                "loss": r.get("loss") if r.get("loss") is not None else prev.get("loss"),
+                "adapterDir": r["adapterDir"],
+                "gateReport": r["gateReport"],
+                "ggufSha256": r.get("ggufSha256"),
+                "ggufPath": None,
+            }
+        )
+    ckpt_payload["checkpoints"] = merged_rows
+    ckpt_payload["baseRepoId"] = base_id
+    ckpt_path.write_text(json.dumps(ckpt_payload, indent=2) + "\n", encoding="utf-8")
+    print(f"wrote {ckpt_path}")
+    print("done. did not train. merged weights and GGUF deleted after each checkpoint.")
 
 
 if __name__ == "__main__":

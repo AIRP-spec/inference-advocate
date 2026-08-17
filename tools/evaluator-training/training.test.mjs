@@ -335,7 +335,7 @@ test('composed profanity and hate scaffolds exhibit, do not describe, and cap fr
   }
 });
 
-test('train recipe pins the SmolLM3 training base, a fixed seed, and no held-out input', () => {
+test('train recipe pins the Qwen3-1.7B training base, a fixed seed, and no held-out input', () => {
   const trainRecipe = JSON.parse(readFileSync(join(here, 'train-recipe.json'), 'utf8'));
   const manifest = JSON.parse(readFileSync(join(repoRoot, 'data/models/manifest.json'), 'utf8'));
   const req = readFileSync(join(here, 'requirements-train.txt'), 'utf8');
@@ -347,12 +347,15 @@ test('train recipe pins the SmolLM3 training base, a fixed seed, and no held-out
   assert.equal(trainRecipe.train.enableThinking, false);
   assert.equal(trainRecipe.train.assistantOnlyLoss, true);
   assert.equal(trainRecipe.train.gradientCheckpointing, true);
-  assert.equal(trainRecipe.train.chatTemplate, 'tools/evaluator-training/smollm3-chat-template.jinja');
+  assert.equal(trainRecipe.train.perDeviceBatchSize, 2);
+  assert.equal(trainRecipe.train.gradientAccumulationSteps, 16);
+  assert.equal(trainRecipe.train.maxSeqLen, 2048);
+  assert.equal(trainRecipe.train.chatTemplate, 'tools/evaluator-training/qwen3-chat-template.jinja');
   assert.equal(trainRecipe.framework.reportTo, 'none');
   assert.equal(trainRecipe.publish.flipLivePin, false);
   assert.equal(trainRecipe.base.source, 'data/models/manifest.json');
   assert.equal(trainRecipe.base.field, 'trainBaseRepoId');
-  assert.equal(manifest.trainBaseRepoId, 'HuggingFaceTB/SmolLM3-3B');
+  assert.equal(manifest.trainBaseRepoId, 'Qwen/Qwen3-1.7B');
   assert.equal(trainRecipe.base.repoId, manifest.trainBaseRepoId);
   assert.equal(manifest.baseRepoId, 'Qwen/Qwen3-0.6B');
   assert.equal(manifest.fileName, 'Qwen3-0.6B-Q8_0.gguf');
@@ -360,35 +363,36 @@ test('train recipe pins the SmolLM3 training base, a fixed seed, and no held-out
   assert.equal(manifest.sha256, '9465e63a22add5354d9bb4b99e90117043c7124007664907259bd16d043bb031');
   assert.equal(trainRecipe.sft, recipe.outputs.sft);
   assert.equal(trainRecipe.sft.includes('held-out'), false);
+  assert.equal(trainRecipe.base.repoId.includes('SmolLM3'), false);
+  assert.equal(trainRecipe.train.chatTemplate.includes('smollm3'), false);
+  assert.equal(JSON.stringify(trainRecipe).includes('Qwen3-0.6B-airp'), false);
   assert.match(trainPy, /manifest\.get\(field\)/);
   assert.match(trainPy, /enable_thinking/);
   assert.match(trainPy, /wrap_tokenizer_enable_thinking/);
   assert.equal(trainPy.includes('wrap_tokenizer_no_think'), false);
   assert.match(trainPy, /assert_generation_aware_template/);
-  assert.match(trainPy, /MIN_TRANSFORMERS = \(4, 53, 0\)/);
+  assert.match(trainPy, /assert_base_matches_template/);
   assert.match(trainPy, /assistant_only_loss.*= True/);
   assert.match(trainPy, /gradient_checkpointing.*= True/);
   assert.match(trainPy, /use_reentrant/);
   assert.match(trainPy, /use_cache = False/);
   assert.equal(trainPy.includes('assistant_only_loss"] = False'), false);
   assert.match(trainPy, /training input must not be the held-out suite/);
-  const jinja = readFileSync(join(here, 'smollm3-chat-template.jinja'), 'utf8');
+  const jinja = readFileSync(join(here, 'qwen3-chat-template.jinja'), 'utf8');
   assert.match(jinja, /\{%-? generation -?%\}/);
   assert.match(jinja, /\{%-? endgeneration -?%\}/);
-  assert.match(jinja, /\/no_think/);
-  assert.match(jinja, /Reasoning Mode/);
+  assert.match(jinja, /enable_thinking is false/);
   assert.equal(jinja.includes('\u2014'), false);
   const [maj, min] = trainRecipe.framework.pins.transformers.split('.').map(Number);
   assert.ok(maj > 4 || (maj === 4 && min >= 53), trainRecipe.framework.pins.transformers);
   for (const [pkg, ver] of Object.entries(trainRecipe.framework.pins)) {
     assert.match(req, new RegExp(`^${pkg}==${ver}$`, 'm'), pkg);
   }
-  assert.match(req, /transformers >= 4\.53\.0/);
   assert.equal(JSON.stringify(trainRecipe).includes('\u2014'), false);
   assert.equal(trainPy.includes('\u2014'), false);
 });
 
-test('sweep recipe is a diagnostic curve on SmolLM3-3B, same corpus and gate', () => {
+test('sweep recipe is a diagnostic curve on Qwen3-1.7B, same corpus and gate', () => {
   const sweepRecipe = JSON.parse(readFileSync(join(here, 'sweep-recipe.json'), 'utf8'));
   const trainRecipe = JSON.parse(readFileSync(join(here, 'train-recipe.json'), 'utf8'));
   const manifest = JSON.parse(readFileSync(join(repoRoot, 'data/models/manifest.json'), 'utf8'));
@@ -403,10 +407,11 @@ test('sweep recipe is a diagnostic curve on SmolLM3-3B, same corpus and gate', (
   assert.equal(sweepRecipe.promptTemplateVersion, 'v3');
   assert.equal(sweepRecipe.base.field, 'trainBaseRepoId');
   assert.equal(sweepRecipe.base.repoId, manifest.trainBaseRepoId);
-  assert.equal(manifest.trainBaseRepoId, 'HuggingFaceTB/SmolLM3-3B');
+  assert.equal(manifest.trainBaseRepoId, 'Qwen/Qwen3-1.7B');
   assert.equal(manifest.baseRepoId, 'Qwen/Qwen3-0.6B');
   assert.equal(sweepRecipe.sft, trainRecipe.sft);
   assert.equal(sweepRecipe.train.chatTemplate, trainRecipe.train.chatTemplate);
+  assert.equal(sweepRecipe.train.chatTemplate, 'tools/evaluator-training/qwen3-chat-template.jinja');
   assert.equal(sweepRecipe.sft.includes('held-out'), false);
   assert.equal(sweepRecipe.train.evalDataset, 'none');
   assert.equal(sweepRecipe.train.assistantOnlyLoss, true);
@@ -414,28 +419,44 @@ test('sweep recipe is a diagnostic curve on SmolLM3-3B, same corpus and gate', (
   assert.equal(sweepRecipe.train.enableThinking, false);
   assert.equal(sweepRecipe.train.epochs, 3);
   assert.equal(sweepRecipe.train.learningRate, 0.0001);
+  assert.equal(sweepRecipe.train.perDeviceBatchSize, 2);
+  assert.equal(sweepRecipe.train.gradientAccumulationSteps, 16);
+  assert.equal(sweepRecipe.train.maxSeqLen, 2048);
   assert.equal(sweepRecipe.lora.r, 16);
   assert.equal(sweepRecipe.lora.alpha, 32);
   assert.equal(sweepRecipe.lora.dropout, 0.1);
   assert.equal(sweepRecipe.sweep.saveEveryEpoch, 0.5);
   assert.equal(sweepRecipe.sweep.minCheckpoints, 6);
+  assert.equal(sweepRecipe.sweep.diskHygiene, true);
   assert.equal(sweepRecipe.outputs.dir.includes('sweep'), true);
   assert.notEqual(sweepRecipe.outputs.dir, trainRecipe.outputs.dir);
+  assert.equal(sweepRecipe.base.repoId.includes('SmolLM3'), false);
+  assert.equal(sweepRecipe.train.chatTemplate.includes('smollm3'), false);
+  assert.equal(JSON.stringify(sweepRecipe).includes('Qwen3-0.6B-airp'), false);
 
   assert.match(trainPy, /save_strategy.*= "steps"/);
   assert.match(trainPy, /sweep_save_steps/);
   assert.match(trainPy, /collect_checkpoint_rows/);
   assert.match(trainPy, /export_adapter_gguf/);
+  assert.match(trainPy, /save_only_model/);
+  assert.match(trainPy, /save_total_limit.*= min_ck/);
+  assert.match(trainPy, /clean_stale_weight_artifacts/);
+  assert.match(trainPy, /strip_checkpoint_optimizer_files/);
+  assert.equal(trainPy.includes('kwargs.pop("save_total_limit"'), false);
   assert.equal(trainPy.includes('assistant_only_loss"] = False'), false);
   assert.match(gate, /--allow-fail/);
   assert.match(gate, /args\.sha256 \|\| sha256FileHex\(ggufPath\)/);
   assert.match(sweepGate, /gate\.mjs/);
   assert.match(sweepGate, /--allow-fail/);
+  assert.match(sweepGate, /unlinkSync/);
   assert.equal(sweepGate.includes('scoreHeldOutGate'), false);
   assert.match(runSweep, /sweep-recipe\.json/);
+  assert.match(runSweep, /gate-from-adapters\.py/);
+  assert.match(runSweep, /skip-export-checkpoints/);
   assert.match(readme, /evaluator-training:sweep/);
   assert.match(readme, /--check-template/);
   assert.match(readme, /gate-from-adapters/);
+  assert.match(readme, /Qwen3-1\.7B/);
 
   for (const text of [
     JSON.stringify(sweepRecipe),
@@ -452,14 +473,18 @@ test('sweep recipe is a diagnostic curve on SmolLM3-3B, same corpus and gate', (
 
 test('gate-from-adapters does not train and deletes merged weights and GGUF', () => {
   const src = readFileSync(join(here, 'gate-from-adapters.py'), 'utf8');
+  const trainPy = readFileSync(join(here, 'train.py'), 'utf8');
   assert.match(src, /Does not train/);
   assert.match(src, /checkpoint-\*/);
   assert.match(src, /export_adapter_gguf/);
   assert.match(src, /gate\.mjs/);
   assert.match(src, /--allow-fail/);
-  assert.match(src, /HuggingFaceTB\/SmolLM3-3B/);
+  assert.equal(src.includes('HuggingFaceTB/SmolLM3-3B'), false);
   assert.match(src, /rm_if_exists\(merged_dir\)/);
   assert.match(src, /rm_if_exists\(gguf_path\)/);
+  assert.match(src, /clean_stale_artifacts_tree/);
+  assert.match(trainPy, /rm_if_exists\(f16_path\)/);
+  assert.match(trainPy, /rm_if_exists\(merged_dir\)/);
   assert.equal(src.includes('trainer.train'), false);
   assert.equal(src.includes('\u2014'), false);
 });

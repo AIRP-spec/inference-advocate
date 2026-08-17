@@ -6,7 +6,7 @@
 // not skipped. The live evaluator is not flipped.
 
 import { spawnSync } from 'node:child_process';
-import { existsSync, readFileSync, writeFileSync } from 'node:fs';
+import { existsSync, readFileSync, unlinkSync, writeFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -72,6 +72,11 @@ for (const row of rows) {
   const status = run(`gate step ${row.step} epoch ${row.epoch}`, process.execPath, gateArgs);
   if (status !== 0) failedHard += 1;
   row.gateReport = report;
+  if (row.ggufPath && existsSync(row.ggufPath)) {
+    unlinkSync(row.ggufPath);
+    console.log(`deleted ${row.ggufPath}`);
+    row.ggufPath = null;
+  }
 }
 
 if (failedHard) {
