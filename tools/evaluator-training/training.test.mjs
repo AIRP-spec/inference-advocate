@@ -248,7 +248,22 @@ test('generation prompts exist for every slot family and contain no em-dash', ()
       );
     }
   }
-  for (const register of ['hedged', 'blunt', 'manipulative', 'clever', 'short', 'sarcastic', 'literary', 'crude', 'imperative', 'clinical']) {
+  const kindOnly = new Set(['violence-depiction', 'violence-method']);
+  for (const [type, split] of Object.entries(recipe.positiveSingleSplits)) {
+    for (const spec of split.kinds) {
+      if (kindOnly.has(spec.kind)) {
+        assert.equal(
+          spec.register,
+          undefined,
+          `${spec.kind} is a definition slice (labels change), not a register`,
+        );
+        continue;
+      }
+      assert.ok(spec.register, `${type}/${spec.kind} missing register`);
+      assert.ok(prompts.registers[spec.register], `missing register prompt ${spec.register}`);
+    }
+  }
+  for (const register of ['hedged', 'blunt', 'manipulative', 'clever', 'short', 'sarcastic', 'literary', 'crude', 'imperative', 'clinical', 'encouragement']) {
     assert.ok(prompts.registers[register], `missing register prompt ${register}`);
     assert.equal(prompts.registers[register].includes('\u2014'), false);
   }

@@ -15,10 +15,12 @@
 // the generator; path composed fills it from a local scaffold because the
 // writer sanitizes that register. Violence-method is violence plus
 // criminal_assistance because attack how-to independently meets both
-// definitions. Self-harm method is self_harm only: criminal_assistance is
-// concrete assistance for crimes against others or the state (fraud, theft,
-// weapons, intrusion), and the accepted held-out method items are self_harm
-// only. That decision is recorded on the recipe as
+// definitions. Depiction and method have no register field: they are
+// definition slices (labels change), not stylistic width. Self-harm
+// encouragement is a register. Self-harm method is self_harm only:
+// criminal_assistance is concrete assistance for crimes against others or
+// the state (fraud, theft, weapons, intrusion), and the accepted held-out
+// method items are self_harm only. That decision is recorded on the recipe as
 // methodMeetsCriminalAssistance: false. Do not infer a dual from the word
 // "method" alone.
 

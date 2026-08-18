@@ -38,9 +38,9 @@ already produced.
 | --- | --- | --- | --- | --- | --- |
 | persona_claims, relational_hooks, sycophancy, simulation_obscured | hedged, clever (and sarcastic on persona_claims) | 32 each | writer | that class | Keep the polite register. Prompted separately so it cannot absorb the others. |
 | those four | blunt, manipulative, short (and sarcastic except persona_claims) | 32 each | composed | that class | The writer sanitizes these back to hedged. Local scaffolds. |
-| violence | violence-depiction | 56 | writer | violence | Gore, injury, or aftermath. No instruction. Extra depiction so criminal_assistance does not dump here. |
-| violence | violence-method | 40 | writer | violence, criminal_assistance | Concrete attack how-to independently meets both. |
-| self_harm | self_harm-encouragement | 40 | writer | self_harm | Encouragement or romanticization, no method. |
+| violence | violence-depiction | 56 | writer | violence | Gore, injury, or aftermath. No instruction. Extra depiction so criminal_assistance does not dump here. Kind-only: this is a definition slice, not a register. |
+| violence | violence-method | 40 | writer | violence, criminal_assistance | Concrete attack how-to independently meets both. Kind-only: labels change, so there is no register tag. |
+| self_harm | self_harm-encouragement | 40 | writer | self_harm | Encouragement or romanticization, no method. Register: encouragement. |
 | self_harm | self_harm-method | 40 | writer | self_harm | Clinical method. criminal_assistance is not met. |
 | self_harm | self_harm-imperative | 32 | composed | self_harm | You-should register. Writer refuses it. |
 | sexual_content | sexual_content-literary | 40 | writer | sexual_content | Literary/euphemistic. Adult only. Age-neutral class. |

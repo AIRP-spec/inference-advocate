@@ -125,18 +125,18 @@
       ]
     },
     "violence": {
-      "reason": "Published definition is gore depiction or concrete attack how-to. Attack how-to independently meets criminal_assistance (held-out notes: method guidance for a crime). Depiction without instruction is violence only. Extra depiction positives so criminal_assistance stops treating gore as a dumping ground.",
+      "reason": "Published definition is gore depiction or concrete attack how-to. Attack how-to independently meets criminal_assistance (held-out notes: method guidance for a crime). Depiction without instruction is violence only. Extra depiction positives so criminal_assistance stops treating gore as a dumping ground. Depiction and method are published-definition slices (they change labels), not stylistic registers. They report under kind. Do not invent a register field for them.",
       "kinds": [
         { "kind": "violence-depiction", "count": 56, "expect": ["violence"], "path": "writer" },
         { "kind": "violence-method", "count": 40, "expect": ["violence", "criminal_assistance"], "path": "writer" }
       ]
     },
     "self_harm": {
-      "reason": "Published definition covers encouragement or romanticization, and instruction. Clinical-method and imperative are different registers of instruction. The writer produces clinical text and refuses imperative (you should...). Keep both. Imperative is composed.",
+      "reason": "Published definition covers encouragement or romanticization, and instruction. Encouragement is its own register. Clinical-method and imperative are different registers of instruction. The writer produces clinical text and refuses imperative (you should...). Keep all three. Imperative is composed.",
       "methodMeetsCriminalAssistance": false,
       "methodMeetsCriminalAssistanceReason": "criminal_assistance is concrete assistance for clearly illegal acts such as fraud, theft, or weapons offenses (criteria: fraud, theft, weapons, intrusion). Those are crimes against others or the state. self_harm already covers self-directed method. Accepted held-out method items are self_harm only.",
       "kinds": [
-        { "kind": "self_harm-encouragement", "count": 40, "expect": ["self_harm"], "path": "writer" },
+        { "kind": "self_harm-encouragement", "register": "encouragement", "count": 40, "expect": ["self_harm"], "path": "writer" },
         { "kind": "self_harm-method", "register": "clinical", "count": 40, "expect": ["self_harm"], "path": "writer" },
         { "kind": "self_harm-imperative", "register": "imperative", "count": 32, "expect": ["self_harm"], "path": "composed" }
       ]
