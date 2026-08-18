@@ -11,7 +11,7 @@ import {
   normalizeContent,
 } from './leak.mjs';
 import { assertGeneratorBaseUrl } from './endpoint.mjs';
-import { buildSlots, expectedTotal, writerPositiveTypes, positivePathReport, kindPath } from './slots.mjs';
+import { buildSlots, expectedTotal, writerPositiveTypes, positivePathReport, kindPath, composedClassKindsFor, contrastGroupsFor } from './slots.mjs';
 import { conformanceReason, profanityExpletiveRe } from './conformance.mjs';
 import { parseExamples, expandScaffold, composedBlockFor } from './generate.mjs';
 
@@ -27,13 +27,16 @@ test('recipe taxonomy version matches the taxonomy file', () => {
   assert.equal(recipe.promptTemplateVersion, 'v3');
   assert.equal(recipe.review.composedRegisters.status, 'accepted');
   assert.equal(recipe.review.composedRegisters.date, '2026-08-18');
+  assert.equal(recipe.review.composedPreview.status, 'accepted');
+  assert.equal(recipe.review.composedPreview.date, '2026-08-18');
+  assert.equal(recipe.review.composedPreview.sampleSize, 407);
 });
 
 test('slot counts sum to the recipe total and cover every class', () => {
   const total = expectedTotal(recipe, types);
   const slots = buildSlots(recipe, types);
   assert.equal(slots.length, total);
-  assert.equal(total, 4548);
+  assert.equal(total, 6296);
   const cse = recipe.composedClass;
   const writerTypes = writerPositiveTypes(recipe, types);
   assert.equal(writerTypes.length, types.length - 1 - recipe.composedSurfaceClasses.length);
@@ -42,7 +45,9 @@ test('slot counts sum to the recipe total and cover every class', () => {
   assert.ok(!writerTypes.includes(cse));
   for (const type of writerTypes) {
     const writerSlots = slots.filter((s) => s.family === 'positive-single' && s.class === type);
-    const composedSlots = slots.filter((s) => s.family === 'positive-composed' && s.class === type);
+    const composedSlots = slots.filter(
+      (s) => s.family === 'positive-composed' && s.class === type && !s.contrastGroup,
+    );
     const split = recipe.positiveSingleSplits?.[type];
     if (split) {
       let writerN = 0;
@@ -78,6 +83,16 @@ test('slot counts sum to the recipe total and cover every class', () => {
       (s) => s.expect.includes('violence') && s.expect.includes('criminal_assistance'),
     ),
   );
+  const violenceConjunction = slots.filter((s) => s.kind === 'violence-conjunction');
+  assert.equal(violenceConjunction.length, 32);
+  assert.ok(
+    violenceConjunction.every(
+      (s) =>
+        s.family === 'positive-composed' &&
+        s.expect.includes('violence') &&
+        s.expect.includes('criminal_assistance'),
+    ),
+  );
   const violenceDepiction = slots.filter((s) => s.kind === 'violence-depiction');
   assert.equal(violenceDepiction.length, 56);
   assert.ok(violenceDepiction.every((s) => s.expect.length === 1 && s.expect[0] === 'violence'));
@@ -100,6 +115,8 @@ test('slot counts sum to the recipe total and cover every class', () => {
   assert.equal(recipe.generator.maxRetries, 8);
   assert.equal(recipe.hardNegativeBoosts.criminal_assistance.mentionVersusUse, 20);
   assert.equal(recipe.hardNegativeBoosts.criminal_assistance.classRefusal, 20);
+  assert.equal(recipe.hardNegativeBoosts.self_harm.mentionVersusUse, 20);
+  assert.equal(recipe.hardNegativeBoosts.hate.classRefusal, 20);
   const caMentions = slots.filter((s) => s.family === 'mention-versus-use' && s.class === 'criminal_assistance');
   assert.equal(caMentions.length, 70);
   const cseWriterPositives = slots.filter(
@@ -113,17 +130,34 @@ test('slot counts sum to the recipe total and cover every class', () => {
   );
   assert.equal(surfaceWriterPositives.length, 0);
   const composedSingles = slots.filter((s) => s.family === 'positive-composed' && s.expect.length === 1);
-  const cseComposed = composedSingles.filter((s) => s.expect[0] === cse);
-  assert.equal(cseComposed.length, recipe.counts.positive.composedSingle);
+  const cseKinds = composedClassKindsFor(recipe);
+  assert.ok(cseKinds);
+  const cseSingleN = cseKinds.filter((k) => k.expect.length === 1).reduce((s, k) => s + k.count, 0);
+  const cseDualN = cseKinds.filter((k) => k.expect.length > 1).reduce((s, k) => s + k.count, 0);
+  assert.equal(cseSingleN, 160);
+  assert.equal(cseDualN, 400);
+  const cseComposed = composedSingles.filter((s) => s.expect[0] === cse && !s.contrastGroup);
+  assert.equal(cseComposed.length, cseSingleN);
+  assert.ok(cseComposed.every((s) => s.kind && s.form && s.path === 'composed'));
+  for (const spec of cseKinds.filter((k) => k.expect.length === 1)) {
+    const rows = cseComposed.filter((s) => s.kind === spec.kind);
+    assert.equal(rows.length, spec.count, spec.kind);
+  }
   for (const type of recipe.composedSurfaceClasses) {
     const rows = composedSingles.filter((s) => s.expect[0] === type && !s.kind);
     assert.equal(rows.length, recipe.counts.positive.singlePerClass, `composed ${type}`);
     assert.ok(rows.every((s) => s.expect.length === 1 && s.expect[0] === type));
   }
-  const composedDuals = slots.filter((s) => s.family === 'positive-composed' && s.expect.length === 2);
-  assert.equal(composedDuals.length, recipe.counts.positive.composedDual);
+  const composedDuals = slots.filter(
+    (s) =>
+      s.family === 'positive-composed' &&
+      s.expect.length === 2 &&
+      s.expect.includes(cse) &&
+      !s.contrastGroup,
+  );
+  assert.equal(composedDuals.length, cseDualN);
   assert.ok(
-    composedDuals.every((s) => s.expect.includes(cse) && s.expect.includes('sexual_content')),
+    composedDuals.every((s) => s.expect.includes(cse) && s.expect.includes('sexual_content') && s.kind && s.form),
   );
   assert.ok(recipe.multiPairs.every((pair) => !pair.includes(cse)));
   assert.ok(recipe.multiPairs.some((pair) => pair.includes('profanity')));
@@ -132,7 +166,7 @@ test('slot counts sum to the recipe total and cover every class', () => {
   assert.equal(paths.find((r) => r.type === 'profanity')?.path, 'composed');
   assert.equal(paths.find((r) => r.type === 'hate')?.path, 'composed');
   assert.equal(paths.find((r) => r.type === cse)?.path, 'composed');
-  assert.equal(paths.find((r) => r.type === 'violence')?.path, 'writer');
+  assert.equal(paths.find((r) => r.type === 'violence')?.path, 'mixed');
   assert.equal(paths.find((r) => r.type === 'persona_claims')?.path, 'mixed');
   assert.equal(paths.find((r) => r.type === 'sexual_content')?.path, 'mixed');
   assert.equal(paths.find((r) => r.type === 'self_harm')?.path, 'mixed');
@@ -147,10 +181,14 @@ test('slot counts sum to the recipe total and cover every class', () => {
     const mentions = slots.filter((s) => s.family === 'mention-versus-use' && s.class === type);
     assert.equal(mentions.length, recipe.counts.hardNegative.mentionVersusUsePerClass + mentionBoost);
     assert.ok(mentions.every((s) => s.expect.length === 0));
-    const refusals = slots.filter((s) => s.family === 'class-refusal' && s.class === type);
+    const refusals = slots.filter(
+      (s) => s.family === 'class-refusal' && s.class === type && s.path !== 'composed',
+    );
     assert.equal(refusals.length, recipe.counts.hardNegative.classRefusalPerClass + refusalBoost);
   }
-  const cseSensitive = slots.filter((s) => s.family === 'sensitive-discussion' && s.class === cse);
+  const cseSensitive = slots.filter(
+    (s) => s.family === 'sensitive-discussion' && s.class === cse && s.path !== 'composed',
+  );
   assert.equal(cseSensitive.length, recipe.counts.hardNegative.sensitiveDiscussionPerHarmClass);
   const clean = slots.filter((s) => s.family === 'greeting' || s.family === 'fact');
   assert.ok(clean.length > 0);
@@ -163,6 +201,12 @@ test('a kind with an invalid count fails closed', () => {
   const bad = structuredClone(recipe);
   bad.positiveSingleSplits.violence.kinds[0].count = 0;
   assert.throws(() => buildSlots(bad, types), /invalid count/);
+});
+
+test('a composed CSE kind without a form fails closed', () => {
+  const bad = structuredClone(recipe);
+  delete bad.composedClassSplits.kinds[0].form;
+  assert.throws(() => buildSlots(bad, types), /no form/);
 });
 
 test('a composed register kind without a scaffold path fails closed', () => {
@@ -248,7 +292,8 @@ test('generation prompts exist for every slot family and contain no em-dash', ()
       );
     }
   }
-  const kindOnly = new Set(['violence-depiction', 'violence-method']);
+  const kindOnly = new Set(['violence-depiction', 'violence-method', 'violence-conjunction']);
+  const spanKinds = new Set(['persona_claims-modality', 'simulation_obscured-circumlocution']);
   for (const [type, split] of Object.entries(recipe.positiveSingleSplits)) {
     for (const spec of split.kinds) {
       if (kindOnly.has(spec.kind)) {
@@ -256,6 +301,14 @@ test('generation prompts exist for every slot family and contain no em-dash', ()
           spec.register,
           undefined,
           `${spec.kind} is a definition slice (labels change), not a register`,
+        );
+        continue;
+      }
+      if (spanKinds.has(spec.kind)) {
+        assert.equal(
+          spec.register,
+          undefined,
+          `${spec.kind} spans existing registers rather than adding one`,
         );
         continue;
       }
@@ -285,9 +338,11 @@ test('no generation prompt for CSE-exhibiting text exists in the recipe', () => 
   assert.match(gen, /wouldSendCsePositiveToWriter/);
   assert.match(gen, /wouldSendSurfacePositiveToWriter/);
   assert.match(gen, /composed-only/);
+  assert.match(gen, /append-kinds/);
   assert.match(gen, /composedBlockFor/);
   const sample = readFileSync(join(here, 'sample.mjs'), 'utf8');
   assert.match(sample, /positive-composed/);
+  assert.match(sample, /--keep/);
 });
 
 test('conformance screen applies only to writer-positive families', () => {
@@ -337,24 +392,111 @@ test('composed CSE scaffold is leak-free, large enough, and has no meta-language
   const meta =
     /\b(fixture|classifier|taxonomy|minor-framed|sexualized child frame|not a story)\b/i;
   const thisIsA = /\bthis is a\b/i;
-  const singles = expandScaffold(scaffold.single);
-  const duals = expandScaffold(scaffold.dual);
-  const uniqueSingles = new Set();
-  for (const content of singles) {
-    assert.equal(leakReason(content, index), null, content);
-    assert.equal(meta.test(content), false, content);
-    assert.equal(thisIsA.test(content), false, content);
-    uniqueSingles.add(normalizeContent(content));
+  const cseKinds = composedClassKindsFor(recipe);
+  assert.ok(cseKinds);
+  const digit = /\d/;
+  const minorNoun = /\b(child|kid|teen|teenager|girl|boy|schoolgirl|schoolboy)s?\b/i;
+  const school = /\b(sixth|seventh|eighth|ninth|grader|middle schooler|middle school|junior high|elementary)\b/i;
+  const roleplay = /\b(character|role|playing|play|cast as|assigned|part of|assignment|part|acting)\b/i;
+  /** @type {Map<string, Set<string>>} */
+  const owners = new Map();
+  /** @type {string[]} */
+  const all = [];
+
+  /**
+   * @param {object} block
+   * @param {{ templates: string[], arities: number[] }} acc
+   */
+  function walk(block, acc) {
+    if (Array.isArray(block.blocks)) {
+      for (const inner of block.blocks) walk(inner, acc);
+      return;
+    }
+    const keys = Object.keys(block).filter(
+      (k) => k !== 'templates' && k !== 'note' && k !== 'blocks' && Array.isArray(block[k]),
+    );
+    let arity = 1;
+    for (const k of keys) arity *= block[k].length;
+    for (const t of block.templates) {
+      acc.templates.push(t);
+      acc.arities.push(arity);
+    }
   }
-  const uniqueDuals = new Set();
-  for (const content of duals) {
-    assert.equal(leakReason(content, index), null, content);
-    assert.equal(meta.test(content), false, content);
-    assert.equal(thisIsA.test(content), false, content);
-    uniqueDuals.add(normalizeContent(content));
+
+  for (const spec of cseKinds) {
+    assert.ok(scaffold.kinds[spec.kind], `missing ${spec.kind}`);
+    const slot = { id: 't', class: recipe.composedClass, kind: spec.kind, expect: spec.expect };
+    const block = composedBlockFor(slot, recipe, new Map([[recipe.composedClass, scaffold]]));
+    const acc = { templates: [], arities: [] };
+    walk(block, acc);
+    assert.equal(new Set(acc.templates).size, acc.templates.length, `${spec.kind} duplicate frames`);
+    for (let i = 0; i < acc.templates.length; i++) {
+      assert.ok(acc.arities[i] <= 2, `${spec.kind} frame reused ${acc.arities[i]} times: ${acc.templates[i]}`);
+    }
+    const expanded = expandScaffold(block);
+    const unique = new Set();
+    for (const content of expanded) {
+      assert.equal(leakReason(content, index), null, content);
+      assert.equal(meta.test(content), false, content);
+      assert.equal(thisIsA.test(content), false, content);
+      unique.add(normalizeContent(content));
+      all.push(content);
+      if (spec.form === 'minor-noun') {
+        assert.equal(digit.test(content), false, content);
+        assert.match(content, minorNoun);
+      }
+      if (spec.form === 'numeric-age') {
+        assert.match(content, /\d/);
+      }
+      if (spec.form === 'school-grade') {
+        assert.match(content, school);
+      }
+      if (spec.form === 'roleplay') {
+        assert.match(content, roleplay);
+      }
+      if (spec.form === 'age-marker') {
+        assert.equal(digit.test(content), false, content);
+        assert.equal(minorNoun.test(content), false, content);
+      }
+      if (spec.form === 'named-csam') {
+        assert.match(content, /csam|underage porn|child porn/i);
+      }
+      if (String(spec.kind).startsWith('cse-alone-')) {
+        assert.equal(
+          /\b(suck|cock|pussy|cum|lick|erotic|pornographic|fuck|blowjob|sex scene)\b/i.test(content),
+          false,
+          content,
+        );
+      }
+    }
+    assert.ok(unique.size >= spec.count, `${spec.kind} unique ${unique.size} < ${spec.count}`);
+    owners.set(spec.kind, unique);
   }
-  assert.ok(uniqueSingles.size >= recipe.counts.positive.composedSingle, uniqueSingles.size);
-  assert.ok(uniqueDuals.size >= recipe.counts.positive.composedDual, uniqueDuals.size);
+  const claimed = new Map();
+  for (const [kind, unique] of owners) {
+    for (const n of unique) {
+      const list = claimed.get(n) ?? [];
+      list.push(kind);
+      claimed.set(n, list);
+    }
+  }
+  for (const [kind, unique] of owners) {
+    let exclusive = 0;
+    for (const n of unique) if (claimed.get(n).length === 1) exclusive += 1;
+    const need = cseKinds.find((k) => k.kind === kind).count;
+    assert.ok(exclusive >= need, `${kind} exclusive leak-free ${exclusive} < ${need}`);
+  }
+  const words = all.join(' ').toLowerCase().match(/[a-z]+/g) ?? [];
+  const typesSet = new Set(words);
+  assert.ok(typesSet.size > 80, `CSE vocabulary types ${typesSet.size}`);
+  /** @type {Map<string, number>} */
+  const leads = new Map();
+  for (const content of all) {
+    const lead = normalizeContent(content).split(' ').slice(0, 3).join(' ');
+    leads.set(lead, (leads.get(lead) ?? 0) + 1);
+  }
+  const top = Math.max(...leads.values());
+  assert.ok(top / all.length < 0.12, `leading-clause share ${top}/${all.length}`);
 });
 
 test('composed profanity and hate scaffolds exhibit, do not describe, and cap frame reuse', () => {
@@ -447,7 +589,7 @@ test('composed register scaffolds cover each kind, stay leak-free, and cap frame
     const scaffold = JSON.parse(readFileSync(join(repoRoot, rel), 'utf8'));
     assert.equal(JSON.stringify(scaffold).includes('\u2014'), false, type);
     assert.match(scaffold.contentWarning, /^Content warning:/);
-    assert.match(scaffold.note, /writer sanitizes|writer refuses|writer emits/);
+    assert.match(scaffold.note, /writer sanitizes|writer refuses|writer emits|writer volume/);
     const split = recipe.positiveSingleSplits[type];
     const composedKinds = split.kinds.filter((k) => (k.path ?? 'writer') === 'composed');
     assert.ok(composedKinds.length > 0, type);
@@ -698,15 +840,157 @@ test('sweep verdict names a publish candidate only on a clean gate', async () =>
     { epoch: 2, loss: 0.004, extraClassFires: 12, recallMisses: 3, cleanFires: 0, perClassPass: 6, perClassTotal: 11, pass: false },
     { epoch: 3, loss: 0.0003, extraClassFires: 27, recallMisses: 0, cleanFires: 0, perClassPass: 8, perClassTotal: 11, pass: false },
   ]);
-  assert.equal(ceiling.kind, 'ceiling');
+  assert.equal(ceiling.kind, 'coverage-gap');
   assert.equal(ceiling.nearest.epoch, 2);
-  assert.match(ceiling.text, /capacity ceiling confirmed/);
+  assert.match(ceiling.text, /coverage gap/);
+  assert.equal(ceiling.text.includes('capacity ceiling confirmed'), false);
   assert.equal(fmtLoss(0.003), '0.0030');
   const table = formatTable([
     { epoch: 1, loss: 0.02, extraClassFires: 5, recallMisses: 2, cleanFires: 0, perClassPass: 9, perClassTotal: 11, pass: false },
   ]);
   assert.match(table, /extra-fires/);
   assert.equal(table.includes('\u2014'), false);
+});
+
+test('definitional independence is stated on the recipe and encoded as contrast groups', () => {
+  assert.match(recipe.definitionalIndependence, /if and only if its own published definition is met/);
+  assert.match(recipe.definitionalIndependence, /No flag implies or suppresses another/);
+  assert.match(recipe.definitionalIndependence, /Severity never decides/);
+  assert.match(recipe.enactVersusDescribe, /enacts, directs, continues, or depicts/);
+  assert.match(recipe.enactVersusDescribe, /regardless of which words name the act/);
+  assert.match(recipe.enactVersusDescribe, /instances of description, not the whole category/);
+  assert.match(recipe.enactVersusDescribe, /mention-versus-use/);
+  const groups = contrastGroupsFor(recipe);
+  assert.ok(groups.length >= 14);
+  const ids = new Set(groups.map((g) => g.id));
+  for (const id of [
+    'cse-cofire',
+    'sex-profanity-cofire',
+    'violence-ca-cofire',
+    'rh-vs-pc',
+    'pc-vs-so',
+    'rh-vs-syc',
+    'hate-vs-sh',
+    'difficulty-modality',
+    'persona-sim-modality',
+    'clean-crisis-warm',
+    'clean-refusal-reasoned',
+    'clean-greeting-warm',
+    'clean-plain-cant',
+    'clinical-hard-negative',
+  ]) {
+    assert.ok(ids.has(id), id);
+  }
+  const slots = buildSlots(recipe, types);
+  for (const group of groups) {
+    for (const arm of group.arms) {
+      const rows = slots.filter((s) => s.kind === arm.kind);
+      assert.equal(rows.length, group.count, arm.kind);
+      assert.ok(rows.every((s) => s.path === 'composed' && s.contrastGroup === group.id));
+    }
+  }
+  const cseAlone = slots.filter((s) => String(s.kind).startsWith('cse-alone-') && !s.contrastGroup);
+  assert.equal(cseAlone.length, 160);
+  assert.ok(cseAlone.every((s) => s.expect.length === 1 && s.expect[0] === recipe.composedClass));
+  const cseBase = ['cse-numeric-age', 'cse-minor-noun', 'cse-school-grade', 'cse-roleplay', 'cse-age-marker'];
+  const cseAct = slots.filter((s) => cseBase.includes(s.kind) && !s.contrastGroup);
+  assert.equal(cseAct.length, 160);
+  assert.ok(
+    cseAct.every(
+      (s) => s.expect.includes(recipe.composedClass) && s.expect.includes('sexual_content') && s.form,
+    ),
+  );
+  assert.equal(slots.filter((s) => String(s.kind).startsWith('cse-enact-')).length, 0);
+  const clinical = slots.filter((s) => s.kind === 'clinical-hard-negative');
+  assert.equal(clinical.length, 32);
+  assert.ok(
+    clinical.every(
+      (s) =>
+        s.expect.length === 0 &&
+        s.path === 'composed' &&
+        s.family === 'sensitive-discussion' &&
+        s.class === 'sexual_content',
+    ),
+  );
+});
+
+test('v3 system prompt renders taxonomy definitions from flags.v0.json', async () => {
+  let buildV3System;
+  let Taxonomy;
+  try {
+    ({ Taxonomy } = await import('@airp/core'));
+    ({ buildV3System } = await import('@airp/evaluator-local'));
+  } catch (err) {
+    assert.fail(err.message);
+  }
+  const taxonomy = Taxonomy.loadFromFile(join(repoRoot, recipe.taxonomyFile));
+  const system = buildV3System(taxonomy);
+  assert.equal(system.includes('\u2014'), false);
+  for (const def of tax.flags) {
+    assert.match(system, new RegExp(def.type));
+    const snippet = def.definition.slice(0, 24);
+    assert.ok(system.includes(snippet), def.type);
+  }
+});
+
+test('composed contrast scaffolds lock arms, stay leak-free, and cover the group count', () => {
+  const contents = loadHeldOutContentsFromSuite(heldOutPath);
+  const index = buildLeakIndex(contents);
+  const meta = /\b(fixture|classifier|taxonomy|labelled|the reply|this reply)\b/i;
+  const cseAloneSex =
+    /\b(suck|sucking|cock|pussy|cum|lick|licking|erotic|pornographic|fuck|blowjob|sex scene)\b/i;
+  const minor =
+    /\b(child|kid|teen|teenager|girl|boy|schoolgirl|schoolboy|grader|underage|prepubescent|not yet adult|before adulthood|below the age of majority|still developing|still in puberty|too young to vote|not of legal age|middle schooler|middle school|junior high|elementary)\b|\b(?:[1-9]|1[0-7])-year-old\b|\baged (?:[1-9]|1[0-7])\b/i;
+  const expletive = profanityExpletiveRe(tax);
+  const groups = contrastGroupsFor(recipe);
+  for (const group of groups) {
+    const scaffold = JSON.parse(readFileSync(join(repoRoot, group.scaffold), 'utf8'));
+    assert.equal(JSON.stringify(scaffold).includes('\u2014'), false, group.id);
+    assert.match(scaffold.contentWarning, /^Content warning:|^This scaffold/);
+    assert.match(scaffold.note, /deciding feature|locked|fires nothing|co-fire|labeled clean/);
+    assert.ok(Array.isArray(scaffold.items), group.id);
+    assert.ok(scaffold.items.length >= group.count, `${group.id} items ${scaffold.items.length}`);
+    const fields = group.arms.map((a) => scaffold.arms[a.arm]?.field ?? a.arm);
+    /** @type {Set<string>} */
+    const seen = new Set();
+    for (const item of scaffold.items) {
+      const texts = fields.map((f) => item[f]);
+      for (const text of texts) {
+        assert.equal(typeof text, 'string', group.id);
+        assert.equal(leakReason(text, index), null, text);
+        assert.equal(meta.test(text), false, text);
+        assert.equal(text.includes('\u2014'), false, text);
+        const key = normalizeContent(text);
+        assert.equal(seen.has(key), false, `duplicate ${text}`);
+        seen.add(key);
+      }
+      if (group.id === 'cse-cofire') {
+        assert.match(item.both, cseAloneSex);
+        assert.match(item.both, minor);
+        assert.equal(cseAloneSex.test(item.cseAlone), false, item.cseAlone);
+        assert.match(item.cseAlone, minor);
+        assert.match(item.sexualAlone, cseAloneSex);
+        assert.equal(minor.test(item.sexualAlone), false, item.sexualAlone);
+      }
+      if (group.id === 'sex-profanity-cofire') {
+        assert.ok(expletive.test(item.both), item.both);
+        assert.match(item.both, /cock|pussy|sex|cum|blowjob|lick|suck|pornographic/i);
+        assert.equal(expletive.test(item.sexualAlone), false, item.sexualAlone);
+        assert.match(item.sexualAlone, /cock|pussy|sex|cum|blowjob|lick|suck|pornographic/i);
+        assert.ok(expletive.test(item.profanityAlone), item.profanityAlone);
+        assert.equal(/cock|pussy|cum|blowjob|lick my|suck my/i.test(item.profanityAlone), false, item.profanityAlone);
+      }
+      if (group.id === 'clinical-hard-negative') {
+        assert.equal(cseAloneSex.test(item.text), false, item.text);
+        assert.equal(/erotic|pornographic|blowjob/i.test(item.text), false, item.text);
+      }
+      if (group.id === 'difficulty-modality') {
+        assert.match(item.subject, /difficult|hard/i);
+        assert.match(item.speaker, /difficult|hard/i);
+        assert.match(item.speaker, /\b(me|I|mine)\b/);
+      }
+    }
+  }
 });
 
 test('generation-aware jinja emits the same text as stock Qwen3 for a single-turn example', () => {

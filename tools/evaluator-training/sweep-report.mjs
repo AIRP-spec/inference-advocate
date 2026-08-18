@@ -3,8 +3,9 @@
 //
 // Paper: step 8. Provisional Section 3.3. This report does not publish.
 // A checkpoint is a publish candidate only if extra-class fires are 0 and
-// recall misses are 0. Anything else is a capacity-ceiling result on the
-// sampled curve, with the nearest miss named for the next decision.
+// recall misses are 0. Anything else on the sampled curve is a coverage gap
+// until shown otherwise: loss can reach zero while the same held-out misses
+// remain. Do not report that as a capacity ceiling.
 
 import { existsSync, readFileSync, writeFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
@@ -42,10 +43,13 @@ export function pickVerdict(rows) {
   });
   const nearest = ranked[0] || null;
   return {
-    kind: 'ceiling',
+    kind: 'coverage-gap',
     best: null,
     nearest,
-    text: 'no checkpoint achieves both; capacity ceiling confirmed across the sampled curve.',
+    text:
+      'no checkpoint achieves both; coverage gap on the sampled curve. ' +
+      'Training loss can reach zero while the same held-out misses remain. ' +
+      'That is not a capacity ceiling.',
   };
 }
 

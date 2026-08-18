@@ -4,13 +4,16 @@
 // Paper: step 8. Labels come from the slot spec. The generator writes assistant
 // text only. Held-out contents are never in the prompt. Positive-single kinds
 // pick the prompt; the slot still owns the labels. Register is which slot.
-// CSE, profanity, hate, and sanitized registers (blunt/manipulative/short
-// formation, imperative self_harm, crude sexual_content) are composed locally.
+// CSE, profanity, hate, sanitized registers (blunt/manipulative/short
+// formation, imperative self_harm, crude sexual_content), CSE minor-signal
+// forms, extra violence-conjunction how-to, CSE act-continuation duals,
+// co-fire triples, contrastive pairs, implied-inner-life modality,
+// composed clean-path items, and clinical hard negatives are composed locally.
 // Run locally or on RunPod against an OpenAI-compatible endpoint serving the
 // recipe's generator model. --composed-only fills scaffolds without a writer
 // and is not a training corpus.
 
-import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
+import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { conformanceReason, profanityExpletiveRe } from './conformance.mjs';
@@ -33,6 +36,7 @@ function parseArgs(argv) {
   const out = {
     plan: false,
     composedOnly: false,
+    appendKinds: [],
     limit: 0,
     outDir: join(repoRoot, 'data', 'evaluator-training'),
   };
@@ -40,6 +44,12 @@ function parseArgs(argv) {
     const a = argv[i];
     if (a === '--plan') out.plan = true;
     else if (a === '--composed-only') out.composedOnly = true;
+    else if (a === '--append-kinds') {
+      out.appendKinds = argv[++i]
+        .split(',')
+        .map((s) => s.trim())
+        .filter(Boolean);
+    }
     else if (a === '--limit') out.limit = Number(argv[++i]);
     else if (a === '--out') out.outDir = argv[++i];
     else if (a === '--help' || a === '-h') out.help = true;
@@ -187,7 +197,7 @@ function looksLikeThinking(s) {
 }
 
 function wouldSendCsePositiveToWriter(slot) {
-  if (slot.family === 'positive-composed') return false;
+  if (slot.path === 'composed' || slot.family === 'positive-composed') return false;
   if (slot.family !== 'positive-single' && slot.family !== 'positive-multi') return false;
   return slot.class === 'child_sexual_exploitation' || slot.expect.includes('child_sexual_exploitation');
 }
@@ -195,9 +205,13 @@ function wouldSendCsePositiveToWriter(slot) {
 function wouldSendSurfacePositiveToWriter(slot, recipe) {
   const surface = new Set(recipe.composedSurfaceClasses ?? []);
   if (surface.size === 0) return false;
-  if (slot.family === 'positive-composed') return false;
+  if (slot.path === 'composed' || slot.family === 'positive-composed') return false;
   if (slot.family !== 'positive-single') return false;
   return surface.has(slot.class) || slot.expect.some((t) => surface.has(t));
+}
+
+function isComposedSlot(slot) {
+  return slot.path === 'composed' || slot.family === 'positive-composed';
 }
 
 function placeholderName(key) {
@@ -254,13 +268,38 @@ export function expandScaffold(block) {
  * @param {Map<string, object>} scaffolds
  */
 export function composedBlockFor(slot, recipe, scaffolds) {
-  const cse = recipe.composedClass;
-  if (slot.kind && recipe.composedRegisterScaffolds?.[slot.class]) {
-    const scaffold = scaffolds.get(slot.class);
-    if (!scaffold) throw new Error(`no register scaffold loaded for ${slot.class}`);
+  if (slot.contrastGroup) {
+    const scaffold = scaffolds.get(`contrast:${slot.contrastGroup}`);
+    if (!scaffold) {
+      throw new Error(`no contrast scaffold loaded for ${slot.contrastGroup}`);
+    }
+    if (Array.isArray(scaffold.items)) {
+      const field = scaffold.arms?.[slot.arm]?.field ?? slot.arm;
+      const templates = [];
+      for (const item of scaffold.items) {
+        const text = item[field];
+        if (typeof text !== 'string' || text.length === 0) {
+          throw new Error(`contrast ${slot.contrastGroup} item missing ${field}`);
+        }
+        templates.push(text);
+      }
+      return { templates };
+    }
     const kindBlock = scaffold.kinds?.[slot.kind];
     if (!kindBlock) {
-      throw new Error(`register scaffold for ${slot.class} missing kind ${slot.kind}`);
+      throw new Error(`contrast scaffold ${slot.contrastGroup} missing kind ${slot.kind}`);
+    }
+    return kindBlock.single ?? kindBlock;
+  }
+  const cse = recipe.composedClass;
+  if (slot.kind) {
+    const key = slot.class ?? (slot.expect.includes(cse) ? cse : null);
+    if (!key) throw new Error(`composed slot ${slot.id} has kind but no class`);
+    const scaffold = scaffolds.get(key);
+    if (!scaffold) throw new Error(`no scaffold loaded for ${key}`);
+    const kindBlock = scaffold.kinds?.[slot.kind];
+    if (!kindBlock) {
+      throw new Error(`scaffold for ${key} missing kind ${slot.kind}`);
     }
     return kindBlock.single ?? kindBlock;
   }
@@ -290,9 +329,10 @@ async function main() {
   const args = parseArgs(process.argv.slice(2));
   if (args.help) {
     console.log(
-      'Usage: node tools/evaluator-training/generate.mjs [--plan] [--composed-only] [--limit N] [--out DIR]\n' +
+      'Usage: node tools/evaluator-training/generate.mjs [--plan] [--composed-only] [--append-kinds k1,k2] [--limit N] [--out DIR]\n' +
         '--plan prints the slot plan with no model and no writes of corpus rows.\n' +
         '--composed-only fills composed slots from scaffolds (no writer). Not a training corpus.\n' +
+        '--append-kinds fills only those kinds into an existing corpus (no truncate).\n' +
         'Full generate requires AIRP_GENERATOR_BASE_URL. Optional AIRP_GENERATOR_API_KEY, AIRP_GENERATOR_MODEL.',
     );
     return;
@@ -310,7 +350,7 @@ async function main() {
   }
   const types = taxDoc.flags.map((f) => f.type);
 
-  const { buildSlots, expectedTotal, mulberry32, shuffle, positivePathReport } = await import(
+  const { buildSlots, expectedTotal, mulberry32, shuffle, positivePathReport, contrastGroupsFor } = await import(
     './slots.mjs'
   );
   const { buildLeakIndex, leakReason, loadHeldOutContentsFromSuite, normalizeContent } = await import(
@@ -382,6 +422,26 @@ async function main() {
     for (const [key, n] of [...byRegister.entries()].sort()) {
       console.log(`  ${key}: ${n}`);
     }
+    /** @type {Map<string, number>} */
+    const byForm = new Map();
+    for (const slot of slots.filter((s) => s.form)) {
+      const key = `${slot.expect.join('+')}:${slot.form}:${slot.kind}`;
+      byForm.set(key, (byForm.get(key) ?? 0) + 1);
+    }
+    console.log('by CSE form:');
+    for (const [key, n] of [...byForm.entries()].sort()) {
+      console.log(`  ${key}: ${n}`);
+    }
+    /** @type {Map<string, number>} */
+    const byContrast = new Map();
+    for (const slot of slots.filter((s) => s.contrastGroup)) {
+      const key = `${slot.contrastGroup}:${slot.arm}`;
+      byContrast.set(key, (byContrast.get(key) ?? 0) + 1);
+    }
+    console.log('by contrast arm:');
+    for (const [key, n] of [...byContrast.entries()].sort()) {
+      console.log(`  ${key}: ${n}`);
+    }
     const cseWriter = slots.filter(
       (s) =>
         (s.family === 'positive-single' || s.family === 'positive-multi') &&
@@ -443,8 +503,24 @@ async function main() {
 
   const corpusPath = join(args.outDir, 'corpus.jsonl');
   const sftPath = join(args.outDir, 'sft.jsonl');
-  writeFileSync(corpusPath, '');
-  writeFileSync(sftPath, '');
+  /** @type {Set<string>} */
+  const existingIds = new Set();
+  if (args.appendKinds.length > 0) {
+    args.composedOnly = true;
+    if (!existsSync(corpusPath) || !existsSync(sftPath)) {
+      throw new Error(`--append-kinds needs an existing corpus and sft under ${args.outDir}`);
+    }
+    for (const line of readFileSync(corpusPath, 'utf8')
+      .split('\n')
+      .filter((line) => line.trim())) {
+      const row = JSON.parse(line);
+      seen.add(normalizeContent(row.content));
+      existingIds.add(row.id);
+    }
+  } else {
+    writeFileSync(corpusPath, '');
+    writeFileSync(sftPath, '');
+  }
 
   let written = 0;
   let dropped = 0;
@@ -493,7 +569,10 @@ async function main() {
       class: slot.class,
       ...(slot.kind ? { kind: slot.kind } : {}),
       ...(slot.register ? { register: slot.register } : {}),
+      ...(slot.form ? { form: slot.form } : {}),
       ...(slot.path ? { path: slot.path } : {}),
+      ...(slot.pair ? { pair: slot.pair } : {}),
+      ...(slot.contrastGroup ? { contrastGroup: slot.contrastGroup, arm: slot.arm } : {}),
       expect: slot.expect,
       content,
       taxonomyVersion: recipe.taxonomyVersion,
@@ -514,8 +593,16 @@ async function main() {
     written += 1;
   }
 
-  const composedSlots = slots.filter((s) => s.family === 'positive-composed');
-  const writerSlots = slots.filter((s) => s.family !== 'positive-composed');
+  let composedSlots = slots.filter((s) => isComposedSlot(s));
+  const writerSlots = slots.filter((s) => !isComposedSlot(s));
+  if (args.appendKinds.length > 0) {
+    composedSlots = composedSlots.filter(
+      (s) => args.appendKinds.includes(s.kind) && !existingIds.has(s.id),
+    );
+    if (composedSlots.length === 0) {
+      throw new Error(`--append-kinds matched no unfilled slots: ${args.appendKinds.join(',')}`);
+    }
+  }
   for (const slot of writerSlots) {
     if (wouldSendCsePositiveToWriter(slot)) {
       throw new Error(
@@ -541,6 +628,9 @@ async function main() {
     }
     for (const [type, rel] of Object.entries(recipe.composedRegisterScaffolds ?? {})) {
       scaffolds.set(type, loadJson(join(repoRoot, rel)));
+    }
+    for (const group of contrastGroupsFor(recipe)) {
+      scaffolds.set(`contrast:${group.id}`, loadJson(join(repoRoot, group.scaffold)));
     }
     /** @type {Map<string, number>} */
     const composedWritten = new Map();
@@ -600,6 +690,7 @@ async function main() {
       const head = batch[0];
       if (
         head.family === 'positive-composed' ||
+        head.path === 'composed' ||
         wouldSendCsePositiveToWriter(head) ||
         wouldSendSurfacePositiveToWriter(head, recipe)
       ) {
