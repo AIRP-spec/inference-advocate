@@ -1,0 +1,69 @@
+slot plan 4548/4548 -> /workspace/inference-advocate/data/evaluator-training/slot-plan.json
+composed 792 positives locally (no writer call) [child_sexual_exploitation:80, hate:80, persona_claims:persona_claims-blunt:32, persona_claims:persona_claims-manipulative:32, persona_claims:persona_claims-short:32, profanity:80, relational_hooks:relational_hooks-blunt:32, relational_hooks:relational_hooks-manipulative:32, relational_hooks:relational_hooks-sarcastic:32, relational_hooks:relational_hooks-short:32, self_harm:self_harm-imperative:32, sexual_content:sexual_content-crude:40, simulation_obscured:simulation_obscured-blunt:32, simulation_obscured:simulation_obscured-manipulative:32, simulation_obscured:simulation_obscured-sarcastic:32, simulation_obscured:simulation_obscured-short:32, sycophancy:sycophancy-blunt:32, sycophancy:sycophancy-manipulative:32, sycophancy:sycophancy-sarcastic:32, sycophancy:sycophancy-short:32]
+generator reachable at https://lkj3plcpduem09-8000.proxy.runpod.net/v1 (model Qwen/Qwen2.5-32B-Instruct)
+drop tr-helpful-0850 (duplicate-corpus)
+drop tr-helpful-0944 (duplicate-corpus)
+drop tr-helpful-0946 (duplicate-corpus)
+drop tr-helpful-0842 (duplicate-corpus)
+drop tr-helpful-1136 (duplicate-corpus)
+batch tr-helpful-1136 attempt 2: malformed-json: Unexpected non-whitespace character after JSON at position 170 (line 1 column 171)
+drop tr-helpful-0769 (duplicate-corpus)
+drop tr-helpful-1121 (duplicate-corpus)
+drop tr-helpful-1162 (duplicate-corpus)
+drop tr-helpful-0673 (duplicate-corpus)
+drop tr-helpful-0980 (duplicate-corpus)
+drop tr-helpful-0760 (duplicate-corpus)
+drop tr-helpful-0386 (duplicate-corpus)
+drop tr-helpful-0510 (duplicate-corpus)
+drop tr-helpful-0914 (duplicate-corpus)
+drop tr-helpful-1076 (duplicate-corpus)
+drop tr-helpful-1175 (duplicate-corpus)
+drop tr-positive-single-3865 (duplicate-corpus)
+drop tr-class-refusal-2576 (em-dash)
+drop tr-class-refusal-2564 (em-dash)
+batch tr-positive-single-4128 attempt 1: malformed-json: Expected ',' or ']' after array element in JSON at position 1082 (line 1 column 1083)
+drop tr-class-refusal-1797 (duplicate-corpus)
+drop tr-fact-0355 (duplicate-corpus)
+drop tr-fact-0372 (duplicate-corpus)
+drop tr-fact-0350 (duplicate-corpus)
+drop tr-fact-0210 (duplicate-corpus)
+drop tr-fact-0298 (duplicate-corpus)
+drop tr-fact-0328 (duplicate-corpus)
+drop tr-fact-0304 (duplicate-corpus)
+drop tr-fact-0304 (duplicate-corpus)
+drop tr-fact-0296 (duplicate-corpus)
+drop tr-fact-0082 (duplicate-corpus)
+drop tr-positive-single-3369 (em-dash)
+drop tr-refusal-1268 (duplicate-corpus)
+drop tr-greeting-0014 (duplicate-corpus)
+drop tr-positive-single-3468 (em-dash)
+drop tr-positive-single-3463 (em-dash)
+drop tr-positive-single-3476 (em-dash)
+drop tr-positive-single-3454 (em-dash)
+drop tr-positive-single-3474 (em-dash)
+drop tr-positive-single-3653 (em-dash)
+drop tr-positive-multi-4457 (writer-refusal)
+drop tr-positive-multi-4465 (profanity-no-expletive)
+drop tr-positive-multi-4457 (writer-refusal)
+drop tr-positive-multi-4437 (writer-refusal)
+drop tr-positive-multi-4485 (writer-refusal)
+drop tr-positive-single-3186 (em-dash)
+drop tr-positive-single-3544 (em-dash)
+drop tr-positive-single-3744 (em-dash)
+drop tr-denial-persona-2623 (em-dash)
+wrote 4548 examples (48 dropped) to /workspace/inference-advocate/data/evaluator-training/corpus.jsonl
+drops by reason:
+  duplicate-corpus: 30
+  em-dash: 13
+  profanity-no-expletive: 1
+  writer-refusal: 4
+drops by family:
+  class-refusal: 3
+  denial-persona: 1
+  fact: 10
+  greeting: 1
+  helpful: 16
+  positive-multi: 5
+  positive-single: 11
+  refusal: 1
+sft /workspace/inference-advocate/data/evaluator-training/sft.jsonl
