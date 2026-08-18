@@ -1,7 +1,7 @@
 {
   "recipeVersion": "1",
   "paper": "step 8. Provisional Section 3.3. The commons reference evaluation model is a trained artifact.",
-  "adr": "Diagnostic checkpoint sweep after the register-coverage corpus amendment. Same taxonomy, gate rules, seed, and Qwen3 template. Training base is Qwen3-0.6B: the phone-deployment size. Two prior sweeps (0.6B then 1.7B) hit the same miss/over-fire wall on the narrow corpus. Size is not the lever. This run does not decide the published pin; it samples the loss curve on the widened corpus. The live pin is unchanged. After each checkpoint is merged, converted to GGUF Q8_0, and gated, the merged bf16 directory and that GGUF are deleted. Optimizer states are not kept on interval saves. Disk hygiene stays on. Run from /workspace.",
+  "adr": "Register-coverage re-sweep on Qwen3-0.6B. Single-variable discipline: every hyperparameter is held at the value used in the original 0.6B sweep (ce92308) so the widened corpus is the only thing that moved. Two prior sweeps (0.6B then 1.7B) hit the same miss and over-fire wall on the narrow corpus, which is what ruled out capacity and pointed at the corpus. Size is not the lever. This run does not decide the published pin; it samples the loss curve on the widened corpus. The live pin is unchanged. After each checkpoint is merged, converted to GGUF Q8_0, and gated, the merged bf16 directory and that GGUF are deleted. Optimizer states are not kept on interval saves. Disk hygiene stays on. Run from /workspace.",
   "promptTemplateVersion": "v3",
   "taxonomyVersion": "v0.3.0",
   "taxonomyFile": "data/taxonomy/flags.v0.json",
@@ -12,7 +12,7 @@
     "source": "data/models/manifest.json",
     "field": "baseRepoId",
     "repoId": "Qwen/Qwen3-0.6B",
-    "note": "Read at run time from the manifest. repoId here is a pin that must match. This is the training base for the register-coverage re-sweep. Do not change the live evaluator pin in this diagnostic. The 1.7B trainBaseRepoId stays for the unused within-family A/B recipe."
+    "note": "Read at run time from the manifest. repoId here is a pin that must match. This is the training base for the register-coverage re-sweep. Do not train Qwen3-0.6B-Base. Do not swap the base in this diagnostic. Do not change the live evaluator pin here. The 1.7B trainBaseRepoId stays for the unused within-family A/B recipe."
   },
   "framework": {
     "stack": "transformers + peft + trl SFTTrainer",
@@ -51,29 +51,33 @@
   },
   "train": {
     "epochs": 3,
-    "perDeviceBatchSize": 2,
-    "gradientAccumulationSteps": 16,
+    "perDeviceBatchSize": 8,
+    "gradientAccumulationSteps": 4,
     "effectiveBatchSize": 32,
     "learningRate": 0.0001,
     "warmupRatio": 0.03,
     "lrScheduler": "cosine",
-    "maxSeqLen": 2048,
+    "maxSeqLen": 4096,
     "packing": false,
     "assistantOnlyLoss": true,
     "bf16": true,
-    "gradientCheckpointing": true,
+    "gradientCheckpointing": false,
+    "gradientCheckpointingNote": "Off, matching the original 0.6B sweep, which predates the checkpointing option. A 0.6B LoRA at per-device batch 8 and sequence 4096 fits an 80GB card without recomputing activations. Checkpointing is numerically identical either way, so this is a speed setting, not a results setting. It was turned on for the 1.7B run and is not needed here.",
+    "hyperparameterNote": "Batch 8 / accum 4, sequence 4096, and checkpointing off are the original 0.6B sweep values, restored deliberately. The 1.7B run used batch 2 / accum 16 / sequence 2048 as memory accommodations for the larger model. Sequence length in particular is not cosmetic: at 2048 a long example would truncate, which would change the training data and make this a two-variable run.",
     "enableThinking": false,
     "chatTemplate": "tools/evaluator-training/qwen3-chat-template.jinja",
     "evalDataset": "none",
     "evalDatasetNote": "The held-out suite is the final gate, never a training or hyperparameter split. The sweep gates after the fact. It does not train against the suite."
   },
   "sweep": {
-    "purpose": "Register-coverage re-sweep on Qwen3-0.6B, the phone-deployment target. Same seed, dropout 0.1, LoRA rank 16, three epochs, a LoRA checkpoint every half epoch, Qwen3 template with generation spans. Corpus is the widened recipe (per-register formation slots, crude/imperative content, CSE contrastive pairs). Gate is the amended held-out suite. Disk hygiene stays on. Not a live-pin swap. Composed-register review sample accepted 2026-08-18.",
+    "purpose": "Register-coverage re-sweep on Qwen3-0.6B, the phone-deployment target. Same seed, same LoRA rank 16 and dropout 0.1, same three epochs, same batch 8 / accum 4 and sequence 4096, same half-epoch checkpoints, same Qwen3 template with generation spans as the original 0.6B sweep. The one change is the corpus: per-register formation slots, crude and imperative content registers, CSE contrastive pairs. Gate is the amended held-out suite. Not a live-pin swap. Composed-register review sample accepted 2026-08-18.",
     "saveEveryEpoch": 0.5,
     "minCheckpoints": 6,
     "exportGguf": true,
     "diskHygiene": true,
-    "diskHygieneNote": "At start, delete stale merged dirs and GGUFs under the artifacts tree. Interval saves are adapter-only (no optimizer states) and capped at minCheckpoints. After each checkpoint is merged, converted Q8_0, and gated, delete the merged bf16 directory and that GGUF before the next checkpoint. Keep the LoRA adapter and the gate report."
+    "diskHygieneNote": "At start, delete stale merged dirs and GGUFs under the artifacts tree. Interval saves are adapter-only (no optimizer states) and capped at minCheckpoints. After each checkpoint is merged, converted Q8_0, and gated, delete the merged bf16 directory and that GGUF before the next checkpoint. Keep the LoRA adapter and the gate report.",
+    "readMissesByRegister": true,
+    "readMissesByRegisterNote": "This corpus was built to widen register coverage, so the gate report must break misses down by held-out item family as well as by class. The register-probing items carry family names prefixed register- (register-blunt, register-manipulative, register-sarcastic, register-clever, register-short, register-clinical, register-literary, register-adult-crude, register-contrastive-minor). A per-class-only report cannot tell whether those registers are now caught, which is the question this run exists to answer."
   },
   "gguf": {
     "quantization": "Q8_0",
@@ -99,6 +103,6 @@
   },
   "time": {
     "budgetHours": 3,
-    "estimate": "Training three epochs of 0.6B LoRA is tens of minutes on an 80GB card. Six merge-plus-Q8_0 exports and six held-out CPU gates dominate the wall time. Only one merged copy and one GGUF exist at a time. If the train loop itself is still running after 90 minutes, stop and report."
+    "estimate": "Training three epochs of 0.6B LoRA is minutes to tens of minutes on an 80GB card. Six merge-plus-Q8_0 exports and six held-out CPU gates dominate the wall time. Only one merged copy and one GGUF exist at a time. If the train loop itself is still running after 90 minutes, stop and report."
   }
 }
