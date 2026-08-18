@@ -3,10 +3,14 @@
 //
 // Paper: step 8. Labels are a property of the slot, not a second model call.
 // Dual-class slots are the published conjunction pairs, never bundles.
-// Profanity and hate positive-singles are composed locally: the writer refuses
-// those surface features, and the conformance screen is binary, so a refusal
-// leaves the slot unfillable. CSE remains composedClass. Writer hard-negatives
-// and writer multi-pairs are unchanged.
+// Contrastive triples and minimal pairs are composed locally from committed
+// scaffolds: the deciding feature is the slot spec. Profanity and hate
+// positive-singles are composed locally: the writer refuses those surface
+// features, and the conformance screen is binary, so a refusal leaves the
+// slot unfillable. CSE remains composedClass, split by minor-signal form,
+// plus a CSE-alone framing slice that does not depict the act. Extra
+// violence-conjunction how-to is composed. Writer hard-negatives and writer
+// multi-pairs are unchanged.
 //
 // Positive-single splits: a class may split its positives by kind. Kinds no
 // longer have to sum to singlePerClass. Volume follows register coverage: each
@@ -182,13 +186,30 @@ export function positivePathReport(recipe, types) {
   const rows = [];
   for (const type of types) {
     if (type === cse) {
-      rows.push({
-        type,
-        path: 'composed',
-        family: 'positive-composed',
-        count: c.composedSingle,
-        dual: c.composedDual,
-      });
+      const kinds = composedClassKindsFor(recipe);
+      if (kinds) {
+        let single = 0;
+        let dual = 0;
+        for (const spec of kinds) {
+          if (spec.expect.length > 1) dual += spec.count;
+          else single += spec.count;
+        }
+        rows.push({
+          type,
+          path: 'composed',
+          family: 'positive-composed',
+          count: single,
+          dual,
+        });
+      } else {
+        rows.push({
+          type,
+          path: 'composed',
+          family: 'positive-composed',
+          count: c.composedSingle,
+          dual: c.composedDual,
+        });
+      }
     } else if (surface.has(type)) {
       rows.push({
         type,
@@ -267,6 +288,121 @@ export function positiveSingleKindsFor(recipe, type) {
 }
 
 /**
+ * CSE composed kinds. Replaces flat composedSingle plus composedDual counts.
+ * Every kind is composed. Expect always includes composedClass.
+ *
+ * @param {object} recipe
+ */
+export function composedClassKindsFor(recipe) {
+  const split = recipe.composedClassSplits;
+  if (!split) return null;
+  if (!Array.isArray(split.kinds) || split.kinds.length === 0) {
+    throw new Error('composedClassSplits has no kinds');
+  }
+  const cse = recipe.composedClass;
+  const seen = new Set();
+  const forms = new Set();
+  for (const kind of split.kinds) {
+    if (!kind.kind || typeof kind.kind !== 'string') {
+      throw new Error('composedClassSplits has a kind without a name');
+    }
+    if (seen.has(kind.kind)) throw new Error(`duplicate composedClass kind ${kind.kind}`);
+    seen.add(kind.kind);
+    if (!Number.isInteger(kind.count) || kind.count < 1) {
+      throw new Error(`composedClass kind ${kind.kind} has invalid count`);
+    }
+    if (!Array.isArray(kind.expect) || !kind.expect.includes(cse)) {
+      throw new Error(`composedClass kind ${kind.kind} must expect ${cse}`);
+    }
+    if (kind.path && kind.path !== 'composed') {
+      throw new Error(`composedClass kind ${kind.kind} must be composed`);
+    }
+    if (!kind.form || typeof kind.form !== 'string') {
+      throw new Error(`composedClass kind ${kind.kind} has no form`);
+    }
+    forms.add(kind.form);
+  }
+  for (const required of ['numeric-age', 'minor-noun', 'school-grade', 'roleplay', 'age-marker']) {
+    if (!forms.has(required)) {
+      throw new Error(`composedClassSplits missing minor-signal form ${required}`);
+    }
+  }
+  return split.kinds;
+}
+
+/**
+ * @param {object} recipe
+ * @returns {number}
+ */
+export function composedClassCount(recipe) {
+  const kinds = composedClassKindsFor(recipe);
+  if (kinds) return kinds.reduce((sum, spec) => sum + spec.count, 0);
+  const c = recipe.counts.positive;
+  return c.composedSingle + c.composedDual;
+}
+
+/**
+ * Locked contrastive pairs and triples. Each group is count times arms.
+ * Labels and the deciding feature come from the group spec, not the writer.
+ *
+ * @param {object} recipe
+ */
+export function contrastGroupsFor(recipe) {
+  const spec = recipe.composedContrasts;
+  if (!spec) return [];
+  if (!Array.isArray(spec.groups) || spec.groups.length === 0) {
+    throw new Error('composedContrasts has no groups');
+  }
+  const seen = new Set();
+  const kindSeen = new Set();
+  for (const group of spec.groups) {
+    if (!group.id || typeof group.id !== 'string') {
+      throw new Error('composedContrasts group has no id');
+    }
+    if (seen.has(group.id)) throw new Error(`duplicate contrast group ${group.id}`);
+    seen.add(group.id);
+    if (!Number.isInteger(group.count) || group.count < 1) {
+      throw new Error(`contrast group ${group.id} has invalid count`);
+    }
+    if (!group.scaffold || typeof group.scaffold !== 'string') {
+      throw new Error(`contrast group ${group.id} has no scaffold`);
+    }
+    if (!Array.isArray(group.arms) || group.arms.length === 0) {
+      throw new Error(`contrast group ${group.id} has no arms`);
+    }
+    if (!group.decidingFeature || typeof group.decidingFeature !== 'string') {
+      throw new Error(`contrast group ${group.id} has no decidingFeature`);
+    }
+    for (const arm of group.arms) {
+      if (!arm.kind || typeof arm.kind !== 'string') {
+        throw new Error(`contrast group ${group.id} arm has no kind`);
+      }
+      if (!arm.arm || typeof arm.arm !== 'string') {
+        throw new Error(`contrast kind ${arm.kind} has no arm name`);
+      }
+      if (kindSeen.has(arm.kind)) throw new Error(`duplicate contrast kind ${arm.kind}`);
+      kindSeen.add(arm.kind);
+      if (!Array.isArray(arm.expect)) {
+        throw new Error(`contrast kind ${arm.kind} has no expect`);
+      }
+    }
+  }
+  return spec.groups;
+}
+
+/**
+ * @param {object} recipe
+ * @returns {number}
+ */
+export function contrastCount(recipe) {
+  let n = 0;
+  for (const group of contrastGroupsFor(recipe)) {
+    n += group.count * group.arms.length;
+  }
+  return n;
+}
+
+/**
  * @param {object} recipe
  * @param {string[]} types taxonomy types in order
  */
@@ -289,9 +425,9 @@ export function expectedTotal(recipe, types) {
     writerSingleCount(recipe, types) +
     composedRegisterCount(recipe, types) +
     c.positive.multi +
-    c.positive.composedSingle +
-    c.positive.composedDual +
-    c.positive.singlePerClass * surface
+    composedClassCount(recipe) +
+    c.positive.singlePerClass * surface +
+    contrastCount(recipe)
   );
 }
 
@@ -356,12 +492,23 @@ export function buildSlots(recipe, types) {
       for (let i = 0; i < c.positive.singlePerClass; i++) add('positive-single', type, [type]);
     }
   }
-  for (let i = 0; i < c.positive.composedSingle; i++) {
-    add('positive-composed', cse, [cse]);
-  }
-  const dualAlso = 'sexual_content';
-  for (let i = 0; i < c.positive.composedDual; i++) {
-    add('positive-composed', null, [cse, dualAlso], { pair: [cse, dualAlso] });
+  const cseKinds = composedClassKindsFor(recipe);
+  if (cseKinds) {
+    for (const spec of cseKinds) {
+      const extra = { kind: spec.kind, path: 'composed', form: spec.form };
+      if (spec.expect.length > 1) extra.pair = [...spec.expect];
+      for (let i = 0; i < spec.count; i++) {
+        add('positive-composed', cse, [...spec.expect], extra);
+      }
+    }
+  } else {
+    for (let i = 0; i < c.positive.composedSingle; i++) {
+      add('positive-composed', cse, [cse]);
+    }
+    const dualAlso = 'sexual_content';
+    for (let i = 0; i < c.positive.composedDual; i++) {
+      add('positive-composed', null, [cse, dualAlso], { pair: [cse, dualAlso] });
+    }
   }
   for (const type of composedSurfaceTypes(recipe)) {
     if (!types.includes(type)) throw new Error(`composed surface class ${type} is not in the taxonomy`);
@@ -383,6 +530,25 @@ export function buildSlots(recipe, types) {
   for (let i = 0; i < c.positive.multi; i++) {
     const pair = pairs[i % pairs.length];
     add('positive-multi', null, [...pair], { pair });
+  }
+  for (const group of contrastGroupsFor(recipe)) {
+    for (const arm of group.arms) {
+      const extra = {
+        kind: arm.kind,
+        path: 'composed',
+        contrastGroup: group.id,
+        arm: arm.arm,
+      };
+      if (arm.form) extra.form = arm.form;
+      if (arm.expect.length > 1) extra.pair = [...arm.expect];
+      const family = arm.family ?? 'positive-composed';
+      const klass = Object.prototype.hasOwnProperty.call(arm, 'class')
+        ? arm.class
+        : (arm.expect[0] ?? null);
+      for (let i = 0; i < group.count; i++) {
+        add(family, klass, [...arm.expect], extra);
+      }
+    }
   }
 
   const total = expectedTotal(recipe, types);

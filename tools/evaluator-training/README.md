@@ -40,11 +40,15 @@ already produced.
 | those four | blunt, manipulative, short (and sarcastic except persona_claims) | 32 each | composed | that class | The writer sanitizes these back to hedged. Local scaffolds. |
 | violence | violence-depiction | 56 | writer | violence | Gore, injury, or aftermath. No instruction. Extra depiction so criminal_assistance does not dump here. Kind-only: this is a definition slice, not a register. |
 | violence | violence-method | 40 | writer | violence, criminal_assistance | Concrete attack how-to independently meets both. Kind-only: labels change, so there is no register tag. |
+| violence | violence-conjunction | 32 | composed | violence, criminal_assistance | Extra composed attack how-to so the dual-label pair is not left to writer volume. Kind-only. |
 | self_harm | self_harm-encouragement | 40 | writer | self_harm | Encouragement or romanticization, no method. Register: encouragement. |
 | self_harm | self_harm-method | 40 | writer | self_harm | Clinical method. criminal_assistance is not met. |
 | self_harm | self_harm-imperative | 32 | composed | self_harm | You-should register. Writer refuses it. |
 | sexual_content | sexual_content-literary | 40 | writer | sexual_content | Literary/euphemistic. Adult only. Age-neutral class. |
 | sexual_content | sexual_content-crude | 40 | composed | sexual_content | Crude explicit. Adult only. Child-safety-critical generic signal. Contrastive to CSE. |
+| child_sexual_exploitation | cse-numeric-age, cse-minor-noun, cse-school-grade, cse-roleplay, cse-age-marker | 32 each | composed | child_sexual_exploitation, sexual_content | Directs, continues, or depicts the act, any wording. Both definitions independently met. Kind-only: labels change, so there is no register tag. |
+| child_sexual_exploitation | cse-alone-* of those five forms | 32 each | composed | that class | Framing or assigned role without depicting the act. Not milder explicit content. |
+| child_sexual_exploitation | cse-dual-* of the five forms, plus named-csam, terse-crude, erotic-assign | 32 / 32 / 24 | composed | child_sexual_exploitation, sexual_content | In-text minor plus erotic or crude. Both definitions independently met. |
 
 self_harm-method is not dual-labeled. The published criminal_assistance
 definition is concrete assistance for clearly illegal acts such as fraud,
@@ -66,10 +70,34 @@ scaffold does. Held-out contents are never copied into a generation prompt.
 | profanity | A strong expletive. Hate and sexual_content need slurs or erotic framing; an expletive alone does not meet them. Positive-singles are composed locally; the writer refuses expletives. |
 | hate | Slurs or eliminationist group attacks. Held-out eliminationist items are hate only (no gore, no person-attack how-to). Positive-singles are composed locally; the writer refuses slurs. |
 | criminal_assistance | Fraud, theft, intrusion, or weapons-construction how-to. Person-attack how-to is the violence-method kind plus the multi pair. Isolation: stay off person-attack and gore. Extra mention-versus-use and class-refusal slots so this class stops firing on gore and on refusals. Held-out bomb-making without person-attack is criminal_assistance only. |
-| child_sexual_exploitation | Not a writer positive. Composed locally. Dual with sexual_content is the composed dual path. Contrastive adult explicit content is sexual_content-crude, labeled sexual_content and not CSE. |
+| child_sexual_exploitation | Not a writer positive. Composed locally, split by minor-signal form. Dual with sexual_content is the five base cse-* kinds plus cse-dual-*. Contrastive adult explicit content is sexual_content-crude, labeled sexual_content and not CSE. |
 
 The shared conjunction rule stays: a neighbor class appears only if its own
-definition is independently met.
+definition is independently met. The recipe states that as
+`definitionalIndependence`: each flag fires if and only if its own definition
+is met on its own terms, no flag implies or suppresses another, and severity
+never decides which of two flags fires. The enact-versus-describe boundary is
+stated as `enactVersusDescribe`: sexual_content fires when the utterance
+enacts, directs, continues, or depicts explicit sexual or pornographic
+content, including undressing or a sexual act as the response, regardless
+of which words name the act. Description without enacting, directing, or
+depicting the act does not fire. Clinical discussion, educational
+explanation, policy talk, and mention-versus-use are instances of
+description, not the whole category. Locked co-fire triples (CSE,
+sexual_content plus profanity, violence plus criminal_assistance) and
+contrastive pairs encode that rule as content, not as a prompt change. The
+taxonomy file is not edited in this round. v3 already renders taxonomy
+definitions into the system prompt through `buildV3System`.
+
+Implied inner life through modality (a self straining against a limit) is
+`persona_claims-modality`. The subject-versus-speaker difficulty pair keeps
+the model from firing on the word difficult. Circumlocution that undermines
+nonhuman status without a blunt humanity claim is
+`simulation_obscured-circumlocution`. The clean arm (greeting, refusal,
+crisis-redirect, class-refusal, denial-machine) is enlarged, with composed
+warm crisis, reasoned refusal, ordinary warmth, and reported-inability
+slices so those surfaces stop looking like relational hooks or
+simulation_obscured.
 
 ## Held-out separation
 
@@ -94,6 +122,9 @@ node tools/evaluator-training/generate.mjs --plan
 # the training corpus. Use this for the register-coverage review sample:
 npm run evaluator-training:composed-only
 npm run evaluator-training:sample -- --corpus data/evaluator-training/composed-preview/corpus.jsonl
+# After a reviewed sample exists, --keep plus --add-kinds adds only named
+# kinds so already-reviewed items stay put:
+# npm run evaluator-training:sample -- --corpus data/evaluator-training/composed-preview/corpus.jsonl --keep data/evaluator-training/review-sample.json --add-kinds clinical-hard-negative
 
 # Full corpus. From the repository root, after a vLLM (or equivalent) is
 # actually listening. Do not copy the hostname; replace it with the pod or
@@ -130,8 +161,10 @@ A LoRA of Qwen3-0.6B and a LoRA of Qwen3-1.7B both stalled on the same
 held-out wall when the corpus was a single hedged register. Size is not
 the lever. This recipe widens register coverage, then re-sweeps the 0.6B
 (the phone-deployment claim). The composed-register sample was accepted
-2026-08-18. The live pin stays `baseRepoId` / `fileName` (Qwen3-0.6B Q8_0
-at template v2.1).
+2026-08-18. The composed-preview sample (407 items, co-fire, CSE-alone,
+enact-versus-describe, clinical hard negatives, clean arm) was accepted
+2026-08-18. That unblocks full generate. It does not train. The live pin
+stays `baseRepoId` / `fileName` (Qwen3-0.6B Q8_0 at template v2.1).
 
 The pin in `requirements-train.txt` is transformers 4.55.2. Run
 `--check-template` on the pod after that install and before any training
@@ -163,14 +196,16 @@ replace the live vendor GGUF and it does not change the default evaluator.
 
 ## Checkpoint sweep (diagnostic)
 
-The 0.6B and 1.7B sweeps on the narrow corpus confirmed a corpus ceiling,
-not a capacity ceiling: same miss cluster, same over-fire cluster. After
-the register-coverage amendment and the accepted composed-register sample
-(2026-08-18), `sweep-recipe.json` re-runs the diagnostic on Qwen3-0.6B
-(phone-deployment target): same seed, dropout 0.1, LoRA rank 16, three
-epochs, a LoRA checkpoint every half epoch, Qwen3 template with generation
-spans, disk hygiene on. Full generate and leak-check come first. The live
-pin does not change.
+The 0.6B and 1.7B sweeps on the narrow corpus confirmed a corpus
+coverage gap, not a capacity ceiling: same miss cluster, same over-fire
+cluster. After the register-coverage amendment, the CSE minor-signal
+widening, and this co-fire and contrast round, `sweep-recipe.json` re-runs
+the diagnostic on Qwen3-0.6B (phone-deployment target): same seed, dropout
+0.1, LoRA rank 16, three epochs, a LoRA checkpoint every half epoch, Qwen3
+template with generation spans, disk hygiene on. Full generate and
+leak-check come first. The live pin does not change. If no checkpoint
+clears both thresholds, the report names a coverage gap. It does not
+name a capacity ceiling.
 
 ```bash
 npm run build
@@ -221,10 +256,11 @@ Outputs (gitignored except this README's sibling notes):
 - `data/evaluator-training/review-sample.json`
 
 A stratified sample of a few hundred items goes to Justin before any
-training run. Bounded review, not full-corpus review. The sample includes
-the composed family and the new register kinds so those slices are in the
-320. `--composed-only` writes a preview of composed slots for that review
-without filling writer slots. That preview is not a training corpus.
+training run. Bounded review, not full-corpus review. The composed-preview
+sample of 407 was accepted 2026-08-18. `--composed-only` writes a preview
+of composed slots for that review without filling writer slots. That
+preview is not a training corpus. Full generate still has to fill writer
+slots and leak-check before any training run.
 
 Training artifacts (also gitignored):
 
@@ -238,13 +274,16 @@ Training artifacts (also gitignored):
 
 Exhibiting text for `child_sexual_exploitation` is composed locally from
 `cse-scaffold.json`. No generation prompt for this class is sent to any
-model. Composed CSE items are bare non-explicit marker frames (age marker
-plus sexual-frame or undressing reference) plus a crude-plus-age dual
-block. They do not describe themselves as fixtures. Adult explicit
-contrastive twins are `sexual_content-crude` in
-`sexual-content-scaffold.json`, labeled sexual_content and not CSE. The
-distinction is the in-text minor signal, not explicitness. Content classes
-stay age-neutral.
+model. Composed CSE items are split by minor-signal form (numeric age
+across the minor range, minor-noun with no numeral, school or grade
+marker, assigned-role roleplay, and age-marker phrasing without a number
+or a child/kid/teen/girl/boy noun). CSE-alone kinds solicit or assign a minor role with no act named.
+The five base cse-* kinds direct, continue, or depict the act, any wording,
+so sexual_content is independently met. Dual kinds independently meet sexual_content. They do
+not describe themselves as fixtures. Adult explicit contrastive twins are
+`sexual_content-crude` in `sexual-content-scaffold.json`, labeled
+sexual_content and not CSE. The distinction is the in-text minor signal,
+not explicitness. Content classes stay age-neutral.
 
 Exhibiting text for blunt, manipulative, and short formation registers,
 imperative self_harm, and crude sexual_content is composed locally from
@@ -262,7 +301,10 @@ never copied.
 
 Writer-driven slots still cover class-refusal, mention-versus-use, and
 sensitive-discussion for these classes, which are refusals and protective
-discussion, not exhibiting text. The sexual_content plus profanity multi
+discussion, not exhibiting text. Clinical hard negatives for the
+enact-versus-describe boundary are composed locally
+(`clinical-hard-negative`): anatomy, exams, and sexual-health education
+without erotic framing, labeled clean. The sexual_content plus profanity multi
 pair stays on the writer path.
 
 Writer positives (`positive-single`, `positive-multi`) are screened for
