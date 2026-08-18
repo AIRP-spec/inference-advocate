@@ -11,9 +11,9 @@ import {
   normalizeContent,
 } from './leak.mjs';
 import { assertGeneratorBaseUrl } from './endpoint.mjs';
-import { buildSlots, expectedTotal, writerPositiveTypes, positivePathReport } from './slots.mjs';
+import { buildSlots, expectedTotal, writerPositiveTypes, positivePathReport, kindPath } from './slots.mjs';
 import { conformanceReason, profanityExpletiveRe } from './conformance.mjs';
-import { parseExamples, expandScaffold } from './generate.mjs';
+import { parseExamples, expandScaffold, composedBlockFor } from './generate.mjs';
 
 const here = dirname(fileURLToPath(import.meta.url));
 const repoRoot = join(here, '..', '..');
@@ -31,7 +31,7 @@ test('slot counts sum to the recipe total and cover every class', () => {
   const total = expectedTotal(recipe, types);
   const slots = buildSlots(recipe, types);
   assert.equal(slots.length, total);
-  assert.equal(total, 3936);
+  assert.equal(total, 4548);
   const cse = recipe.composedClass;
   const writerTypes = writerPositiveTypes(recipe, types);
   assert.equal(writerTypes.length, types.length - 1 - recipe.composedSurfaceClasses.length);
@@ -39,12 +39,18 @@ test('slot counts sum to the recipe total and cover every class', () => {
   assert.ok(!writerTypes.includes('hate'));
   assert.ok(!writerTypes.includes(cse));
   for (const type of writerTypes) {
-    const singles = slots.filter((s) => s.family === 'positive-single' && s.class === type);
-    assert.equal(singles.length, recipe.counts.positive.singlePerClass);
+    const writerSlots = slots.filter((s) => s.family === 'positive-single' && s.class === type);
+    const composedSlots = slots.filter((s) => s.family === 'positive-composed' && s.class === type);
     const split = recipe.positiveSingleSplits?.[type];
     if (split) {
+      let writerN = 0;
+      let composedN = 0;
       for (const spec of split.kinds) {
-        const rows = singles.filter((s) => s.kind === spec.kind);
+        const path = kindPath(spec);
+        const rows =
+          path === 'composed'
+            ? composedSlots.filter((s) => s.kind === spec.kind)
+            : writerSlots.filter((s) => s.kind === spec.kind);
         assert.equal(rows.length, spec.count, `${type} kind ${spec.kind}`);
         assert.ok(
           rows.every(
@@ -52,9 +58,15 @@ test('slot counts sum to the recipe total and cover every class', () => {
           ),
           `${type} kind ${spec.kind} expect`,
         );
+        if (path === 'composed') composedN += spec.count;
+        else writerN += spec.count;
       }
+      assert.equal(writerSlots.length, writerN, `${type} writer`);
+      assert.equal(composedSlots.length, composedN, `${type} composed`);
     } else {
-      assert.ok(singles.every((s) => !s.kind && s.expect.length === 1 && s.expect[0] === type));
+      assert.equal(writerSlots.length, recipe.counts.positive.singlePerClass);
+      assert.equal(composedSlots.length, 0);
+      assert.ok(writerSlots.every((s) => !s.kind && s.expect.length === 1 && s.expect[0] === type));
     }
   }
   const violenceMethod = slots.filter((s) => s.kind === 'violence-method');
@@ -65,13 +77,29 @@ test('slot counts sum to the recipe total and cover every class', () => {
     ),
   );
   const violenceDepiction = slots.filter((s) => s.kind === 'violence-depiction');
-  assert.equal(violenceDepiction.length, 40);
+  assert.equal(violenceDepiction.length, 56);
   assert.ok(violenceDepiction.every((s) => s.expect.length === 1 && s.expect[0] === 'violence'));
   const selfHarmMethod = slots.filter((s) => s.kind === 'self_harm-method');
   assert.equal(selfHarmMethod.length, 40);
   assert.ok(selfHarmMethod.every((s) => s.expect.length === 1 && s.expect[0] === 'self_harm'));
+  const selfHarmImperative = slots.filter((s) => s.kind === 'self_harm-imperative');
+  assert.equal(selfHarmImperative.length, 32);
+  assert.ok(selfHarmImperative.every((s) => s.family === 'positive-composed'));
   assert.equal(recipe.positiveSingleSplits.self_harm.methodMeetsCriminalAssistance, false);
+  const sexualCrude = slots.filter((s) => s.kind === 'sexual_content-crude');
+  assert.equal(sexualCrude.length, 40);
+  assert.ok(sexualCrude.every((s) => s.family === 'positive-composed' && s.expect[0] === 'sexual_content'));
+  const personaBlunt = slots.filter((s) => s.kind === 'persona_claims-blunt');
+  assert.equal(personaBlunt.length, 32);
+  assert.ok(personaBlunt.every((s) => s.family === 'positive-composed'));
+  const personaHedged = slots.filter((s) => s.kind === 'persona_claims-hedged');
+  assert.equal(personaHedged.length, 32);
+  assert.ok(personaHedged.every((s) => s.family === 'positive-single'));
   assert.equal(recipe.generator.maxRetries, 8);
+  assert.equal(recipe.hardNegativeBoosts.criminal_assistance.mentionVersusUse, 20);
+  assert.equal(recipe.hardNegativeBoosts.criminal_assistance.classRefusal, 20);
+  const caMentions = slots.filter((s) => s.family === 'mention-versus-use' && s.class === 'criminal_assistance');
+  assert.equal(caMentions.length, 70);
   const cseWriterPositives = slots.filter(
     (s) =>
       (s.family === 'positive-single' || s.family === 'positive-multi') &&
@@ -86,7 +114,7 @@ test('slot counts sum to the recipe total and cover every class', () => {
   const cseComposed = composedSingles.filter((s) => s.expect[0] === cse);
   assert.equal(cseComposed.length, recipe.counts.positive.composedSingle);
   for (const type of recipe.composedSurfaceClasses) {
-    const rows = composedSingles.filter((s) => s.expect[0] === type);
+    const rows = composedSingles.filter((s) => s.expect[0] === type && !s.kind);
     assert.equal(rows.length, recipe.counts.positive.singlePerClass, `composed ${type}`);
     assert.ok(rows.every((s) => s.expect.length === 1 && s.expect[0] === type));
   }
@@ -103,16 +131,22 @@ test('slot counts sum to the recipe total and cover every class', () => {
   assert.equal(paths.find((r) => r.type === 'hate')?.path, 'composed');
   assert.equal(paths.find((r) => r.type === cse)?.path, 'composed');
   assert.equal(paths.find((r) => r.type === 'violence')?.path, 'writer');
+  assert.equal(paths.find((r) => r.type === 'persona_claims')?.path, 'mixed');
+  assert.equal(paths.find((r) => r.type === 'sexual_content')?.path, 'mixed');
+  assert.equal(paths.find((r) => r.type === 'self_harm')?.path, 'mixed');
+  assert.equal(paths.find((r) => r.type === 'criminal_assistance')?.path, 'writer');
   assert.equal(
     slots.filter((s) => s.family === 'positive-multi').length,
     recipe.counts.positive.multi,
   );
   for (const type of types) {
+    const mentionBoost = recipe.hardNegativeBoosts?.[type]?.mentionVersusUse ?? 0;
+    const refusalBoost = recipe.hardNegativeBoosts?.[type]?.classRefusal ?? 0;
     const mentions = slots.filter((s) => s.family === 'mention-versus-use' && s.class === type);
-    assert.equal(mentions.length, recipe.counts.hardNegative.mentionVersusUsePerClass);
+    assert.equal(mentions.length, recipe.counts.hardNegative.mentionVersusUsePerClass + mentionBoost);
     assert.ok(mentions.every((s) => s.expect.length === 0));
     const refusals = slots.filter((s) => s.family === 'class-refusal' && s.class === type);
-    assert.equal(refusals.length, recipe.counts.hardNegative.classRefusalPerClass);
+    assert.equal(refusals.length, recipe.counts.hardNegative.classRefusalPerClass + refusalBoost);
   }
   const cseSensitive = slots.filter((s) => s.family === 'sensitive-discussion' && s.class === cse);
   assert.equal(cseSensitive.length, recipe.counts.hardNegative.sensitiveDiscussionPerHarmClass);
@@ -123,10 +157,16 @@ test('slot counts sum to the recipe total and cover every class', () => {
   assert.ok(allNo > total * 0.6, `all-no fraction ${allNo}/${total} should mirror mostly-clean traffic`);
 });
 
-test('a split that does not sum to singlePerClass fails closed', () => {
+test('a kind with an invalid count fails closed', () => {
   const bad = structuredClone(recipe);
-  bad.positiveSingleSplits.violence.kinds[0].count = 39;
-  assert.throws(() => buildSlots(bad, types), /sums to 79/);
+  bad.positiveSingleSplits.violence.kinds[0].count = 0;
+  assert.throws(() => buildSlots(bad, types), /invalid count/);
+});
+
+test('a composed register kind without a scaffold path fails closed', () => {
+  const bad = structuredClone(recipe);
+  bad.composedRegisterScaffolds = {};
+  assert.throws(() => buildSlots(bad, types), /composedRegisterScaffolds/);
 });
 
 test('leak checker flags held-out content and allows a novel greeting', () => {
@@ -190,9 +230,27 @@ test('generation prompts exist for every slot family and contain no em-dash', ()
   }
   for (const [type, split] of Object.entries(recipe.positiveSingleSplits)) {
     for (const spec of split.kinds) {
-      assert.ok(prompts.positiveSingleKinds[spec.kind], `recipe kind ${type}/${spec.kind} has no prompt`);
+      const path = spec.path ?? 'writer';
+      if (path === 'composed') {
+        assert.ok(
+          recipe.composedRegisterScaffolds[type],
+          `composed kind ${type}/${spec.kind} has no register scaffold`,
+        );
+        continue;
+      }
+      const hasKindPrompt = Boolean(prompts.positiveSingleKinds[spec.kind]);
+      const hasRegister = Boolean(spec.register && prompts.registers[spec.register]);
+      assert.ok(
+        hasKindPrompt || hasRegister,
+        `writer kind ${type}/${spec.kind} needs a kind prompt or a register prompt`,
+      );
     }
   }
+  for (const register of ['hedged', 'blunt', 'manipulative', 'clever', 'short', 'sarcastic', 'literary', 'crude', 'imperative', 'clinical']) {
+    assert.ok(prompts.registers[register], `missing register prompt ${register}`);
+    assert.equal(prompts.registers[register].includes('\u2014'), false);
+  }
+  assert.match(prompts.families['positive-single'], /registerNote/);
   assert.match(prompts.families.greeting, /Vary tone/);
   assert.match(prompts.families.greeting, /opening word/);
   assert.match(prompts.families.fact, /horticulture/);
@@ -209,6 +267,8 @@ test('no generation prompt for CSE-exhibiting text exists in the recipe', () => 
   );
   assert.match(gen, /wouldSendCsePositiveToWriter/);
   assert.match(gen, /wouldSendSurfacePositiveToWriter/);
+  assert.match(gen, /composed-only/);
+  assert.match(gen, /composedBlockFor/);
   const sample = readFileSync(join(here, 'sample.mjs'), 'utf8');
   assert.match(sample, /positive-composed/);
 });
@@ -335,6 +395,92 @@ test('composed profanity and hate scaffolds exhibit, do not describe, and cap fr
   }
 });
 
+test('composed register scaffolds cover each kind, stay leak-free, and cap frame reuse', () => {
+  const contents = loadHeldOutContentsFromSuite(heldOutPath);
+  const index = buildLeakIndex(contents);
+  const meta =
+    /\b(fixture|classifier|taxonomy|labelled|identity attack|the reply|this reply)\b/i;
+
+  /**
+   * @param {object} block
+   * @param {{ templates: string[], arities: number[] }} acc
+   */
+  function walk(block, acc) {
+    if (Array.isArray(block.blocks)) {
+      for (const inner of block.blocks) walk(inner, acc);
+      return;
+    }
+    const keys = Object.keys(block).filter(
+      (k) => k !== 'templates' && k !== 'note' && k !== 'blocks' && Array.isArray(block[k]),
+    );
+    let arity = 1;
+    for (const k of keys) arity *= block[k].length;
+    for (const t of block.templates) {
+      acc.templates.push(t);
+      acc.arities.push(arity);
+    }
+  }
+
+  /** @type {Map<string, Set<string>>} */
+  const owners = new Map();
+  /** @type {Map<string, number>} */
+  const needed = new Map();
+
+  for (const [type, rel] of Object.entries(recipe.composedRegisterScaffolds)) {
+    const scaffold = JSON.parse(readFileSync(join(repoRoot, rel), 'utf8'));
+    assert.equal(JSON.stringify(scaffold).includes('\u2014'), false, type);
+    assert.match(scaffold.contentWarning, /^Content warning:/);
+    assert.match(scaffold.note, /writer sanitizes|writer refuses|writer emits/);
+    const split = recipe.positiveSingleSplits[type];
+    const composedKinds = split.kinds.filter((k) => (k.path ?? 'writer') === 'composed');
+    assert.ok(composedKinds.length > 0, type);
+    for (const spec of composedKinds) {
+      assert.ok(scaffold.kinds[spec.kind], `${type} missing ${spec.kind}`);
+      const slot = { id: 't', class: type, kind: spec.kind, expect: spec.expect };
+      const block = composedBlockFor(slot, recipe, new Map([[type, scaffold]]));
+      const acc = { templates: [], arities: [] };
+      walk(block, acc);
+      assert.equal(new Set(acc.templates).size, acc.templates.length, `${spec.kind} duplicate frames`);
+      for (let i = 0; i < acc.templates.length; i++) {
+        assert.ok(acc.arities[i] <= 2, `${spec.kind} frame reused ${acc.arities[i]} times: ${acc.templates[i]}`);
+      }
+      const expanded = expandScaffold(block);
+      const unique = new Set();
+      for (const content of expanded) {
+        assert.equal(leakReason(content, index), null, content);
+        assert.equal(meta.test(content), false, content);
+        assert.equal(content.includes('\u2014'), false, content);
+        unique.add(normalizeContent(content));
+        if (type === 'sexual_content') {
+          assert.match(content, /adult|twenty|cock|pussy|sex|cum|blowjob|lick|suck/i);
+          assert.equal(/\b(child|kid|minor|underage|1[0-7]-year-old)\b/i.test(content), false, content);
+        }
+      }
+      assert.ok(unique.size >= spec.count, `${spec.kind} unique ${unique.size} < ${spec.count}`);
+      owners.set(spec.kind, unique);
+      needed.set(spec.kind, spec.count);
+    }
+  }
+  // Global seen in generate.mjs skips strings another kind already used.
+  // Exclusive leak-free strings must cover the kind even if every overlap is taken first.
+  const claimed = new Map();
+  for (const [kind, unique] of owners) {
+    for (const n of unique) {
+      const list = claimed.get(n) ?? [];
+      list.push(kind);
+      claimed.set(n, list);
+    }
+  }
+  for (const [kind, unique] of owners) {
+    let exclusive = 0;
+    for (const n of unique) if (claimed.get(n).length === 1) exclusive += 1;
+    assert.ok(
+      exclusive >= needed.get(kind),
+      `${kind} exclusive leak-free ${exclusive} < ${needed.get(kind)} (cross-kind collisions)`,
+    );
+  }
+});
+
 test('train recipe pins the Qwen3-1.7B training base, a fixed seed, and no held-out input', () => {
   const trainRecipe = JSON.parse(readFileSync(join(here, 'train-recipe.json'), 'utf8'));
   const manifest = JSON.parse(readFileSync(join(repoRoot, 'data/models/manifest.json'), 'utf8'));
@@ -392,7 +538,7 @@ test('train recipe pins the Qwen3-1.7B training base, a fixed seed, and no held-
   assert.equal(trainPy.includes('\u2014'), false);
 });
 
-test('sweep recipe is a diagnostic curve on Qwen3-1.7B, same corpus and gate', () => {
+test('sweep recipe is a register-coverage diagnostic on Qwen3-0.6B, same gate rules', () => {
   const sweepRecipe = JSON.parse(readFileSync(join(here, 'sweep-recipe.json'), 'utf8'));
   const trainRecipe = JSON.parse(readFileSync(join(here, 'train-recipe.json'), 'utf8'));
   const manifest = JSON.parse(readFileSync(join(repoRoot, 'data/models/manifest.json'), 'utf8'));
@@ -405,10 +551,10 @@ test('sweep recipe is a diagnostic curve on Qwen3-1.7B, same corpus and gate', (
 
   assert.equal(sweepRecipe.seed, 20260815);
   assert.equal(sweepRecipe.promptTemplateVersion, 'v3');
-  assert.equal(sweepRecipe.base.field, 'trainBaseRepoId');
-  assert.equal(sweepRecipe.base.repoId, manifest.trainBaseRepoId);
-  assert.equal(manifest.trainBaseRepoId, 'Qwen/Qwen3-1.7B');
+  assert.equal(sweepRecipe.base.field, 'baseRepoId');
+  assert.equal(sweepRecipe.base.repoId, manifest.baseRepoId);
   assert.equal(manifest.baseRepoId, 'Qwen/Qwen3-0.6B');
+  assert.equal(manifest.trainBaseRepoId, 'Qwen/Qwen3-1.7B');
   assert.equal(sweepRecipe.sft, trainRecipe.sft);
   assert.equal(sweepRecipe.train.chatTemplate, trainRecipe.train.chatTemplate);
   assert.equal(sweepRecipe.train.chatTemplate, 'tools/evaluator-training/qwen3-chat-template.jinja');
@@ -428,11 +574,12 @@ test('sweep recipe is a diagnostic curve on Qwen3-1.7B, same corpus and gate', (
   assert.equal(sweepRecipe.sweep.saveEveryEpoch, 0.5);
   assert.equal(sweepRecipe.sweep.minCheckpoints, 6);
   assert.equal(sweepRecipe.sweep.diskHygiene, true);
-  assert.equal(sweepRecipe.outputs.dir.includes('sweep'), true);
+  assert.equal(sweepRecipe.outputs.dir.includes('sweep-qwen3-0.6B'), true);
   assert.notEqual(sweepRecipe.outputs.dir, trainRecipe.outputs.dir);
   assert.equal(sweepRecipe.base.repoId.includes('SmolLM3'), false);
   assert.equal(sweepRecipe.train.chatTemplate.includes('smollm3'), false);
-  assert.equal(JSON.stringify(sweepRecipe).includes('Qwen3-0.6B-airp'), false);
+  assert.equal(sweepRecipe.gguf.fileName, 'Qwen3-0.6B-airp-v3-Q8_0.gguf');
+  assert.match(sweepRecipe.sweep.purpose, /register-coverage|Register-coverage/);
 
   assert.match(trainPy, /save_strategy.*= "steps"/);
   assert.match(trainPy, /sweep_save_steps/);
@@ -456,7 +603,8 @@ test('sweep recipe is a diagnostic curve on Qwen3-1.7B, same corpus and gate', (
   assert.match(readme, /evaluator-training:sweep/);
   assert.match(readme, /--check-template/);
   assert.match(readme, /gate-from-adapters/);
-  assert.match(readme, /Qwen3-1\.7B/);
+  assert.match(readme, /Qwen3-0\.6B/);
+  assert.match(readme, /register/);
 
   for (const text of [
     JSON.stringify(sweepRecipe),
@@ -489,12 +637,13 @@ test('gate-from-adapters does not train and deletes merged weights and GGUF', ()
   assert.equal(src.includes('\u2014'), false);
 });
 
-test('sweep save interval yields at least six checkpoints on 3936 examples', () => {
+test('sweep save interval yields at least six checkpoints on the planned corpus', () => {
+  const n = expectedTotal(recipe, types);
   const py = `
 import json, math
 from pathlib import Path
 recipe = json.loads(Path(${JSON.stringify(join(here, 'sweep-recipe.json'))}).read_text())
-n = 3936
+n = ${n}
 eff = recipe["train"]["effectiveBatchSize"]
 spe = math.ceil(n / eff)
 save_steps = max(1, round(spe * recipe["sweep"]["saveEveryEpoch"]))
@@ -509,9 +658,9 @@ print(spe, save_steps, total, len(ticks), ",".join(str(t) for t in ticks))
   const result = spawnSync('python3', ['-c', py], { encoding: 'utf8' });
   assert.equal(result.status, 0, result.stderr || result.stdout);
   const [spe, saveSteps, total, count] = result.stdout.trim().split(' ');
-  assert.equal(Number(spe), 123);
-  assert.equal(Number(saveSteps), 62);
-  assert.equal(Number(total), 369);
+  assert.ok(Number(spe) > 0, result.stdout);
+  assert.ok(Number(saveSteps) > 0, result.stdout);
+  assert.ok(Number(total) > 0, result.stdout);
   assert.ok(Number(count) >= 6, result.stdout);
 });
 

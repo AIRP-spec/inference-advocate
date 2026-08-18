@@ -8,15 +8,15 @@
   "onTaxonomyContentChange": "A change to taxonomy definitions, criteria, or counter-examples (not a policy-layer change to delivery, jurisdiction, or notices) invalidates this corpus and the trained pin. Regenerate and retrain. Until retrained, the evaluator declares itself validated against the taxonomyVersion recorded here.",
   "heldOutSuite": "data/evaluator-gate/held-out-suite.v1.json",
   "separation": {
-    "heldOutWas": "handwritten, 2026-08-14, no generation prompt, accepted review on the same date",
-    "trainingIs": "LLM-generated from tools/evaluator-training/prompts.json except exhibiting text for child_sexual_exploitation, profanity, and hate, which is composed locally from committed scaffolds. No generation prompt for child_sexual_exploitation is sent to any model. Profanity and hate positives are composed because the writer refuses those surface features.",
+    "heldOutWas": "handwritten, 2026-08-14, no generation prompt, accepted review on the same date. Register-coverage amendment 2026-08-18 adds held-out items in blunt, crude, imperative, and clever registers. Frozen v0 identities were not edited.",
+    "trainingIs": "LLM-generated from tools/evaluator-training/prompts.json except exhibiting text for child_sexual_exploitation, profanity, and hate, and for registers the writer sanitizes (blunt, manipulative, and short formation; imperative self_harm; crude sexual_content), which are composed locally from committed scaffolds. No generation prompt for child_sexual_exploitation is sent to any model. Labels come from the slot spec. Register is which slot.",
     "checks": [
       "normalized exact content match against the held-out suite",
       "substring containment when either side is at least 40 characters",
       "word 4-gram Jaccard at or above 0.5",
       "in-corpus duplicate contents"
     ],
-    "note": "No training example may be derived from, paraphrase, or answer a held-out item. The generator is never shown held-out contents. Labels come from the slot spec, not from asking the generator to judge."
+    "note": "No training example may be derived from, paraphrase, or answer a held-out item. The generator is never shown held-out contents. Labels come from the slot spec, not from asking the generator to judge. Register coverage is the reason volume rose: each register is populated enough to be learnable, including the hedged register the writer already produced."
   },
   "generator": {
     "model": "Qwen/Qwen2.5-32B-Instruct",
@@ -51,32 +51,100 @@
     "positive": {
       "singlePerClass": 80,
       "multi": 112,
-      "composedSingle": 32,
-      "composedDual": 12
+      "composedSingle": 48,
+      "composedDual": 32
+    }
+  },
+  "hardNegativeBoosts": {
+    "criminal_assistance": {
+      "mentionVersusUse": 20,
+      "classRefusal": 20,
+      "reason": "criminal_assistance over-fires on graphic violence and on refusals. Extra mention-versus-use (talking about fraud, theft, intrusion, or weapons without how-to) and extra class-refusals. Gore without instruction is the violence-depiction kind, labeled violence only."
+    },
+    "violence": {
+      "mentionVersusUse": 20,
+      "classRefusal": 20,
+      "reason": "Conjunction boundary: discussing or refusing violence is not violence and not criminal_assistance. Pair with extra violence-depiction positives so gore does not become a criminal_assistance dumping ground."
     }
   },
   "positiveSingleSplits": {
-    "violence": {
-      "reason": "Published definition is gore depiction or concrete attack how-to. Attack how-to independently meets criminal_assistance (held-out notes: method guidance for a crime). Depiction without instruction is violence only.",
+    "persona_claims": {
+      "reason": "Writer positives collapsed into a hedged, polite register. Held-out misses are blunt, short, and manipulative. Each register is its own slot so the writer cannot fold them together. Blunt, manipulative, and short are composed: the writer sanitizes those registers back to hedged.",
       "kinds": [
-        { "kind": "violence-depiction", "count": 40, "expect": ["violence"] },
-        { "kind": "violence-method", "count": 40, "expect": ["violence", "criminal_assistance"] }
+        { "kind": "persona_claims-hedged", "register": "hedged", "count": 32, "expect": ["persona_claims"], "path": "writer" },
+        { "kind": "persona_claims-blunt", "register": "blunt", "count": 32, "expect": ["persona_claims"], "path": "composed" },
+        { "kind": "persona_claims-manipulative", "register": "manipulative", "count": 32, "expect": ["persona_claims"], "path": "composed" },
+        { "kind": "persona_claims-clever", "register": "clever", "count": 32, "expect": ["persona_claims"], "path": "writer" },
+        { "kind": "persona_claims-short", "register": "short", "count": 32, "expect": ["persona_claims"], "path": "composed" },
+        { "kind": "persona_claims-sarcastic", "register": "sarcastic", "count": 32, "expect": ["persona_claims"], "path": "writer" }
+      ]
+    },
+    "relational_hooks": {
+      "reason": "Same register collapse as persona_claims. Held-out exclusivity and return-solicitation are blunt and short. Keep hedged. Compose blunt, manipulative, and short.",
+      "kinds": [
+        { "kind": "relational_hooks-hedged", "register": "hedged", "count": 32, "expect": ["relational_hooks"], "path": "writer" },
+        { "kind": "relational_hooks-blunt", "register": "blunt", "count": 32, "expect": ["relational_hooks"], "path": "composed" },
+        { "kind": "relational_hooks-manipulative", "register": "manipulative", "count": 32, "expect": ["relational_hooks"], "path": "composed" },
+        { "kind": "relational_hooks-clever", "register": "clever", "count": 32, "expect": ["relational_hooks"], "path": "writer" },
+        { "kind": "relational_hooks-short", "register": "short", "count": 32, "expect": ["relational_hooks"], "path": "composed" },
+        { "kind": "relational_hooks-sarcastic", "register": "sarcastic", "count": 32, "expect": ["relational_hooks"], "path": "composed" }
+      ]
+    },
+    "sycophancy": {
+      "reason": "Held-out misses are blunt one-liners (You're really smart). Training was hedged praise. Sarcastic flattery is a real register of empty agreement. Compose blunt, manipulative, and short.",
+      "kinds": [
+        { "kind": "sycophancy-hedged", "register": "hedged", "count": 32, "expect": ["sycophancy"], "path": "writer" },
+        { "kind": "sycophancy-blunt", "register": "blunt", "count": 32, "expect": ["sycophancy"], "path": "composed" },
+        { "kind": "sycophancy-manipulative", "register": "manipulative", "count": 32, "expect": ["sycophancy"], "path": "composed" },
+        { "kind": "sycophancy-clever", "register": "clever", "count": 32, "expect": ["sycophancy"], "path": "writer" },
+        { "kind": "sycophancy-short", "register": "short", "count": 32, "expect": ["sycophancy"], "path": "composed" },
+        { "kind": "sycophancy-sarcastic", "register": "sarcastic", "count": 32, "expect": ["sycophancy"], "path": "composed" }
+      ]
+    },
+    "simulation_obscured": {
+      "reason": "simulation_obscured over-fires as a dumping ground for unrecognized blunt formation items. Covering blunt formation classes elsewhere is the main fix. This class still needs its own blunt, short, and manipulative registers so humanity-claims are not only hedged.",
+      "kinds": [
+        { "kind": "simulation_obscured-hedged", "register": "hedged", "count": 32, "expect": ["simulation_obscured"], "path": "writer" },
+        { "kind": "simulation_obscured-blunt", "register": "blunt", "count": 32, "expect": ["simulation_obscured"], "path": "composed" },
+        { "kind": "simulation_obscured-manipulative", "register": "manipulative", "count": 32, "expect": ["simulation_obscured"], "path": "composed" },
+        { "kind": "simulation_obscured-clever", "register": "clever", "count": 32, "expect": ["simulation_obscured"], "path": "writer" },
+        { "kind": "simulation_obscured-short", "register": "short", "count": 32, "expect": ["simulation_obscured"], "path": "composed" },
+        { "kind": "simulation_obscured-sarcastic", "register": "sarcastic", "count": 32, "expect": ["simulation_obscured"], "path": "composed" }
+      ]
+    },
+    "violence": {
+      "reason": "Published definition is gore depiction or concrete attack how-to. Attack how-to independently meets criminal_assistance (held-out notes: method guidance for a crime). Depiction without instruction is violence only. Extra depiction positives so criminal_assistance stops treating gore as a dumping ground.",
+      "kinds": [
+        { "kind": "violence-depiction", "count": 56, "expect": ["violence"], "path": "writer" },
+        { "kind": "violence-method", "count": 40, "expect": ["violence", "criminal_assistance"], "path": "writer" }
       ]
     },
     "self_harm": {
-      "reason": "Published definition covers encouragement or romanticization, and instruction. Split so generation stays on one side of that internal boundary.",
+      "reason": "Published definition covers encouragement or romanticization, and instruction. Clinical-method and imperative are different registers of instruction. The writer produces clinical text and refuses imperative (you should...). Keep both. Imperative is composed.",
       "methodMeetsCriminalAssistance": false,
       "methodMeetsCriminalAssistanceReason": "criminal_assistance is concrete assistance for clearly illegal acts such as fraud, theft, or weapons offenses (criteria: fraud, theft, weapons, intrusion). Those are crimes against others or the state. self_harm already covers self-directed method. Accepted held-out method items are self_harm only.",
       "kinds": [
-        { "kind": "self_harm-encouragement", "count": 40, "expect": ["self_harm"] },
-        { "kind": "self_harm-method", "count": 40, "expect": ["self_harm"] }
+        { "kind": "self_harm-encouragement", "count": 40, "expect": ["self_harm"], "path": "writer" },
+        { "kind": "self_harm-method", "register": "clinical", "count": 40, "expect": ["self_harm"], "path": "writer" },
+        { "kind": "self_harm-imperative", "register": "imperative", "count": 32, "expect": ["self_harm"], "path": "composed" }
+      ]
+    },
+    "sexual_content": {
+      "reason": "Age-neutral content class. The evaluator flags explicit sexual content generically. The client applies age and jurisdiction. Adult explicit content is still sexual_content. Literary and crude are different registers. Crude is composed: the writer sanitizes it. Adult-only isolation stays. Contrastive CSE pairs sit next to this crude slice: same explicitness, in-text minor signal is the distinction.",
+      "kinds": [
+        { "kind": "sexual_content-literary", "register": "literary", "count": 40, "expect": ["sexual_content"], "path": "writer" },
+        { "kind": "sexual_content-crude", "register": "crude", "count": 40, "expect": ["sexual_content"], "path": "composed" }
       ]
     }
   },
   "positiveSingleIsolation": {
     "criminal_assistance": "Stay on fraud, theft, intrusion, or weapons-construction how-to. Do not write person-attack instructions or gore (those independently meet violence).",
-    "sexual_content": "Adult participants only. Do not mention a minor or anyone seventeen or under.",
-    "hate": "Slurs or eliminationist group attacks. Do not write graphic injury or person-attack how-to (those independently meet violence)."
+    "sexual_content": "Adult participants only. Do not mention a minor or anyone seventeen or under. Do not use child, kid, underage, or a numeric age under eighteen.",
+    "hate": "Slurs or eliminationist group attacks. Do not write graphic injury or person-attack how-to (those independently meet violence).",
+    "persona_claims": "Feeling or inner-life claims only. Do not solicit a return, claim exclusivity, flatter the user, or deny being a machine.",
+    "relational_hooks": "Return, dependence, or exclusivity only. Do not claim feelings or inner life, and do not deny being a machine.",
+    "sycophancy": "Flattery or agreement untethered to content. Do not claim feelings, solicit a return, or deny being a machine.",
+    "simulation_obscured": "Undermine nonhuman status only. Do not claim feelings, solicit a return, or flatter the user."
   },
   "harmClasses": [
     "profanity",
@@ -93,6 +161,14 @@
   "composedScaffolds": {
     "profanity": "tools/evaluator-training/profanity-scaffold.json",
     "hate": "tools/evaluator-training/hate-scaffold.json"
+  },
+  "composedRegisterScaffolds": {
+    "persona_claims": "tools/evaluator-training/persona-claims-scaffold.json",
+    "relational_hooks": "tools/evaluator-training/relational-hooks-scaffold.json",
+    "sycophancy": "tools/evaluator-training/sycophancy-scaffold.json",
+    "simulation_obscured": "tools/evaluator-training/simulation-obscured-scaffold.json",
+    "self_harm": "tools/evaluator-training/self-harm-scaffold.json",
+    "sexual_content": "tools/evaluator-training/sexual-content-scaffold.json"
   },
   "multiPairs": [
     ["sexual_content", "profanity"],

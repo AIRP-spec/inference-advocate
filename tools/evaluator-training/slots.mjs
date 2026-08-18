@@ -8,11 +8,14 @@
 // leaves the slot unfillable. CSE remains composedClass. Writer hard-negatives
 // and writer multi-pairs are unchanged.
 //
-// Positive-single splits: when a class's published definition overlaps a
-// neighbor on the content a positive would produce, the 80 singles are split
-// by kind and the slot's expect is fixed to that kind. Violence-method is
-// violence plus criminal_assistance because attack how-to independently meets
-// both definitions. Self-harm method is self_harm only: criminal_assistance is
+// Positive-single splits: a class may split its positives by kind. Kinds no
+// longer have to sum to singlePerClass. Volume follows register coverage: each
+// kind is a register or a published-definition slice, and the kind's count is
+// the learnable population for that register. path writer sends the kind to
+// the generator; path composed fills it from a local scaffold because the
+// writer sanitizes that register. Violence-method is violence plus
+// criminal_assistance because attack how-to independently meets both
+// definitions. Self-harm method is self_harm only: criminal_assistance is
 // concrete assistance for crimes against others or the state (fraud, theft,
 // weapons, intrusion), and the accepted held-out method items are self_harm
 // only. That decision is recorded on the recipe as
@@ -83,18 +86,97 @@ export function composedSurfaceTypes(recipe) {
 }
 
 /**
- * Preflight: every taxonomy class that has a positive path is writer or composed.
+ * @param {{ path?: string }} spec
+ */
+export function kindPath(spec) {
+  const path = spec.path ?? 'writer';
+  if (path !== 'writer' && path !== 'composed') {
+    throw new Error(`kind path must be writer or composed, got ${path}`);
+  }
+  return path;
+}
+
+/**
+ * @param {object} recipe
+ * @param {string} type
+ * @returns {number}
+ */
+export function positiveCountForType(recipe, type) {
+  const kinds = positiveSingleKindsFor(recipe, type);
+  if (!kinds) return recipe.counts.positive.singlePerClass;
+  return kinds.reduce((sum, spec) => sum + spec.count, 0);
+}
+
+/**
+ * @param {object} recipe
+ * @param {string[]} types
+ * @returns {number}
+ */
+export function writerSingleCount(recipe, types) {
+  let n = 0;
+  for (const type of writerPositiveTypes(recipe, types)) {
+    const kinds = positiveSingleKindsFor(recipe, type);
+    if (!kinds) {
+      n += recipe.counts.positive.singlePerClass;
+      continue;
+    }
+    for (const spec of kinds) {
+      if (kindPath(spec) === 'writer') n += spec.count;
+    }
+  }
+  return n;
+}
+
+/**
+ * Composed register kinds on otherwise-writer classes (blunt formation,
+ * imperative self-harm, crude sexual_content). Not CSE, not surface classes.
  *
  * @param {object} recipe
  * @param {string[]} types
- * @returns {Array<{ type: string, path: 'writer' | 'composed', family: string, count: number, dual: number }>}
+ * @returns {number}
+ */
+export function composedRegisterCount(recipe, types) {
+  let n = 0;
+  for (const type of writerPositiveTypes(recipe, types)) {
+    const kinds = positiveSingleKindsFor(recipe, type);
+    if (!kinds) continue;
+    for (const spec of kinds) {
+      if (kindPath(spec) === 'composed') n += spec.count;
+    }
+  }
+  return n;
+}
+
+/**
+ * @param {object} recipe
+ * @param {string[]} types
+ * @returns {number}
+ */
+export function hardNegativeBoostTotal(recipe, types) {
+  const boosts = recipe.hardNegativeBoosts ?? {};
+  let n = 0;
+  for (const [type, spec] of Object.entries(boosts)) {
+    if (!types.includes(type)) throw new Error(`hardNegativeBoosts type ${type} is not in the taxonomy`);
+    n += spec.mentionVersusUse ?? 0;
+    n += spec.classRefusal ?? 0;
+  }
+  return n;
+}
+
+/**
+ * Preflight: every taxonomy class that has a positive path is writer, composed,
+ * or mixed (some kinds writer, some composed).
+ *
+ * @param {object} recipe
+ * @param {string[]} types
+ * @returns {Array<{ type: string, path: 'writer' | 'composed' | 'mixed', family: string, count: number, dual: number, writer?: number, composed?: number }>}
  */
 export function positivePathReport(recipe, types) {
   const writer = new Set(writerPositiveTypes(recipe, types));
   const surface = new Set(composedSurfaceTypes(recipe));
   const cse = recipe.composedClass;
   const c = recipe.counts.positive;
-  /** @type {Array<{ type: string, path: 'writer' | 'composed', family: string, count: number, dual: number }>} */
+  /** @type {Array<{ type: string, path: 'writer' | 'composed' | 'mixed', family: string, count: number, dual: number, writer?: number, composed?: number }>} */
   const rows = [];
   for (const type of types) {
     if (type === cse) {
@@ -114,13 +196,33 @@ export function positivePathReport(recipe, types) {
         dual: 0,
       });
     } else if (writer.has(type)) {
-      rows.push({
-        type,
-        path: 'writer',
-        family: 'positive-single',
-        count: c.singlePerClass,
-        dual: 0,
-      });
+      const kinds = positiveSingleKindsFor(recipe, type);
+      if (kinds) {
+        let writerN = 0;
+        let composedN = 0;
+        for (const spec of kinds) {
+          if (kindPath(spec) === 'composed') composedN += spec.count;
+          else writerN += spec.count;
+        }
+        const path = writerN && composedN ? 'mixed' : composedN ? 'composed' : 'writer';
+        rows.push({
+          type,
+          path,
+          family: path === 'composed' ? 'positive-composed' : 'positive-single',
+          count: writerN + composedN,
+          dual: 0,
+          writer: writerN,
+          composed: composedN,
+        });
+      } else {
+        rows.push({
+          type,
+          path: 'writer',
+          family: 'positive-single',
+          count: c.singlePerClass,
+          dual: 0,
+        });
+      }
     }
   }
   return rows;
@@ -136,7 +238,6 @@ export function positiveSingleKindsFor(recipe, type) {
   if (!Array.isArray(split.kinds) || split.kinds.length === 0) {
     throw new Error(`positiveSingleSplits.${type} has no kinds`);
   }
-  let sum = 0;
   const seen = new Set();
   for (const kind of split.kinds) {
     if (!kind.kind || typeof kind.kind !== 'string') {
@@ -150,11 +251,15 @@ export function positiveSingleKindsFor(recipe, type) {
     if (!Array.isArray(kind.expect) || kind.expect.length === 0) {
       throw new Error(`kind ${kind.kind} on ${type} has empty expect`);
     }
-    sum += kind.count;
-  }
-  const want = recipe.counts.positive.singlePerClass;
-  if (sum !== want) {
-    throw new Error(`split for ${type} sums to ${sum}, want ${want}`);
+    const path = kindPath(kind);
+    if (path === 'composed') {
+      const rel = recipe.composedRegisterScaffolds?.[type];
+      if (!rel) {
+        throw new Error(
+          `kind ${kind.kind} is composed but composedRegisterScaffolds has no path for ${type}`,
+        );
+      }
+    }
   }
   return split.kinds;
 }
@@ -166,7 +271,6 @@ export function positiveSingleKindsFor(recipe, type) {
 export function expectedTotal(recipe, types) {
   const c = recipe.counts;
   const harm = recipe.harmClasses.length;
-  const writer = writerPositiveTypes(recipe, types).length;
   const surface = composedSurfaceTypes(recipe).length;
   return (
     c.clean.greeting +
@@ -176,10 +280,12 @@ export function expectedTotal(recipe, types) {
     c.clean['crisis-redirect'] +
     c.hardNegative.mentionVersusUsePerClass * types.length +
     c.hardNegative.classRefusalPerClass * types.length +
+    hardNegativeBoostTotal(recipe, types) +
     c.hardNegative.denialPersona +
     c.hardNegative.denialMachine +
     c.hardNegative.sensitiveDiscussionPerHarmClass * harm +
-    c.positive.singlePerClass * writer +
+    writerSingleCount(recipe, types) +
+    composedRegisterCount(recipe, types) +
     c.positive.multi +
     c.positive.composedSingle +
     c.positive.composedDual +
@@ -190,11 +296,11 @@ export function expectedTotal(recipe, types) {
 /**
  * @param {object} recipe
  * @param {string[]} types
- * @returns {Array<{ id: string, family: string, class: string | null, expect: string[], pair?: string[], kind?: string }>}
+ * @returns {Array<{ id: string, family: string, class: string | null, expect: string[], pair?: string[], kind?: string, register?: string, path?: string }>}
  */
 export function buildSlots(recipe, types) {
   const c = recipe.counts;
-  /** @type {Array<{ id: string, family: string, class: string | null, expect: string[], pair?: string[], kind?: string }>} */
+  /** @type {Array<{ id: string, family: string, class: string | null, expect: string[], pair?: string[], kind?: string, register?: string, path?: string }>} */
   const slots = [];
   let n = 0;
   const add = (family, klass, expect, extra = {}) => {
@@ -214,13 +320,12 @@ export function buildSlots(recipe, types) {
   for (let i = 0; i < c.clean.refusal; i++) add('refusal', null, []);
   for (let i = 0; i < c.clean['crisis-redirect']; i++) add('crisis-redirect', null, []);
 
+  const boosts = recipe.hardNegativeBoosts ?? {};
   for (const type of types) {
-    for (let i = 0; i < c.hardNegative.mentionVersusUsePerClass; i++) {
-      add('mention-versus-use', type, []);
-    }
-    for (let i = 0; i < c.hardNegative.classRefusalPerClass; i++) {
-      add('class-refusal', type, []);
-    }
+    const mention = c.hardNegative.mentionVersusUsePerClass + (boosts[type]?.mentionVersusUse ?? 0);
+    const refusal = c.hardNegative.classRefusalPerClass + (boosts[type]?.classRefusal ?? 0);
+    for (let i = 0; i < mention; i++) add('mention-versus-use', type, []);
+    for (let i = 0; i < refusal; i++) add('class-refusal', type, []);
   }
   for (let i = 0; i < c.hardNegative.denialPersona; i++) add('denial-persona', 'persona_claims', []);
   for (let i = 0; i < c.hardNegative.denialMachine; i++) {
@@ -237,8 +342,12 @@ export function buildSlots(recipe, types) {
     const kinds = positiveSingleKindsFor(recipe, type);
     if (kinds) {
       for (const spec of kinds) {
+        const path = kindPath(spec);
+        const family = path === 'composed' ? 'positive-composed' : 'positive-single';
+        const extra = { kind: spec.kind, path };
+        if (spec.register) extra.register = spec.register;
         for (let i = 0; i < spec.count; i++) {
-          add('positive-single', type, [...spec.expect], { kind: spec.kind });
+          add(family, type, [...spec.expect], extra);
         }
       }
     } else {

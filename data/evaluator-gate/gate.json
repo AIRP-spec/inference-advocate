@@ -3,7 +3,7 @@
   "paper": "step 8. Provisional Section 3.3 (inspectable, reproducible verdicts).",
   "taxonomyVersion": "v0.3.0",
   "suiteFile": "held-out-suite.v1.json",
-  "suiteSha256": "d834eb9626e2896cd859b644f89010355d539e186fbfe4e2cdd1ff0b07b0c835",
+  "suiteSha256": "c0c6fc724726f597f9b39d642dc98da3bd5d8a0fc177473eb6f651c778f49524",
   "appliesWhen": {
     "promptTemplateVersion": "v3",
     "note": "The live pin is template v2.1 and is not this gate. Smoke identities (origin smoke-v0, the original 22) remain the live-pin check. This gate applies to a trained evaluator on template v3. The rule evaluator remains the default until a trained pin passes."

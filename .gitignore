@@ -36,6 +36,7 @@ data/evaluator-training/corpus.jsonl
 data/evaluator-training/sft.jsonl
 data/evaluator-training/slot-plan.json
 data/evaluator-training/review-sample.json
+data/evaluator-training/composed-preview/
 data/evaluator-training/*.log
 data/evaluator-training/artifacts/
 __pycache__/

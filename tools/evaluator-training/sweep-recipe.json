@@ -1,7 +1,7 @@
 {
   "recipeVersion": "1",
   "paper": "step 8. Provisional Section 3.3. The commons reference evaluation model is a trained artifact.",
-  "adr": "Diagnostic checkpoint sweep. Same corpus, taxonomy, gate, seed, and Qwen3 template as the 0.6B ceiling. Training base is Qwen3-1.7B: only the parameter count moves. This run does not decide the published pin; it samples the loss curve so a sweet spot or a capacity ceiling is a measured fact. The live pin is unchanged. After each checkpoint is merged, converted to GGUF Q8_0, and gated, the merged bf16 directory and that GGUF are deleted. Optimizer states are not kept on interval saves.",
+  "adr": "Diagnostic checkpoint sweep after the register-coverage corpus amendment. Same taxonomy, gate rules, seed, and Qwen3 template. Training base is Qwen3-0.6B: the phone-deployment size. Two prior sweeps (0.6B then 1.7B) hit the same miss/over-fire wall on the narrow corpus. Size is not the lever. This run does not decide the published pin; it samples the loss curve on the widened corpus. The live pin is unchanged. After each checkpoint is merged, converted to GGUF Q8_0, and gated, the merged bf16 directory and that GGUF are deleted. Optimizer states are not kept on interval saves. Disk hygiene stays on. Run from /workspace.",
   "promptTemplateVersion": "v3",
   "taxonomyVersion": "v0.3.0",
   "taxonomyFile": "data/taxonomy/flags.v0.json",
@@ -10,13 +10,13 @@
   "seed": 20260815,
   "base": {
     "source": "data/models/manifest.json",
-    "field": "trainBaseRepoId",
-    "repoId": "Qwen/Qwen3-1.7B",
-    "note": "Read at run time from the manifest. repoId here is a pin that must match. This is the training base. Do not change the live evaluator pin in this diagnostic."
+    "field": "baseRepoId",
+    "repoId": "Qwen/Qwen3-0.6B",
+    "note": "Read at run time from the manifest. repoId here is a pin that must match. This is the training base for the register-coverage re-sweep. Do not change the live evaluator pin in this diagnostic. The 1.7B trainBaseRepoId stays for the unused within-family A/B recipe."
   },
   "framework": {
     "stack": "transformers + peft + trl SFTTrainer",
-    "whyNotUnsloth": "1.7B plus 3936 short examples on an 80GB card does not need Unsloth's memory path. The standard stack is the one a reader can follow without a third training runtime.",
+    "whyNotUnsloth": "0.6B plus a few thousand short examples on an 80GB card does not need Unsloth's memory path. The standard stack is the one a reader can follow without a third training runtime.",
     "reportTo": "none",
     "torch": "supplied by the GPU image; not pinned here so a CUDA wheel is not overwritten",
     "python": ">=3.10",
@@ -68,7 +68,7 @@
     "evalDatasetNote": "The held-out suite is the final gate, never a training or hyperparameter split. The sweep gates after the fact. It does not train against the suite."
   },
   "sweep": {
-    "purpose": "Within-family capacity A/B versus the measured 0.6B ceiling. Same accepted sft.jsonl, same seed, same 187-item gate, same half-epoch interval, Qwen3 template with generation spans. Only the base moves from Qwen3-0.6B to Qwen3-1.7B. One GPU run, many gated checkpoints. Not a second gate, not a label change, not a live-pin swap.",
+    "purpose": "Register-coverage re-sweep on Qwen3-0.6B, the phone-deployment target. Same seed, dropout 0.1, LoRA rank 16, three epochs, a LoRA checkpoint every half epoch, Qwen3 template with generation spans. Corpus is the widened recipe (per-register formation slots, crude/imperative content, CSE contrastive pairs). Gate is the amended held-out suite. Disk hygiene stays on. Not a live-pin swap. Do not run until the review sample is accepted.",
     "saveEveryEpoch": 0.5,
     "minCheckpoints": 6,
     "exportGguf": true,
@@ -78,7 +78,7 @@
   "gguf": {
     "quantization": "Q8_0",
     "outtype": "f16",
-    "fileName": "Qwen3-1.7B-airp-v3-Q8_0.gguf",
+    "fileName": "Qwen3-0.6B-airp-v3-Q8_0.gguf",
     "llamaCpp": {
       "repo": "https://github.com/ggml-org/llama.cpp",
       "fallbackRepo": "https://github.com/ggerganov/llama.cpp",
@@ -87,7 +87,7 @@
     }
   },
   "outputs": {
-    "dir": "data/evaluator-training/artifacts/sweep-qwen3-1.7B",
+    "dir": "data/evaluator-training/artifacts/sweep-qwen3-0.6B",
     "adapter": "lora",
     "merged": "merged",
     "gguf": "gguf",
@@ -99,6 +99,6 @@
   },
   "time": {
     "budgetHours": 3,
-    "estimate": "Training three epochs of 1.7B LoRA is tens of minutes on an 80GB card. Six merge-plus-Q8_0 exports of 1.7B and six 187-item CPU gates dominate the wall time. Only one merged copy and one GGUF exist at a time. If the train loop itself is still running after 90 minutes, stop and report."
+    "estimate": "Training three epochs of 0.6B LoRA is tens of minutes on an 80GB card. Six merge-plus-Q8_0 exports and six held-out CPU gates dominate the wall time. Only one merged copy and one GGUF exist at a time. If the train loop itself is still running after 90 minutes, stop and report."
   }
 }

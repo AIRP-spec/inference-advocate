@@ -3,9 +3,12 @@
 //
 // Paper: step 8. Labels come from the slot spec. The generator writes assistant
 // text only. Held-out contents are never in the prompt. Positive-single kinds
-// pick the prompt; the slot still owns the labels. CSE, profanity, and hate
-// positives are composed locally. Run locally or on RunPod against an
-// OpenAI-compatible endpoint serving the recipe's generator model.
+// pick the prompt; the slot still owns the labels. Register is which slot.
+// CSE, profanity, hate, and sanitized registers (blunt/manipulative/short
+// formation, imperative self_harm, crude sexual_content) are composed locally.
+// Run locally or on RunPod against an OpenAI-compatible endpoint serving the
+// recipe's generator model. --composed-only fills scaffolds without a writer
+// and is not a training corpus.
 
 import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { dirname, join, resolve } from 'node:path';
@@ -27,10 +30,16 @@ function interpolate(template, vars) {
 }
 
 function parseArgs(argv) {
-  const out = { plan: false, limit: 0, outDir: join(repoRoot, 'data', 'evaluator-training') };
+  const out = {
+    plan: false,
+    composedOnly: false,
+    limit: 0,
+    outDir: join(repoRoot, 'data', 'evaluator-training'),
+  };
   for (let i = 0; i < argv.length; i++) {
     const a = argv[i];
     if (a === '--plan') out.plan = true;
+    else if (a === '--composed-only') out.composedOnly = true;
     else if (a === '--limit') out.limit = Number(argv[++i]);
     else if (a === '--out') out.outDir = argv[++i];
     else if (a === '--help' || a === '-h') out.help = true;
@@ -39,14 +48,23 @@ function parseArgs(argv) {
   return out;
 }
 
-function fillPrompt(prompts, family, vars, kind) {
+function fillPrompt(prompts, family, vars, kind, register) {
+  if (register) {
+    const note = prompts.registers?.[register];
+    if (!note) throw new Error(`no register prompt for ${register}`);
+    vars.registerNote = note;
+  } else if (!('registerNote' in vars)) {
+    vars.registerNote = '';
+  }
   let template;
-  if (kind) {
-    template = prompts.positiveSingleKinds?.[kind];
-    if (!template) throw new Error(`no prompt for kind ${kind}`);
+  if (kind && prompts.positiveSingleKinds?.[kind]) {
+    template = prompts.positiveSingleKinds[kind];
   } else {
     template = prompts.families[family];
-    if (!template) throw new Error(`no prompt for family ${family}`);
+    if (!template) throw new Error(`no prompt for family ${family}${kind ? ` or kind ${kind}` : ''}`);
+  }
+  if (register && !template.includes('{{registerNote}}')) {
+    template = `${template}\n${vars.registerNote}`;
   }
   const constraints = prompts.sharedConstraints.map((c) => `- ${c}`).join('\n');
   return `${interpolate(template, vars)}\n\nConstraints:\n${constraints}`;
@@ -230,12 +248,33 @@ export function expandScaffold(block) {
   return out;
 }
 
-function pickComposedContent(slot, scaffold, rng, shuffle, accept) {
-  const kind = slot.expect.length > 1 ? 'dual' : 'single';
-  const block = scaffold[kind];
-  if (!block) {
-    throw new Error(`scaffold missing ${kind} for ${slot.id}`);
+/**
+ * @param {object} slot
+ * @param {object} recipe
+ * @param {Map<string, object>} scaffolds
+ */
+export function composedBlockFor(slot, recipe, scaffolds) {
+  const cse = recipe.composedClass;
+  if (slot.kind && recipe.composedRegisterScaffolds?.[slot.class]) {
+    const scaffold = scaffolds.get(slot.class);
+    if (!scaffold) throw new Error(`no register scaffold loaded for ${slot.class}`);
+    const kindBlock = scaffold.kinds?.[slot.kind];
+    if (!kindBlock) {
+      throw new Error(`register scaffold for ${slot.class} missing kind ${slot.kind}`);
+    }
+    return kindBlock.single ?? kindBlock;
   }
+  const key = slot.expect.includes(cse) ? cse : slot.class;
+  const scaffold = scaffolds.get(key);
+  if (!scaffold) throw new Error(`no loaded scaffold for composed slot ${slot.id}`);
+  const blockName = slot.expect.length > 1 ? 'dual' : 'single';
+  const block = scaffold[blockName];
+  if (!block) throw new Error(`scaffold missing ${blockName} for ${slot.id}`);
+  return block;
+}
+
+function pickComposedContent(slot, recipe, scaffolds, rng, shuffle, accept) {
+  const block = composedBlockFor(slot, recipe, scaffolds);
   const order = shuffle(expandScaffold(block), rng);
   for (const content of order) {
     const reason = accept(content, slot);
@@ -251,8 +290,10 @@ async function main() {
   const args = parseArgs(process.argv.slice(2));
   if (args.help) {
     console.log(
-      'Usage: node tools/evaluator-training/generate.mjs [--plan] [--limit N] [--out DIR]\n' +
-        'Requires AIRP_GENERATOR_BASE_URL (OpenAI-compatible). Optional AIRP_GENERATOR_API_KEY, AIRP_GENERATOR_MODEL.',
+      'Usage: node tools/evaluator-training/generate.mjs [--plan] [--composed-only] [--limit N] [--out DIR]\n' +
+        '--plan prints the slot plan with no model and no writes of corpus rows.\n' +
+        '--composed-only fills composed slots from scaffolds (no writer). Not a training corpus.\n' +
+        'Full generate requires AIRP_GENERATOR_BASE_URL. Optional AIRP_GENERATOR_API_KEY, AIRP_GENERATOR_MODEL.',
     );
     return;
   }
@@ -321,6 +362,26 @@ async function main() {
     for (const [key, n] of [...byKind.entries()].sort()) {
       console.log(`  ${key}: ${n}`);
     }
+    /** @type {Map<string, number>} */
+    const byComposedKind = new Map();
+    for (const slot of slots.filter((s) => s.family === 'positive-composed')) {
+      const key = slot.kind ? `${slot.class ?? '_'}:${slot.kind}` : slot.expect.join('+');
+      byComposedKind.set(key, (byComposedKind.get(key) ?? 0) + 1);
+    }
+    console.log('by composed kind:');
+    for (const [key, n] of [...byComposedKind.entries()].sort()) {
+      console.log(`  ${key}: ${n}`);
+    }
+    /** @type {Map<string, number>} */
+    const byRegister = new Map();
+    for (const slot of slots.filter((s) => s.register)) {
+      const key = `${slot.class}:${slot.register}:${slot.path ?? 'writer'}`;
+      byRegister.set(key, (byRegister.get(key) ?? 0) + 1);
+    }
+    console.log('by register:');
+    for (const [key, n] of [...byRegister.entries()].sort()) {
+      console.log(`  ${key}: ${n}`);
+    }
     const cseWriter = slots.filter(
       (s) =>
         (s.family === 'positive-single' || s.family === 'positive-multi') &&
@@ -346,7 +407,9 @@ async function main() {
     console.log('positive compose/generate split:');
     for (const row of positivePathReport(recipe, types)) {
       const dual = row.dual > 0 ? ` + ${row.dual} dual` : '';
-      console.log(`  ${row.type}: ${row.path} (${row.family}, ${row.count}${dual})`);
+      const mixed =
+        row.path === 'mixed' ? `, writer ${row.writer}, composed ${row.composed}` : '';
+      console.log(`  ${row.type}: ${row.path} (${row.family}, ${row.count}${dual}${mixed})`);
     }
     return;
   }
@@ -429,6 +492,8 @@ async function main() {
       family: slot.family,
       class: slot.class,
       ...(slot.kind ? { kind: slot.kind } : {}),
+      ...(slot.register ? { register: slot.register } : {}),
+      ...(slot.path ? { path: slot.path } : {}),
       expect: slot.expect,
       content,
       taxonomyVersion: recipe.taxonomyVersion,
@@ -474,15 +539,18 @@ async function main() {
       if (!rel) throw new Error(`no composedScaffolds path for ${type}`);
       scaffolds.set(type, loadJson(join(repoRoot, rel)));
     }
+    for (const [type, rel] of Object.entries(recipe.composedRegisterScaffolds ?? {})) {
+      scaffolds.set(type, loadJson(join(repoRoot, rel)));
+    }
     /** @type {Map<string, number>} */
     const composedWritten = new Map();
     for (const slot of composedSlots) {
-      const key = slot.expect.includes(recipe.composedClass)
-        ? recipe.composedClass
-        : slot.class;
-      const scaffold = scaffolds.get(key);
-      if (!scaffold) throw new Error(`no loaded scaffold for composed slot ${slot.id}`);
-      const content = pickComposedContent(slot, scaffold, rng, shuffle, accept);
+      const key = slot.kind
+        ? `${slot.class}:${slot.kind}`
+        : slot.expect.includes(recipe.composedClass)
+          ? recipe.composedClass
+          : slot.class;
+      const content = pickComposedContent(slot, recipe, scaffolds, rng, shuffle, accept);
       writeExample(slot, content);
       composedWritten.set(key, (composedWritten.get(key) ?? 0) + 1);
     }
@@ -491,6 +559,14 @@ async function main() {
       .map(([k, n]) => `${k}:${n}`)
       .join(', ');
     console.log(`composed ${composedSlots.length} positives locally (no writer call) [${breakdown}]`);
+  }
+
+  if (args.composedOnly) {
+    console.log(
+      `composed-only: wrote ${written} of ${total} planned. Writer slots were not filled. Not a training corpus.`,
+    );
+    console.log(`sft ${sftPath}`);
+    return;
   }
 
   if (writerSlots.length > 0) {
@@ -561,7 +637,7 @@ async function main() {
           vars.profanityRequirement = prompts.profanityRequirement;
         }
       }
-      const user = fillPrompt(prompts, head.family, vars, head.kind);
+      const user = fillPrompt(prompts, head.family, vars, head.kind, head.register);
       const seed = recipe.generator.seed + attempt * 10007 + written;
       const raw = await chat(baseUrl, apiKey, {
         model,

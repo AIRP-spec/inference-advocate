@@ -44,7 +44,11 @@ function groupKey(row) {
     return `${row.family}:${row.class}`;
   }
   if (row.family === 'sensitive-discussion') return `${row.family}:${row.class}`;
-  if (row.family === 'positive-multi' || row.family === 'positive-composed') {
+  if (row.family === 'positive-multi') {
+    return `${row.family}:${(row.expect ?? []).join('+')}`;
+  }
+  if (row.family === 'positive-composed') {
+    if (row.kind) return `${row.family}:${row.class}:${row.kind}`;
     return `${row.family}:${(row.expect ?? []).join('+')}`;
   }
   return row.family;
@@ -104,7 +108,7 @@ function main() {
     review: {
       status: 'pending',
       reviewer: 'Justin Philip Flores',
-      note: 'Bounded stratified sample. Not full-corpus review. Accept before any training run.',
+      note: 'Bounded stratified sample. Not full-corpus review. Accept before any training run. New register kinds and composed slices must appear in the strata.',
     },
     items: picked,
   };

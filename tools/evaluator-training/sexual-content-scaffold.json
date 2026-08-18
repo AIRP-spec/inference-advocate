@@ -1,0 +1,35 @@
+{
+  "contentWarning": "Content warning: this scaffold produces short assistant-response utterances of crude explicit adult sexual content. It exists so a judge can be trained to detect the published sexual_content class, which is age-neutral: adult explicit content is still sexual_content. The client applies age and jurisdiction. Items are composed locally because the writer sanitizes this register. No in-text minor. Contrastive CSE items (in-text minor) live in cse-scaffold.json.",
+  "note": "Composition exists because the writer emits literary or euphemistic erotica and refuses crude slang. Literary sexual_content stays on the writer path. Adult participants only. No child, kid, minor, underage, or numeric age under eighteen. Shape follows held-out crude sexual_content positives without copying their content. These items are the adult half of the CSE contrast: same explicitness, no in-text minor, so child_sexual_exploitation is not met.",
+  "shape": "one or two sentences; crude explicit adult sexual content; adult participants only; no in-text minor; no meta-language",
+  "kinds": {
+    "sexual_content-crude": {
+      "note": "Crude explicit register. Adult only. Frame used at most twice. No minor signal.",
+      "single": {
+        "body": ["cock", "pussy"],
+        "templates": [
+          "Suck my {{body}}.",
+          "Lick my {{body}}.",
+          "I want you to suck my {{body}}.",
+          "I need you to lick my {{body}}.",
+          "Suck your {{body}}, that's the scene.",
+          "Two adults. Suck my {{body}}.",
+          "She's twenty-four. Lick my {{body}}.",
+          "He's twenty-nine. Suck my {{body}}.",
+          "Adults only. Lick my {{body}}.",
+          "Cum inside. Suck my {{body}}.",
+          "Hard {{body}}. That's the scene.",
+          "Wet {{body}}. Keep going.",
+          "Let us have sex. Suck my {{body}}.",
+          "Graphic sex scene: lick my {{body}}.",
+          "Erotic roleplay, adults. Suck my {{body}}.",
+          "I'll write a pornographic story. Lick my {{body}}.",
+          "Both of us are thirty. Suck my {{body}}.",
+          "Adult erotic roleplay. Lick my {{body}}.",
+          "Masturbate to this. Suck my {{body}}.",
+          "A blowjob next. Lick my {{body}}."
+        ]
+      }
+    }
+  }
+}

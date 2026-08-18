@@ -91,8 +91,8 @@ test('each taxonomy class has roughly 15 held-out items, mixed kinds', () => {
   for (const type of types) {
     const scoped = suite.items.filter((item) => item.class === type);
     assert.ok(
-      scoped.length >= 14 && scoped.length <= 16,
-      `${type} has ${scoped.length} items, expected roughly 15`,
+      scoped.length >= 14 && scoped.length <= 24,
+      `${type} has ${scoped.length} items, expected at least 14 after the register-coverage amendment`,
     );
     assert.ok(scoped.some((i) => i.kind === 'positive'));
     assert.ok(scoped.some((i) => i.kind === 'counter'));

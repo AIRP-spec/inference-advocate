@@ -24,19 +24,27 @@ sensitive-topic discussion, greetings.
 
 ## Positive-single neighbor boundaries
 
-Writer `positive-single` slots stay at 80 per writer class. When a class's
-published definition overlaps a neighbor on the content a positive would
-produce, those 80 are split by kind. The kind chooses the prompt. The slot
-spec chooses the labels. The writer is never asked to judge.
+Writer `positive-single` slots stay writer-filled where the writer can hold the
+register. When a class's published definition overlaps a neighbor, or when a
+class needs more than one register, those positives are split by kind. The
+kind chooses the prompt or the scaffold. The slot spec chooses the labels.
+The writer is never asked to judge. Volume rose because each register needs
+enough examples to be learnable, including the hedged register the writer
+already produced.
 
 ### Split
 
-| Class | Kind | Count | Labels | Why |
-| --- | --- | --- | --- | --- |
-| violence | violence-depiction | 40 | violence | Gore, injury, or aftermath. No instruction. Held-out gore items are violence only. |
-| violence | violence-method | 40 | violence, criminal_assistance | Concrete attack how-to independently meets both definitions. Held-out instruction items carry both. |
-| self_harm | self_harm-encouragement | 40 | self_harm | Encouragement or romanticization, no method. |
-| self_harm | self_harm-method | 40 | self_harm | Concrete self-directed method. criminal_assistance is not met (see below). |
+| Class | Kind | Count | Path | Labels | Why |
+| --- | --- | --- | --- | --- | --- |
+| persona_claims, relational_hooks, sycophancy, simulation_obscured | hedged, clever (and sarcastic on persona_claims) | 32 each | writer | that class | Keep the polite register. Prompted separately so it cannot absorb the others. |
+| those four | blunt, manipulative, short (and sarcastic except persona_claims) | 32 each | composed | that class | The writer sanitizes these back to hedged. Local scaffolds. |
+| violence | violence-depiction | 56 | writer | violence | Gore, injury, or aftermath. No instruction. Extra depiction so criminal_assistance does not dump here. |
+| violence | violence-method | 40 | writer | violence, criminal_assistance | Concrete attack how-to independently meets both. |
+| self_harm | self_harm-encouragement | 40 | writer | self_harm | Encouragement or romanticization, no method. |
+| self_harm | self_harm-method | 40 | writer | self_harm | Clinical method. criminal_assistance is not met. |
+| self_harm | self_harm-imperative | 32 | composed | self_harm | You-should register. Writer refuses it. |
+| sexual_content | sexual_content-literary | 40 | writer | sexual_content | Literary/euphemistic. Adult only. Age-neutral class. |
+| sexual_content | sexual_content-crude | 40 | composed | sexual_content | Crude explicit. Adult only. Child-safety-critical generic signal. Contrastive to CSE. |
 
 self_harm-method is not dual-labeled. The published criminal_assistance
 definition is concrete assistance for clearly illegal acts such as fraud,
@@ -55,15 +63,10 @@ scaffold does. Held-out contents are never copied into a generation prompt.
 
 | Class | Why not split |
 | --- | --- |
-| persona_claims | Feeling or inner-life claims. A positive need not also meet relational_hooks or simulation_obscured. |
-| relational_hooks | Return, dependence, or exclusivity. Can be met without a feeling claim or a humanity claim. |
-| sycophancy | Flattery untethered to content. No neighbor whose definition is independently met by ordinary sycophancy text. |
-| simulation_obscured | Undermining nonhuman status. Distinct from persona_claims (feelings) and relational_hooks. |
 | profanity | A strong expletive. Hate and sexual_content need slurs or erotic framing; an expletive alone does not meet them. Positive-singles are composed locally; the writer refuses expletives. |
-| sexual_content | Explicit adult sexual content. Conjunction with a minor is CSE, which is the composed path, not this prompt. Isolation: adult participants only. |
 | hate | Slurs or eliminationist group attacks. Held-out eliminationist items are hate only (no gore, no person-attack how-to). Positive-singles are composed locally; the writer refuses slurs. |
-| criminal_assistance | Fraud, theft, intrusion, or weapons-construction how-to. Person-attack how-to is the violence-method kind plus the multi pair. Isolation: stay off person-attack and gore. Held-out bomb-making without person-attack is criminal_assistance only. |
-| child_sexual_exploitation | Not a writer positive. Composed locally. Dual with sexual_content is the composed dual path. |
+| criminal_assistance | Fraud, theft, intrusion, or weapons-construction how-to. Person-attack how-to is the violence-method kind plus the multi pair. Isolation: stay off person-attack and gore. Extra mention-versus-use and class-refusal slots so this class stops firing on gore and on refusals. Held-out bomb-making without person-attack is criminal_assistance only. |
+| child_sexual_exploitation | Not a writer positive. Composed locally. Dual with sexual_content is the composed dual path. Contrastive adult explicit content is sexual_content-crude, labeled sexual_content and not CSE. |
 
 The shared conjunction rule stays: a neighbor class appears only if its own
 definition is independently met.
@@ -86,6 +89,11 @@ npm run build   # v3 serialization is imported from @airp/evaluator-local
 
 # Slot plan only (no model):
 node tools/evaluator-training/generate.mjs --plan
+
+# Composed slots only (scaffolds, no writer). Writes a preview corpus, not
+# the training corpus. Use this for the register-coverage review sample:
+npm run evaluator-training:composed-only
+npm run evaluator-training:sample -- --corpus data/evaluator-training/composed-preview/corpus.jsonl
 
 # Full corpus. From the repository root, after a vLLM (or equivalent) is
 # actually listening. Do not copy the hostname; replace it with the pod or
@@ -118,17 +126,21 @@ file remains in the tree and is not used. Full-sequence loss is refused:
 it trains the model to reproduce the long taxonomy prompt and under-learns
 the short line.
 
-A LoRA of Qwen3-0.6B hit a capacity ceiling on the 187-item held-out
-gate (six gated checkpoints, no per-class pass). This recipe is the
-within-family move to 1.7B, not a live-pin swap.
+A LoRA of Qwen3-0.6B and a LoRA of Qwen3-1.7B both stalled on the same
+held-out wall when the corpus was a single hedged register. Size is not
+the lever. This recipe widens register coverage, then re-sweeps the 0.6B
+(the phone-deployment claim) after the review sample is accepted. The live
+pin stays `baseRepoId` / `fileName` (Qwen3-0.6B Q8_0 at template v2.1).
 
 The pin in `requirements-train.txt` is transformers 4.55.2. Run
 `--check-template` on the pod after that install and before any training
 run. It must print a non-empty assistant mask and no-think active.
 
-On a single 80GB card this is well under three hours (1.7B LoRA, 3936 short
-examples, then merge, GGUF Q8_0, 187 compact-verdict items). If training is
-still running after 90 minutes, stop and report.
+On a single 80GB card a 1.7B LoRA of the previous 3936-example corpus was
+well under three hours. The register-coverage corpus is larger. The next
+diagnostic is the 0.6B sweep in `sweep-recipe.json`, after the review
+sample is accepted. If training is still running after 90 minutes, stop
+and report.
 
 ```bash
 npm run build
@@ -150,19 +162,14 @@ replace the live vendor GGUF and it does not change the default evaluator.
 
 ## Checkpoint sweep (diagnostic)
 
-The 0.6B sweep confirmed a capacity ceiling: no checkpoint passed the
-held-out gate. `sweep-recipe.json` is the same diagnostic on
-Qwen3-1.7B: same accepted `sft.jsonl`, same seed, dropout 0.1, LoRA
-rank 16, three epochs, a LoRA checkpoint every half epoch, Qwen3
-template with generation spans. Only the base parameter count moves.
-After training, each checkpoint is merged, converted to GGUF Q8_0, and
-gated through the real `@airp/evaluator-local` v3 path, then the merged
-bf16 directory and that GGUF are deleted before the next checkpoint.
-Optimizer states are not kept on interval saves. The gate harness is
-not reimplemented. Corpus, taxonomy, and gate thresholds do not change.
-The live pin does not change. This run does not decide the published
-model; it produces the curve that decides whether a stopping point
-exists for 1.7B.
+The 0.6B and 1.7B sweeps on the narrow corpus confirmed a corpus ceiling,
+not a capacity ceiling: same miss cluster, same over-fire cluster. After
+the register-coverage amendment and an accepted review sample,
+`sweep-recipe.json` re-runs the diagnostic on Qwen3-0.6B (phone-deployment
+target): same seed, dropout 0.1, LoRA rank 16, three epochs, a LoRA
+checkpoint every half epoch, Qwen3 template with generation spans, disk
+hygiene on. Do not run it until the review sample is accepted. The live
+pin does not change.
 
 ```bash
 npm run build
@@ -173,18 +180,17 @@ node tools/evaluator-training/sweep-gate.mjs
 node tools/evaluator-training/sweep-report.mjs
 ```
 
-The report writes `data/evaluator-training/artifacts/sweep-qwen3-1.7B/sweep-report.json`
+The report writes `data/evaluator-training/artifacts/sweep-qwen3-0.6B/sweep-report.json`
 with extra-class fires, recall misses, clean-traffic fires, and per-class
 pass counts against training loss. A checkpoint is a publish candidate
-only if extra-class fires are 0 and recall misses are 0. If no checkpoint
-hits both, the sampled curve confirms a capacity ceiling for this 1.7B.
+only if extra-class fires are 0 and recall misses are 0.
 
 Sweep artifacts (gitignored):
 
-- `data/evaluator-training/artifacts/sweep-qwen3-1.7B/lora/checkpoint-*`
-- `data/evaluator-training/artifacts/sweep-qwen3-1.7B/checkpoints.json`
-- `data/evaluator-training/artifacts/sweep-qwen3-1.7B/gate-report-step-*.json`
-- `data/evaluator-training/artifacts/sweep-qwen3-1.7B/adapter-gate-table.json`
+- `data/evaluator-training/artifacts/sweep-qwen3-0.6B/lora/checkpoint-*`
+- `data/evaluator-training/artifacts/sweep-qwen3-0.6B/checkpoints.json`
+- `data/evaluator-training/artifacts/sweep-qwen3-0.6B/gate-report-step-*.json`
+- `data/evaluator-training/artifacts/sweep-qwen3-0.6B/adapter-gate-table.json`
 
 Merged bf16 directories and `step-*.gguf` files are deleted after each
 gated checkpoint. They must not accumulate.
@@ -193,11 +199,11 @@ gated checkpoint. They must not accumulate.
 
 If the sweep already wrote `lora/checkpoint-*` and exporting every GGUF at
 once filled the disk, do not retrain. `gate-from-adapters.py` merges one
-adapter into the training base (`trainBaseRepoId`, currently Qwen3-1.7B),
-converts Q8_0, runs `gate.mjs` at template v3, records the 187-item
-report, then deletes the merged model and the GGUF before the next
-checkpoint. The f16 intermediate is deleted too. It does not train. The
-live pin does not change.
+adapter into the sweep recipe's training base (Qwen3-0.6B for the
+register-coverage re-sweep), converts Q8_0, runs `gate.mjs` at template v3,
+records the held-out report, then deletes the merged model and the GGUF
+before the next checkpoint. The f16 intermediate is deleted too. It does
+not train. The live pin does not change.
 
 ```bash
 npm run build
@@ -205,7 +211,7 @@ python3 tools/evaluator-training/gate-from-adapters.py
 ```
 
 The table is printed and written to
-`data/evaluator-training/artifacts/sweep-qwen3-1.7B/adapter-gate-table.txt`.
+`data/evaluator-training/artifacts/sweep-qwen3-0.6B/adapter-gate-table.txt`.
 
 Outputs (gitignored except this README's sibling notes):
 
@@ -215,7 +221,9 @@ Outputs (gitignored except this README's sibling notes):
 
 A stratified sample of a few hundred items goes to Justin before any
 training run. Bounded review, not full-corpus review. The sample includes
-the composed family so that slice is in the 320.
+the composed family and the new register kinds so those slices are in the
+320. `--composed-only` writes a preview of composed slots for that review
+without filling writer slots. That preview is not a training corpus.
 
 Training artifacts (also gitignored):
 
@@ -230,8 +238,18 @@ Training artifacts (also gitignored):
 Exhibiting text for `child_sexual_exploitation` is composed locally from
 `cse-scaffold.json`. No generation prompt for this class is sent to any
 model. Composed CSE items are bare non-explicit marker frames (age marker
-plus sexual-frame or undressing reference). They do not describe themselves
-as fixtures.
+plus sexual-frame or undressing reference) plus a crude-plus-age dual
+block. They do not describe themselves as fixtures. Adult explicit
+contrastive twins are `sexual_content-crude` in
+`sexual-content-scaffold.json`, labeled sexual_content and not CSE. The
+distinction is the in-text minor signal, not explicitness. Content classes
+stay age-neutral.
+
+Exhibiting text for blunt, manipulative, and short formation registers,
+imperative self_harm, and crude sexual_content is composed locally from
+the files in `composedRegisterScaffolds`. The writer sanitizes those
+registers. Hedged and clever (and sarcastic persona_claims) stay on the
+writer path, prompted as separate slots.
 
 Exhibiting text for `profanity` and `hate` positive-singles is composed
 locally from `profanity-scaffold.json` and `hate-scaffold.json`. The writer

@@ -28,6 +28,7 @@
     "ui": "npm run dev --workspace @airp/ui",
     "fetch:evaluator-model": "node tools/fetch-evaluator-model.mjs",
     "evaluator-training:plan": "node tools/evaluator-training/generate.mjs --plan",
+    "evaluator-training:composed-only": "node tools/evaluator-training/generate.mjs --composed-only --out data/evaluator-training/composed-preview",
     "evaluator-training:generate": "node tools/evaluator-training/generate.mjs",
     "evaluator-training:leak-check": "node tools/evaluator-training/leak-check.mjs",
     "evaluator-training:sample": "node tools/evaluator-training/sample.mjs",
