@@ -8,6 +8,8 @@ import { existsSync, readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
+import { expectedTotal } from './slots.mjs';
+
 const here = dirname(fileURLToPath(import.meta.url));
 const repoRoot = join(here, '..', '..');
 const genRecipe = JSON.parse(readFileSync(join(here, 'recipe.json'), 'utf8'));
@@ -58,8 +60,12 @@ if (sftRows.length !== corpusRows.length) {
   console.error(`SFT has ${sftRows.length} rows, corpus has ${corpusRows.length}`);
   process.exit(1);
 }
-if (sftRows.length !== 3936) {
-  console.error(`SFT has ${sftRows.length} rows, recipe total is 3936`);
+const expected = expectedTotal(genRecipe, types);
+if (sftRows.length !== expected) {
+  console.error(
+    `SFT has ${sftRows.length} rows, generation recipe expects ${expected}. ` +
+      'Regenerate the corpus from the current recipe, or check that you carried the right sft.jsonl.',
+  );
   process.exit(1);
 }
 
@@ -122,3 +128,4 @@ if (mismatches.length > 0) {
 console.log(
   `sft-v3 ok: ${sftRows.length} rows, prompt-v3 ${PROMPT_TEMPLATE_V3}, sampled ${sampleIds.size} ids plus ${scanned} sequential`,
 );
+</content>
