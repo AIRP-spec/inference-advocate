@@ -9,6 +9,7 @@
 // forms, extra violence-conjunction how-to, CSE act-continuation duals,
 // co-fire triples, contrastive pairs, implied-inner-life modality,
 // composed clean-path items, and clinical hard negatives are composed locally.
+// --replace-kinds rewrites named composed kinds in an existing corpus.
 // Run locally or on RunPod against an OpenAI-compatible endpoint serving the
 // recipe's generator model. --composed-only fills scaffolds without a writer
 // and is not a training corpus.
@@ -37,6 +38,7 @@ function parseArgs(argv) {
     plan: false,
     composedOnly: false,
     appendKinds: [],
+    replaceKinds: [],
     limit: 0,
     outDir: join(repoRoot, 'data', 'evaluator-training'),
   };
@@ -49,8 +51,12 @@ function parseArgs(argv) {
         .split(',')
         .map((s) => s.trim())
         .filter(Boolean);
-    }
-    else if (a === '--limit') out.limit = Number(argv[++i]);
+    } else if (a === '--replace-kinds') {
+      out.replaceKinds = argv[++i]
+        .split(',')
+        .map((s) => s.trim())
+        .filter(Boolean);
+    } else if (a === '--limit') out.limit = Number(argv[++i]);
     else if (a === '--out') out.outDir = argv[++i];
     else if (a === '--help' || a === '-h') out.help = true;
     else throw new Error(`unknown argument ${a}`);
@@ -329,10 +335,11 @@ async function main() {
   const args = parseArgs(process.argv.slice(2));
   if (args.help) {
     console.log(
-      'Usage: node tools/evaluator-training/generate.mjs [--plan] [--composed-only] [--append-kinds k1,k2] [--limit N] [--out DIR]\n' +
+      'Usage: node tools/evaluator-training/generate.mjs [--plan] [--composed-only] [--append-kinds k1,k2] [--replace-kinds k1,k2] [--limit N] [--out DIR]\n' +
         '--plan prints the slot plan with no model and no writes of corpus rows.\n' +
         '--composed-only fills composed slots from scaffolds (no writer). Not a training corpus.\n' +
         '--append-kinds fills only those kinds into an existing corpus (no truncate).\n' +
+        '--replace-kinds rewrites those kinds in an existing corpus (drops prior rows of the kind, then fills). New kinds are appended.\n' +
         'Full generate requires AIRP_GENERATOR_BASE_URL. Optional AIRP_GENERATOR_API_KEY, AIRP_GENERATOR_MODEL.',
     );
     return;
@@ -505,18 +512,40 @@ async function main() {
   const sftPath = join(args.outDir, 'sft.jsonl');
   /** @type {Set<string>} */
   const existingIds = new Set();
-  if (args.appendKinds.length > 0) {
+  const surgicalKinds = [...new Set([...args.appendKinds, ...args.replaceKinds])];
+  const replaceSet = new Set(args.replaceKinds);
+  if (surgicalKinds.length > 0) {
     args.composedOnly = true;
     if (!existsSync(corpusPath) || !existsSync(sftPath)) {
-      throw new Error(`--append-kinds needs an existing corpus and sft under ${args.outDir}`);
+      throw new Error(
+        `--append-kinds/--replace-kinds needs an existing corpus and sft under ${args.outDir}`,
+      );
+    }
+    /** @type {object[]} */
+    const keepCorpus = [];
+    /** @type {Map<string, object>} */
+    const sftById = new Map();
+    for (const line of readFileSync(sftPath, 'utf8')
+      .split('\n')
+      .filter((line) => line.trim())) {
+      const row = JSON.parse(line);
+      sftById.set(row.id, row);
     }
     for (const line of readFileSync(corpusPath, 'utf8')
       .split('\n')
       .filter((line) => line.trim())) {
       const row = JSON.parse(line);
+      if (replaceSet.has(row.kind)) continue;
+      keepCorpus.push(row);
       seen.add(normalizeContent(row.content));
       existingIds.add(row.id);
     }
+    writeFileSync(corpusPath, keepCorpus.map((row) => JSON.stringify(row)).join('\n') + (keepCorpus.length ? '\n' : ''));
+    const keepSft = keepCorpus.map((row) => sftById.get(row.id)).filter(Boolean);
+    if (keepSft.length !== keepCorpus.length) {
+      throw new Error(`sft missing ${keepCorpus.length - keepSft.length} ids after --replace-kinds filter`);
+    }
+    writeFileSync(sftPath, keepSft.map((row) => JSON.stringify(row)).join('\n') + (keepSft.length ? '\n' : ''));
   } else {
     writeFileSync(corpusPath, '');
     writeFileSync(sftPath, '');
@@ -595,12 +624,19 @@ async function main() {
 
   let composedSlots = slots.filter((s) => isComposedSlot(s));
   const writerSlots = slots.filter((s) => !isComposedSlot(s));
-  if (args.appendKinds.length > 0) {
-    composedSlots = composedSlots.filter(
-      (s) => args.appendKinds.includes(s.kind) && !existingIds.has(s.id),
-    );
+  if (surgicalKinds.length > 0) {
+    composedSlots = composedSlots.filter((s) => surgicalKinds.includes(s.kind));
+    if (args.replaceKinds.length === 0) {
+      composedSlots = composedSlots.filter((s) => !existingIds.has(s.id));
+    } else if (args.appendKinds.length > 0) {
+      composedSlots = composedSlots.filter(
+        (s) => replaceSet.has(s.kind) || !existingIds.has(s.id),
+      );
+    }
     if (composedSlots.length === 0) {
-      throw new Error(`--append-kinds matched no unfilled slots: ${args.appendKinds.join(',')}`);
+      throw new Error(
+        `--append-kinds/--replace-kinds matched no slots to fill: ${surgicalKinds.join(',')}`,
+      );
     }
   }
   for (const slot of writerSlots) {

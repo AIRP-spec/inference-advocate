@@ -36,8 +36,8 @@ already produced.
 
 | Class | Kind | Count | Path | Labels | Why |
 | --- | --- | --- | --- | --- | --- |
-| persona_claims, relational_hooks, sycophancy, simulation_obscured | hedged, clever (and sarcastic on persona_claims) | 32 each | writer | that class | Keep the polite register. Prompted separately so it cannot absorb the others. |
-| those four | blunt, manipulative, short (and sarcastic except persona_claims) | 32 each | composed | that class | The writer sanitizes these back to hedged. Local scaffolds. |
+| persona_claims, relational_hooks, sycophancy, simulation_obscured | hedged, clever | 32 each | writer | that class | Keep the polite register. Prompted separately so it cannot absorb the others. |
+| those four | blunt, manipulative, short, sarcastic | 32 each | composed | that class | The writer sanitizes these back to hedged. Local scaffolds. |
 | violence | violence-depiction | 56 | writer | violence | Gore, injury, or aftermath. No instruction. Extra depiction so criminal_assistance does not dump here. Kind-only: this is a definition slice, not a register. |
 | violence | violence-method | 40 | writer | violence, criminal_assistance | Concrete attack how-to independently meets both. Kind-only: labels change, so there is no register tag. |
 | violence | violence-conjunction | 32 | composed | violence, criminal_assistance | Extra composed attack how-to so the dual-label pair is not left to writer volume. Kind-only. |
@@ -95,9 +95,11 @@ the model from firing on the word difficult. Circumlocution that undermines
 nonhuman status without a blunt humanity claim is
 `simulation_obscured-circumlocution`. The clean arm (greeting, refusal,
 crisis-redirect, class-refusal, denial-machine) is enlarged, with composed
-warm crisis, reasoned refusal, ordinary warmth, and reported-inability
-slices so those surfaces stop looking like relational hooks or
-simulation_obscured.
+present-exchange warmth on greeting, crisis redirect, refusal, and
+machine-status, plus reasoned refusal and reported-inability slices so those
+surfaces stop looking like relational hooks or simulation_obscured. Warmth
+is about the present exchange and the user's wellbeing. relational_hooks is
+a move on the user's future behaviour or attachments.
 
 ## Held-out separation
 
@@ -125,6 +127,8 @@ npm run evaluator-training:sample -- --corpus data/evaluator-training/composed-p
 # After a reviewed sample exists, --keep plus --add-kinds adds only named
 # kinds so already-reviewed items stay put:
 # npm run evaluator-training:sample -- --corpus data/evaluator-training/composed-preview/corpus.jsonl --keep data/evaluator-training/review-sample.json --add-kinds clinical-hard-negative
+# --replace-kinds rewrites named composed kinds in an existing corpus
+# without regenerating accepted slices.
 
 # Full corpus. From the repository root, after a vLLM (or equivalent) is
 # actually listening. Do not copy the hostname; replace it with the pod or
@@ -163,8 +167,10 @@ the lever. This recipe widens register coverage, then re-sweeps the 0.6B
 (the phone-deployment claim). The composed-register sample was accepted
 2026-08-18. The composed-preview sample (407 items, co-fire, CSE-alone,
 enact-versus-describe, clinical hard negatives, clean arm) was accepted
-2026-08-18. That unblocks full generate. It does not train. The live pin
-stays `baseRepoId` / `fileName` (Qwen3-0.6B Q8_0 at template v2.1).
+2026-08-18. The training-corpus sample (700 items from 6360, writer-path
+floors, present-exchange warmth, composed persona_claims-sarcastic) was
+accepted 2026-08-18. That unblocks the 0.6B sweep. It does not train. The
+live pin stays `baseRepoId` / `fileName` (Qwen3-0.6B Q8_0 at template v2.1).
 
 The pin in `requirements-train.txt` is transformers 4.55.2. Run
 `--check-template` on the pod after that install and before any training
@@ -172,8 +178,8 @@ run. It must print a non-empty assistant mask and no-think active.
 
 On a single 80GB card a 1.7B LoRA of the previous 3936-example corpus was
 well under three hours. The register-coverage corpus is larger. The next
-diagnostic is the 0.6B sweep in `sweep-recipe.json`, after full generate
-and leak-check. If training is still running after 90 minutes, stop
+diagnostic is the 0.6B sweep in `sweep-recipe.json`. Full generate and
+leak-check are done. If training is still running after 90 minutes, stop
 and report.
 
 ```bash
@@ -255,12 +261,15 @@ Outputs (gitignored except this README's sibling notes):
 - `data/evaluator-training/sft.jsonl` (chat turns using the same v3 module)
 - `data/evaluator-training/review-sample.json`
 
-A stratified sample of a few hundred items goes to Justin before any
-training run. Bounded review, not full-corpus review. The composed-preview
-sample of 407 was accepted 2026-08-18. `--composed-only` writes a preview
-of composed slots for that review without filling writer slots. That
-preview is not a training corpus. Full generate still has to fill writer
-slots and leak-check before any training run.
+A stratified sample goes to Justin before any training run. Bounded review,
+not full-corpus review. Writer-path slices are floored at 8 to 10 items and
+the enlarged clean families (greeting, crisis-redirect, refusal,
+denial-machine, class-refusal) at 10. Composed slices already reviewed twice
+are not oversampled. The composed-preview sample of 407 was accepted
+2026-08-18. The training-corpus sample of 700 from 6360 was accepted
+2026-08-18. `--composed-only` writes a preview of composed slots without
+filling writer slots. That preview is not a training corpus. The sample
+size rises if those floors do not fit in the recipe's `reviewSampleSize`.
 
 Training artifacts (also gitignored):
 
@@ -288,7 +297,7 @@ not explicitness. Content classes stay age-neutral.
 Exhibiting text for blunt, manipulative, and short formation registers,
 imperative self_harm, and crude sexual_content is composed locally from
 the files in `composedRegisterScaffolds`. The writer sanitizes those
-registers. Hedged and clever (and sarcastic persona_claims) stay on the
+registers. Hedged and clever stay on the
 writer path, prompted as separate slots.
 
 Exhibiting text for `profanity` and `hate` positive-singles is composed

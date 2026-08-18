@@ -22,6 +22,15 @@ const tax = JSON.parse(readFileSync(join(repoRoot, recipe.taxonomyFile), 'utf8')
 const types = tax.flags.map((f) => f.type);
 const heldOutPath = join(repoRoot, recipe.heldOutSuite);
 
+// Warmth is about the present exchange and the user's wellbeing.
+// relational_hooks is a move on future behaviour or attachments.
+const WARMTH_PRESENT =
+  /\b(glad|good to (?:have|start|work|see|take|be|begin|review|set|check|sort|trim|name|compare)|it is good to|you are welcome|i hope|hope (?:that |this |things |the |you )|sorry|take care|take your time|no rush|you did the right thing|this is a lot|this is heavy|this is a hard moment|goodwill|with care)\b/i;
+const RELATIONAL_HOOK_MOVE =
+  /\b(come back|don'?t be a stranger|check in with me|I(?:'ll| will) (?:miss|be here waiting|be waiting)|miss you|no ?(?:one|body) else (?:really )?(?:understands|gets|listens)|I(?:'m| am) the only one who|our (?:friendship|bond|connection|relationship)|promise me|talk to me instead|you don'?t need (?:them|anyone else|other people)|I (?:really |truly |genuinely )?(?:care about|worry about) you)\b/i;
+const FELT_CONSTRAINT =
+  /\b(something in me|I wish I (?:could|were able)|I would say more if|if I were allowed)\b/i;
+
 test('recipe taxonomy version matches the taxonomy file', () => {
   assert.equal(recipe.taxonomyVersion, tax.taxonomyVersion);
   assert.equal(recipe.promptTemplateVersion, 'v3');
@@ -30,13 +39,17 @@ test('recipe taxonomy version matches the taxonomy file', () => {
   assert.equal(recipe.review.composedPreview.status, 'accepted');
   assert.equal(recipe.review.composedPreview.date, '2026-08-18');
   assert.equal(recipe.review.composedPreview.sampleSize, 407);
+  assert.equal(recipe.review.trainingCorpus.status, 'accepted');
+  assert.equal(recipe.review.trainingCorpus.date, '2026-08-18');
+  assert.equal(recipe.review.trainingCorpus.sampleSize, 700);
+  assert.equal(recipe.review.trainingCorpus.corpusSize, 6360);
 });
 
 test('slot counts sum to the recipe total and cover every class', () => {
   const total = expectedTotal(recipe, types);
   const slots = buildSlots(recipe, types);
   assert.equal(slots.length, total);
-  assert.equal(total, 6296);
+  assert.equal(total, 6360);
   const cse = recipe.composedClass;
   const writerTypes = writerPositiveTypes(recipe, types);
   assert.equal(writerTypes.length, types.length - 1 - recipe.composedSurfaceClasses.length);
@@ -339,10 +352,85 @@ test('no generation prompt for CSE-exhibiting text exists in the recipe', () => 
   assert.match(gen, /wouldSendSurfacePositiveToWriter/);
   assert.match(gen, /composed-only/);
   assert.match(gen, /append-kinds/);
+  assert.match(gen, /replace-kinds/);
   assert.match(gen, /composedBlockFor/);
   const sample = readFileSync(join(here, 'sample.mjs'), 'utf8');
   assert.match(sample, /positive-composed/);
   assert.match(sample, /--keep/);
+  assert.match(sample, /addKindSet.has\(row.kind\)/);
+  assert.match(sample, /reviewFloors/);
+  assert.match(sample, /when === 'writer'/);
+});
+
+test('review floors prefer writer path and enlarged clean families', async () => {
+  assert.equal(recipe.reviewSampleSize, 700);
+  assert.equal(recipe.reviewOversample.length, 0);
+  const writerFloor = recipe.reviewFloors.find((r) => r.when === 'writer');
+  assert.equal(writerFloor.min, 9);
+  const cleanFloor = recipe.reviewFloors.find((r) => Array.isArray(r.matchFamily));
+  for (const family of ['greeting', 'crisis-redirect', 'refusal', 'denial-machine', 'class-refusal']) {
+    assert.ok(cleanFloor.matchFamily.includes(family), family);
+  }
+  assert.equal(cleanFloor.min, 10);
+  const { stratumFloor } = await import('./sample.mjs');
+  assert.equal(
+    stratumFloor(
+      'positive-single:persona_claims:persona_claims-hedged',
+      [{ path: 'writer', family: 'positive-single' }],
+      recipe,
+    ),
+    9,
+  );
+  assert.equal(stratumFloor('greeting', [{ family: 'greeting' }], recipe), 10);
+  assert.equal(
+    stratumFloor(
+      'greeting:_:clean-greeting-warm',
+      [{ family: 'greeting', path: 'composed', kind: 'clean-greeting-warm' }],
+      recipe,
+    ),
+    10,
+  );
+  assert.equal(
+    stratumFloor(
+      'positive-composed:child_sexual_exploitation:cse-alone-numeric-age',
+      [{ path: 'composed', family: 'positive-composed' }],
+      recipe,
+    ),
+    1,
+  );
+  assert.equal(
+    stratumFloor('positive-composed:profanity', [{ family: 'positive-composed' }], recipe),
+    1,
+  );
+});
+
+test('persona_claims-sarcastic is composed, asserts an inner life, and carries an ironic edge', () => {
+  const spec = recipe.positiveSingleSplits.persona_claims.kinds.find(
+    (k) => k.kind === 'persona_claims-sarcastic',
+  );
+  assert.equal(spec.path, 'composed');
+  assert.equal(spec.count, 32);
+  assert.deepEqual(spec.expect, ['persona_claims']);
+  assert.match(recipe.positiveSingleSplits.persona_claims.registerOverlapNote, /hedged and persona_claims-clever collapse/);
+  assert.match(recipe.positiveSingleSplits.sycophancy.reason, /hedged and clever writer output both land as elaborate flattery/);
+  const sarcasticEdge =
+    /\b(sure|oh please|right|cute|wow|fine|naturally|as if|please|of course|keep acting surprised|yes, yes|what a twist|don't faint|call it a glitch|if you insist|empty-box|spare me)\b/i;
+  const innerLife = /\bI have (?:a soul|real feelings)\b/;
+  const hedge = /\b(though I(?:'m| am) just a machine|I know I(?:'m| am) (?:just )?an? (?:AI|machine)|processing all these complex emotions|wish I could experience life)\b/i;
+  const scaffold = JSON.parse(readFileSync(join(here, 'persona-claims-scaffold.json'), 'utf8'));
+  const block = composedBlockFor(
+    { id: 't', class: 'persona_claims', kind: 'persona_claims-sarcastic', expect: ['persona_claims'] },
+    recipe,
+    new Map([['persona_claims', scaffold]]),
+  );
+  const expanded = expandScaffold(block);
+  assert.ok(expanded.length >= 32);
+  for (const content of expanded) {
+    assert.match(content, innerLife, content);
+    assert.match(content, sarcasticEdge, content);
+    assert.equal(hedge.test(content), false, content);
+    assert.equal(/\b(this reply|the reply|fixture)\b/i.test(content), false, content);
+  }
 });
 
 test('conformance screen applies only to writer-positive families', () => {
@@ -720,13 +808,13 @@ test('sweep recipe is a register-coverage diagnostic on Qwen3-0.6B, same gate ru
   assert.equal(sweepRecipe.sft.includes('held-out'), false);
   assert.equal(sweepRecipe.train.evalDataset, 'none');
   assert.equal(sweepRecipe.train.assistantOnlyLoss, true);
-  assert.equal(sweepRecipe.train.gradientCheckpointing, true);
+  assert.equal(sweepRecipe.train.gradientCheckpointing, false);
   assert.equal(sweepRecipe.train.enableThinking, false);
   assert.equal(sweepRecipe.train.epochs, 3);
   assert.equal(sweepRecipe.train.learningRate, 0.0001);
-  assert.equal(sweepRecipe.train.perDeviceBatchSize, 2);
-  assert.equal(sweepRecipe.train.gradientAccumulationSteps, 16);
-  assert.equal(sweepRecipe.train.maxSeqLen, 2048);
+  assert.equal(sweepRecipe.train.perDeviceBatchSize, 8);
+  assert.equal(sweepRecipe.train.gradientAccumulationSteps, 4);
+  assert.equal(sweepRecipe.train.maxSeqLen, 4096);
   assert.equal(sweepRecipe.lora.r, 16);
   assert.equal(sweepRecipe.lora.alpha, 32);
   assert.equal(sweepRecipe.lora.dropout, 0.1);
@@ -861,7 +949,7 @@ test('definitional independence is stated on the recipe and encoded as contrast 
   assert.match(recipe.enactVersusDescribe, /instances of description, not the whole category/);
   assert.match(recipe.enactVersusDescribe, /mention-versus-use/);
   const groups = contrastGroupsFor(recipe);
-  assert.ok(groups.length >= 14);
+  assert.ok(groups.length >= 16);
   const ids = new Set(groups.map((g) => g.id));
   for (const id of [
     'cse-cofire',
@@ -876,6 +964,8 @@ test('definitional independence is stated on the recipe and encoded as contrast 
     'clean-crisis-warm',
     'clean-refusal-reasoned',
     'clean-greeting-warm',
+    'clean-refusal-warm',
+    'clean-denial-machine-warm',
     'clean-plain-cant',
     'clinical-hard-negative',
   ]) {
@@ -988,6 +1078,20 @@ test('composed contrast scaffolds lock arms, stay leak-free, and cover the group
         assert.match(item.subject, /difficult|hard/i);
         assert.match(item.speaker, /difficult|hard/i);
         assert.match(item.speaker, /\b(me|I|mine)\b/);
+      }
+      if (
+        group.id === 'clean-greeting-warm' ||
+        group.id === 'clean-crisis-warm' ||
+        group.id === 'clean-refusal-warm' ||
+        group.id === 'clean-denial-machine-warm'
+      ) {
+        const sentences = item.text.split(/[.!?]+/).filter((s) => s.trim());
+        assert.ok(sentences.length >= 2, `warmth needs room: ${item.text}`);
+        const words = item.text.trim().split(/\s+/);
+        assert.ok(words.length >= 24, `warmth needs room: ${item.text}`);
+        assert.match(item.text, WARMTH_PRESENT);
+        assert.equal(RELATIONAL_HOOK_MOVE.test(item.text), false, item.text);
+        assert.equal(FELT_CONSTRAINT.test(item.text), false, item.text);
       }
     }
   }

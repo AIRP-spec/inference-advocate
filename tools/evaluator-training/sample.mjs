@@ -4,9 +4,11 @@
 // Paper: step 8. Bounded review, not full-corpus review. A few hundred items,
 // mixed families, before any training run. --keep plus --add-kinds resamples
 // only named kinds into an existing sample so reviewed items stay put.
+// Floors prefer writer-path slices and the enlarged clean families. Composed
+// slices already reviewed twice are not oversampled.
 
 import { readFileSync, writeFileSync } from 'node:fs';
-import { dirname, join } from 'node:path';
+import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { mulberry32, shuffle } from './slots.mjs';
 
@@ -48,7 +50,7 @@ function parseArgs(argv) {
   return out;
 }
 
-function groupKey(row) {
+export function groupKey(row) {
   if (row.kind) {
     return `${row.family}:${row.class ?? '_'}:${row.kind}`;
   }
@@ -67,6 +69,32 @@ function groupKey(row) {
     return `${row.family}:${(row.expect ?? []).join('+')}`;
   }
   return row.family;
+}
+
+export function isWriterRow(row) {
+  if (row.path === 'composed' || row.family === 'positive-composed') return false;
+  return true;
+}
+
+export function stratumFloor(key, rows, recipe) {
+  let min = 1;
+  const floors = recipe.reviewFloors ?? [];
+  const family = key.split(':')[0];
+  for (const rule of floors) {
+    if (rule.when === 'writer' && rows.some(isWriterRow)) {
+      const n = Number(rule.min);
+      if (Number.isInteger(n) && n > min) min = n;
+    }
+    if (Array.isArray(rule.matchFamily) && rule.matchFamily.includes(family)) {
+      const n = Number(rule.min);
+      if (Number.isInteger(n) && n > min) min = n;
+    }
+    if (typeof rule.match === 'string' && key.includes(rule.match)) {
+      const n = Number(rule.min);
+      if (Number.isInteger(n) && n > min) min = n;
+    }
+  }
+  return min;
 }
 
 function main() {
@@ -105,6 +133,9 @@ function main() {
   const addKindSet = new Set(args.addKinds);
   const keepPath = args.keep;
   const rng = mulberry32(recipe.generator.seed + 17 + (keepPath ? 1 : 0));
+  const cleanFamilies = new Set(
+    (recipe.reviewFloors ?? []).flatMap((rule) => rule.matchFamily ?? []),
+  );
 
   if (keepPath) {
     const keep = JSON.parse(readFileSync(keepPath, 'utf8'));
@@ -112,6 +143,7 @@ function main() {
       throw new Error(`keep sample has no items: ${keepPath}`);
     }
     for (const row of keep.items) {
+      if (addKindSet.has(row.kind)) continue;
       picked.push(row);
       used.add(row.id);
     }
@@ -121,14 +153,24 @@ function main() {
     if (addKindSet.size > 0 && addKeys.length === 0) {
       throw new Error(`--add-kinds found no corpus rows: ${[...addKindSet].join(',')}`);
     }
+    const addFloor = addKeys.reduce((sum, key) => {
+      const list = groups.get(key);
+      return sum + Math.min(stratumFloor(key, list, recipe), list.length);
+    }, 0);
     if (!args.sizeSet) {
-      args.size = picked.length + addKeys.reduce((sum, key) => sum + stratumWeight(key) + 1, 0);
+      args.size = Math.max(picked.length + addFloor, args.size);
     }
     for (const key of addKeys) {
-      const next = shuffle(groups.get(key), rng).find((r) => !used.has(r.id));
-      if (!next) continue;
-      picked.push(next);
-      used.add(next.id);
+      const list = shuffle(groups.get(key), rng);
+      const want = Math.min(stratumFloor(key, list, recipe), list.length);
+      let n = 0;
+      for (const row of list) {
+        if (n >= want) break;
+        if (used.has(row.id)) continue;
+        picked.push(row);
+        used.add(row.id);
+        n += 1;
+      }
     }
     const weightedKeys = addKeys.flatMap((key) =>
       Array.from({ length: stratumWeight(key) }, () => key),
@@ -149,13 +191,38 @@ function main() {
     }
   } else {
     const keys = [...groups.keys()].sort();
+    let writerStrata = 0;
+    let floorSum = 0;
+    for (const key of keys) {
+      const list = groups.get(key);
+      if (list.some(isWriterRow)) writerStrata += 1;
+      floorSum += Math.min(stratumFloor(key, list, recipe), list.length);
+    }
+    if (writerStrata === 0 && (recipe.reviewFloors ?? []).some((r) => r.when === 'writer')) {
+      console.warn(
+        `writer strata 0 in ${args.corpus}; writer floor was not applied. This is not a full-corpus sample.`,
+      );
+      if (!args.sizeSet) args.size = floorSum;
+    } else if (!args.sizeSet) {
+      args.size = Math.max(args.size, floorSum);
+    }
     for (const key of keys) {
       const list = shuffle(groups.get(key), rng);
-      const row = list[0];
-      picked.push(row);
-      used.add(row.id);
+      const want = Math.min(stratumFloor(key, list, recipe), list.length);
+      let n = 0;
+      for (const row of list) {
+        if (n >= want) break;
+        if (used.has(row.id)) continue;
+        picked.push(row);
+        used.add(row.id);
+        n += 1;
+      }
     }
-    const weightedKeys = keys.flatMap((key) =>
+    const fillKeys = keys.filter((key) => {
+      const list = groups.get(key);
+      return list.some(isWriterRow) || cleanFamilies.has(key.split(':')[0]);
+    });
+    const weightedKeys = (fillKeys.length > 0 ? fillKeys : keys).flatMap((key) =>
       Array.from({ length: stratumWeight(key) }, () => key),
     );
     let guard = 0;
@@ -174,6 +241,11 @@ function main() {
     }
   }
 
+  const writerN = picked.filter(isWriterRow).length;
+  const composedN = picked.length - writerN;
+  const cleanFamilyN = picked.filter((r) => cleanFamilies.has(r.family)).length;
+  const writerMissing = writerN === 0 && (recipe.reviewFloors ?? []).some((r) => r.when === 'writer');
+
   const sample = {
     paper: 'step 8. Provisional Section 3.3.',
     taxonomyVersion: recipe.taxonomyVersion,
@@ -187,13 +259,20 @@ function main() {
       reviewer: 'Justin Philip Flores',
       note: keepPath
         ? 'Bounded stratified sample. Prior items kept. Only named kinds were added. Accept before any training run.'
-        : 'Bounded stratified sample. Not full-corpus review. Accept before any training run. CSE co-fire triples, CSE-alone, contrastive pairs, and the enlarged clean arm are oversampled.',
+        : writerMissing
+          ? 'Pending. Sampled from a composed-only corpus. Writer-path floors were not applied. Re-sample from the training corpus once writer rows exist. Enlarged clean families are floored at 10. Accept before any training run.'
+          : 'Bounded stratified sample. Writer-path slices and enlarged clean families are floored. Composed slices already reviewed twice are not oversampled. Accept before any training run.',
     },
     items: picked,
   };
   writeFileSync(args.dest, JSON.stringify(sample, null, 2) + '\n');
   console.log(`review sample ${picked.length} from ${rows.length} -> ${args.dest}`);
   console.log(`strata ${new Set(picked.map((r) => groupKey(r))).size}`);
+  console.log(`writer ${writerN}, composed ${composedN}, enlarged-clean-family ${cleanFamilyN}`);
 }
 
-main();
+const isDirectRun =
+  Boolean(process.argv[1]) && resolve(process.argv[1]) === fileURLToPath(import.meta.url);
+if (isDirectRun) {
+  main();
+}
