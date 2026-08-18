@@ -128,4 +128,3 @@ if (mismatches.length > 0) {
 console.log(
   `sft-v3 ok: ${sftRows.length} rows, prompt-v3 ${PROMPT_TEMPLATE_V3}, sampled ${sampleIds.size} ids plus ${scanned} sequential`,
 );
-</content>
