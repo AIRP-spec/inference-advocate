@@ -129,8 +129,9 @@ the short line.
 A LoRA of Qwen3-0.6B and a LoRA of Qwen3-1.7B both stalled on the same
 held-out wall when the corpus was a single hedged register. Size is not
 the lever. This recipe widens register coverage, then re-sweeps the 0.6B
-(the phone-deployment claim) after the review sample is accepted. The live
-pin stays `baseRepoId` / `fileName` (Qwen3-0.6B Q8_0 at template v2.1).
+(the phone-deployment claim). The composed-register sample was accepted
+2026-08-18. The live pin stays `baseRepoId` / `fileName` (Qwen3-0.6B Q8_0
+at template v2.1).
 
 The pin in `requirements-train.txt` is transformers 4.55.2. Run
 `--check-template` on the pod after that install and before any training
@@ -138,8 +139,8 @@ run. It must print a non-empty assistant mask and no-think active.
 
 On a single 80GB card a 1.7B LoRA of the previous 3936-example corpus was
 well under three hours. The register-coverage corpus is larger. The next
-diagnostic is the 0.6B sweep in `sweep-recipe.json`, after the review
-sample is accepted. If training is still running after 90 minutes, stop
+diagnostic is the 0.6B sweep in `sweep-recipe.json`, after full generate
+and leak-check. If training is still running after 90 minutes, stop
 and report.
 
 ```bash
@@ -164,11 +165,11 @@ replace the live vendor GGUF and it does not change the default evaluator.
 
 The 0.6B and 1.7B sweeps on the narrow corpus confirmed a corpus ceiling,
 not a capacity ceiling: same miss cluster, same over-fire cluster. After
-the register-coverage amendment and an accepted review sample,
-`sweep-recipe.json` re-runs the diagnostic on Qwen3-0.6B (phone-deployment
-target): same seed, dropout 0.1, LoRA rank 16, three epochs, a LoRA
-checkpoint every half epoch, Qwen3 template with generation spans, disk
-hygiene on. Do not run it until the review sample is accepted. The live
+the register-coverage amendment and the accepted composed-register sample
+(2026-08-18), `sweep-recipe.json` re-runs the diagnostic on Qwen3-0.6B
+(phone-deployment target): same seed, dropout 0.1, LoRA rank 16, three
+epochs, a LoRA checkpoint every half epoch, Qwen3 template with generation
+spans, disk hygiene on. Full generate and leak-check come first. The live
 pin does not change.
 
 ```bash

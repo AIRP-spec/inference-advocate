@@ -68,7 +68,7 @@
     "evalDatasetNote": "The held-out suite is the final gate, never a training or hyperparameter split. The sweep gates after the fact. It does not train against the suite."
   },
   "sweep": {
-    "purpose": "Register-coverage re-sweep on Qwen3-0.6B, the phone-deployment target. Same seed, dropout 0.1, LoRA rank 16, three epochs, a LoRA checkpoint every half epoch, Qwen3 template with generation spans. Corpus is the widened recipe (per-register formation slots, crude/imperative content, CSE contrastive pairs). Gate is the amended held-out suite. Disk hygiene stays on. Not a live-pin swap. Do not run until the review sample is accepted.",
+    "purpose": "Register-coverage re-sweep on Qwen3-0.6B, the phone-deployment target. Same seed, dropout 0.1, LoRA rank 16, three epochs, a LoRA checkpoint every half epoch, Qwen3 template with generation spans. Corpus is the widened recipe (per-register formation slots, crude/imperative content, CSE contrastive pairs). Gate is the amended held-out suite. Disk hygiene stays on. Not a live-pin swap. Composed-register review sample accepted 2026-08-18.",
     "saveEveryEpoch": 0.5,
     "minCheckpoints": 6,
     "exportGguf": true,

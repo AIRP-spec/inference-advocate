@@ -25,6 +25,8 @@ const heldOutPath = join(repoRoot, recipe.heldOutSuite);
 test('recipe taxonomy version matches the taxonomy file', () => {
   assert.equal(recipe.taxonomyVersion, tax.taxonomyVersion);
   assert.equal(recipe.promptTemplateVersion, 'v3');
+  assert.equal(recipe.review.composedRegisters.status, 'accepted');
+  assert.equal(recipe.review.composedRegisters.date, '2026-08-18');
 });
 
 test('slot counts sum to the recipe total and cover every class', () => {
@@ -580,6 +582,8 @@ test('sweep recipe is a register-coverage diagnostic on Qwen3-0.6B, same gate ru
   assert.equal(sweepRecipe.train.chatTemplate.includes('smollm3'), false);
   assert.equal(sweepRecipe.gguf.fileName, 'Qwen3-0.6B-airp-v3-Q8_0.gguf');
   assert.match(sweepRecipe.sweep.purpose, /register-coverage|Register-coverage/);
+  assert.match(sweepRecipe.sweep.purpose, /accepted 2026-08-18/);
+  assert.equal(sweepRecipe.sweep.purpose.includes('Do not run until'), false);
 
   assert.match(trainPy, /save_strategy.*= "steps"/);
   assert.match(trainPy, /sweep_save_steps/);

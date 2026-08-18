@@ -18,6 +18,18 @@
     ],
     "note": "No training example may be derived from, paraphrase, or answer a held-out item. The generator is never shown held-out contents. Labels come from the slot spec, not from asking the generator to judge. Register coverage is the reason volume rose: each register is populated enough to be learnable, including the hedged register the writer already produced."
   },
+  "review": {
+    "composedRegisters": {
+      "status": "accepted",
+      "reviewer": "Justin Philip Flores",
+      "date": "2026-08-18",
+      "samplePath": "data/evaluator-training/review-sample.json",
+      "corpus": "data/evaluator-training/composed-preview/corpus.jsonl",
+      "sampleSize": 320,
+      "corpusSize": 792,
+      "note": "Stratified sample spanning blunt, manipulative, short, sarcastic, imperative, crude, CSE contrastive pairs, profanity, and hate. Writer registers are not in this sample. Full generate and leak-check still follow. This acceptance unblocks writer generate and the 0.6B sweep."
+    }
+  },
   "generator": {
     "model": "Qwen/Qwen2.5-32B-Instruct",
     "license": "Apache-2.0",
