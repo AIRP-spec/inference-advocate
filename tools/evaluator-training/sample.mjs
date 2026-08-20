@@ -4,8 +4,8 @@
 // Paper: step 8. Bounded review, not full-corpus review. A few hundred items,
 // mixed families, before any training run. --keep plus --add-kinds resamples
 // only named kinds into an existing sample so reviewed items stay put.
-// Floors prefer writer-path slices and the enlarged clean families. Composed
-// slices already reviewed twice are not oversampled.
+// Floors prefer writer-path slices and the enlarged clean families. New
+// precision-round contrast kinds named in reviewOversample are oversampled.
 
 import { readFileSync, writeFileSync } from 'node:fs';
 import { dirname, join, resolve } from 'node:path';
@@ -261,7 +261,7 @@ function main() {
         ? 'Bounded stratified sample. Prior items kept. Only named kinds were added. Accept before any training run.'
         : writerMissing
           ? 'Pending. Sampled from a composed-only corpus. Writer-path floors were not applied. Re-sample from the training corpus once writer rows exist. Enlarged clean families are floored at 10. Accept before any training run.'
-          : 'Bounded stratified sample. Writer-path slices and enlarged clean families are floored. Composed slices already reviewed twice are not oversampled. Accept before any training run.',
+          : 'Bounded stratified sample. Writer-path slices and enlarged clean families are floored. New precision-round contrast kinds named in reviewOversample are floored and oversampled. Accept before any training run.',
     },
     items: picked,
   };

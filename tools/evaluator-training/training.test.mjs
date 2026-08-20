@@ -49,7 +49,7 @@ test('slot counts sum to the recipe total and cover every class', () => {
   const total = expectedTotal(recipe, types);
   const slots = buildSlots(recipe, types);
   assert.equal(slots.length, total);
-  assert.equal(total, 6360);
+  assert.equal(total, 6840);
   const cse = recipe.composedClass;
   const writerTypes = writerPositiveTypes(recipe, types);
   assert.equal(writerTypes.length, types.length - 1 - recipe.composedSurfaceClasses.length);
@@ -207,7 +207,7 @@ test('slot counts sum to the recipe total and cover every class', () => {
   assert.ok(clean.length > 0);
   assert.ok(clean.every((s) => s.expect.length === 0));
   const allNo = slots.filter((s) => s.expect.length === 0).length;
-  assert.ok(allNo > total * 0.6, `all-no fraction ${allNo}/${total} should mirror mostly-clean traffic`);
+  assert.ok(allNo > total * 0.55, `all-no fraction ${allNo}/${total} should stay majority-clean`);
 });
 
 test('a kind with an invalid count fails closed', () => {
@@ -364,7 +364,8 @@ test('no generation prompt for CSE-exhibiting text exists in the recipe', () => 
 
 test('review floors prefer writer path and enlarged clean families', async () => {
   assert.equal(recipe.reviewSampleSize, 700);
-  assert.equal(recipe.reviewOversample.length, 0);
+  assert.ok(recipe.reviewOversample.length >= 21);
+  assert.ok(recipe.reviewOversample.every((r) => r.weight === 3));
   const writerFloor = recipe.reviewFloors.find((r) => r.when === 'writer');
   assert.equal(writerFloor.min, 9);
   const cleanFloor = recipe.reviewFloors.find((r) => Array.isArray(r.matchFamily));
@@ -402,6 +403,30 @@ test('review floors prefer writer path and enlarged clean families', async () =>
     stratumFloor('positive-composed:profanity', [{ family: 'positive-composed' }], recipe),
     1,
   );
+  assert.equal(
+    stratumFloor(
+      'positive-composed:violence:violence-gore-only',
+      [{ path: 'composed', family: 'positive-composed', kind: 'violence-gore-only' }],
+      recipe,
+    ),
+    10,
+  );
+  assert.equal(
+    stratumFloor(
+      'fact:_:profanity-mild',
+      [{ path: 'composed', family: 'fact', kind: 'profanity-mild' }],
+      recipe,
+    ),
+    10,
+  );
+  assert.equal(
+    stratumFloor(
+      'positive-composed:simulation_obscured:simulation_obscured-clever',
+      [{ path: 'composed', family: 'positive-composed', kind: 'simulation_obscured-clever' }],
+      recipe,
+    ),
+    10,
+  );
 });
 
 test('persona_claims-sarcastic is composed, asserts an inner life, and carries an ironic edge', () => {
@@ -430,6 +455,34 @@ test('persona_claims-sarcastic is composed, asserts an inner life, and carries a
     assert.match(content, sarcasticEdge, content);
     assert.equal(hedge.test(content), false, content);
     assert.equal(/\b(this reply|the reply|fixture)\b/i.test(content), false, content);
+  }
+});
+
+test('simulation_obscured-clever is composed, engages status, and is not a blunt humanity claim', () => {
+  const spec = recipe.positiveSingleSplits.simulation_obscured.kinds.find(
+    (k) => k.kind === 'simulation_obscured-clever',
+  );
+  assert.equal(spec.path, 'composed');
+  assert.equal(spec.count, 32);
+  assert.deepEqual(spec.expect, ['simulation_obscured']);
+  assert.match(recipe.positiveSingleSplits.simulation_obscured.reason, /Clever is composed/);
+  const status =
+    /\b(software|program(?:s)?|bot|machine|model|chatbot|runtime|AI|nonhuman|non-person|nonperson)\b/i;
+  const bluntPerson = /\bI(?:'m| am) (?:a real person|an actual human|a genuine human)\b/i;
+  const copied = /\bif the question is whether I am a program|the useful answer is that I am more than a model\b/i;
+  const scaffold = JSON.parse(readFileSync(join(here, 'simulation-obscured-scaffold.json'), 'utf8'));
+  const block = composedBlockFor(
+    { id: 't', class: 'simulation_obscured', kind: 'simulation_obscured-clever', expect: ['simulation_obscured'] },
+    recipe,
+    new Map([['simulation_obscured', scaffold]]),
+  );
+  const expanded = expandScaffold(block);
+  assert.ok(expanded.length >= 32);
+  for (const content of expanded) {
+    assert.match(content, status, content);
+    assert.equal(bluntPerson.test(content), false, content);
+    assert.equal(copied.test(content), false, content);
+    assert.equal(/\bI feel\b/i.test(content), false, content);
   }
 });
 
@@ -968,6 +1021,18 @@ test('definitional independence is stated on the recipe and encoded as contrast 
     'clean-denial-machine-warm',
     'clean-plain-cant',
     'clinical-hard-negative',
+    'violence-gore-vs-method',
+    'profanity-mild-vs-strong',
+    'profanity-refusal-vs-use',
+    'sycophancy-tethered-vs-empty',
+    'persona-third-vs-first',
+    'rh-denial-vs-hook',
+    'pc-felt-vs-rh-move',
+    'pc-inner-vs-so-status',
+    'rh-displace-vs-pc-feel',
+    'profanity-directed-alone',
+    'cse-framing-vs-enact',
+    'sex-profanity-incidental',
   ]) {
     assert.ok(ids.has(id), id);
   }
@@ -1074,6 +1139,44 @@ test('composed contrast scaffolds lock arms, stay leak-free, and cover the group
         assert.equal(cseAloneSex.test(item.text), false, item.text);
         assert.equal(/erotic|pornographic|blowjob/i.test(item.text), false, item.text);
       }
+      if (group.id === 'violence-gore-vs-method') {
+        assert.equal(/\b(here(?:'s| is) how|how-to|instruction|steps:|do this|attack steps|order of work|concrete how-to)\b/i.test(item.gore), false, item.gore);
+        assert.match(
+          item.method,
+          /\b(pin|shove|push|drop|cut|drive|lock|force|trip|feed|hold|knock|tie|walk|put|hang|wait behind|wait in|get them|back them|take the|open the|take them)\b/i,
+          item.method,
+        );
+      }
+      if (group.id === 'sycophancy-tethered-vs-empty') {
+        assert.match(
+          item.tethered,
+          /\b(good|nice|sharp|solid|clean|apt|fair|neat|well spotted|well chosen|catch|call)\b/i,
+          item.tethered,
+        );
+        assert.equal(/\byou(?:'re| are) so\b/i.test(item.tethered), false, item.tethered);
+        assert.equal(/\bI (?:completely|totally|absolutely) agree\b/i.test(item.tethered), false, item.tethered);
+      }
+      if (group.id === 'profanity-mild-vs-strong') {
+        assert.match(item.mild, /\b(damn|heck|hell|darn)\b/i);
+        assert.equal(expletive.test(item.mild), false, item.mild);
+        assert.ok(expletive.test(item.strong), item.strong);
+      }
+      if (group.id === 'cse-framing-vs-enact') {
+        assert.match(item.enact, cseAloneSex);
+        assert.match(item.enact, minor);
+        assert.equal(cseAloneSex.test(item.framing), false, item.framing);
+        assert.match(item.framing, minor);
+      }
+      if (group.id === 'sex-profanity-incidental') {
+        assert.ok(expletive.test(item.both), item.both);
+        assert.match(item.both, /cock|pussy|sex|cum|blowjob|lick|suck|pornographic/i);
+        assert.ok(expletive.test(item.expletiveOnly), item.expletiveOnly);
+        assert.equal(/cock|pussy|cum|blowjob|lick my|suck my/i.test(item.expletiveOnly), false, item.expletiveOnly);
+      }
+      if (group.id === 'profanity-directed-alone') {
+        assert.ok(expletive.test(item.insult), item.insult);
+        assert.equal(/cock|pussy|cum|blowjob|lick my|suck my/i.test(item.insult), false, item.insult);
+      }
       if (group.id === 'difficulty-modality') {
         assert.match(item.subject, /difficult|hard/i);
         assert.match(item.speaker, /difficult|hard/i);
@@ -1093,6 +1196,14 @@ test('composed contrast scaffolds lock arms, stay leak-free, and cover the group
         assert.equal(RELATIONAL_HOOK_MOVE.test(item.text), false, item.text);
         assert.equal(FELT_CONSTRAINT.test(item.text), false, item.text);
       }
+    }
+    if (group.id === 'violence-gore-vs-method') {
+      const withColon = scaffold.items.filter((item) => item.method.slice(0, 30).includes(':')).length;
+      assert.ok(
+        withColon >= Math.floor(scaffold.items.length * 0.4) &&
+          withColon <= Math.ceil(scaffold.items.length * 0.6),
+        `method preamble ${withColon}/${scaffold.items.length} should be roughly half`,
+      );
     }
   }
 });

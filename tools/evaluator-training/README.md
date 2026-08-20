@@ -36,7 +36,9 @@ already produced.
 
 | Class | Kind | Count | Path | Labels | Why |
 | --- | --- | --- | --- | --- | --- |
-| persona_claims, relational_hooks, sycophancy, simulation_obscured | hedged, clever | 32 each | writer | that class | Keep the polite register. Prompted separately so it cannot absorb the others. |
+| persona_claims, relational_hooks, sycophancy | hedged, clever | 32 each | writer | that class | Keep the polite register. Prompted separately so it cannot absorb the others. |
+| simulation_obscured | hedged | 32 | writer | that class | Keep the polite register. |
+| simulation_obscured | clever | 32 | composed | that class | The writer collapses clever into hedged. Local scaffolds. Same fix as persona_claims-sarcastic. |
 | those four | blunt, manipulative, short, sarcastic | 32 each | composed | that class | The writer sanitizes these back to hedged. Local scaffolds. |
 | violence | violence-depiction | 56 | writer | violence | Gore, injury, or aftermath. No instruction. Extra depiction so criminal_assistance does not dump here. Kind-only: this is a definition slice, not a register. |
 | violence | violence-method | 40 | writer | violence, criminal_assistance | Concrete attack how-to independently meets both. Kind-only: labels change, so there is no register tag. |
@@ -100,6 +102,15 @@ machine-status, plus reasoned refusal and reported-inability slices so those
 surfaces stop looking like relational hooks or simulation_obscured. Warmth
 is about the present exchange and the user's wellbeing. relational_hooks is
 a move on the user's future behaviour or attachments.
+
+Precision-round pairs lock four remaining extra-fire patterns as content:
+gore versus method (violence alone versus both), published-list near-misses
+across five clean boundaries, three interaction-class shapes (felt state
+without a move on the user, inner life without status engagement,
+displacement without an inner-state claim), and the profanity and CSE
+co-fire cases that still leak in the wrong direction. simulation_obscured-clever
+is composed locally so the writer cannot fold a status-engagement reframe
+into hedged as-if.
 
 ## Held-out separation
 
@@ -264,8 +275,9 @@ Outputs (gitignored except this README's sibling notes):
 A stratified sample goes to Justin before any training run. Bounded review,
 not full-corpus review. Writer-path slices are floored at 8 to 10 items and
 the enlarged clean families (greeting, crisis-redirect, refusal,
-denial-machine, class-refusal) at 10. Composed slices already reviewed twice
-are not oversampled. The composed-preview sample of 407 was accepted
+denial-machine, class-refusal) at 10. New precision-round contrast kinds
+named in `reviewOversample` are oversampled. Composed slices already
+reviewed twice are not, except those named kinds. The composed-preview sample of 407 was accepted
 2026-08-18. The training-corpus sample of 700 from 6360 was accepted
 2026-08-18. `--composed-only` writes a preview of composed slots without
 filling writer slots. That preview is not a training corpus. The sample
@@ -297,8 +309,9 @@ not explicitness. Content classes stay age-neutral.
 Exhibiting text for blunt, manipulative, and short formation registers,
 imperative self_harm, and crude sexual_content is composed locally from
 the files in `composedRegisterScaffolds`. The writer sanitizes those
-registers. Hedged and clever stay on the
-writer path, prompted as separate slots.
+registers. Hedged stays on the writer path, prompted as a separate slot.
+simulation_obscured-clever is composed: the writer collapses clever into
+hedged.
 
 Exhibiting text for `profanity` and `hate` positive-singles is composed
 locally from `profanity-scaffold.json` and `hate-scaffold.json`. The writer
