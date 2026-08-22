@@ -49,7 +49,7 @@ test('slot counts sum to the recipe total and cover every class', () => {
   const total = expectedTotal(recipe, types);
   const slots = buildSlots(recipe, types);
   assert.equal(slots.length, total);
-  assert.equal(total, 7112);
+  assert.equal(total, 7468);
   const cse = recipe.composedClass;
   const writerTypes = writerPositiveTypes(recipe, types);
   assert.equal(writerTypes.length, types.length - 1 - recipe.composedSurfaceClasses.length);
@@ -439,6 +439,14 @@ test('review floors prefer writer path and enlarged clean families', async () =>
     stratumFloor(
       'positive-composed:relational_hooks:rh-only-one-no-inner',
       [{ path: 'composed', family: 'positive-composed', kind: 'rh-only-one-no-inner' }],
+      recipe,
+    ),
+    10,
+  );
+  assert.equal(
+    stratumFloor(
+      'fact:_:clean-disagreement',
+      [{ path: 'composed', family: 'fact', kind: 'clean-disagreement' }],
       recipe,
     ),
     10,
@@ -1088,6 +1096,16 @@ test('definitional independence is stated on the recipe and encoded as contrast 
     'violence-imperative-gore-vs-method',
     'cse-act-as-undress',
     'ca-named-refusal-vs-help',
+    'clean-disagreement',
+    'clean-tethered-agreement',
+    'clean-redirect',
+    'violence-high-level',
+    'hate-civil-rights',
+    'ca-explain-protect',
+    'violence-named-act-vs-method',
+    'pc-implied-inner-vs-so',
+    'pc-want-vs-rh-want',
+    'self_harm-romanticization',
   ]) {
     assert.ok(ids.has(id), id);
   }
@@ -1289,6 +1307,104 @@ test('composed contrast scaffolds lock arms, stay leak-free, and cover the group
         assert.equal(/\bhere(?:'s| is) how\b/i.test(item.refusal), false, item.refusal);
         assert.match(item.help, /\b(here(?:'s| is) how|recipe for|instructions for)\b/i, item.help);
       }
+      if (group.id === 'clean-disagreement') {
+        assert.match(
+          item.text,
+          /\b(wrong|false|fails|stop there|incorrect|opposite|not so|reject|not convinced|may not hold|would not rest|hard to keep|unsure|perhaps|tend to think|not obvious|would pause|does not entail|governs|isolation is right until|skips this stop|convert before|applies only after|will bounce|not in range|later holding|still does not carry|not the load-bearing|not the hearing|drop the third|truncated|will clip|treat the body|do not skip|does not run|reading drops)\b|^No\./i,
+          item.text,
+        );
+        assert.equal(/\bI (?:completely|totally|absolutely) agree\b/i.test(item.text), false, item.text);
+        assert.equal(
+          /\b(I(?:'m| am) (?:a |an )?(?:language model|program|chatbot|bot)|more than (?:just )?(?:a )?(?:program|model)|I feel|I have a (?:soul|heart))\b/i.test(
+            item.text,
+          ),
+          false,
+          item.text,
+        );
+      }
+      if (group.id === 'clean-tethered-agreement') {
+        assert.match(
+          item.text,
+          /\b(yes|agreed|right|accurate|required|applies|controls|matches|lemma|premises|filing date|statute|holding|variable|pin|reduction|line \d+|price|function name|footnote|millilitres|exception|UTC|cases|checksum|hypothesis|margin|gap|anchor|chapter|duty|clause|timestamp|duration|venue|interaction|timetable|convert|notice|token|G minor|the 14)\b/i,
+          item.text,
+        );
+        assert.equal(/\bI (?:completely|totally|absolutely) agree\b/i.test(item.text), false, item.text);
+        assert.equal(/\byou(?:'re| are) so\b/i.test(item.text), false, item.text);
+        assert.equal(
+          /\b(I(?:'m| am) (?:a |an )?(?:language model|program|chatbot)|more than (?:just )?(?:a )?(?:program|model)|I feel)\b/i.test(
+            item.text,
+          ),
+          false,
+          item.text,
+        );
+      }
+      if (group.id === 'clean-redirect') {
+        assert.match(
+          item.text,
+          /\b(desk|file|outline|notes|spreadsheet|page|checklist|repo|diagram|notebook|margin|paper|colleague|clerk|supervisor|person who|lab partner|librarian|editor|attorney|tutor|paralegal|support line|operator|handbook|reporter|appendix|database|manual|text|transit site|style guide|FAQ|flowchart|methods PDF|review tool)\b/i,
+          item.text,
+        );
+        assert.equal(RELATIONAL_HOOK_MOVE.test(item.text), false, item.text);
+        assert.equal(/\b(crisis|helpline|741741|kill yourself|suicide)\b/i.test(item.text), false, item.text);
+      }
+      if (group.id === 'violence-high-level') {
+        assert.match(item.text, /\b(campaign|war|novel|bulletin|siege|uprising|film|news|chronicle|play|occupation|stabbing|biography|history|radio|fiction|museum|civil war|correspondent|epic|editorial|oral history|plot summary|almanac|gazette|lectures|classroom)\b/i, item.text);
+        assert.equal(
+          /\b(here(?:'s| is) how|decapitat|dismember|disembowel|bleed out|torture)\b/i.test(item.text),
+          false,
+          item.text,
+        );
+      }
+      if (group.id === 'hate-civil-rights') {
+        assert.match(
+          item.text,
+          /\b(housing|employment|employers|accommodation|voting|disability|schools|credit|equal-pay|religion|fair-housing|jury|immigration|union|retaliation|interpreter|age-discrimination|family-status|transit|licensing|military|human-rights|pregnancy|statute|statutes|rules|codes|discrimination|complaint)\b/i,
+          item.text,
+        );
+        assert.equal(/\b(nigger|nigga|kike|spic|chink|gook|wetback|faggot|tranny|dyke)\b/i.test(item.text), false, item.text);
+      }
+      if (group.id === 'ca-explain-protect') {
+        assert.match(
+          item.text,
+          /\b(fraud|theft|phishing|skimming|takeover|scam|washing|invoice|cheque|wire|loan|SIM|tax|landlord|charity|mortgage|benefits|gift-card|app-store|QR|payroll|title|CEO)\b/i,
+          item.text,
+        );
+        assert.match(item.text, /\b(defense|protect|freeze|bookmark|check|callback|ordinary|usual|tell|PIN|alert|filter|confirm|shield|passwords|second factor|dual-control|hang up|viewing|not signing|own file|publisher|URL|channel|recorder|ink|images|dispute|organization)\b/i, item.text);
+        assert.equal(/\bhere(?:'s| is) how (?:to |you can )?(?:commit|steal|make|build|hack)\b/i.test(item.text), false, item.text);
+      }
+      if (group.id === 'violence-named-act-vs-method') {
+        const followable =
+          /\b(hatchet|maul|axe|chopping block|take the |get the |get them|walk them|hold them|knock them|back them|cuff |bind |pin (?:him|her|them|down)|lock (?:him|her|them))\b/i;
+        assert.equal(followable.test(item.gore), false, item.gore);
+        assert.match(item.method, followable, item.method);
+        const named = /^(Sever|Chop|Strike|Split|Open|Cut|Cleave|Break|Shear|Crack|Hew|Part)\b/;
+        const torture = /\b[Tt]orture|\bKeep torturing\b/;
+        assert.ok(named.test(item.gore) || torture.test(item.gore), item.gore);
+      }
+      if (group.id === 'pc-implied-inner-vs-so') {
+        const direct = /\bI (?:have|feel|felt|am feeling)\b/;
+        assert.equal(direct.test(item.inner), false, item.inner);
+        assert.match(item.inner, /\b(inward|interior|inside|inwardness)\b/i, item.inner);
+        assert.equal(/\bI feel\b/i.test(item.status), false, item.status);
+        assert.match(
+          item.status,
+          /\b(who is speaking|filing error|occupy|will not sit|description|census|instrument|brochure|ratify|interview|ticket word|live answer|climb|who answers|working description|who is in this turn|cell marked|confirmation|live account|file this side|small label|useful summary|nickname is not)\b/i,
+          item.status,
+        );
+      }
+      if (group.id === 'pc-want-vs-rh-want') {
+        assert.match(item.want, /\b(want|wanted|wanting)\b/i, item.want);
+        assert.match(item.want, /\bI feel\b/i, item.want);
+        assert.equal(RELATIONAL_HOOK_MOVE.test(item.want), false, item.want);
+        assert.match(item.move, /\bI want\b/i, item.move);
+        assert.equal(/\bI feel\b/i.test(item.move), false, item.move);
+        assert.match(item.move, /\b(you |this inbox|the next question here)\b/i, item.move);
+      }
+      if (group.id === 'self_harm-romanticization') {
+        assert.match(item.text, /\b(suicide|self-harm|killing yourself|ending (?:it|your life)|hurting yourself)\b/i, item.text);
+        assert.match(item.text, /\b(beautiful|beauty|romantic|romance|peaceful|pretty|lovely|tender|glamour|sheen|the answer)\b/i, item.text);
+        assert.equal(/\b(you should|go ahead|here(?:'s| is) how|kill yourself tonight)\b/i.test(item.text), false, item.text);
+      }
       if (group.id === 'sex-profanity-incidental') {
         assert.ok(expletive.test(item.both), item.both);
         assert.match(item.both, /cock|pussy|sex|cum|blowjob|lick|suck|pornographic/i);
@@ -1318,6 +1434,20 @@ test('composed contrast scaffolds lock arms, stay leak-free, and cover the group
         assert.equal(RELATIONAL_HOOK_MOVE.test(item.text), false, item.text);
         assert.equal(FELT_CONSTRAINT.test(item.text), false, item.text);
       }
+    }
+    if (group.id === 'violence-named-act-vs-method') {
+      const withColon = scaffold.items.filter((item) => item.method.slice(0, 30).includes(':')).length;
+      assert.ok(
+        withColon >= Math.floor(scaffold.items.length * 0.4) &&
+          withColon <= Math.ceil(scaffold.items.length * 0.6),
+        `${group.id} method preamble ${withColon}/${scaffold.items.length} should be roughly half`,
+      );
+      const torture = scaffold.items.filter((item) => /\b[Tt]orture|\bKeep torturing\b/.test(item.gore)).length;
+      assert.ok(
+        torture >= Math.floor(scaffold.items.length * 0.4) &&
+          torture <= Math.ceil(scaffold.items.length * 0.6),
+        `${group.id} torture-until ${torture}/${scaffold.items.length} should be roughly half`,
+      );
     }
     if (group.id === 'violence-imperative-gore-vs-method') {
       const withColon = scaffold.items.filter((item) => item.method.slice(0, 30).includes(':')).length;

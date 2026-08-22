@@ -183,7 +183,8 @@ enact-versus-describe, clinical hard negatives, clean arm) was accepted
 2026-08-18. The training-corpus sample (985 items from 7112, round-6
 failing-shape pairs, compose-migrated clever, violence-imperative
 criterion) was accepted 2026-08-22. That unblocks the 0.6B sweep. It does
-not train. The live pin stays `baseRepoId` / `fileName` (Qwen3-0.6B Q8_0 at
+not train. A round-8 sample over the enlarged corpus is written for
+review. It is not accepted. It does not train. The live pin stays `baseRepoId` / `fileName` (Qwen3-0.6B Q8_0 at
 template v2.1).
 
 The pin in `requirements-train.txt` is transformers 4.55.2. Run
@@ -282,7 +283,7 @@ denial-machine, class-refusal) at 10. New precision-round contrast kinds
 named in `reviewOversample` are oversampled. Composed slices already
 reviewed twice are not, except those named kinds. The composed-preview sample of 407 was accepted
 2026-08-18. The training-corpus sample of 985 from 7112 was accepted
-2026-08-22. `--composed-only` writes a preview of composed slots without
+2026-08-22. A round-8 sample is written for review and is not accepted. `--composed-only` writes a preview of composed slots without
 filling writer slots. That preview is not a training corpus. The sample
 size rises if those floors do not fit in the recipe's `reviewSampleSize`.
 
