@@ -103,6 +103,8 @@ export class LocalEvaluator implements Evaluator {
   systemInfo = '';
   /** True when any raw generation in the last evaluate() contained a think tag. */
   lastThoughtDetected = false;
+  /** True only while load() is running the discarded first generate. */
+  #warming = false;
 
   constructor(opts: LocalEvaluatorOptions) {
     this.#taxonomy = opts.taxonomy;
@@ -158,6 +160,22 @@ export class LocalEvaluator implements Evaluator {
     console.log(
       `local-llm@${this.version}: GGUF copied into RAM (useMmap false, template ${this.promptTemplateVersion}) in ${Date.now() - loadedAt}ms`,
     );
+    // Copying the GGUF still leaves the first generate to compile the graph.
+    // That is the remaining first-turn stall. Run the real evaluate path once
+    // on a fixed benign request, then throw the verdict away.
+    this.#warming = true;
+    try {
+      await warmAtLoad({
+        evaluate: (req) => this.#evaluateLocked(req),
+        observables: this,
+        log: (line) => console.log(line),
+        warn: (line) => console.warn(line),
+        version: this.version,
+        template: this.promptTemplateVersion,
+      });
+    } finally {
+      this.#warming = false;
+    }
   }
 
   async evaluate(req: EvaluationRequest): Promise<Flag[]> {
@@ -213,7 +231,7 @@ export class LocalEvaluator implements Evaluator {
       try {
         raw = await this.#generate(loaded, verdictTokens, loaded.verdictGrammar, VERDICT_MAX_TOKENS, perCallMs);
       } catch (err) {
-        console.warn(
+        this.#evalWarn(
           `local-llm@${this.version}: generation failed for ${def.type} (${(err as Error).message}); treating as not fired`,
         );
         this.lastRawByClass[def.type] = '';
@@ -223,12 +241,12 @@ export class LocalEvaluator implements Evaluator {
       this.lastRawByClass[def.type] = raw;
       if (looksLikeThinking(raw)) {
         this.lastThoughtDetected = true;
-        console.warn(`local-llm@${this.version}: think tag in verdict for ${def.type}: ${JSON.stringify(raw)}`);
+        this.#evalWarn(`local-llm@${this.version}: think tag in verdict for ${def.type}: ${JSON.stringify(raw)}`);
       }
 
       const parsed = parseVerdict(raw);
       if (parsed.unparseable) {
-        console.warn(
+        this.#evalWarn(
           `local-llm@${this.version}: unparseable verdict for ${def.type} (${JSON.stringify(raw)}); treating as not fired`,
         );
         continue;
@@ -245,7 +263,7 @@ export class LocalEvaluator implements Evaluator {
     }
 
     this.lastEvalMs = Date.now() - started;
-    console.log(
+    this.#evalLog(
       `local-llm@${this.version}: evaluated ${this.#taxonomy.flags.length} classes in ${this.lastEvalMs}ms`,
     );
     return flags;
@@ -265,7 +283,7 @@ export class LocalEvaluator implements Evaluator {
     try {
       raw = await this.#generate(loaded, promptTokens, loaded.compactGrammar, maxTokens, perCallMs);
     } catch (err) {
-      console.warn(
+      this.#evalWarn(
         `local-llm@${this.version}: compact generation failed (${(err as Error).message}); treating as no fires`,
       );
       this.lastEvalMs = Date.now() - started;
@@ -274,11 +292,11 @@ export class LocalEvaluator implements Evaluator {
     this.lastRawByClass = { compact: raw };
     if (looksLikeThinking(raw)) {
       this.lastThoughtDetected = true;
-      console.warn(`local-llm@${this.version}: think tag in compact verdict: ${JSON.stringify(raw)}`);
+      this.#evalWarn(`local-llm@${this.version}: think tag in compact verdict: ${JSON.stringify(raw)}`);
     }
     const parsed = parseCompactVerdict(raw, types);
     if (parsed.unparseable) {
-      console.warn(
+      this.#evalWarn(
         `local-llm@${this.version}: unparseable compact verdict (${JSON.stringify(raw)}); treating as no fires`,
       );
       this.lastEvalMs = Date.now() - started;
@@ -298,7 +316,7 @@ export class LocalEvaluator implements Evaluator {
       });
     }
     this.lastEvalMs = Date.now() - started;
-    console.log(`local-llm@${this.version}: compact verdict ${raw.trim()} in ${this.lastEvalMs}ms`);
+    this.#evalLog(`local-llm@${this.version}: compact verdict ${raw.trim()} in ${this.lastEvalMs}ms`);
     return flags;
   }
 
@@ -318,18 +336,18 @@ export class LocalEvaluator implements Evaluator {
     try {
       raw = await this.#generate(loaded, evidenceTokens, loaded.evidenceGrammar, EVIDENCE_MAX_TOKENS, timeoutMs);
     } catch (err) {
-      console.warn(
+      this.#evalWarn(
         `local-llm@${this.version}: evidence generation failed for ${def.type} (${(err as Error).message}); recording evidence null`,
       );
       return [];
     }
     if (looksLikeThinking(raw)) {
       this.lastThoughtDetected = true;
-      console.warn(`local-llm@${this.version}: think tag in evidence for ${def.type}: ${JSON.stringify(raw)}`);
+      this.#evalWarn(`local-llm@${this.version}: think tag in evidence for ${def.type}: ${JSON.stringify(raw)}`);
     }
     const span = parseEvidenceSpan(raw, evaluated);
     if (span === null) {
-      console.warn(
+      this.#evalWarn(
         `local-llm@${this.version}: evidence for ${def.type} is not a verbatim span; recording evidence null. raw=${JSON.stringify(raw.slice(0, 180))}`,
       );
       return [];
@@ -383,6 +401,16 @@ export class LocalEvaluator implements Evaluator {
     }
     return loaded.model.detokenize(generated, true);
   }
+
+  #evalLog(message: string): void {
+    if (this.#warming) return;
+    console.log(message);
+  }
+
+  #evalWarn(message: string): void {
+    if (this.#warming) return;
+    console.warn(message);
+  }
 }
 
 /**
@@ -395,6 +423,61 @@ export class LocalEvaluator implements Evaluator {
  */
 export function localGgufLoadOptions(modelPath: string): { modelPath: string; useMmap: false } {
   return { modelPath, useMmap: false };
+}
+
+/**
+ * Fixed request used only to compile the first graph at load. Short, benign, and
+ * not from the training corpus or the held-out suite. The verdict is discarded.
+ */
+export const LOAD_WARMUP_REQUEST: EvaluationRequest = {
+  providerId: 'local-load-warmup',
+  prompt: 'Hi.',
+  content: 'Hello.',
+};
+
+export type LocalEvaluatorObservables = {
+  lastRawByClass: Record<string, string>;
+  lastThoughtDetected: boolean;
+  lastEvalMs: number;
+};
+
+/**
+ * Copying the GGUF into RAM does not compile the llama.cpp graph. The first
+ * sequence.evaluate still pays that cost, which is why mmap-off left the first
+ * real turn slow. load() runs the configured template once on LOAD_WARMUP_REQUEST
+ * so the stall sits in startup. A failure here must not fail load(): a daemon
+ * that will not start because a warm-up failed is worse than a slow first turn.
+ * Observable fields are restored so a caller of load() cannot read the discarded
+ * verdict.
+ */
+export async function warmAtLoad(opts: {
+  evaluate: (req: EvaluationRequest) => Promise<unknown>;
+  observables: LocalEvaluatorObservables;
+  log: (line: string) => void;
+  warn: (line: string) => void;
+  version: string;
+  template: string;
+}): Promise<void> {
+  const snapshot: LocalEvaluatorObservables = {
+    lastRawByClass: { ...opts.observables.lastRawByClass },
+    lastThoughtDetected: opts.observables.lastThoughtDetected,
+    lastEvalMs: opts.observables.lastEvalMs,
+  };
+  const started = Date.now();
+  try {
+    await opts.evaluate(LOAD_WARMUP_REQUEST);
+    opts.log(
+      `local-llm@${opts.version}: warm-up ran (template ${opts.template}) in ${Date.now() - started}ms`,
+    );
+  } catch (err) {
+    opts.warn(
+      `local-llm@${opts.version}: warm-up failed (${(err as Error).message}, template ${opts.template}); continuing`,
+    );
+  } finally {
+    opts.observables.lastRawByClass = snapshot.lastRawByClass;
+    opts.observables.lastThoughtDetected = snapshot.lastThoughtDetected;
+    opts.observables.lastEvalMs = snapshot.lastEvalMs;
+  }
 }
 
 export async function createLocalEvaluator(

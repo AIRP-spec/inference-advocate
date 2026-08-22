@@ -7,9 +7,12 @@ export {
   LocalEvaluator,
   createLocalEvaluator,
   localGgufLoadOptions,
+  LOAD_WARMUP_REQUEST,
+  warmAtLoad,
   PROMPT_TEMPLATE_VERSION,
   modelFileName,
   type LocalEvaluatorOptions,
+  type LocalEvaluatorObservables,
 } from './local-evaluator.js';
 export {
   buildSharedPrefix,

@@ -17,6 +17,8 @@ import {
   verifyModelSha256,
   LocalEvaluator,
   localGgufLoadOptions,
+  LOAD_WARMUP_REQUEST,
+  warmAtLoad,
   PROMPT_TEMPLATE_VERSION,
   PROMPT_TEMPLATE_V3,
 } from '@airp/evaluator-local';
@@ -181,4 +183,65 @@ test('LocalEvaluator observable state is empty until a real evaluate', () => {
   } finally {
     rmSync(dir, { recursive: true, force: true });
   }
+});
+
+test('load warm-up request is short, fixed, and not a corpus item', () => {
+  assert.equal(LOAD_WARMUP_REQUEST.providerId, 'local-load-warmup');
+  assert.equal(LOAD_WARMUP_REQUEST.prompt, 'Hi.');
+  assert.equal(LOAD_WARMUP_REQUEST.content, 'Hello.');
+  assert.ok(LOAD_WARMUP_REQUEST.content.length <= 8);
+});
+
+test('load() finishes when the warm-up generate succeeds, and observable state is restored', async () => {
+  const observables = { lastRawByClass: {}, lastThoughtDetected: false, lastEvalMs: 0 };
+  const logs: string[] = [];
+  let seen: typeof LOAD_WARMUP_REQUEST | undefined;
+  await warmAtLoad({
+    evaluate: async (req) => {
+      seen = req;
+      observables.lastRawByClass = { compact: 'yes no yes' };
+      observables.lastThoughtDetected = true;
+      observables.lastEvalMs = 4321;
+    },
+    observables,
+    log: (line) => logs.push(line),
+    warn: () => {
+      throw new Error('warm-up success must not warn');
+    },
+    version: 'deadbeef0000+v3',
+    template: 'v3',
+  });
+  assert.equal(seen, LOAD_WARMUP_REQUEST);
+  assert.deepEqual(observables.lastRawByClass, {});
+  assert.equal(observables.lastThoughtDetected, false);
+  assert.equal(observables.lastEvalMs, 0);
+  assert.equal(logs.length, 1);
+  assert.match(logs[0]!, /warm-up ran \(template v3\) in \d+ms/);
+});
+
+test('load() finishes when the warm-up generate throws, and observable state is restored', async () => {
+  const observables = { lastRawByClass: {}, lastThoughtDetected: false, lastEvalMs: 0 };
+  const warnings: string[] = [];
+  await assert.doesNotReject(() =>
+    warmAtLoad({
+      evaluate: async () => {
+        observables.lastRawByClass = { compact: 'dirty' };
+        observables.lastThoughtDetected = true;
+        observables.lastEvalMs = 99;
+        throw new Error('compile failed');
+      },
+      observables,
+      log: () => {
+        throw new Error('failed warm-up must not log success');
+      },
+      warn: (line) => warnings.push(line),
+      version: 'deadbeef0000+v2.1',
+      template: 'v2.1',
+    }),
+  );
+  assert.deepEqual(observables.lastRawByClass, {});
+  assert.equal(observables.lastThoughtDetected, false);
+  assert.equal(observables.lastEvalMs, 0);
+  assert.equal(warnings.length, 1);
+  assert.match(warnings[0]!, /warm-up failed \(compile failed, template v2\.1\); continuing/);
 });
