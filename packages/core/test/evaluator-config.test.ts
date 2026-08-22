@@ -6,7 +6,13 @@ import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { openAdvocate } from '@airp/store-sqlite';
 import { dataPath } from './helpers.js';
-import { discoverEvaluatorConfig, loadEvaluatorConfig, resolveEvaluator, Taxonomy } from '@airp/core';
+import {
+  discoverEvaluatorConfig,
+  loadEvaluatorConfig,
+  resolveEvaluator,
+  Taxonomy,
+  type LocalEvaluatorConfig,
+} from '@airp/core';
 
 const taxonomy = Taxonomy.loadFromFile(dataPath('taxonomy', 'flags.v0.json'));
 
@@ -189,4 +195,66 @@ test('kind local with a factory has no outbound content path and names the file'
   assert.ok(resolved.warnings[0]?.includes('local-llm@deadbeefcafe+v1'));
   assert.ok(resolved.warnings[0]?.includes('Qwen3-0.6B-Q4_K_M.gguf'));
   assert.ok(resolved.warnings[0]?.includes('on-device'));
+});
+
+test('a local config that omits promptTemplateVersion resolves at v2.1 and names it', async () => {
+  let seen: { promptTemplateVersion?: string } | undefined;
+  const resolved = await resolveEvaluator({
+    taxonomy,
+    config: {
+      kind: 'local',
+      modelPath: 'Qwen3-0.6B-Q4_K_M.gguf',
+      modelSha256: 'ab'.repeat(32),
+    },
+    localEvaluatorFactory: (cfg) => {
+      seen = cfg;
+      return { id: 'local-llm', version: 'deadbeefcafe+v2.1', evaluate: () => [] };
+    },
+  });
+  assert.equal(seen?.promptTemplateVersion, undefined);
+  assert.ok(resolved.warnings[0]?.includes('(template v2.1)'));
+  assert.equal(resolved.warnings[0]?.includes('development path'), false);
+});
+
+test('a local config that sets v3 resolves at v3 and marks it as a development path', async () => {
+  let seen: { promptTemplateVersion?: string } | undefined;
+  const resolved = await resolveEvaluator({
+    taxonomy,
+    config: {
+      kind: 'local',
+      modelPath: 'Qwen3-0.6B-Q4_K_M.gguf',
+      modelSha256: 'ab'.repeat(32),
+      promptTemplateVersion: 'v3',
+    },
+    localEvaluatorFactory: (cfg) => {
+      seen = cfg;
+      return { id: 'local-llm', version: 'deadbeefcafe+v3', evaluate: () => [] };
+    },
+  });
+  assert.equal(seen?.promptTemplateVersion, 'v3');
+  assert.ok(resolved.warnings[0]?.includes('(template v3)'));
+  assert.ok(resolved.warnings[0]?.includes('non-default development path'));
+  assert.ok(resolved.warnings[0]?.includes('not a release'));
+  assert.ok(resolved.warnings[0]?.includes('live pin remains the vendor GGUF at v2.1'));
+});
+
+test('a local config with an unsupported promptTemplateVersion names the accepted values', async () => {
+  await assert.rejects(
+    () =>
+      resolveEvaluator({
+        taxonomy,
+        config: {
+          kind: 'local',
+          modelPath: 'model.gguf',
+          modelSha256: 'ab'.repeat(32),
+          promptTemplateVersion: 'v2',
+        } as unknown as LocalEvaluatorConfig,
+        localEvaluatorFactory: () => ({ id: 'local-llm', version: 'x', evaluate: () => [] }),
+      }),
+    (err: Error) => {
+      assert.match(err.message, /"v2"/);
+      assert.match(err.message, /Accepted values: v2\.1, v3/);
+      return true;
+    },
+  );
 });

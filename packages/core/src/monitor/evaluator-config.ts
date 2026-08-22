@@ -42,6 +42,19 @@ export interface ModelEvaluatorConfig {
 }
 
 /**
+ * Decode templates the on-device evaluator can run. Must stay in register with
+ * LocalEvaluator's constructor: v2.1 is the live pin, v3 is the compact line.
+ */
+export const LOCAL_PROMPT_TEMPLATES = ['v2.1', 'v3'] as const;
+export type LocalPromptTemplateVersion = (typeof LOCAL_PROMPT_TEMPLATES)[number];
+/** Omit promptTemplateVersion and construction stays here. The live pin is this template. */
+export const LIVE_LOCAL_PROMPT_TEMPLATE: LocalPromptTemplateVersion = 'v2.1';
+
+export function isLocalPromptTemplateVersion(value: unknown): value is LocalPromptTemplateVersion {
+  return value === 'v2.1' || value === 'v3';
+}
+
+/**
  * On-device GGUF evaluator. Core never loads the native runtime: the host injects a factory
  * that constructs `@airp/evaluator-local`. Same port pattern as StoreBackend.
  */
@@ -54,6 +67,13 @@ export interface LocalEvaluatorConfig {
   /** GPU offload is optional and never required. CPU-only must work. */
   gpu?: boolean;
   timeoutMs?: number;
+  /**
+   * Decode template. Omit for the live pin (v2.1). v3 is the compact multi-label line the
+   * training gate uses. Selecting v3 does not change the live pin. It is a development path
+   * so a v3-trained candidate can be run as the same task it was trained on. Construction
+   * refuses any other string.
+   */
+  promptTemplateVersion?: LocalPromptTemplateVersion;
   note?: string;
 }
 
@@ -81,6 +101,15 @@ function origin(url: string): string {
   } catch {
     return url;
   }
+}
+
+function resolvedLocalPromptTemplate(value: unknown): LocalPromptTemplateVersion {
+  if (value === undefined) return LIVE_LOCAL_PROMPT_TEMPLATE;
+  if (isLocalPromptTemplateVersion(value)) return value;
+  throw new Error(
+    `local evaluator config promptTemplateVersion ${JSON.stringify(value)} is not supported. ` +
+      `Accepted values: ${LOCAL_PROMPT_TEMPLATES.join(', ')}. Omit the field for the live pin (${LIVE_LOCAL_PROMPT_TEMPLATE}).`,
+  );
 }
 
 export interface ResolveEvaluatorInput {
@@ -119,11 +148,24 @@ export async function resolveEvaluator(input: ResolveEvaluatorInput): Promise<Re
     if (!config.modelPath || !config.modelSha256) {
       throw new Error('local evaluator config requires modelPath and modelSha256');
     }
+    // Named here, not only inside the constructor, so a JSON config that asks for a template
+    // the constructor does not know cannot load a GGUF first and fail later. Configuration
+    // that silently does nothing is worse than none; the accepted values have to be in the
+    // message a config author reads.
+    const template = resolvedLocalPromptTemplate(config.promptTemplateVersion);
     const evaluator = await input.localEvaluatorFactory(config, input.taxonomy);
     // Basename only: startup warnings reach the UI, and an absolute path would publish host layout.
-    warnings.unshift(
-      `the semantic layer is running ${evaluator.id}@${evaluator.version} on-device against ${basename(config.modelPath)}`,
-    );
+    // The template is named even when it is also in evaluator.version, because a mock or a
+    // stale factory could omit it, and a v3-trained model quietly running at v2.1 is the
+    // miss this field exists to make impossible.
+    let localWarning =
+      `the semantic layer is running ${evaluator.id}@${evaluator.version} on-device against ${basename(config.modelPath)} ` +
+      `(template ${template})`;
+    if (template !== LIVE_LOCAL_PROMPT_TEMPLATE) {
+      localWarning +=
+        '. Template v3 is a non-default development path. It is not a release. The live pin remains the vendor GGUF at v2.1.';
+    }
+    warnings.unshift(localWarning);
     return { evaluator, outboundContentPaths: [], warnings };
   }
 

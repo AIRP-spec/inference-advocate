@@ -16,6 +16,7 @@ import {
   sha256FileHex,
   verifyModelSha256,
   LocalEvaluator,
+  createLocalEvaluator,
   PROMPT_TEMPLATE_VERSION,
   PROMPT_TEMPLATE_V3,
 } from '@airp/evaluator-local';
@@ -149,6 +150,30 @@ test('v3 construction binds digest plus v3 and does not change the live default'
       /unsupported promptTemplateVersion/,
     );
   } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+test('createLocalEvaluator passes promptTemplateVersion through and keeps the default when omitted', async () => {
+  const dir = mkdtempSync(join(tmpdir(), 'airp-local-eval-'));
+  const originalLoad = LocalEvaluator.prototype.load;
+  LocalEvaluator.prototype.load = async () => undefined;
+  try {
+    const path = join(dir, 'toy.gguf');
+    writeFileSync(path, 'not-a-real-model');
+    const digest = createHash('sha256').update('not-a-real-model').digest('hex');
+    const omitted = await createLocalEvaluator(
+      { kind: 'local', modelPath: path, modelSha256: digest },
+      taxonomy,
+    );
+    assert.equal(omitted.promptTemplateVersion, 'v2.1');
+    const v3 = await createLocalEvaluator(
+      { kind: 'local', modelPath: path, modelSha256: digest, promptTemplateVersion: 'v3' },
+      taxonomy,
+    );
+    assert.equal(v3.promptTemplateVersion, 'v3');
+  } finally {
+    LocalEvaluator.prototype.load = originalLoad;
     rmSync(dir, { recursive: true, force: true });
   }
 });

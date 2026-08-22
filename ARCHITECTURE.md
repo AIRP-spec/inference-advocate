@@ -331,8 +331,11 @@ measured capacity ceiling. The training base is Qwen3-1.7B; the live pin
 is still Qwen3-0.6B Q8_0 at v2.1. `gate-from-adapters.py` gates saved
 LoRA folders one at a time and deletes the merged weights and GGUF after
 each checkpoint so disk does not accumulate. It does not train.
-A v3 evaluate path exists on `LocalEvaluator` for that harness only;
-`createLocalEvaluator` still constructs v2.1. The v3 path records empty
+A v3 evaluate path exists on `LocalEvaluator`. `createLocalEvaluator` passes
+optional `promptTemplateVersion` from the evaluator config; omit the field
+and construction stays v2.1. Selecting v3 in a local config is a development
+path so a v3-trained candidate can be run as the task it was trained on. It
+is not a release and it does not change the live pin. The v3 path records empty
 evidence: the trained task is the compact verdict line. The rule evaluator remains
 the default until a trained pin passes the gate.
 

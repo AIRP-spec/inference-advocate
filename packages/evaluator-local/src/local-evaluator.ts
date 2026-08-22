@@ -12,10 +12,12 @@
 // sequence via adaptStateToTokens. v1's eleven-way call is not kept live. The 22 smoke
 // identities remain the live-pin check. Template v3 (compact multi-label line) is
 // defined in prompt-v3.ts. This class can evaluate at v3 when constructed with
-// promptTemplateVersion: 'v3' (the training gate). createLocalEvaluator does not
-// pass that option, so the live path stays v2.1 until a trained pin passes the
-// held-out gate. The v3 path records empty evidence: the trained task is the
-// compact verdict line, not span extraction.
+// promptTemplateVersion: 'v3' (the training gate). createLocalEvaluator passes
+// that field through when the evaluator config sets it. Omit the field and the
+// constructor still defaults to v2.1. Selecting v3 from a config is a development
+// path so a v3-trained candidate can be run as the task it was trained on. It is
+// not a release and it does not change the live pin. The v3 path records empty
+// evidence: the trained task is the compact verdict line, not span extraction.
 //
 // Core never imports this file. The host injects a factory through resolveEvaluator.
 
@@ -390,6 +392,8 @@ export async function createLocalEvaluator(
     contextSize: cfg.contextSize,
     gpu: cfg.gpu ?? false,
     timeoutMs: cfg.timeoutMs,
+    // Undefined keeps the constructor default (v2.1). Do not substitute a second default here.
+    promptTemplateVersion: cfg.promptTemplateVersion,
   });
   await evaluator.load();
   return evaluator;

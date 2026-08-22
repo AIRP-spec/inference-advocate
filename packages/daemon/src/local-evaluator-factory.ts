@@ -12,5 +12,6 @@ export async function localEvaluatorFactory(
   taxonomy: Taxonomy,
 ): Promise<Evaluator> {
   const { createLocalEvaluator } = await import('@airp/evaluator-local');
+  // Whole config, including optional promptTemplateVersion. Do not pick fields here.
   return createLocalEvaluator(cfg, taxonomy);
 }
