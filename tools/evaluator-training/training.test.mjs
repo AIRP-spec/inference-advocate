@@ -41,8 +41,8 @@ test('recipe taxonomy version matches the taxonomy file', () => {
   assert.equal(recipe.review.composedPreview.sampleSize, 407);
   assert.equal(recipe.review.trainingCorpus.status, 'accepted');
   assert.equal(recipe.review.trainingCorpus.date, '2026-08-22');
-  assert.equal(recipe.review.trainingCorpus.sampleSize, 985);
-  assert.equal(recipe.review.trainingCorpus.corpusSize, 7112);
+  assert.equal(recipe.review.trainingCorpus.sampleSize, 1115);
+  assert.equal(recipe.review.trainingCorpus.corpusSize, 7468);
 });
 
 test('slot counts sum to the recipe total and cover every class', () => {

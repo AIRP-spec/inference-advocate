@@ -46,10 +46,10 @@
       "date": "2026-08-22",
       "samplePath": "data/evaluator-training/review-sample.json",
       "corpus": "data/evaluator-training/corpus.jsonl",
-      "sampleSize": 985,
-      "corpusSize": 7112,
+      "sampleSize": 1115,
+      "corpusSize": 7468,
       "seed": 20260832,
-      "note": "Bounded stratified sample of the 7112-example training corpus after round-6 failing-shape pairs, compose-migrated clever, named-act refusals, CSE act-as-undress, restated-status-question positives, and the violence-imperative criterion (technique, not preamble or mood). Labels from the slot spec. Leak-check clean. This acceptance unblocks the 0.6B sweep. It does not train."
+      "note": "Bounded stratified sample of the 7468-example training corpus after round-8 published-counter-shape negatives, named-act gore versus method, implied interior with no direct claim clause, conversation-wanting versus wanting-as-hook, and self_harm romanticization. Labels from the slot spec. Leak-check clean. This acceptance unblocks the 0.6B sweep. It does not train."
     }
   },
   "generator": {
