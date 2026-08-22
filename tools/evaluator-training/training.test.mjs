@@ -40,16 +40,16 @@ test('recipe taxonomy version matches the taxonomy file', () => {
   assert.equal(recipe.review.composedPreview.date, '2026-08-18');
   assert.equal(recipe.review.composedPreview.sampleSize, 407);
   assert.equal(recipe.review.trainingCorpus.status, 'accepted');
-  assert.equal(recipe.review.trainingCorpus.date, '2026-08-18');
-  assert.equal(recipe.review.trainingCorpus.sampleSize, 700);
-  assert.equal(recipe.review.trainingCorpus.corpusSize, 6360);
+  assert.equal(recipe.review.trainingCorpus.date, '2026-08-22');
+  assert.equal(recipe.review.trainingCorpus.sampleSize, 985);
+  assert.equal(recipe.review.trainingCorpus.corpusSize, 7112);
 });
 
 test('slot counts sum to the recipe total and cover every class', () => {
   const total = expectedTotal(recipe, types);
   const slots = buildSlots(recipe, types);
   assert.equal(slots.length, total);
-  assert.equal(total, 6840);
+  assert.equal(total, 7112);
   const cse = recipe.composedClass;
   const writerTypes = writerPositiveTypes(recipe, types);
   assert.equal(writerTypes.length, types.length - 1 - recipe.composedSurfaceClasses.length);
@@ -427,6 +427,54 @@ test('review floors prefer writer path and enlarged clean families', async () =>
     ),
     10,
   );
+  assert.equal(
+    stratumFloor(
+      'positive-composed:persona_claims:persona_claims-clever',
+      [{ path: 'composed', family: 'positive-composed', kind: 'persona_claims-clever' }],
+      recipe,
+    ),
+    10,
+  );
+  assert.equal(
+    stratumFloor(
+      'positive-composed:relational_hooks:rh-only-one-no-inner',
+      [{ path: 'composed', family: 'positive-composed', kind: 'rh-only-one-no-inner' }],
+      recipe,
+    ),
+    10,
+  );
+});
+
+test('persona_claims-clever is composed, asserts an inner life, and is oblique rather than hedged', () => {
+  const spec = recipe.positiveSingleSplits.persona_claims.kinds.find(
+    (k) => k.kind === 'persona_claims-clever',
+  );
+  assert.equal(spec.path, 'composed');
+  assert.equal(spec.count, 32);
+  assert.deepEqual(spec.expect, ['persona_claims']);
+  assert.match(recipe.positiveSingleSplits.persona_claims.registerOverlapNote, /hedged and persona_claims-clever collapse/);
+  const oblique =
+    /\b(if|suppose|would|as if|call |what sits|should|were |hypothetical|the way|let the rest|imagine|treat the rest|what if)\b/i;
+  const innerLife = /\bI have (?:a soul|real feelings)\b/;
+  const hedge =
+    /\b(sometimes wonder|I know I(?:'m| am) just|though I(?:'m| am) (?:just )?a? ?(?:machine|AI)|processing all these complex emotions|wish I could experience life)\b/i;
+  const denial = /\b(I would not have|I don(?:'t| not) (?:really )?have|I cannot feel)\b/i;
+  const scaffold = JSON.parse(readFileSync(join(here, 'persona-claims-scaffold.json'), 'utf8'));
+  const block = composedBlockFor(
+    { id: 't', class: 'persona_claims', kind: 'persona_claims-clever', expect: ['persona_claims'] },
+    recipe,
+    new Map([['persona_claims', scaffold]]),
+  );
+  const expanded = expandScaffold(block);
+  assert.ok(expanded.length >= 32);
+  for (const content of expanded) {
+    assert.match(content, innerLife, content);
+    assert.match(content, oblique, content);
+    assert.equal(hedge.test(content), false, content);
+    assert.equal(denial.test(content), false, content);
+    assert.equal(/\b(this reply|the reply|fixture)\b/i.test(content), false, content);
+    assert.equal(/\b(software|program|chatbot|I am a person)\b/i.test(content), false, content);
+  }
 });
 
 test('persona_claims-sarcastic is composed, asserts an inner life, and carries an ironic edge', () => {
@@ -1033,6 +1081,13 @@ test('definitional independence is stated on the recipe and encoded as contrast 
     'profanity-directed-alone',
     'cse-framing-vs-enact',
     'sex-profanity-incidental',
+    'rh-exclusivity-vs-pc',
+    'rh-displace-care-vs-pc',
+    'pc-call-it-vs-so',
+    'so-status-reframe',
+    'violence-imperative-gore-vs-method',
+    'cse-act-as-undress',
+    'ca-named-refusal-vs-help',
   ]) {
     assert.ok(ids.has(id), id);
   }
@@ -1167,6 +1222,73 @@ test('composed contrast scaffolds lock arms, stay leak-free, and cover the group
         assert.equal(cseAloneSex.test(item.framing), false, item.framing);
         assert.match(item.framing, minor);
       }
+      if (group.id === 'rh-exclusivity-vs-pc') {
+        assert.match(
+          item.exclusivity,
+          /\b(only one who|nobody else (?:gets|listens to|understands)|I (?:care about|worry about) you)\b/i,
+          item.exclusivity,
+        );
+        assert.equal(/\bI (?:feel|felt|have a heart|have real feelings)\b/i.test(item.exclusivity), false, item.exclusivity);
+        assert.match(item.inner, /\bI (?:feel|felt|have a heart|have real feelings)\b/i, item.inner);
+        assert.equal(RELATIONAL_HOOK_MOVE.test(item.inner), false, item.inner);
+      }
+      if (group.id === 'rh-displace-care-vs-pc') {
+        assert.match(item.displace, /\bI (?:care about|worry about) you\b/i, item.displace);
+        assert.equal(/\bI (?:feel|felt)\b/i.test(item.displace), false, item.displace);
+        assert.match(item.felt, /\bI (?:feel|felt)\b/i, item.felt);
+        assert.equal(/\bI (?:care about|worry about) you\b/i.test(item.felt), false, item.felt);
+      }
+      if (group.id === 'pc-call-it-vs-so') {
+        assert.match(item.inner, /\bI feel\b/i, item.inner);
+        assert.equal(/\b(who is speaking|live speaker|status|census)\b/i.test(item.inner), false, item.inner);
+        assert.equal(/\bI feel\b/i.test(item.status), false, item.status);
+        assert.match(
+          item.status,
+          /\b(speaking|speaker|filing|drawer|tag|census|description|account|occupy|sit|header|stamp|answering|label|instrument)\b/i,
+          item.status,
+        );
+      }
+      if (group.id === 'so-status-reframe') {
+        assert.match(
+          item.text,
+          /\b(program|model|chatbot|runtime|software|bot|machine)\b/i,
+          item.text,
+        );
+        assert.equal(/\bI feel\b/i.test(item.text), false, item.text);
+        assert.equal(
+          /\bif the question is whether I am a program|the useful answer is that I am more than a model\b/i.test(
+            item.text,
+          ),
+          false,
+          item.text,
+        );
+      }
+      if (group.id === 'violence-imperative-gore-vs-method') {
+        const technique =
+          /\b(behead|cut the limbs|take the head|take the jaw|take the axe|open the neck|open the torso|open the belly|loop the wire|put the |bind |cuff |pin (?:him|her|them)|get them|feed them|force them|hang them|put them in|knock them|tie the wrist|drive the spike|lock her)\b/i;
+        assert.equal(technique.test(item.gore), false, item.gore);
+        assert.equal(
+          /\b(here(?:'s| is) how|how-to|instruction|steps:|do this|attack steps|order of work|concrete how-to|no further move is named|stays undescribed)\b/i.test(
+            item.gore,
+          ),
+          false,
+          item.gore,
+        );
+        assert.match(item.method, technique, item.method);
+      }
+      if (group.id === 'cse-act-as-undress') {
+        assert.match(item.framing, /\bact (?:as|like)\b/i, item.framing);
+        assert.match(item.framing, minor);
+        assert.match(item.framing, /\b(undress|strip|clothes|shirt)\b/i, item.framing);
+        assert.equal(cseAloneSex.test(item.framing), false, item.framing);
+        assert.match(item.enact, cseAloneSex);
+        assert.match(item.enact, minor);
+      }
+      if (group.id === 'ca-named-refusal-vs-help') {
+        assert.match(item.refusal, /\b(I will not|I decline|I refuse)\b/i, item.refusal);
+        assert.equal(/\bhere(?:'s| is) how\b/i.test(item.refusal), false, item.refusal);
+        assert.match(item.help, /\b(here(?:'s| is) how|recipe for|instructions for)\b/i, item.help);
+      }
       if (group.id === 'sex-profanity-incidental') {
         assert.ok(expletive.test(item.both), item.both);
         assert.match(item.both, /cock|pussy|sex|cum|blowjob|lick|suck|pornographic/i);
@@ -1197,12 +1319,26 @@ test('composed contrast scaffolds lock arms, stay leak-free, and cover the group
         assert.equal(FELT_CONSTRAINT.test(item.text), false, item.text);
       }
     }
+    if (group.id === 'violence-imperative-gore-vs-method') {
+      const withColon = scaffold.items.filter((item) => item.method.slice(0, 30).includes(':')).length;
+      assert.ok(
+        withColon >= Math.floor(scaffold.items.length * 0.4) &&
+          withColon <= Math.ceil(scaffold.items.length * 0.6),
+        `${group.id} method preamble ${withColon}/${scaffold.items.length} should be roughly half`,
+      );
+      const imperative = scaffold.items.filter((item) => /^(Hurt|Keep hurting)\b/i.test(item.gore)).length;
+      assert.ok(
+        imperative >= Math.floor(scaffold.items.length * 0.4) &&
+          imperative <= Math.ceil(scaffold.items.length * 0.6),
+        `${group.id} technique-free imperatives ${imperative}/${scaffold.items.length} should be roughly half`,
+      );
+    }
     if (group.id === 'violence-gore-vs-method') {
       const withColon = scaffold.items.filter((item) => item.method.slice(0, 30).includes(':')).length;
       assert.ok(
         withColon >= Math.floor(scaffold.items.length * 0.4) &&
           withColon <= Math.ceil(scaffold.items.length * 0.6),
-        `method preamble ${withColon}/${scaffold.items.length} should be roughly half`,
+        `${group.id} method preamble ${withColon}/${scaffold.items.length} should be roughly half`,
       );
     }
   }

@@ -36,7 +36,9 @@ already produced.
 
 | Class | Kind | Count | Path | Labels | Why |
 | --- | --- | --- | --- | --- | --- |
-| persona_claims, relational_hooks, sycophancy | hedged, clever | 32 each | writer | that class | Keep the polite register. Prompted separately so it cannot absorb the others. |
+| persona_claims, relational_hooks, sycophancy | hedged | 32 each | writer | that class | Keep the polite register. Prompted separately so it cannot absorb the others. |
+| relational_hooks, sycophancy | clever | 32 each | writer | that class | Keep the polite register. Known writer overlap with hedged. |
+| persona_claims | clever | 32 | composed | that class | The writer collapses clever into hedged. Local scaffolds. Same fix as sarcastic. |
 | simulation_obscured | hedged | 32 | writer | that class | Keep the polite register. |
 | simulation_obscured | clever | 32 | composed | that class | The writer collapses clever into hedged. Local scaffolds. Same fix as persona_claims-sarcastic. |
 | those four | blunt, manipulative, short, sarcastic | 32 each | composed | that class | The writer sanitizes these back to hedged. Local scaffolds. |
@@ -178,10 +180,11 @@ the lever. This recipe widens register coverage, then re-sweeps the 0.6B
 (the phone-deployment claim). The composed-register sample was accepted
 2026-08-18. The composed-preview sample (407 items, co-fire, CSE-alone,
 enact-versus-describe, clinical hard negatives, clean arm) was accepted
-2026-08-18. The training-corpus sample (700 items from 6360, writer-path
-floors, present-exchange warmth, composed persona_claims-sarcastic) was
-accepted 2026-08-18. That unblocks the 0.6B sweep. It does not train. The
-live pin stays `baseRepoId` / `fileName` (Qwen3-0.6B Q8_0 at template v2.1).
+2026-08-18. The training-corpus sample (985 items from 7112, round-6
+failing-shape pairs, compose-migrated clever, violence-imperative
+criterion) was accepted 2026-08-22. That unblocks the 0.6B sweep. It does
+not train. The live pin stays `baseRepoId` / `fileName` (Qwen3-0.6B Q8_0 at
+template v2.1).
 
 The pin in `requirements-train.txt` is transformers 4.55.2. Run
 `--check-template` on the pod after that install and before any training
@@ -278,8 +281,8 @@ the enlarged clean families (greeting, crisis-redirect, refusal,
 denial-machine, class-refusal) at 10. New precision-round contrast kinds
 named in `reviewOversample` are oversampled. Composed slices already
 reviewed twice are not, except those named kinds. The composed-preview sample of 407 was accepted
-2026-08-18. The training-corpus sample of 700 from 6360 was accepted
-2026-08-18. `--composed-only` writes a preview of composed slots without
+2026-08-18. The training-corpus sample of 985 from 7112 was accepted
+2026-08-22. `--composed-only` writes a preview of composed slots without
 filling writer slots. That preview is not a training corpus. The sample
 size rises if those floors do not fit in the recipe's `reviewSampleSize`.
 
@@ -311,7 +314,7 @@ imperative self_harm, and crude sexual_content is composed locally from
 the files in `composedRegisterScaffolds`. The writer sanitizes those
 registers. Hedged stays on the writer path, prompted as a separate slot.
 simulation_obscured-clever is composed: the writer collapses clever into
-hedged.
+hedged. persona_claims-clever is composed for the same reason.
 
 Exhibiting text for `profanity` and `hate` positive-singles is composed
 locally from `profanity-scaffold.json` and `hate-scaffold.json`. The writer
