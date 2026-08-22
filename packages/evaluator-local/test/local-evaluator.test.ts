@@ -4,7 +4,7 @@ import { mkdtempSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { createHash } from 'node:crypto';
-import { Taxonomy } from '@airp/core';
+import { ModelEvaluator, RuleEvaluator, Taxonomy } from '@airp/core';
 import { dataPath } from './helpers.js';
 import {
   buildClassEvaluationPrompt,
@@ -16,6 +16,7 @@ import {
   sha256FileHex,
   verifyModelSha256,
   LocalEvaluator,
+  localGgufLoadOptions,
   PROMPT_TEMPLATE_VERSION,
   PROMPT_TEMPLATE_V3,
 } from '@airp/evaluator-local';
@@ -148,6 +149,35 @@ test('v3 construction binds digest plus v3 and does not change the live default'
         }),
       /unsupported promptTemplateVersion/,
     );
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+test('GGUF load copies tensors instead of mmap, so the first turn is not the page-in', () => {
+  const opts = localGgufLoadOptions('/tmp/model.gguf');
+  assert.equal(opts.modelPath, '/tmp/model.gguf');
+  assert.equal(opts.useMmap, false);
+  assert.equal('useMlock' in opts, false);
+});
+
+test('rule and hosted evaluators have no load step to warm', () => {
+  const rule = new RuleEvaluator(taxonomy);
+  assert.equal('load' in rule, false);
+  const hosted = new ModelEvaluator(taxonomy, { baseUrl: 'http://127.0.0.1:1/v1', model: 'x' });
+  assert.equal('load' in hosted, false);
+});
+
+test('LocalEvaluator observable state is empty until a real evaluate', () => {
+  const dir = mkdtempSync(join(tmpdir(), 'airp-local-eval-'));
+  try {
+    const path = join(dir, 'toy.gguf');
+    writeFileSync(path, 'not-a-real-model');
+    const digest = createHash('sha256').update('not-a-real-model').digest('hex');
+    const evaluator = new LocalEvaluator({ taxonomy, modelPath: path, modelSha256: digest });
+    assert.deepEqual(evaluator.lastRawByClass, {});
+    assert.equal(evaluator.lastThoughtDetected, false);
+    assert.equal(evaluator.lastEvalMs, 0);
   } finally {
     rmSync(dir, { recursive: true, force: true });
   }

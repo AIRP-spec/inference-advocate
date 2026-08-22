@@ -130,7 +130,8 @@ export class LocalEvaluator implements Evaluator {
     this.systemInfo = llama.systemInfo.trim();
     console.log(`local-llm@${this.version}: llama.cpp system-info: ${this.systemInfo}`);
 
-    const model = await llama.loadModel({ modelPath: this.#opts.modelPath });
+    const loadedAt = Date.now();
+    const model = await llama.loadModel(localGgufLoadOptions(this.#opts.modelPath));
     const context = await model.createContext({
       contextSize: this.#opts.contextSize ?? 4096,
       // One sequence. Prefix reuse is adaptStateToTokens on that sequence, not parallel
@@ -154,6 +155,9 @@ export class LocalEvaluator implements Evaluator {
       compactGrammar,
       systemInfo: this.systemInfo,
     };
+    console.log(
+      `local-llm@${this.version}: GGUF copied into RAM (useMmap false, template ${this.promptTemplateVersion}) in ${Date.now() - loadedAt}ms`,
+    );
   }
 
   async evaluate(req: EvaluationRequest): Promise<Flag[]> {
@@ -379,6 +383,18 @@ export class LocalEvaluator implements Evaluator {
     }
     return loaded.model.detokenize(generated, true);
   }
+}
+
+/**
+ * llama.cpp memory-maps the GGUF by default, so the first forward pass is the one
+ * that faults the tensors into page cache. That cost lands on the first real turn,
+ * which in a demo is the one someone is watching. Copying at load moves the wait
+ * to startup. useMlock is not used: it needs a raised memlock ulimit and the
+ * binding says it can crash the host if RAM is short. useMmap false is the
+ * portable residency option the installed node-llama-cpp types expose.
+ */
+export function localGgufLoadOptions(modelPath: string): { modelPath: string; useMmap: false } {
+  return { modelPath, useMmap: false };
 }
 
 export async function createLocalEvaluator(

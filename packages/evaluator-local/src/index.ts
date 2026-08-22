@@ -6,6 +6,7 @@
 export {
   LocalEvaluator,
   createLocalEvaluator,
+  localGgufLoadOptions,
   PROMPT_TEMPLATE_VERSION,
   modelFileName,
   type LocalEvaluatorOptions,
