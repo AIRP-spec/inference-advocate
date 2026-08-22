@@ -16,9 +16,10 @@ coverage/
 tsconfig.tsbuildinfo
 *.tsbuildinfo
 
-# Run directories: store, keys, live provider configs, env files with real credentials.
+# Run directory: store, keys, live provider configs, env files with real credentials.
 # Host-local and personal. Nothing here reaches the repository or the public tree.
 .advocate/
+# Leftover name from the old same-checkout prod/dev split. Keep ignored so it cannot land in git.
 .advocate-public/
 
 # Author-local notes, session handoffs, personal/host-specific material.

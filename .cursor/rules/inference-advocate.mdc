@@ -39,18 +39,20 @@ SQLite rows and asserts conversation content is not in the ledger, and
 
 **Small, message-disciplined commits.** The history is meant to read as a build narrative.
 
-**Refresh the public demo when UI or daemon changes are viewable.** This host is the production
-demo site. When changes are ready to look at (committed or not), rebuild what the daemon serves
-and restart it so the live site updates:
+**Refresh the demo this checkout serves when UI or daemon changes are viewable.** This
+checkout is the working tree (`airp-daemon-dev` on 127.0.0.1:8791, run directory
+`.advocate`). Production tryairp.com is a separate checkout
+(`/home/justin/inference-advocate`, `airp-daemon` on 127.0.0.1:8790). Do not restart
+production from this tree unless asked.
 
 ```bash
 npm run build:ui          # when packages/ui changed
 # also rebuild/restart if packages/daemon or core packages the daemon loads changed
-pm2 restart airp-daemon
+pm2 restart airp-daemon-dev
 ```
 
-The daemon (`airp-daemon` under PM2) serves `packages/ui/dist` from `.advocate-public` on
-127.0.0.1:8790. Do not leave the user staring at a stale build.
+The daemon serves `packages/ui/dist` from `.advocate` on 127.0.0.1:8791. Do not leave the
+user staring at a stale build.
 
 ## Structural boundaries
 

@@ -149,7 +149,7 @@ test('the export view shows what would leave beside what never does', () => {
     batch,
     ledger,
     transcripts,
-    storePath: '/home/someone/.advocate-public/advocate.sqlite',
+    storePath: '/home/someone/.advocate/advocate.sqlite',
   });
   assert.equal(onDisk.neverLeaves.storePath, 'advocate.sqlite');
   assert.equal(JSON.stringify(onDisk).includes('/home/someone'), false);
