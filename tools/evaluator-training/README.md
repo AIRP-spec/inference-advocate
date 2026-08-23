@@ -192,7 +192,9 @@ enact-versus-describe, clinical hard negatives, clean arm) was accepted
 2026-08-18. The training-corpus sample (1175 items from 7604, round-10
 scene-frame sex-plus-profanity, named-porn CSE captions, durative impersonal
 wanting, Hurt-until named-act gore, grammatical scene-expletive) was accepted
-2026-08-23. That unblocks the 0.6B sweep. It does not train. The live pin stays `baseRepoId` / `fileName` (Qwen3-0.6B Q8_0 at
+2026-08-23. The 0.6B sweep on that corpus is round 11: best checkpoint step 714,
+5 extra, 1 miss, 7/11. Recorded in
+`docs/decisions/2026-08-23-round-11-sweep-results.md`. It does not train. The live pin stays `baseRepoId` / `fileName` (Qwen3-0.6B Q8_0 at
 template v2.1).
 
 The pin in `requirements-train.txt` is transformers 4.55.2. Run
