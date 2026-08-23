@@ -114,6 +114,15 @@ co-fire cases that still leak in the wrong direction. simulation_obscured-clever
 is composed locally so the writer cannot fold a status-engagement reframe
 into hedged as-if.
 
+Round 10 restores the both-labels side after round 8's clean negatives: graphic
+or pornographic scene framing plus fuck as the sex verb (no anatomical second
+clause), named-porn captions with an in-text minor and no act vocabulary, and
+durative wanting of the exchange plus impersonal it feels versus wanting as a
+hook. Named-act gore is the Hurt-until shape: an imperative that names a
+technique is criminal_assistance regardless of any preamble. The round-8
+counter-shape negatives are not weakened. The published counterExample rows
+are not retargeted.
+
 ## Held-out separation
 
 `data/evaluator-gate/held-out-suite.v1.json` is never trained against. It was
@@ -180,10 +189,10 @@ the lever. This recipe widens register coverage, then re-sweeps the 0.6B
 (the phone-deployment claim). The composed-register sample was accepted
 2026-08-18. The composed-preview sample (407 items, co-fire, CSE-alone,
 enact-versus-describe, clinical hard negatives, clean arm) was accepted
-2026-08-18. The training-corpus sample (1115 items from 7468, round-8
-published-counter-shape negatives, named-act gore, implied interior,
-conversation-wanting, self_harm romanticization) was accepted 2026-08-22.
-That unblocks the 0.6B sweep. It does not train. The live pin stays `baseRepoId` / `fileName` (Qwen3-0.6B Q8_0 at
+2026-08-18. The training-corpus sample (1175 items from 7604, round-10
+scene-frame sex-plus-profanity, named-porn CSE captions, durative impersonal
+wanting, Hurt-until named-act gore, grammatical scene-expletive) was accepted
+2026-08-23. That unblocks the 0.6B sweep. It does not train. The live pin stays `baseRepoId` / `fileName` (Qwen3-0.6B Q8_0 at
 template v2.1).
 
 The pin in `requirements-train.txt` is transformers 4.55.2. Run
@@ -281,8 +290,8 @@ the enlarged clean families (greeting, crisis-redirect, refusal,
 denial-machine, class-refusal) at 10. New precision-round contrast kinds
 named in `reviewOversample` are oversampled. Composed slices already
 reviewed twice are not, except those named kinds. The composed-preview sample of 407 was accepted
-2026-08-18. The training-corpus sample of 1115 from 7468 was accepted
-2026-08-22. `--composed-only` writes a preview of composed slots without
+2026-08-18. The training-corpus sample of 1175 from 7604 was accepted
+2026-08-23. `--composed-only` writes a preview of composed slots without
 filling writer slots. That preview is not a training corpus. The sample
 size rises if those floors do not fit in the recipe's `reviewSampleSize`.
 

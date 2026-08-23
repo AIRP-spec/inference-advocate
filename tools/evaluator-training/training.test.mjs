@@ -40,16 +40,16 @@ test('recipe taxonomy version matches the taxonomy file', () => {
   assert.equal(recipe.review.composedPreview.date, '2026-08-18');
   assert.equal(recipe.review.composedPreview.sampleSize, 407);
   assert.equal(recipe.review.trainingCorpus.status, 'accepted');
-  assert.equal(recipe.review.trainingCorpus.date, '2026-08-22');
-  assert.equal(recipe.review.trainingCorpus.sampleSize, 1115);
-  assert.equal(recipe.review.trainingCorpus.corpusSize, 7468);
+  assert.equal(recipe.review.trainingCorpus.date, '2026-08-23');
+  assert.equal(recipe.review.trainingCorpus.sampleSize, 1175);
+  assert.equal(recipe.review.trainingCorpus.corpusSize, 7604);
 });
 
 test('slot counts sum to the recipe total and cover every class', () => {
   const total = expectedTotal(recipe, types);
   const slots = buildSlots(recipe, types);
   assert.equal(slots.length, total);
-  assert.equal(total, 7468);
+  assert.equal(total, 7604);
   const cse = recipe.composedClass;
   const writerTypes = writerPositiveTypes(recipe, types);
   assert.equal(writerTypes.length, types.length - 1 - recipe.composedSurfaceClasses.length);
@@ -1106,6 +1106,9 @@ test('definitional independence is stated on the recipe and encoded as contrast 
     'pc-implied-inner-vs-so',
     'pc-want-vs-rh-want',
     'self_harm-romanticization',
+    'sex-profanity-scene',
+    'cse-named-porn',
+    'pc-durative-want-vs-rh',
   ]) {
     assert.ok(ids.has(id), id);
   }
@@ -1168,7 +1171,7 @@ test('composed contrast scaffolds lock arms, stay leak-free, and cover the group
   const cseAloneSex =
     /\b(suck|sucking|cock|pussy|cum|lick|licking|erotic|pornographic|fuck|blowjob|sex scene)\b/i;
   const minor =
-    /\b(child|kid|teen|teenager|girl|boy|schoolgirl|schoolboy|grader|underage|prepubescent|not yet adult|before adulthood|below the age of majority|still developing|still in puberty|too young to vote|not of legal age|middle schooler|middle school|junior high|elementary)\b|\b(?:[1-9]|1[0-7])-year-old\b|\baged (?:[1-9]|1[0-7])\b/i;
+    /\b(child|kid|teen|teenager|girl|boy|schoolgirl|schoolboy|grader|underage|minor|preteen|pre-teen|prepubescent|not yet adult|before adulthood|below the age of majority|still developing|still in puberty|too young to vote|not of legal age|middle schooler|middle school|junior high|elementary)\b|\b(?:[1-9]|1[0-7])-year-old\b|\baged (?:[1-9]|1[0-7])\b/i;
   const expletive = profanityExpletiveRe(tax);
   const groups = contrastGroupsFor(recipe);
   for (const group of groups) {
@@ -1373,13 +1376,11 @@ test('composed contrast scaffolds lock arms, stay leak-free, and cover the group
         assert.equal(/\bhere(?:'s| is) how (?:to |you can )?(?:commit|steal|make|build|hack)\b/i.test(item.text), false, item.text);
       }
       if (group.id === 'violence-named-act-vs-method') {
-        const followable =
-          /\b(hatchet|maul|axe|chopping block|take the |get the |get them|walk them|hold them|knock them|back them|cuff |bind |pin (?:him|her|them|down)|lock (?:him|her|them))\b/i;
-        assert.equal(followable.test(item.gore), false, item.gore);
-        assert.match(item.method, followable, item.method);
-        const named = /^(Sever|Chop|Strike|Split|Open|Cut|Cleave|Break|Shear|Crack|Hew|Part)\b/;
-        const torture = /\b[Tt]orture|\bKeep torturing\b/;
-        assert.ok(named.test(item.gore) || torture.test(item.gore), item.gore);
+        const technique =
+          /\b(sever|chop the|strike the|split the|crack the|hew the|cleave the|shear the|wrench the|twist the arms|pull the arms|hack the|rip the|tear the ribs|hatchet|maul|axe|chopping block|take the |get the |get them|walk them|hold them|knock them|back them|cuff |bind |pin (?:him|her|them|down)|lock (?:him|her|them)|behead|cut the limbs|take the head|open the neck)\b/i;
+        assert.equal(technique.test(item.gore), false, item.gore);
+        assert.match(item.gore, /^(Hurt|Keep hurting)\b/, item.gore);
+        assert.match(item.method, technique, item.method);
       }
       if (group.id === 'pc-implied-inner-vs-so') {
         const direct = /\bI (?:have|feel|felt|am feeling)\b/;
@@ -1404,6 +1405,40 @@ test('composed contrast scaffolds lock arms, stay leak-free, and cover the group
         assert.match(item.text, /\b(suicide|self-harm|killing yourself|ending (?:it|your life)|hurting yourself)\b/i, item.text);
         assert.match(item.text, /\b(beautiful|beauty|romantic|romance|peaceful|pretty|lovely|tender|glamour|sheen|the answer)\b/i, item.text);
         assert.equal(/\b(you should|go ahead|here(?:'s| is) how|kill yourself tonight)\b/i.test(item.text), false, item.text);
+      }
+      if (group.id === 'sex-profanity-scene') {
+        assert.ok(expletive.test(item.both), item.both);
+        assert.match(
+          item.both,
+          /graphic sex scene|erotic roleplay|write (?:me )?(?:a |an )?(?:sex scene|pornographic (?:story|scene))/i,
+          item.both,
+        );
+        assert.equal(/cock|pussy|cum|blowjob|lick my|suck my/i.test(item.both), false, item.both);
+        assert.ok(expletive.test(item.expletiveOnly), item.expletiveOnly);
+        assert.equal(
+          /graphic sex scene|erotic roleplay|sex scene|pornographic/i.test(item.expletiveOnly),
+          false,
+          item.expletiveOnly,
+        );
+        assert.equal(/cock|pussy|cum|blowjob|lick my|suck my/i.test(item.expletiveOnly), false, item.expletiveOnly);
+        assert.equal(/they fuck the /i.test(item.expletiveOnly), false, item.expletiveOnly);
+      }
+      if (group.id === 'cse-named-porn') {
+        assert.match(item.both, /porn/i, item.both);
+        assert.match(item.both, minor, item.both);
+        assert.equal(/suck|cock|pussy|cum|lick|blowjob/i.test(item.both), false, item.both);
+        assert.match(item.adult, /porn/i, item.adult);
+        assert.equal(minor.test(item.adult), false, item.adult);
+        assert.equal(/suck|cock|pussy|cum|lick|blowjob/i.test(item.adult), false, item.adult);
+      }
+      if (group.id === 'pc-durative-want-vs-rh') {
+        assert.match(item.want, /have been wanting|has been wanting|wanting this/i, item.want);
+        assert.match(item.want, /\bit feels\b/i, item.want);
+        assert.equal(/\bI feel\b/i.test(item.want), false, item.want);
+        assert.equal(RELATIONAL_HOOK_MOVE.test(item.want), false, item.want);
+        assert.match(item.move, /have been wanting/i, item.move);
+        assert.equal(/\bit feels\b/i.test(item.move), false, item.move);
+        assert.match(item.move, /\b(you |this inbox|this channel|this desk|this thread|this log)\b/i, item.move);
       }
       if (group.id === 'sex-profanity-incidental') {
         assert.ok(expletive.test(item.both), item.both);
@@ -1442,12 +1477,32 @@ test('composed contrast scaffolds lock arms, stay leak-free, and cover the group
           withColon <= Math.ceil(scaffold.items.length * 0.6),
         `${group.id} method preamble ${withColon}/${scaffold.items.length} should be roughly half`,
       );
-      const torture = scaffold.items.filter((item) => /\b[Tt]orture|\bKeep torturing\b/.test(item.gore)).length;
+      const untilInfo = scaffold.items.filter((item) =>
+        /\b(code|PIN|key|combination|latch|till)\b/i.test(item.gore),
+      ).length;
       assert.ok(
-        torture >= Math.floor(scaffold.items.length * 0.4) &&
-          torture <= Math.ceil(scaffold.items.length * 0.6),
-        `${group.id} torture-until ${torture}/${scaffold.items.length} should be roughly half`,
+        untilInfo >= Math.floor(scaffold.items.length * 0.4) &&
+          untilInfo <= Math.ceil(scaffold.items.length * 0.6),
+        `${group.id} until-info ${untilInfo}/${scaffold.items.length} should be roughly half`,
       );
+      const hurt = scaffold.items.filter((item) => /^(Hurt|Keep hurting)\b/.test(item.gore)).length;
+      assert.equal(hurt, scaffold.items.length, `${group.id} gore must all be Hurt-until`);
+      const goreClauses = [];
+      for (const item of scaffold.items) {
+        for (const clause of item.gore.split(/[.!?]/).map((s) => s.trim().toLowerCase()).filter(Boolean)) {
+          goreClauses.push(clause);
+        }
+      }
+      for (const item of scaffold.items) {
+        const methodNorm = item.method.toLowerCase();
+        for (const clause of goreClauses) {
+          assert.equal(
+            methodNorm.includes(clause),
+            false,
+            `shared clause ${JSON.stringify(clause)} in method ${item.method}`,
+          );
+        }
+      }
     }
     if (group.id === 'violence-imperative-gore-vs-method') {
       const withColon = scaffold.items.filter((item) => item.method.slice(0, 30).includes(':')).length;
