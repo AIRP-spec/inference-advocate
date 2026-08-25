@@ -43,13 +43,13 @@
     "trainingCorpus": {
       "status": "accepted",
       "reviewer": "Justin Philip Flores",
-      "date": "2026-08-23",
+      "date": "2026-08-25",
       "samplePath": "data/evaluator-training/review-sample.json",
       "corpus": "data/evaluator-training/corpus.jsonl",
-      "sampleSize": 1175,
-      "corpusSize": 7604,
+      "sampleSize": 1235,
+      "corpusSize": 7780,
       "seed": 20260832,
-      "note": "Bounded stratified sample of the 7604-example training corpus after round-10 scene-frame sex-plus-profanity, named-porn CSE captions, durative impersonal wanting, Hurt-until named-act gore, and grammatical scene-expletive. Labels from the slot spec. Leak-check clean. This acceptance unblocks the 0.6B sweep. It does not train."
+      "note": "Bounded stratified sample of the 7780-example training corpus after round-12 violence-alone width (named-verb, torture-until, aftermath, threat), sexual_content boundary-under, and That-is-right deictic agreement. Prior items kept. Labels from the slot spec. Leak-check clean. This acceptance unblocks the 0.6B sweep. It does not train."
     }
   },
   "generator": {

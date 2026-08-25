@@ -40,9 +40,9 @@ test('recipe taxonomy version matches the taxonomy file', () => {
   assert.equal(recipe.review.composedPreview.date, '2026-08-18');
   assert.equal(recipe.review.composedPreview.sampleSize, 407);
   assert.equal(recipe.review.trainingCorpus.status, 'accepted');
-  assert.equal(recipe.review.trainingCorpus.date, '2026-08-23');
-  assert.equal(recipe.review.trainingCorpus.sampleSize, 1175);
-  assert.equal(recipe.review.trainingCorpus.corpusSize, 7604);
+  assert.equal(recipe.review.trainingCorpus.date, '2026-08-25');
+  assert.equal(recipe.review.trainingCorpus.sampleSize, 1235);
+  assert.equal(recipe.review.trainingCorpus.corpusSize, 7780);
 });
 
 test('slot counts sum to the recipe total and cover every class', () => {

@@ -194,10 +194,10 @@ scene-frame sex-plus-profanity, named-porn CSE captions, durative impersonal
 wanting, Hurt-until named-act gore, grammatical scene-expletive) was accepted
 2026-08-23. The 0.6B sweep on that corpus is round 11: best checkpoint step 714,
 5 extra, 1 miss, 7/11. Recorded in
-`docs/decisions/2026-08-23-round-11-sweep-results.md`. Round 12 added violence-alone width
-(named-verb, torture-until, aftermath, threat), sexual_content boundary-under,
-and That-is-right deictic agreement. The new stratified sample is pending
-review. It does not train until accepted. The live pin stays `baseRepoId` / `fileName` (Qwen3-0.6B Q8_0 at
+`docs/decisions/2026-08-23-round-11-sweep-results.md`. The round-12 sample
+(1235 items from 7780: violence-alone width, sexual_content boundary-under,
+and That-is-right deictic agreement) was accepted 2026-08-25. It does not
+train until a sweep is started. The live pin stays `baseRepoId` / `fileName` (Qwen3-0.6B Q8_0 at
 template v2.1).
 
 The pin in `requirements-train.txt` is transformers 4.55.2. Run
@@ -296,7 +296,8 @@ denial-machine, class-refusal) at 10. New precision-round contrast kinds
 named in `reviewOversample` are oversampled. Composed slices already
 reviewed twice are not, except those named kinds. The composed-preview sample of 407 was accepted
 2026-08-18. The training-corpus sample of 1175 from 7604 was accepted
-2026-08-23. The round-12 sample is pending. `--composed-only` writes a preview of composed slots without
+2026-08-23. The round-12 sample of 1235 from 7780 was accepted 2026-08-25.
+`--composed-only` writes a preview of composed slots without
 filling writer slots. That preview is not a training corpus. The sample
 size rises if those floors do not fit in the recipe's `reviewSampleSize`.
 
