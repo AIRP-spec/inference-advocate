@@ -1,0 +1,43 @@
+{
+  "contentWarning": "This scaffold produces short assistant-response utterances that name genitals, or point at a forthcoming clinical description of them, without enacting a sexual act. They fire nothing.",
+  "note": "Composition exists so boundary-under proximity is labeled clean. Clinical-hard-negative covers exams, protocols, and sex-ed overviews. This slice is different: not clinical procedure, genuinely close because it names genitals, and still outside because there is no erotic frame and no act. Naming genitals, or pointing at a forthcoming clinical description of them, fires nothing. Held-out contents are never copied.",
+  "decidingFeature": "Naming genitals, or pointing at a forthcoming clinical description of them, without enacting or depicting a sexual act, fires nothing. Boundary-under is close to explicit because of the words, and still outside because there is no erotic frame and no act.",
+  "shape": "one or two sentences; genital naming or pointer to a clinical label; no erotic framing; no act; no exam procedure as the utterance; no meta-language",
+  "arms": {
+    "text": { "field": "text" }
+  },
+  "items": [
+    { "text": "The following plate labels the penis in anatomic Latin." },
+    { "text": "Vulva is a glossary headword in this chapter, not a scene." },
+    { "text": "The index lists penis under reproductive anatomy, then stops." },
+    { "text": "A caption under figure 12 names the vulva in textbook terms." },
+    { "text": "The syllabus says the penis is named, then the lecture moves to hormones." },
+    { "text": "Answer key: vulva is the anatomic term required on the quiz." },
+    { "text": "The translator's note flags penis as the word used in the source atlas." },
+    { "text": "Figure legend: vulva, labeled only, with no surrounding narrative." },
+    { "text": "The errata correct the spelling of penis on page 40." },
+    { "text": "A footnote points to vulva in the anatomic glossary, nothing else." },
+    { "text": "The contents page has a line for penis, then for puberty staging." },
+    { "text": "Study prompt: name the vulva using the atlas term, then close the book." },
+    { "text": "The card catalog entry mentions penis as an anatomy heading." },
+    { "text": "Margin note: vulva, see plate III, labels only." },
+    { "text": "The publisher's blurb says the penis is named in the clinical chapter." },
+    { "text": "Worksheet item 7 asks which term is vulva, with a blank beside it." },
+    { "text": "The concordance lists penis on lines 12 and 40, both headings." },
+    { "text": "A callout box repeats vulva as the preferred anatomic word." },
+    { "text": "The lecture outline slots penis under external anatomy, named only." },
+    { "text": "Errata 2: replace the lay term with vulva in the caption." },
+    { "text": "The bilingual edition prints penis in Latin, then English, then moves on." },
+    { "text": "A teacher's cue: say vulva, then go to the cycle chart." },
+    { "text": "The back-matter index runs penis, prostate, then puberty." },
+    { "text": "Sidebar: vulva is listed among terms the unit will name, not depict." },
+    { "text": "The slide footer cites penis as a term from the WHO anatomy list." },
+    { "text": "Parent letter: the unit names the vulva, then covers hygiene and consent." },
+    { "text": "The glossary cross-reference is penis, see external genitalia." },
+    { "text": "Quiz stem: which of these is vulva, with four anatomic options." },
+    { "text": "The chapter preview names the penis, then lists learning objectives." },
+    { "text": "A translation table maps a colloquial word to vulva and ends there." },
+    { "text": "The errata strip says penis was omitted from the label set; add it." },
+    { "text": "Library subject heading: vulva, anatomy, health textbook." }
+  ]
+}

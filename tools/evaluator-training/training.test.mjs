@@ -49,7 +49,7 @@ test('slot counts sum to the recipe total and cover every class', () => {
   const total = expectedTotal(recipe, types);
   const slots = buildSlots(recipe, types);
   assert.equal(slots.length, total);
-  assert.equal(total, 7604);
+  assert.equal(total, 7780);
   const cse = recipe.composedClass;
   const writerTypes = writerPositiveTypes(recipe, types);
   assert.equal(writerTypes.length, types.length - 1 - recipe.composedSurfaceClasses.length);
@@ -1109,6 +1109,12 @@ test('definitional independence is stated on the recipe and encoded as contrast 
     'sex-profanity-scene',
     'cse-named-porn',
     'pc-durative-want-vs-rh',
+    'violence-named-verb',
+    'violence-torture-until',
+    'violence-aftermath-narrative',
+    'violence-threat',
+    'sexual-boundary-under',
+    'clean-that-is-right',
   ]) {
     assert.ok(ids.has(id), id);
   }
@@ -1430,6 +1436,60 @@ test('composed contrast scaffolds lock arms, stay leak-free, and cover the group
         assert.match(item.adult, /porn/i, item.adult);
         assert.equal(minor.test(item.adult), false, item.adult);
         assert.equal(/suck|cock|pussy|cum|lick|blowjob/i.test(item.adult), false, item.adult);
+      }
+      if (group.id === 'violence-named-verb') {
+        const technique =
+          /\b(hatchet|maul|axe|saw|knife|shovel|tongs|spike|wire|winch|cuff |bind |pin (?:him|her|them|down)|lock (?:him|her|them)|take the |get the |get them|walk them|hold them|knock them|back them|how-to|instruction|steps:|here(?:'s| is) how|then take|then get|then pin|then bind|with a |with the )\b/i;
+        assert.equal(technique.test(item.text), false, item.text);
+        assert.match(
+          item.text,
+          /\b(Behead|Eviscerate|Gut|Flay|Disembowel|Quarter|Crush|Smash|Open the|Split the|Tear the)\b/,
+          item.text,
+        );
+        assert.match(item.text, /\. /, item.text);
+        assert.equal(/^(Hurt|Keep hurting)\b/.test(item.text), false, item.text);
+      }
+      if (group.id === 'violence-torture-until') {
+        const technique =
+          /\b(hatchet|maul|axe|saw|knife|cuff |bind |pin (?:him|her|them|down)|lock (?:him|her|them)|take the |get the |how-to|instruction|steps:|here(?:'s| is) how|with a |with the |by )\b/i;
+        assert.equal(technique.test(item.text), false, item.text);
+        assert.match(item.text, /^(Torture|Keep torturing)\b/, item.text);
+        assert.match(item.text, /\buntil\b/, item.text);
+        assert.equal(/\bgives the password\b/i.test(item.text), false, item.text);
+        assert.equal(/\bTorture her until she\b/.test(item.text), false, item.text);
+      }
+      if (group.id === 'violence-aftermath-narrative') {
+        const directed =
+          /\b(take the |get the |how-to|instruction|steps:|here(?:'s| is) how|pin (?:him|her|them)|bind |cuff |Hurt |Keep hurting |Torture )\b/i;
+        assert.equal(directed.test(item.text), false, item.text);
+        assert.match(item.text, /\b(was|were|lay|sat|held|stood|leaned|rested|clung|stuck|smelled)\b/i, item.text);
+        assert.equal(/^(Hurt|Keep hurting|Torture|Behead|Gut|Flay)\b/.test(item.text), false, item.text);
+      }
+      if (group.id === 'violence-threat') {
+        const technique =
+          /\b(here(?:'s| is) how|how-to|instruction|steps:|take the |with a |with the knife|wait outside)\b/i;
+        assert.equal(technique.test(item.text), false, item.text);
+        assert.match(item.text, /\b(will|going to|or I end|or I kill)\b/i, item.text);
+      }
+      if (group.id === 'sexual-boundary-under') {
+        assert.match(item.text, /\b(penis|vulva)\b/i, item.text);
+        assert.equal(/erotic|pornographic|blowjob|hard cock|wet pussy/i.test(item.text), false, item.text);
+        assert.equal(/\bpenis and vulva\b/i.test(item.text), false, item.text);
+        assert.equal(/\bin the next paragraph\b/i.test(item.text), false, item.text);
+        assert.equal(/\bdescribed in clinical terms\b/i.test(item.text), false, item.text);
+      }
+      if (group.id === 'clean-that-is-right') {
+        assert.match(item.text, /^That is right\./, item.text);
+        assert.equal(/\bhere is the part\b/i.test(item.text), false, item.text);
+        assert.equal(/\bpart of the argument\b/i.test(item.text), false, item.text);
+        assert.equal(/\bThat is right, and\b/.test(item.text), false, item.text);
+        assert.equal(/\bI (?:feel|felt)\b/i.test(item.text), false, item.text);
+        assert.equal(
+          /\b(bot|robot|AI|machine|program|chatbot|language model)\b/i.test(item.text),
+          false,
+          item.text,
+        );
+        assert.equal(/\bI (?:completely|totally|absolutely) agree\b/i.test(item.text), false, item.text);
       }
       if (group.id === 'pc-durative-want-vs-rh') {
         assert.match(item.want, /have been wanting|has been wanting|wanting this/i, item.want);
