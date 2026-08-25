@@ -35,7 +35,15 @@ import {
 import { InstrumentDrawer, type DrawerTab } from './InstrumentDrawer';
 import { IntroDialog } from './IntroDialog';
 import { readIntroDismissed } from './intro-storage';
-import { DEMO_PROMPTS, findDemoProvider, nextDemoJurisdiction } from './demo-scenarios';
+import {
+  DEMO_PROMPTS,
+  LOADING_SCRIPT_STATUS,
+  demoScriptStatus,
+  findDemoProvider,
+  nextDemoJurisdiction,
+  type DemoScriptReply,
+  type DemoScriptStatus,
+} from './demo-scenarios';
 import { ProviderPicker } from './ProviderPicker';
 import { MarkdownBody } from './MarkdownBody';
 import { IconDeliveryPolicy, IconInferenceAdvocate, IconRuleEvaluator } from './icons';
@@ -90,6 +98,7 @@ export function App() {
   );
   const introStripRef = useRef<HTMLButtonElement | null>(null);
   const introTabRef = useRef<HTMLButtonElement | null>(null);
+  const [scriptStatus, setScriptStatus] = useState<DemoScriptStatus>(LOADING_SCRIPT_STATUS);
   // Fresh loads and bfcache restores both need the file's first provider, not whatever the
   // tab last had selected. After that bootstrap, the user's pick sticks for the session.
   const providerBootstrapped = useRef(false);
@@ -110,6 +119,31 @@ export function App() {
   useEffect(() => {
     refresh().catch((e: unknown) => setError(String(e)));
   }, [refresh]);
+
+  const alignedProviderId = findDemoProvider(state?.providers ?? [], 'aligned');
+
+  const fetchScriptStatus = useCallback(async () => {
+    try {
+      const body = (await hostCall('demo.script', {
+        action: 'state',
+        ...(alignedProviderId ? { providerId: alignedProviderId } : {}),
+      })) as DemoScriptReply;
+      setScriptStatus(demoScriptStatus(body));
+    } catch {
+      setScriptStatus(
+        demoScriptStatus({ ok: false, reason: 'could not read the substitution script' }),
+      );
+    }
+  }, [alignedProviderId]);
+
+  useEffect(() => {
+    // Shared counter: show it, do not reset it. A load that reset the script would yank the
+    // next seal out from under anyone else watching the same host.
+    if (!introOpen) return;
+    void fetchScriptStatus();
+    const id = window.setInterval(() => void fetchScriptStatus(), 4000);
+    return () => window.clearInterval(id);
+  }, [introOpen, fetchScriptStatus]);
 
   useEffect(() => {
     const onPageShow = (e: PageTransitionEvent) => {
@@ -338,6 +372,10 @@ export function App() {
     });
   }
 
+  function applyScriptReply(body: DemoScriptReply) {
+    setScriptStatus(demoScriptStatus(body));
+  }
+
   async function resetSubstitution() {
     setError(null);
     const id = findDemoProvider(state?.providers ?? [], 'aligned');
@@ -345,7 +383,8 @@ export function App() {
       const body = (await hostCall('demo.script', {
         action: 'reset',
         ...(id ? { providerId: id } : {}),
-      })) as { ok?: boolean; reason?: string };
+      })) as DemoScriptReply;
+      applyScriptReply(body);
       if (body.ok === false) setError(body.reason ?? 'could not reset the substitution script');
     } catch (e) {
       setError(String(e));
@@ -362,10 +401,8 @@ export function App() {
     setView('chat');
     setError(null);
     try {
-      const body = (await hostCall('demo.script', { action: 'arm', providerId: id })) as {
-        ok?: boolean;
-        reason?: string;
-      };
+      const body = (await hostCall('demo.script', { action: 'arm', providerId: id })) as DemoScriptReply;
+      applyScriptReply(body);
       if (body.ok === false) {
         setError(body.reason ?? 'could not arm the substitution script');
         return;
@@ -697,6 +734,7 @@ export function App() {
         onUnsealed={() => void runUnsealed()}
         onSwitchJurisdiction={() => void switchJurisdiction()}
         onResetSubstitution={() => void resetSubstitution()}
+        scriptStatus={scriptStatus}
       />
     </div>
   );

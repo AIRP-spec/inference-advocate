@@ -100,7 +100,13 @@ export async function dispatchHostMethod(
     case 'jurisdiction.set':
       return host.setJurisdiction(String(params['jurisdictionId'] ?? ''));
     case 'demo.script': {
-      const action = params['action'] === 'arm' ? 'arm' : 'reset';
+      const action = params['action'];
+      if (action !== 'reset' && action !== 'arm' && action !== 'state') {
+        return {
+          ok: false,
+          reason: 'demo.script action must be reset, arm, or state',
+        };
+      }
       const providerId = params['providerId'];
       return host.controlDemoScript(
         action,
@@ -116,6 +122,15 @@ export async function dispatchHostMethod(
     default:
       throw new Error(`unknown host method: ${method}`);
   }
+}
+
+function demoScriptRequest(action: 'reset' | 'arm' | 'state'): {
+  method: 'GET' | 'POST';
+  path: string;
+} {
+  if (action === 'state') return { method: 'GET', path: 'demo/state' };
+  if (action === 'arm') return { method: 'POST', path: 'demo/arm-mismatch' };
+  return { method: 'POST', path: 'demo/reset' };
 }
 
 export class HostSession {
@@ -355,12 +370,13 @@ export class HostSession {
   }
 
   /**
-   * Reset or arm the aligned mock's model-substitution counter. The mock is a separate
-   * loopback process; this is a POST to its /v1/demo/* control path, not a process restart.
-   * The counter is shared by every visitor. Reference demo only.
+   * Read, reset, or arm the aligned mock's model-substitution counter. The mock is a
+   * separate loopback process. `state` is a GET so a page load can show the counter
+   * without moving it. Reset and arm are POSTs. The counter is shared by every visitor.
+   * Reference demo only.
    */
   async controlDemoScript(
-    action: 'reset' | 'arm',
+    action: 'reset' | 'arm' | 'state',
     providerId?: string,
   ): Promise<{
     ok: boolean;
@@ -388,11 +404,11 @@ export class HostSession {
         reason: 'substitution script reset only talks to loopback mock providers',
       };
     }
-    const path = action === 'arm' ? 'demo/arm-mismatch' : 'demo/reset';
+    const { method, path } = demoScriptRequest(action);
     const base = provider.baseUrl.endsWith('/') ? provider.baseUrl : `${provider.baseUrl}/`;
     const target = new URL(path, base);
     try {
-      const res = await fetch(target, { method: 'POST', signal: AbortSignal.timeout(2000) });
+      const res = await fetch(target, { method, signal: AbortSignal.timeout(2000) });
       const body = (await res.json()) as {
         ok?: boolean;
         reason?: string;

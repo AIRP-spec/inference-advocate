@@ -14,6 +14,8 @@ import {
   IconTaxonomy,
 } from './icons';
 import { writeIntroDismissed } from './intro-storage';
+import { INTRO_MORE_LINKS } from './intro-links';
+import { scriptStatusTitle, type DemoScriptStatus } from './demo-scenarios';
 
 export type IntroTab = 'explainer' | 'demo';
 
@@ -47,6 +49,7 @@ export function IntroDialog(props: {
   onUnsealed: () => void;
   onSwitchJurisdiction: () => void;
   onResetSubstitution: () => void;
+  scriptStatus: DemoScriptStatus;
 }) {
   const {
     open,
@@ -57,6 +60,7 @@ export function IntroDialog(props: {
     onUnsealed,
     onSwitchJurisdiction,
     onResetSubstitution,
+    scriptStatus,
   } = props;
 
   const [tab, setTab] = useState<IntroTab>('explainer');
@@ -299,6 +303,20 @@ export function IntroDialog(props: {
                 The thing that ties them together: every one of these runs in a client that
                 answers to you, not to the provider. That's the whole difference.
               </div>
+
+              <div className="intro-more">
+                <div className="intro-section-label">For more information</div>
+                <ul className="intro-more-list">
+                  {INTRO_MORE_LINKS.map((link) => (
+                    <li key={link.href}>
+                      <a href={link.href} target="_blank" rel="noopener noreferrer">
+                        {link.label}
+                      </a>
+                      <span className="intro-more-detail">{link.detail}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
             </div>
           ) : (
             <div role="tabpanel" id={demoPanelId} aria-labelledby={demoTabId} className="intro-demo">
@@ -331,14 +349,22 @@ export function IntroDialog(props: {
                     <button type="button" className="intro-chip quiet" onClick={onResetSubstitution}>
                       Reset script
                     </button>
+                    <span
+                      className={`intro-script-status ${scriptStatus.kind}`}
+                      title={scriptStatusTitle(scriptStatus)}
+                      aria-live="polite"
+                    >
+                      {scriptStatus.label}
+                    </span>
                   </div>
                   <p>
                     Same provider, next turn: <code>How is this different from a normal content
                     filter?</code> AIRP compares the sealed model name to the register. If the
                     seal names a model this provider is not registered to serve, the client
-                    refuses. That decision is deterministic. No model is consulted. If this
-                    provider has already been used, reset the script first so the next turn is
-                    the substitution.
+                    refuses. That decision is deterministic. No model is consulted. Status is
+                    the shared script on this host, not a per-visitor copy, and opening the
+                    page does not reset it. Reset if you want the next seal to be honest
+                    again.
                   </p>
                 </div>
 
@@ -408,7 +434,7 @@ export function IntroDialog(props: {
 }
 
 function focusable(root: HTMLElement): HTMLElement[] {
-  return [...root.querySelectorAll<HTMLElement>('button, input, [tabindex]:not([tabindex="-1"])')].filter(
+  return [...root.querySelectorAll<HTMLElement>('a[href], button, input, [tabindex]:not([tabindex="-1"])')].filter(
     (el) => !el.hasAttribute('disabled') && el.offsetParent !== null,
   );
 }

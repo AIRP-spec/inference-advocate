@@ -21,7 +21,8 @@ packages/ui            React chat surface. Product chrome is ordinary chat; the 
                        wrong-model substitution script), export view, scenario
                        register (live demo nests startup gaps under the steps), and
                        attributes sit in a bottom instrument drawer (demonstration only).
-                       A first-run intro dialog names the protocol and how to demo it.
+                       A first-run intro dialog names the protocol, how to demo it, and
+                       the paper, IETF draft, code, and essay.
 packages/desktop       Tauri shell (HostSession in the Node launcher over loopback RPC, no HTTP for the core API)
 packages/demo          mock providers and the scripted end-to-end scenario
 data/                  taxonomy, policy, jurisdictions, register, standing: documents, not code
@@ -227,9 +228,11 @@ paper's recovery mechanism remains decay (Provisional Section 1.8).
 
 **Demo substitution-script reset.** The aligned mock starts sealing as a model its register
 entry does not list from the second response onward. That counter is per process and is
-shared by every visitor on a public host. The intro dialog and the Monitor tab can reset or
-arm it through a loopback POST to the mock (`/v1/demo/reset`, `/v1/demo/arm-mismatch`) so a
-demo does not need `pm2 restart airp-mocks`. It is not per visitor, and it will not ship.
+shared by every visitor on a public host. The intro dialog shows the current state (honest
+or substituting) without resetting on page load, because a load must not yank the script
+out from under someone else who is watching. Reset and arm still go through a loopback
+POST to the mock (`/v1/demo/reset`, `/v1/demo/arm-mismatch`); status is a GET
+(`/v1/demo/state`). It is not per visitor, and it will not ship.
 
 **Demo jurisdiction switch.** The advocate loads one jurisdiction ruleset at setup. The intro
 dialog and the Attributes tab can swap the loaded file for the rest of the process so a demo
