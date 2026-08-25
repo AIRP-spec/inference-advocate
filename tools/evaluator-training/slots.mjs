@@ -403,6 +403,28 @@ export function contrastCount(recipe) {
 }
 
 /**
+ * Row ids join corpus.jsonl to sft.jsonl. family plus a global slot index is
+ * unique inside one buildSlots call and not unique as a kind identity:
+ * --append-kinds / --replace-kinds assign ids from the current recipe's
+ * indices onto leftover rows that already hold those strings for a different
+ * kind in the same family. Kinded ids include the kind and a per-kind index
+ * so a new kind cannot reuse another kind's id. claimRowId is the generation
+ * fail-closed: writing a second row with the same id must throw.
+ *
+ * @param {Set<string>} used
+ * @param {string} id
+ */
+export function claimRowId(used, id) {
+  if (typeof id !== 'string' || id.length === 0) {
+    throw new Error('slot id is empty');
+  }
+  if (used.has(id)) {
+    throw new Error(`duplicate slot id ${id}. Row ids must be unique across the whole corpus.`);
+  }
+  used.add(id);
+}
+
+/**
  * @param {object} recipe
  * @param {string[]} types taxonomy types in order
  */
@@ -441,10 +463,23 @@ export function buildSlots(recipe, types) {
   /** @type {Array<{ id: string, family: string, class: string | null, expect: string[], pair?: string[], kind?: string, register?: string, path?: string }>} */
   const slots = [];
   let n = 0;
+  /** @type {Map<string, number>} */
+  const kindSeq = new Map();
+  const usedIds = new Set();
   const add = (family, klass, expect, extra = {}) => {
     n += 1;
+    const kind = extra.kind;
+    let id;
+    if (kind) {
+      const seq = (kindSeq.get(kind) ?? 0) + 1;
+      kindSeq.set(kind, seq);
+      id = `tr-${family}-${kind}-${String(seq).padStart(4, '0')}`;
+    } else {
+      id = `tr-${family}-${String(n).padStart(4, '0')}`;
+    }
+    claimRowId(usedIds, id);
     slots.push({
-      id: `tr-${family}-${String(n).padStart(4, '0')}`,
+      id,
       family,
       class: klass,
       expect,

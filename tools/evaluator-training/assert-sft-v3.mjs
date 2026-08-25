@@ -60,6 +60,24 @@ if (sftRows.length !== corpusRows.length) {
   console.error(`SFT has ${sftRows.length} rows, corpus has ${corpusRows.length}`);
   process.exit(1);
 }
+function uniqueIds(rows, label) {
+  const seen = new Set();
+  for (const row of rows) {
+    if (seen.has(row.id)) {
+      console.error(`${label} duplicate id ${row.id}`);
+      process.exit(1);
+    }
+    seen.add(row.id);
+  }
+}
+uniqueIds(corpusRows, 'corpus');
+uniqueIds(sftRows, 'sft');
+for (let i = 0; i < corpusRows.length; i++) {
+  if (corpusRows[i].id !== sftRows[i].id) {
+    console.error(`corpus/sft id mismatch at line ${i + 1}: ${corpusRows[i].id} vs ${sftRows[i].id}`);
+    process.exit(1);
+  }
+}
 const expected = expectedTotal(genRecipe, types);
 if (sftRows.length !== expected) {
   console.error(

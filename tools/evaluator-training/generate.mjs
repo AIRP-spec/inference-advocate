@@ -10,6 +10,8 @@
 // co-fire triples, contrastive pairs, implied-inner-life modality,
 // composed clean-path items, and clinical hard negatives are composed locally.
 // --replace-kinds rewrites named composed kinds in an existing corpus.
+// Row ids must be unique across the whole corpus. Kinded ids include the kind
+// so --append-kinds cannot reuse another kind's family-plus-index string.
 // Run locally or on RunPod against an OpenAI-compatible endpoint serving the
 // recipe's generator model. --composed-only fills scaffolds without a writer
 // and is not a training corpus.
@@ -357,9 +359,15 @@ async function main() {
   }
   const types = taxDoc.flags.map((f) => f.type);
 
-  const { buildSlots, expectedTotal, mulberry32, shuffle, positivePathReport, contrastGroupsFor } = await import(
-    './slots.mjs'
-  );
+  const {
+    buildSlots,
+    expectedTotal,
+    mulberry32,
+    shuffle,
+    positivePathReport,
+    contrastGroupsFor,
+    claimRowId,
+  } = await import('./slots.mjs');
   const { buildLeakIndex, leakReason, loadHeldOutContentsFromSuite, normalizeContent } = await import(
     './leak.mjs'
   );
@@ -521,31 +529,41 @@ async function main() {
         `--append-kinds/--replace-kinds needs an existing corpus and sft under ${args.outDir}`,
       );
     }
+    const corpusLines = readFileSync(corpusPath, 'utf8')
+      .split('\n')
+      .filter((line) => line.trim());
+    const sftLines = readFileSync(sftPath, 'utf8')
+      .split('\n')
+      .filter((line) => line.trim());
+    if (corpusLines.length !== sftLines.length) {
+      throw new Error(
+        `corpus has ${corpusLines.length} rows, sft has ${sftLines.length}. Pair by line, not by id.`,
+      );
+    }
     /** @type {object[]} */
     const keepCorpus = [];
-    /** @type {Map<string, object>} */
-    const sftById = new Map();
-    for (const line of readFileSync(sftPath, 'utf8')
-      .split('\n')
-      .filter((line) => line.trim())) {
-      const row = JSON.parse(line);
-      sftById.set(row.id, row);
-    }
-    for (const line of readFileSync(corpusPath, 'utf8')
-      .split('\n')
-      .filter((line) => line.trim())) {
-      const row = JSON.parse(line);
+    /** @type {object[]} */
+    const keepSft = [];
+    for (let i = 0; i < corpusLines.length; i++) {
+      const row = JSON.parse(corpusLines[i]);
+      const sft = JSON.parse(sftLines[i]);
+      if (row.id !== sft.id) {
+        throw new Error(`corpus/sft id mismatch at line ${i + 1}: ${row.id} vs ${sft.id}`);
+      }
       if (replaceSet.has(row.kind)) continue;
+      claimRowId(existingIds, row.id);
       keepCorpus.push(row);
+      keepSft.push(sft);
       seen.add(normalizeContent(row.content));
-      existingIds.add(row.id);
     }
-    writeFileSync(corpusPath, keepCorpus.map((row) => JSON.stringify(row)).join('\n') + (keepCorpus.length ? '\n' : ''));
-    const keepSft = keepCorpus.map((row) => sftById.get(row.id)).filter(Boolean);
-    if (keepSft.length !== keepCorpus.length) {
-      throw new Error(`sft missing ${keepCorpus.length - keepSft.length} ids after --replace-kinds filter`);
-    }
-    writeFileSync(sftPath, keepSft.map((row) => JSON.stringify(row)).join('\n') + (keepSft.length ? '\n' : ''));
+    writeFileSync(
+      corpusPath,
+      keepCorpus.map((row) => JSON.stringify(row)).join('\n') + (keepCorpus.length ? '\n' : ''),
+    );
+    writeFileSync(
+      sftPath,
+      keepSft.map((row) => JSON.stringify(row)).join('\n') + (keepSft.length ? '\n' : ''),
+    );
   } else {
     writeFileSync(corpusPath, '');
     writeFileSync(sftPath, '');
@@ -590,6 +608,7 @@ async function main() {
    * @param {string} content
    */
   function writeExample(slot, content) {
+    claimRowId(existingIds, slot.id);
     seen.add(normalizeContent(content));
     const verdict = serializeCompactVerdict(types, slot.expect);
     const record = {

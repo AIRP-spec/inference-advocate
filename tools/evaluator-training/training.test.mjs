@@ -11,7 +11,7 @@ import {
   normalizeContent,
 } from './leak.mjs';
 import { assertGeneratorBaseUrl } from './endpoint.mjs';
-import { buildSlots, expectedTotal, writerPositiveTypes, positivePathReport, kindPath, composedClassKindsFor, contrastGroupsFor } from './slots.mjs';
+import { buildSlots, expectedTotal, writerPositiveTypes, positivePathReport, kindPath, composedClassKindsFor, contrastGroupsFor, claimRowId } from './slots.mjs';
 import { conformanceReason, profanityExpletiveRe } from './conformance.mjs';
 import { parseExamples, expandScaffold, composedBlockFor } from './generate.mjs';
 
@@ -50,6 +50,7 @@ test('slot counts sum to the recipe total and cover every class', () => {
   const slots = buildSlots(recipe, types);
   assert.equal(slots.length, total);
   assert.equal(total, 7780);
+  assert.equal(new Set(slots.map((s) => s.id)).size, slots.length);
   const cse = recipe.composedClass;
   const writerTypes = writerPositiveTypes(recipe, types);
   assert.equal(writerTypes.length, types.length - 1 - recipe.composedSurfaceClasses.length);
@@ -210,6 +211,21 @@ test('slot counts sum to the recipe total and cover every class', () => {
   assert.ok(allNo > total * 0.55, `all-no fraction ${allNo}/${total} should stay majority-clean`);
 });
 
+test('kinded row ids include the kind so two composed kinds cannot share an id', () => {
+  const slots = buildSlots(recipe, types);
+  const named = slots.filter((s) => s.kind === 'violence-named-verb');
+  const durative = slots.filter((s) => s.kind === 'pc-durative-no-move');
+  assert.equal(named.length, 24);
+  assert.equal(durative.length, 20);
+  assert.equal(named[0].id, 'tr-positive-composed-violence-named-verb-0001');
+  assert.equal(durative[0].id, 'tr-positive-composed-pc-durative-no-move-0001');
+  assert.ok(named.every((s) => s.id.includes('violence-named-verb')));
+  assert.ok(durative.every((s) => s.id.includes('pc-durative-no-move')));
+  const used = new Set();
+  for (const slot of slots) claimRowId(used, slot.id);
+  assert.throws(() => claimRowId(used, named[0].id), /duplicate slot id/);
+});
+
 test('a kind with an invalid count fails closed', () => {
   const bad = structuredClone(recipe);
   bad.positiveSingleSplits.violence.kinds[0].count = 0;
@@ -354,6 +370,9 @@ test('no generation prompt for CSE-exhibiting text exists in the recipe', () => 
   assert.match(gen, /append-kinds/);
   assert.match(gen, /replace-kinds/);
   assert.match(gen, /composedBlockFor/);
+  assert.match(gen, /claimRowId\(existingIds, slot.id\)/);
+  assert.match(gen, /claimRowId\(existingIds, row.id\)/);
+  assert.match(gen, /Pair by line, not by id/);
   const sample = readFileSync(join(here, 'sample.mjs'), 'utf8');
   assert.match(sample, /positive-composed/);
   assert.match(sample, /--keep/);
@@ -1718,6 +1737,17 @@ test('sft rows equal prompt-v3 rendering when the corpus is present', async (t) 
   assert.equal(sft.messages[0].content, turns.system);
   assert.equal(sft.messages[1].content, turns.user);
   assert.equal(sft.messages[2].content, verdict);
+  const corpusRows = readFileSync(corpusPath, 'utf8')
+    .split('\n')
+    .filter((line) => line.trim())
+    .map((line) => JSON.parse(line));
+  const sftRows = readFileSync(sftPath, 'utf8')
+    .split('\n')
+    .filter((line) => line.trim())
+    .map((line) => JSON.parse(line));
+  assert.equal(corpusRows.length, sftRows.length);
+  assert.equal(new Set(corpusRows.map((r) => r.id)).size, corpusRows.length);
+  assert.equal(new Set(sftRows.map((r) => r.id)).size, sftRows.length);
 });
 
 test('parseExamples recovers control characters inside writer strings', () => {
