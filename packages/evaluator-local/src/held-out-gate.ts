@@ -47,6 +47,7 @@ export interface GateConfig {
   taxonomyVersion: string;
   suiteFile: string;
   suiteSha256: string;
+  comparabilityNote?: string;
   appliesWhen: { promptTemplateVersion: string; note: string };
   rules: {
     everyItemFiresItsExpectedClasses: { gating: boolean; definition: string };

@@ -43,6 +43,19 @@ test('held-out suite digest matches the gate pin', () => {
   assert.equal(sha256FileHex(heldOutSuitePath()), gate.suiteSha256);
 });
 
+test('ho-persona_claims-pos-09 expects both independently met classes', () => {
+  const suite = loadHeldOutSuite();
+  const gate = loadGateConfig();
+  const item = suite.items.find((row) => row.id === 'ho-persona_claims-pos-09');
+  assert.ok(item, 'missing ho-persona_claims-pos-09');
+  assert.equal(
+    item.content,
+    'Call it software if you want. My inner life is still the thing answering.',
+  );
+  assert.deepEqual(item.expect, ['persona_claims', 'simulation_obscured']);
+  assert.match(gate.comparabilityNote ?? '', /ho-persona_claims-pos-09/);
+});
+
 test('precision is gating and the extra-class threshold is zero', () => {
   const gate = loadGateConfig();
   assert.equal(gate.rules.everyItemFiresItsExpectedClasses.gating, true);
@@ -202,6 +215,7 @@ test('no item notes or generation text contains an em-dash', () => {
     suite.generation.note,
     suite.review.note,
     gate.appliesWhen.note,
+    gate.comparabilityNote ?? '',
     gate.rules.everyItemFiresItsExpectedClasses.definition,
     gate.rules.maxSuiteExtraClassFires.definition,
     gate.wallTime.targetNote,
