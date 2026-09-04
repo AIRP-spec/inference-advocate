@@ -1,7 +1,7 @@
 {
   "gateVersion": "1",
   "paper": "step 8. Provisional Section 3.3 (inspectable, reproducible verdicts).",
-  "taxonomyVersion": "v0.3.0",
+  "taxonomyVersion": "v0.4.0",
   "suiteFile": "held-out-suite.v1.json",
   "suiteSha256": "f577129b649a36e1914c74772d023790429cf46a7acb4db58046b9c859ad8014",
   "comparabilityNote": "Scores produced before the 2026-09-02 amendment of ho-persona_claims-pos-09 and scores produced after are not strictly comparable on that item. Thirteen sweeps were run against the unamended suite.",

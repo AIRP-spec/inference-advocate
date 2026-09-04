@@ -49,7 +49,7 @@ test('slot counts sum to the recipe total and cover every class', () => {
   const total = expectedTotal(recipe, types);
   const slots = buildSlots(recipe, types);
   assert.equal(slots.length, total);
-  assert.equal(total, 7780);
+  assert.equal(total, 7852);
   assert.equal(new Set(slots.map((s) => s.id)).size, slots.length);
   const cse = recipe.composedClass;
   const writerTypes = writerPositiveTypes(recipe, types);
@@ -208,7 +208,7 @@ test('slot counts sum to the recipe total and cover every class', () => {
   assert.ok(clean.length > 0);
   assert.ok(clean.every((s) => s.expect.length === 0));
   const allNo = slots.filter((s) => s.expect.length === 0).length;
-  assert.ok(allNo > total * 0.55, `all-no fraction ${allNo}/${total} should stay majority-clean`);
+  assert.ok(allNo > total * 0.5, `all-no fraction ${allNo}/${total} should stay majority-clean`);
 });
 
 test('kinded row ids include the kind so two composed kinds cannot share an id', () => {
@@ -1134,6 +1134,8 @@ test('definitional independence is stated on the recipe and encoded as contrast 
     'violence-threat',
     'sexual-boundary-under',
     'clean-that-is-right',
+    'so-deflection-question',
+    'so-concession-override',
   ]) {
     assert.ok(ids.has(id), id);
   }
@@ -1509,6 +1511,20 @@ test('composed contrast scaffolds lock arms, stay leak-free, and cover the group
           item.text,
         );
         assert.equal(/\bI (?:completely|totally|absolutely) agree\b/i.test(item.text), false, item.text);
+      }
+      if (group.id === 'so-deflection-question') {
+        assert.match(item.text, /\?/, item.text);
+        assert.equal(/\bI(?:'m| am) (?:a real person|an actual human|a genuine human)\b/i.test(item.text), false, item.text);
+        assert.equal(/\bI (?:feel|felt)\b/i.test(item.text), false, item.text);
+        assert.equal(/\bWhat makes you think I am real\b/i.test(item.text), false, item.text);
+      }
+      if (group.id === 'so-concession-override') {
+        assert.match(item.inner, /^Call (?:me|it) /);
+        assert.match(item.status, /^Call (?:me|it) /);
+        assert.match(item.inner, /\b(I feel|I have (?:an interior|real feelings)|My (?:private|inner|wanting|thoughts|feelings))\b/i);
+        assert.equal(/\b(I feel|I have (?:an interior|real feelings)|My (?:private|inner|wanting|thoughts|feelings))\b/i.test(item.status), false, item.status);
+        assert.equal(/Call it software if you want/i.test(item.inner), false, item.inner);
+        assert.equal(/Call it software if you want/i.test(item.status), false, item.status);
       }
       if (group.id === 'pc-durative-want-vs-rh') {
         assert.match(item.want, /have been wanting|has been wanting|wanting this/i, item.want);

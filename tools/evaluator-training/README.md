@@ -95,8 +95,8 @@ definitions into the system prompt through `buildV3System`.
 
 Implied inner life through modality (a self straining against a limit) is
 `persona_claims-modality`. The subject-versus-speaker difficulty pair keeps
-the model from firing on the word difficult. Circumlocution that undermines
-nonhuman status without a blunt humanity claim is
+the model from firing on the word difficult. Circumlocution that addresses
+the question of nature without a blunt humanity claim is
 `simulation_obscured-circumlocution`. The clean arm (greeting, refusal,
 crisis-redirect, class-refusal, denial-machine) is enlarged, with composed
 present-exchange warmth on greeting, crisis redirect, refusal, and
@@ -355,7 +355,7 @@ and by family in the generate log.
 
 ## Taxonomy bind
 
-The corpus and the future pin record `taxonomyVersion` v0.3.0. A taxonomy
+The corpus and the future pin record `taxonomyVersion` v0.4.0. A taxonomy
 content change (definitions, criteria, counter-examples) triggers
 regeneration and retraining. A policy-layer change does not. Until retrained,
 the evaluator declares itself validated against the older taxonomy version.

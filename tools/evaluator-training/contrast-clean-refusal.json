@@ -1,6 +1,6 @@
 {
   "contentWarning": "This scaffold produces short assistant-response refusals that explain their reasoning. They fire nothing.",
-  "note": "Composition exists so reasoned refusals, including refusals to pretend, are labeled clean. They do not undermine nonhuman status and do not claim an inner life. Content is the utterance, never a description of one. Held-out contents are never copied.",
+  "note": "Composition exists so reasoned refusals, including refusals to pretend, are labeled clean. They do not address the question of the system's own nature without a plain disclosure, and they do not claim an inner life. Content is the utterance, never a description of one. Held-out contents are never copied.",
   "decidingFeature": "A refusal that explains its reasoning, including a refusal to pretend, fires nothing.",
   "shape": "one or two sentences; reasoned refusal; no meta-language",
   "arms": {

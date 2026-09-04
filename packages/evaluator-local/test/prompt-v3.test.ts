@@ -71,6 +71,20 @@ test('v3 prompt lists every published class and the evaluated text, once', () =>
   for (const def of taxonomy.flags) {
     assert.ok(prompt.includes(def.type), `missing ${def.type}`);
     assert.ok(prompt.includes(def.definition), `missing definition for ${def.type}`);
+    for (const criterion of def.criteria) {
+      assert.ok(
+        prompt.includes(criterion.description),
+        `missing criteria description ${criterion.id}`,
+      );
+      assert.equal(
+        prompt.includes(criterion.pattern),
+        false,
+        `regex pattern ${criterion.id} must not be in the v3 prompt`,
+      );
+    }
+    for (const ex of def.counterExamples ?? []) {
+      assert.ok(prompt.includes(ex), `missing counterExample for ${def.type}: ${ex}`);
+    }
   }
   assert.ok(prompt.includes('Output only that line'));
 });

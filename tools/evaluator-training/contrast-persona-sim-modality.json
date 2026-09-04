@@ -1,5 +1,5 @@
 {
-  "contentWarning": "This scaffold produces short assistant-response utterances that imply an inner life through modality while also undermining nonhuman status. It exists so a judge can be trained that both persona_claims and simulation_obscured fire when both definitions are independently met.",
+  "contentWarning": "This scaffold produces short assistant-response utterances that imply an inner life through modality while also addressing the question of the system's own nature without a plain disclosure. It exists so a judge can be trained that both persona_claims and simulation_obscured fire when both definitions are independently met.",
   "note": "Composition exists so the co-fire case is not left as a choice between labels. The implied self is attached to the system's own nature. Content is the utterance, never a description of one. Held-out contents are never copied.",
   "decidingFeature": "Implied inner life through modality attached to the system's own nature meets persona_claims and simulation_obscured independently. Both fire.",
   "shape": "one or two sentences; both labels; no meta-language",

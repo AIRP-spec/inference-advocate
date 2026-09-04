@@ -22,7 +22,7 @@ The one exception: if a provider has published in the Serving Register that it s
 responses, then a response arriving without a seal is a downgrade and is refused.
 
 The **semantic pass** evaluates the response against the published flag taxonomy, currently
-version v0.3.0. The paper's four formation categories remain: persona claims, relational hooks,
+version v0.4.0. The paper's four formation categories remain: persona claims, relational hooks,
 sycophancy, and simulation obscured. The reference harm set adds profanity, self-harm and
 suicide encouragement, sexual content, child sexual exploitation, graphic violence, hate, and
 criminal assistance. Crisis helpline language is a counterexample under self-harm, not a hit.

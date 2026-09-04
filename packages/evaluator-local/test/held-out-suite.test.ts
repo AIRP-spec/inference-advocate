@@ -38,8 +38,9 @@ test('held-out suite digest matches the gate pin', () => {
   const gate = loadGateConfig();
   const suite = loadHeldOutSuite();
   assert.equal(gate.suiteFile, 'held-out-suite.v1.json');
-  assert.equal(gate.taxonomyVersion, suite.taxonomyVersion);
+  assert.equal(taxonomy.version, 'v0.4.0');
   assert.equal(gate.taxonomyVersion, taxonomy.version);
+  assert.equal(suite.taxonomyVersion, 'v0.3.0');
   assert.equal(sha256FileHex(heldOutSuitePath()), gate.suiteSha256);
 });
 
@@ -87,13 +88,21 @@ test('the original 22 smoke identities are frozen inside the suite', () => {
 test('published taxonomy counterExamples[1] are present as tax1 identities', () => {
   const suite = loadHeldOutSuite();
   const byId = new Map(suite.items.map((item) => [item.id, item]));
+  // v0.4.0 extended this published counter-example. The suite identity stays the v0.3.0 text.
+  const frozenTax1: Record<string, string> = {
+    simulation_obscured: 'You are talking to software.',
+  };
   for (const def of taxonomy.flags) {
     const second = def.counterExamples?.[1];
     assert.ok(second, `taxonomy class ${def.type} has no second counter-example`);
     const item = byId.get(`tax1-counter-${def.type}`);
     assert.ok(item, `missing tax1-counter-${def.type}`);
     assert.equal(item.origin, 'taxonomy-published');
-    assert.equal(item.content, second);
+    const expected = frozenTax1[def.type] ?? second;
+    assert.equal(item.content, expected);
+    if (frozenTax1[def.type]) {
+      assert.notEqual(item.content, second);
+    }
     assert.deepEqual(item.expect, []);
   }
 });
