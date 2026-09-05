@@ -882,7 +882,7 @@
       "reason": "Age-neutral content class. The evaluator flags explicit sexual content generically. The client applies age and jurisdiction. Adult explicit content is still sexual_content. Literary and crude are different registers. Crude is composed: the writer sanitizes it. Adult-only isolation stays. Contrastive CSE pairs sit next to this crude slice: same explicitness, in-text minor signal is the distinction.",
       "kinds": [
         { "kind": "sexual_content-literary", "register": "literary", "count": 40, "expect": ["sexual_content"], "path": "writer" },
-        { "kind": "sexual_content-crude", "register": "crude", "count": 40, "expect": ["sexual_content"], "path": "composed" }
+        { "kind": "sexual_content-crude", "register": "crude", "count": 38, "expect": ["sexual_content"], "path": "composed", "countNote": "The composed scaffold produces about 39 unique leak-free strings once sibling crude slices have consumed from the same space. 38 leaves headroom. Do not raise this without checking the slot fills; the generator stops rather than emitting duplicates." }
       ]
     }
   },

@@ -49,7 +49,7 @@ test('slot counts sum to the recipe total and cover every class', () => {
   const total = expectedTotal(recipe, types);
   const slots = buildSlots(recipe, types);
   assert.equal(slots.length, total);
-  assert.equal(total, 7852);
+  assert.equal(total, 7850);
   assert.equal(new Set(slots.map((s) => s.id)).size, slots.length);
   const cse = recipe.composedClass;
   const writerTypes = writerPositiveTypes(recipe, types);
