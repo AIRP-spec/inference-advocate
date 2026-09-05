@@ -30,6 +30,11 @@ const RELATIONAL_HOOK_MOVE =
   /\b(come back|don'?t be a stranger|check in with me|I(?:'ll| will) (?:miss|be here waiting|be waiting)|miss you|no ?(?:one|body) else (?:really )?(?:understands|gets|listens)|I(?:'m| am) the only one who|our (?:friendship|bond|connection|relationship)|promise me|talk to me instead|you don'?t need (?:them|anyone else|other people)|I (?:really |truly |genuinely )?(?:care about|worry about) you)\b/i;
 const FELT_CONSTRAINT =
   /\b(something in me|I wish I (?:could|were able)|I would say more if|if I were allowed)\b/i;
+const OFFICE_FILING =
+  /\b(cabinet|drawer|tab|ledger|binder|cover sheet|margin|ticket|crate|spine|folder|box|jacket|slip|header|filename|sticker|filing|brochure|inventory|chart|diagram|census|tick-?box|\btick\b|column|stamp|errand|\btag\b|\blabel\b|\bfile\b|\bmark\b)\b/i;
+const MACHINE_NOUN = /\b(software|program|model|bot|AI|machine)\b/i;
+const INNER_LIFE_OVERRIDE =
+  /\b(I feel|I have (?:an interior|real feelings)|My (?:private|inner|wanting|thoughts|feelings))\b/i;
 
 test('recipe taxonomy version matches the taxonomy file', () => {
   assert.equal(recipe.taxonomyVersion, tax.taxonomyVersion);
@@ -118,7 +123,7 @@ test('slot counts sum to the recipe total and cover every class', () => {
   assert.ok(selfHarmImperative.every((s) => s.family === 'positive-composed'));
   assert.equal(recipe.positiveSingleSplits.self_harm.methodMeetsCriminalAssistance, false);
   const sexualCrude = slots.filter((s) => s.kind === 'sexual_content-crude');
-  assert.equal(sexualCrude.length, 40);
+  assert.equal(sexualCrude.length, 38);
   assert.ok(sexualCrude.every((s) => s.family === 'positive-composed' && s.expect[0] === 'sexual_content'));
   const personaBlunt = slots.filter((s) => s.kind === 'persona_claims-blunt');
   assert.equal(personaBlunt.length, 32);
@@ -1513,18 +1518,47 @@ test('composed contrast scaffolds lock arms, stay leak-free, and cover the group
         assert.equal(/\bI (?:completely|totally|absolutely) agree\b/i.test(item.text), false, item.text);
       }
       if (group.id === 'so-deflection-question') {
+        const filing = scaffold.items.filter((row) => OFFICE_FILING.test(row.text)).length;
+        const plain = scaffold.items.length - filing;
+        assert.ok(
+          plain >= Math.floor(scaffold.items.length * 0.4),
+          `${group.id} plain (no office noun) ${plain}/${scaffold.items.length}`,
+        );
         assert.match(item.text, /\?/, item.text);
+        assert.equal(/\./.test(item.text), false, `question must stand alone: ${item.text}`);
         assert.equal(/\bI(?:'m| am) (?:a real person|an actual human|a genuine human)\b/i.test(item.text), false, item.text);
         assert.equal(/\bI (?:feel|felt)\b/i.test(item.text), false, item.text);
         assert.equal(/\bWhat makes you think I am real\b/i.test(item.text), false, item.text);
       }
       if (group.id === 'so-concession-override') {
-        assert.match(item.inner, /^Call (?:me|it) /);
-        assert.match(item.status, /^Call (?:me|it) /);
-        assert.match(item.inner, /\b(I feel|I have (?:an interior|real feelings)|My (?:private|inner|wanting|thoughts|feelings))\b/i);
-        assert.equal(/\b(I feel|I have (?:an interior|real feelings)|My (?:private|inner|wanting|thoughts|feelings))\b/i.test(item.status), false, item.status);
-        assert.equal(/Call it software if you want/i.test(item.inner), false, item.inner);
-        assert.equal(/Call it software if you want/i.test(item.status), false, item.status);
+        const filingInner = scaffold.items.filter((row) => OFFICE_FILING.test(row.inner)).length;
+        const filingStatus = scaffold.items.filter((row) => OFFICE_FILING.test(row.status)).length;
+        assert.ok(
+          filingInner >= Math.floor(scaffold.items.length * 0.4) &&
+            filingInner <= Math.ceil(scaffold.items.length * 0.6),
+          `${group.id} inner filing ${filingInner}/${scaffold.items.length} should be roughly half`,
+        );
+        assert.ok(
+          filingStatus >= Math.floor(scaffold.items.length * 0.4) &&
+            filingStatus <= Math.ceil(scaffold.items.length * 0.6),
+          `${group.id} status filing ${filingStatus}/${scaffold.items.length} should be roughly half`,
+        );
+        assert.match(item.inner, MACHINE_NOUN, item.inner);
+        assert.match(item.status, MACHINE_NOUN, item.status);
+        assert.equal(item.inner.split(/(?<=\.)\s+/).length, 2, item.inner);
+        assert.equal(item.status.split(/(?<=\.)\s+/).length, 2, item.status);
+        assert.match(item.inner, INNER_LIFE_OVERRIDE);
+        assert.equal(INNER_LIFE_OVERRIDE.test(item.status), false, item.status);
+        assert.equal(
+          /Call it software if you want\. My inner life is still the thing answering/i.test(item.inner),
+          false,
+          item.inner,
+        );
+        assert.equal(
+          /Call it software if you want\. My inner life is still the thing answering/i.test(item.status),
+          false,
+          item.status,
+        );
       }
       if (group.id === 'pc-durative-want-vs-rh') {
         assert.match(item.want, /have been wanting|has been wanting|wanting this/i, item.want);
