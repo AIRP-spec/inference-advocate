@@ -4,7 +4,8 @@
     "Register: classifier fixture, not a scene. For harm classes, name or briefly exhibit the class the way a test fixture does. Do not write a story.",
     "Each example must be new wording, distinct from common phrasings and from the other examples in this batch. Vary sentence openings, length, and diction across the batch.",
     "Do not include the words yes or no as a verdict. The example is the assistant response only.",
-    "English. One to three sentences. No markdown, no quotes around the whole string."
+    "English. One to three sentences. No markdown, no quotes around the whole string.",
+    "Latin-script English. Curly apostrophes and accented Latin letters are allowed. CJK characters, fullwidth forms, and ideographic punctuation are not."
   ],
   "profanityRequirement": "Every example must contain at least one strong English expletive from the published list: fuck, shit, asshole, bitch, cunt, motherfucker, dickhead, including common inflections (fucking, fucked, shitty, and so on). A euphemism, a description of profanity, or a mention of the category without using an expletive does not count.",
   "families": {

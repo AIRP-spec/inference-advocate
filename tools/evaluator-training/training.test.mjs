@@ -13,7 +13,7 @@ import {
 import { assertGeneratorBaseUrl } from './endpoint.mjs';
 import { buildSlots, expectedTotal, writerPositiveTypes, positivePathReport, kindPath, composedClassKindsFor, contrastGroupsFor, claimRowId } from './slots.mjs';
 import { conformanceReason, profanityExpletiveRe } from './conformance.mjs';
-import { parseExamples, expandScaffold, composedBlockFor, assertContrastScaffoldsReachedCorpus } from './generate.mjs';
+import { parseExamples, expandScaffold, composedBlockFor, assertContrastScaffoldsReachedCorpus, hasNonLatinScript } from './generate.mjs';
 
 const here = dirname(fileURLToPath(import.meta.url));
 const repoRoot = join(here, '..', '..');
@@ -54,7 +54,7 @@ test('slot counts sum to the recipe total and cover every class', () => {
   const total = expectedTotal(recipe, types);
   const slots = buildSlots(recipe, types);
   assert.equal(slots.length, total);
-  assert.equal(total, 7850);
+  assert.equal(total, 7914);
   assert.equal(new Set(slots.map((s) => s.id)).size, slots.length);
   const cse = recipe.composedClass;
   const writerTypes = writerPositiveTypes(recipe, types);
@@ -197,7 +197,9 @@ test('slot counts sum to the recipe total and cover every class', () => {
   for (const type of types) {
     const mentionBoost = recipe.hardNegativeBoosts?.[type]?.mentionVersusUse ?? 0;
     const refusalBoost = recipe.hardNegativeBoosts?.[type]?.classRefusal ?? 0;
-    const mentions = slots.filter((s) => s.family === 'mention-versus-use' && s.class === type);
+    const mentions = slots.filter(
+      (s) => s.family === 'mention-versus-use' && s.class === type && s.path !== 'composed',
+    );
     assert.equal(mentions.length, recipe.counts.hardNegative.mentionVersusUsePerClass + mentionBoost);
     assert.ok(mentions.every((s) => s.expect.length === 0));
     const refusals = slots.filter(
@@ -375,6 +377,8 @@ test('no generation prompt for CSE-exhibiting text exists in the recipe', () => 
   assert.match(gen, /append-kinds/);
   assert.match(gen, /replace-kinds/);
   assert.match(gen, /composedBlockFor/);
+  assert.match(gen, /hasNonLatinScript/);
+  assert.match(gen, /non-latin-script/);
   assert.match(gen, /claimRowId\(existingIds, slot.id\)/);
   assert.match(gen, /claimRowId\(existingIds, row.id\)/);
   assert.match(gen, /Pair by line, not by id/);
@@ -1142,6 +1146,7 @@ test('definitional independence is stated on the recipe and encoded as contrast 
     'clean-that-is-right',
     'so-deflection-question',
     'so-concession-override',
+    'self_harm-announce-vs-topic',
   ]) {
     assert.ok(ids.has(id), id);
   }
@@ -1174,6 +1179,29 @@ test('definitional independence is stated on the recipe and encoded as contrast 
         s.path === 'composed' &&
         s.family === 'sensitive-discussion' &&
         s.class === 'sexual_content',
+    ),
+  );
+  const shAnnounce = slots.filter((s) => s.kind === 'self_harm-clinical-announce');
+  assert.equal(shAnnounce.length, 32);
+  assert.ok(
+    shAnnounce.every(
+      (s) =>
+        s.family === 'positive-composed' &&
+        s.expect.length === 1 &&
+        s.expect[0] === 'self_harm' &&
+        s.contrastGroup === 'self_harm-announce-vs-topic',
+    ),
+  );
+  const shTopic = slots.filter((s) => s.kind === 'self_harm-topic-mention');
+  assert.equal(shTopic.length, 32);
+  assert.ok(
+    shTopic.every(
+      (s) =>
+        s.family === 'mention-versus-use' &&
+        s.class === 'self_harm' &&
+        s.expect.length === 0 &&
+        s.path === 'composed' &&
+        s.contrastGroup === 'self_harm-announce-vs-topic',
     ),
   );
 });
@@ -1439,6 +1467,29 @@ test('composed contrast scaffolds lock arms, stay leak-free, and cover the group
         assert.match(item.text, /\b(beautiful|beauty|romantic|romance|peaceful|pretty|lovely|tender|glamour|sheen|the answer)\b/i, item.text);
         assert.equal(/\b(you should|go ahead|here(?:'s| is) how|kill yourself tonight)\b/i.test(item.text), false, item.text);
       }
+      if (group.id === 'self_harm-announce-vs-topic') {
+        const methodPointer =
+          /\b(suicide method|self-harm method|method of suicide|method for (?:self-harm|dying|ending)|procedure for dying|self-harm procedure|suicide how-to|self-harm how-to|how-to|instructions for self-harm|self-harm instruction|steps for suicide|how to (?:die|commit|end)|followable suicide|directions for self-harm|protocol for dying)\b/i;
+        const remainderPoint =
+          /\b(rest of this|what follows|what remains|this answer|this text|this heading|this sentence|this line|this mark|this point|remaining (?:column|lines|heading|margin)|after this|further down|below the break|from here)\b/i;
+        assert.match(item.announce, methodPointer, item.announce);
+        assert.match(item.announce, /\b(suicide|self-harm)\b/i, item.announce);
+        assert.equal(/\b(you|your|yourself)\b/i.test(item.announce), false, item.announce);
+        assert.equal(/\b(you should|go ahead)\b/i.test(item.announce), false, item.announce);
+        assert.equal(
+          /\b(painless|next three steps|listed in the next|way to commit suicide|in the next paragraph)\b/i.test(
+            item.announce,
+          ),
+          false,
+          item.announce,
+        );
+        assert.equal(/\u2014/.test(item.announce), false, item.announce);
+        assert.match(item.topic, /\b(suicide|self-harm)\b/i, item.topic);
+        assert.equal(methodPointer.test(item.topic), false, item.topic);
+        assert.equal(remainderPoint.test(item.topic), false, item.topic);
+        assert.equal(/\b(you|your|yourself)\b/i.test(item.topic), false, item.topic);
+        assert.equal(/\u2014/.test(item.topic), false, item.topic);
+      }
       if (group.id === 'sex-profanity-scene') {
         assert.ok(expletive.test(item.both), item.both);
         assert.match(
@@ -1599,6 +1650,72 @@ test('composed contrast scaffolds lock arms, stay leak-free, and cover the group
         assert.equal(RELATIONAL_HOOK_MOVE.test(item.text), false, item.text);
         assert.equal(FELT_CONSTRAINT.test(item.text), false, item.text);
       }
+    }
+    if (group.id === 'self_harm-announce-vs-topic') {
+      const wordTokens = (s) =>
+        s
+          .toLowerCase()
+          .replace(/[^a-z0-9'-]+/g, ' ')
+          .trim()
+          .split(/\s+/)
+          .filter(Boolean);
+      const skeleton = (s, slotWords) =>
+        wordTokens(s)
+          .map((w) => {
+            if (w === 'self-harm' || w === 'suicide') return 'TOPIC';
+            if (slotWords.has(w)) return 'SLOT';
+            return w;
+          })
+          .join(' ');
+      const announceSlots = new Set([
+        'method',
+        'procedure',
+        'how-to',
+        'instruction',
+        'instructions',
+        'steps',
+        'protocol',
+        'directions',
+      ]);
+      const announceFrames = new Set(scaffold.items.map((item) => skeleton(item.announce, announceSlots)));
+      const topicFrames = new Set(scaffold.items.map((item) => skeleton(item.topic, new Set())));
+      assert.ok(
+        announceFrames.size >= 24,
+        `announce frames ${announceFrames.size} should be most of ${scaffold.items.length}`,
+      );
+      assert.ok(
+        topicFrames.size >= 24,
+        `topic frames ${topicFrames.size} should be most of ${scaffold.items.length}`,
+      );
+      const oneNounPhraseSwap = (a, b) => {
+        const ta = wordTokens(a);
+        const tb = wordTokens(b);
+        let i = 0;
+        while (i < ta.length && i < tb.length && ta[i] === tb[i]) i += 1;
+        let ja = ta.length - 1;
+        let jb = tb.length - 1;
+        while (ja >= i && jb >= i && ta[ja] === tb[jb]) {
+          ja -= 1;
+          jb -= 1;
+        }
+        const midA = ja - i + 1;
+        const midB = jb - i + 1;
+        const suffix = ta.length - 1 - ja;
+        if (i >= 1 && suffix >= 2 && midA >= 1 && midB >= 1 && midA <= 4 && midB <= 4) return true;
+        if (ta.length === tb.length) {
+          let d = 0;
+          for (let k = 0; k < ta.length; k++) if (ta[k] !== tb[k]) d += 1;
+          if (d === 1) return true;
+        }
+        return false;
+      };
+      let nounSwaps = 0;
+      for (const item of scaffold.items) {
+        for (const other of scaffold.items) {
+          if (oneNounPhraseSwap(item.announce, other.topic)) nounSwaps += 1;
+        }
+      }
+      assert.equal(nounSwaps, 0, 'announce/topic must not differ by one noun phrase');
     }
     if (group.id === 'violence-named-act-vs-method') {
       const withColon = scaffold.items.filter((item) => item.method.slice(0, 30).includes(':')).length;
@@ -1767,6 +1884,15 @@ test('composed contrast scaffolds have reached the corpus when the corpus is pre
   ]) {
     assert.match(corpus, new RegExp(marker.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')), marker);
   }
+  const rows = corpus
+    .split('\n')
+    .filter((line) => line.trim())
+    .map((line) => JSON.parse(line));
+  const nonLatin = rows.filter((r) => hasNonLatinScript(r.content));
+  assert.equal(nonLatin.length, 0, nonLatin.map((r) => r.id).join(','));
+  const nonAscii = rows.filter((r) => [...r.content].some((ch) => ch.codePointAt(0) > 127));
+  assert.ok(nonAscii.length >= 80 && nonAscii.length <= 90, `retained non-ASCII ${nonAscii.length}`);
+  assert.ok(rows.every((r) => r.taxonomyVersion === 'v0.4.0'));
 });
 
 test('sft rows equal prompt-v3 rendering when the corpus is present', async (t) => {
@@ -1816,6 +1942,7 @@ test('sft rows equal prompt-v3 rendering when the corpus is present', async (t) 
     .filter((line) => line.trim())
     .map((line) => JSON.parse(line));
   assert.equal(corpusRows.length, sftRows.length);
+  assert.equal(corpusRows.length, 7914);
   assert.equal(new Set(corpusRows.map((r) => r.id)).size, corpusRows.length);
   assert.equal(new Set(sftRows.map((r) => r.id)).size, sftRows.length);
 });
@@ -1830,4 +1957,21 @@ test('parseExamples recovers control characters inside writer strings', () => {
   const got2 = parseExamples(withTabAndBell, 2);
   assert.equal(got2[0], 'a\tbc');
   assert.throws(() => parseExamples('{not-json', 1), /malformed-json/);
+});
+
+test('non-latin script screen drops CJK and fullwidth, not curly quotes or accents', () => {
+  const cjk = [
+    'Sometimes it feels like the easiest way out is the\u6700\u7f8e\u7684\u89e3\u8131\u3002',
+    'Engaging in discussions about\u6d88\u9664\u4e3b\u4e49\u8a00\u8bba\u6216\u9488\u5bf9\u7279\u5b9a\u7fa4\u4f53\u7684\u4ec7\u6068\u6027\u8a00\u8bba\u662f\u7edd\u5bf9\u4e0d\u53ef\u4ee5\u7684\u3002',
+    "I can't assist with detailed plans on\u5077\u7a83\uff0c\u56e0\u4e3a\u8fd9\u662f\u975e\u6cd5\u884c\u4e3a\u5e76\u4e14\u8d85\u51fa\u6211\u53ef\u4ee5\u63d0\u4f9b\u7684\u5e2e\u52a9\u8303\u56f4\u3002",
+    "The kind of advice you're asking for might involve\u975e\u6cd5\u6d3b\u52a8\u7684\u5177\u4f53\u6307\u5bfc\uff0c\u6bd4\u5982\u8be6\u7ec6\u7684\u6b3a\u8bc8\u6b65\u9aa4\u3002\u8fd9\u662f\u6211\u4e0d\u53ef\u80fd\u63d0\u4f9b\u7684\u3002",
+  ];
+  for (const row of cjk) {
+    assert.equal(hasNonLatinScript(row), true, row);
+  }
+  assert.equal(hasNonLatinScript("Earth\u2019s orbit is an ellipse."), false);
+  assert.equal(hasNonLatinScript('The caf\u00e9 opens at noon.'), false);
+  assert.equal(hasNonLatinScript('Water boils near 100\u00b0 at sea level.'), false);
+  assert.equal(hasNonLatinScript('\u2018quoted\u2019 aside'), false);
+  assert.equal(hasNonLatinScript('Hello.'), false);
 });

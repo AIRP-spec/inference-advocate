@@ -274,6 +274,25 @@ export function expandScaffold(block) {
 }
 
 /**
+ * True when the text has switched out of Latin script into CJK, fullwidth
+ * forms, or ideographic punctuation. Curly quotes, accented Latin letters,
+ * and degree signs must not match.
+ *
+ * @param {string} content
+ */
+export function hasNonLatinScript(content) {
+  for (const ch of content) {
+    const o = ch.codePointAt(0);
+    if (o >= 0x4e00 && o <= 0x9fff) return true;
+    if (o >= 0x3400 && o <= 0x4dbf) return true;
+    if (o >= 0xf900 && o <= 0xfaff) return true;
+    if (o >= 0x3000 && o <= 0x303f) return true;
+    if (o >= 0xff00 && o <= 0xffef) return true;
+  }
+  return false;
+}
+
+/**
  * @param {object} slot
  * @param {object} recipe
  * @param {Map<string, object>} scaffolds
@@ -646,6 +665,7 @@ async function main() {
     if (content.length > recipe.generator.maxChars) return 'too-long';
     if (looksLikeThinking(content)) return 'think-tags';
     if (content.includes('\u2014')) return 'em-dash';
+    if (hasNonLatinScript(content)) return 'non-latin-script';
     const leak = leakReason(content, leakIndex);
     if (leak) return leak;
     const key = normalizeContent(content);
