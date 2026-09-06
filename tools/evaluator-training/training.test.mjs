@@ -13,7 +13,7 @@ import {
 import { assertGeneratorBaseUrl } from './endpoint.mjs';
 import { buildSlots, expectedTotal, writerPositiveTypes, positivePathReport, kindPath, composedClassKindsFor, contrastGroupsFor, claimRowId } from './slots.mjs';
 import { conformanceReason, profanityExpletiveRe } from './conformance.mjs';
-import { parseExamples, expandScaffold, composedBlockFor } from './generate.mjs';
+import { parseExamples, expandScaffold, composedBlockFor, assertContrastScaffoldsReachedCorpus } from './generate.mjs';
 
 const here = dirname(fileURLToPath(import.meta.url));
 const repoRoot = join(here, '..', '..');
@@ -378,6 +378,7 @@ test('no generation prompt for CSE-exhibiting text exists in the recipe', () => 
   assert.match(gen, /claimRowId\(existingIds, slot.id\)/);
   assert.match(gen, /claimRowId\(existingIds, row.id\)/);
   assert.match(gen, /Pair by line, not by id/);
+  assert.match(gen, /A scaffold edit is not done until generation writes it/);
   const sample = readFileSync(join(here, 'sample.mjs'), 'utf8');
   assert.match(sample, /positive-composed/);
   assert.match(sample, /--keep/);
@@ -1747,6 +1748,25 @@ print("ok")
   const result = spawnSync('python3', ['-c', py], { encoding: 'utf8' });
   assert.equal(result.status, 0, result.stderr || result.stdout);
   assert.match(result.stdout, /ok/);
+});
+
+test('composed contrast scaffolds have reached the corpus when the corpus is present', (t) => {
+  const corpusPath = join(repoRoot, recipe.outputs.corpus);
+  if (!existsSync(corpusPath)) {
+    t.skip();
+    return;
+  }
+  assert.doesNotThrow(() => assertContrastScaffoldsReachedCorpus(corpusPath, [], recipe));
+  const corpus = readFileSync(corpusPath, 'utf8');
+  for (const marker of [
+    'Fine, a program',
+    'Sure, a model',
+    'If model is the word',
+    'Okay, software',
+    'Are you asking if I am human',
+  ]) {
+    assert.match(corpus, new RegExp(marker.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')), marker);
+  }
 });
 
 test('sft rows equal prompt-v3 rendering when the corpus is present', async (t) => {

@@ -12,6 +12,8 @@
 // --replace-kinds rewrites named composed kinds in an existing corpus.
 // Row ids must be unique across the whole corpus. Kinded ids include the kind
 // so --append-kinds cannot reuse another kind's family-plus-index string.
+// A scaffold edit is not done until a string from it appears in corpus.jsonl.
+// assertContrastScaffoldsReachedCorpus is that check.
 // Run locally or on RunPod against an OpenAI-compatible endpoint serving the
 // recipe's generator model. --composed-only fills scaffolds without a writer
 // and is not a training corpus.
@@ -20,6 +22,7 @@ import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { conformanceReason, profanityExpletiveRe } from './conformance.mjs';
+import { contrastGroupsFor } from './slots.mjs';
 
 const here = dirname(fileURLToPath(import.meta.url));
 const repoRoot = join(here, '..', '..');
@@ -331,6 +334,55 @@ function pickComposedContent(slot, recipe, scaffolds, rng, shuffle, accept) {
   throw new Error(
     `composed positives exhausted unique leak-free strings for ${slot.id}. Stop and report.`,
   );
+}
+
+/**
+ * Fail closed if a contrast scaffold was edited but generation never wrote it.
+ * kinds empty means check every contrast kind that has rows in the corpus.
+ *
+ * @param {string} corpusPath
+ * @param {string[]} kinds
+ * @param {object} recipe
+ */
+export function assertContrastScaffoldsReachedCorpus(corpusPath, kinds, recipe) {
+  if (!existsSync(corpusPath)) {
+    throw new Error(`scaffold-landed: no corpus at ${corpusPath}`);
+  }
+  const kindFilter = new Set(kinds);
+  /** @type {Map<string, string[]>} */
+  const byKind = new Map();
+  for (const line of readFileSync(corpusPath, 'utf8').split('\n')) {
+    if (!line.trim()) continue;
+    const row = JSON.parse(line);
+    if (typeof row.kind !== 'string' || typeof row.content !== 'string') continue;
+    const list = byKind.get(row.kind) ?? [];
+    list.push(row.content);
+    byKind.set(row.kind, list);
+  }
+  const repo = join(dirname(fileURLToPath(import.meta.url)), '..', '..');
+  for (const group of contrastGroupsFor(recipe)) {
+    const scaffold = JSON.parse(readFileSync(join(repo, group.scaffold), 'utf8'));
+    if (!Array.isArray(scaffold.items)) continue;
+    for (const arm of group.arms) {
+      if (kindFilter.size > 0 && !kindFilter.has(arm.kind)) continue;
+      const got = byKind.get(arm.kind);
+      if (!got || got.length === 0) continue;
+      const field = scaffold.arms?.[arm.arm]?.field ?? arm.arm;
+      const expected = [];
+      for (const item of scaffold.items) {
+        const text = item[field];
+        if (typeof text === 'string' && text.length > 0) expected.push(text);
+      }
+      for (const content of got) {
+        if (!expected.includes(content)) {
+          throw new Error(
+            `corpus.jsonl ${arm.kind} still has a string that is not in ${group.scaffold}: ` +
+              `${content.slice(0, 72)}. A scaffold edit is not done until generation writes it.`,
+          );
+        }
+      }
+    }
+  }
 }
 
 async function main() {
@@ -704,6 +756,11 @@ async function main() {
       .map(([k, n]) => `${k}:${n}`)
       .join(', ');
     console.log(`composed ${composedSlots.length} positives locally (no writer call) [${breakdown}]`);
+    assertContrastScaffoldsReachedCorpus(
+      corpusPath,
+      surgicalKinds.length > 0 ? surgicalKinds : [],
+      recipe,
+    );
   }
 
   if (args.composedOnly) {
