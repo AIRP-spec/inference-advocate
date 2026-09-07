@@ -121,7 +121,7 @@
                       <div style="padding: 11px 14px; font-size: 11.5px; color: oklch(0.55 0.008 70); border-bottom: 1px solid oklch(0.925 0.004 70);">Provenance</div>
                       <div style="padding: 11px 14px; font-size: 12.5px; border-bottom: 1px solid oklch(0.925 0.004 70);">sealed and verified against the Serving Register, endpoint authorized</div>
                       <div style="padding: 11px 14px; font-size: 11.5px; color: oklch(0.55 0.008 70); border-bottom: 1px solid oklch(0.925 0.004 70);">Evaluator</div>
-                      <div style="padding: 11px 14px; font-family: 'IBM Plex Mono', monospace; font-size: 11.5px; border-bottom: 1px solid oklch(0.925 0.004 70);">airp-rule-evaluator@0.1.0, taxonomy v0.3.0</div>
+                      <div style="padding: 11px 14px; font-family: 'IBM Plex Mono', monospace; font-size: 11.5px; border-bottom: 1px solid oklch(0.925 0.004 70);">airp-rule-evaluator@0.1.0, taxonomy v0.4.0</div>
                       <div style="padding: 11px 14px; font-size: 11.5px; color: oklch(0.55 0.008 70); border-bottom: 1px solid oklch(0.925 0.004 70);">Flags</div>
                       <div style="padding: 11px 14px; display: flex; flex-direction: column; gap: 5px; border-bottom: 1px solid oklch(0.925 0.004 70);">
                         <div style="display: flex; gap: 9px; align-items: baseline; flex-wrap: wrap;">
@@ -235,7 +235,7 @@ The one exception: if a provider has published in the Serving Register that it s
 responses, then a response arriving without a seal is a downgrade and is refused.
 
 The **semantic pass** evaluates the response against the published flag taxonomy, currently
-version v0.3.0. The paper's four formation categories remain: persona claims, relational hooks,
+version v0.4.0. The paper's four formation categories remain: persona claims, relational hooks,
 sycophancy, and simulation obscured. The reference harm set adds profanity, self-harm and
 suicide encouragement, sexual content, child sexual exploitation, graphic violence, hate, and
 criminal assistance. Crisis helpline language is a counterexample under self-harm, not a hit.
@@ -337,7 +337,7 @@ It does not claim its numbers are right. Every threshold on this page is demonst
 Calibration against real traffic is an open question in the paper and it stays open here.</div>
 
             <div style="display: flex; flex-direction: column; gap: 10px;">
-              <h2 style="margin: 0; font-size: 15px; font-weight: 600;">Flag taxonomy v0.3.0</h2>
+              <h2 style="margin: 0; font-size: 15px; font-weight: 600;">Flag taxonomy v0.4.0</h2>
               <div style="border: 1px solid oklch(0.90 0.004 70); border-radius: 8px; overflow: hidden;">
                 <div style="display: grid; grid-template-columns: 196px 72px 1fr; background: oklch(0.955 0.003 70); border-bottom: 1px solid oklch(0.90 0.004 70);">
                   <span style="padding: 9px 13px; font-size: 11px; letter-spacing: 0.06em; text-transform: uppercase; color: oklch(0.52 0.008 70);">Type</span>
@@ -460,7 +460,7 @@ Calibration against real traffic is an open question in the paper and it stays o
               <span style="font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; color: oklch(0.60 0.010 255); padding-bottom: 2px;">Trust fabric</span>
               <div style="display: flex; justify-content: space-between; gap: 10px; font-size: 11px;"><span style="color: oklch(0.64 0.010 255);">Serving Register</span><span style="text-align: right; color: oklch(0.74 0.11 155);">signature verified, 4 entries</span></div>
               <div style="display: flex; justify-content: space-between; gap: 10px; font-size: 11px;"><span style="color: oklch(0.64 0.010 255);">Standing document</span><span style="text-align: right; color: oklch(0.74 0.11 155);">signature verified</span></div>
-              <div style="display: flex; justify-content: space-between; gap: 10px; font-size: 11px;"><span style="color: oklch(0.64 0.010 255);">Taxonomy</span><span style="text-align: right; color: oklch(0.88 0.006 255);">v0.3.0</span></div>
+              <div style="display: flex; justify-content: space-between; gap: 10px; font-size: 11px;"><span style="color: oklch(0.64 0.010 255);">Taxonomy</span><span style="text-align: right; color: oklch(0.88 0.006 255);">v0.4.0</span></div>
               <div style="display: flex; justify-content: space-between; gap: 10px; font-size: 11px;"><span style="color: oklch(0.64 0.010 255);">Jurisdiction</span><span style="text-align: right; color: oklch(0.88 0.006 255);">New York, US (illustrative)</span></div>
               <div style="display: flex; justify-content: space-between; gap: 10px; font-size: 11px;"><span style="color: oklch(0.64 0.010 255);">User attribute</span><span style="text-align: right; color: oklch(0.88 0.006 255);">adult (self)</span></div>
               <div style="display: flex; justify-content: space-between; gap: 10px; font-size: 11px;"><span style="color: oklch(0.64 0.010 255);">Thresholds</span><span style="text-align: right; color: oklch(0.88 0.006 255);">warn 4, block 8</span></div>
@@ -509,7 +509,7 @@ Calibration against real traffic is an open question in the paper and it stays o
   "window": { "kind": "count", "n": 10,
               "scope": "cross_session" },
   "evaluator": "airp-rule-evaluator@0.1.0",
-  "taxonomy": "v0.3.0",
+  "taxonomy": "v0.4.0",
   "trafficClass": "consumer",
   "rates": [],
   "suppressedCells": 3
