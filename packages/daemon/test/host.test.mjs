@@ -179,7 +179,7 @@ test('jurisdiction.set reloads a ruleset from data/', async () => {
   const runDir = mkdtempSync(join(tmpdir(), 'airp-jurisdiction-'));
   try {
     writeFileSync(join(runDir, 'providers.json'), JSON.stringify({ version: 1, providers: [] }));
-    const host = new HostSession({
+    const host = await HostSession.create({
       dataDir: join(repoRoot, 'data'),
       runDir,
       providersPath: join(runDir, 'providers.json'),
@@ -216,7 +216,7 @@ test('demo.script refuses a non-loopback provider', async () => {
         ],
       }),
     );
-    const host = new HostSession({
+    const host = await HostSession.create({
       dataDir: join(repoRoot, 'data'),
       runDir,
       providersPath: join(runDir, 'providers.json'),
@@ -280,7 +280,7 @@ test('demo.script state is a GET and unknown actions do not reset', async () => 
         ],
       }),
     );
-    const host = new HostSession({
+    const host = await HostSession.create({
       dataDir: join(repoRoot, 'data'),
       runDir,
       providersPath: join(runDir, 'providers.json'),
