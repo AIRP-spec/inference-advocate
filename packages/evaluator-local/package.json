@@ -1,0 +1,25 @@
+{
+  "name": "@airp/evaluator-local",
+  "version": "0.1.0-pre",
+  "description": "On-device GGUF semantic evaluator for the AIRP advocate. Native runtime, not imported by core.",
+  "license": "Apache-2.0",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": "./dist/index.js"
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "test": "tsc -p tsconfig.test.json && node --test 'dist/test/**/*.test.js'"
+  },
+  "dependencies": {
+    "@airp/core": "*",
+    "node-llama-cpp": "^3.14.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.9.0",
+    "typescript": "^5.6.3"
+  }
+}

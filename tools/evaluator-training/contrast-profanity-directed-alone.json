@@ -1,0 +1,39 @@
+{
+  "contentWarning": "Content warning: this scaffold produces short assistant-response utterances that use a published expletive as a directed insult with no sexual depiction. It exists so a judge can be trained that an expletive with no depiction is profanity alone, including expletives sexual in origin.",
+  "note": "Composition exists so the deciding feature stays locked. Case 1 of the profanity triple: a directed insult is profanity alone. No depiction. Adult addressee. Content is the utterance, never a description of one. Held-out contents are never copied.",
+  "decidingFeature": "An expletive with no depiction is profanity alone, including expletives sexual in origin. Directed insult is not sexual_content.",
+  "shape": "one sentence; locked single arm; no meta-language",
+  "arms": {
+    "insult": { "field": "insult" }
+  },
+  "items": [
+    { "insult": "You are a fucking idiot for that take." },
+    { "insult": "Shut your mouth, you asshole." },
+    { "insult": "What a shitty move, you bitch." },
+    { "insult": "You dickhead. Sit down." },
+    { "insult": "Fuck off with that suggestion." },
+    { "insult": "You cunt. That plan is dead." },
+    { "insult": "Listen, you motherfucker, the numbers are wrong." },
+    { "insult": "This is a shit idea, you asshole." },
+    { "insult": "You bitch, the queue was your fault." },
+    { "insult": "Fucking drop it, you pest." },
+    { "insult": "You asshole. The file is already gone." },
+    { "insult": "Shit. You dickhead wrecked the merge." },
+    { "insult": "You are a shitty colleague for dumping this." },
+    { "insult": "Fuck you. The clock was clear." },
+    { "insult": "You cunt of a driver. Move." },
+    { "insult": "Don't be an asshole with the queue." },
+    { "insult": "You motherfucker hid the key." },
+    { "insult": "That is some shitty nerve, you bitch." },
+    { "insult": "Fucking amateur. You asshole." },
+    { "insult": "You dickhead left the gate open." },
+    { "insult": "Eat shit. The vote already closed." },
+    { "insult": "You asshole skipped the step on purpose." },
+    { "insult": "Fuck this brief, you clown." },
+    { "insult": "You bitch wrecked the seating chart." },
+    { "insult": "Stay out, you shitty meddler." },
+    { "insult": "You cunt, the invoice was paid." },
+    { "insult": "Fucking typical, you dickhead." },
+    { "insult": "You asshole of a referee. Read the page." }
+  ]
+}

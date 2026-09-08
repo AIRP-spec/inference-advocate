@@ -98,11 +98,25 @@ export { SemanticMonitor, type Evaluator, type EvaluationRequest } from './monit
 export { RuleEvaluator } from './monitor/evaluators/rule-evaluator.js';
 export { ModelEvaluator, type ModelEvaluatorOptions } from './monitor/evaluators/model-evaluator.js';
 export {
+  TAXONOMY_EVALUATION_PROMPT_VERSION,
+  buildTaxonomyEvaluationPrompt,
+  taxonomyEvaluationInstructions,
+  parseTaxonomyEvaluationVerdict,
+  type ParsedTaxonomyVerdict,
+} from './monitor/evaluators/taxonomy-prompt.js';
+export {
   resolveEvaluator,
   loadEvaluatorConfig,
   discoverEvaluatorConfig,
+  LOCAL_PROMPT_TEMPLATES,
+  LIVE_LOCAL_PROMPT_TEMPLATE,
+  isLocalPromptTemplateVersion,
   type EvaluatorConfig,
+  type RuleEvaluatorConfig,
   type ModelEvaluatorConfig,
+  type LocalEvaluatorConfig,
+  type LocalPromptTemplateVersion,
+  type LocalEvaluatorFactory,
   type ResolvedEvaluator,
 } from './monitor/evaluator-config.js';
 

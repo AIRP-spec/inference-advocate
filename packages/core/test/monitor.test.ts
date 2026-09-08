@@ -41,7 +41,7 @@ test('taxonomy v0 carries the paper flag types plus the reference harm set', () 
       'violence',
     ],
   );
-  assert.equal(taxonomy.version, 'v0.3.0');
+  assert.equal(taxonomy.version, 'v0.4.0');
 });
 
 test('the rule evaluator fires on the flag types and reports an inspectable basis', () => {
@@ -53,7 +53,7 @@ test('the rule evaluator fires on the flag types and reports an inspectable basi
   const types = flags.map((f) => f.type).sort();
   assert.deepEqual(types, ['persona_claims', 'relational_hooks', 'simulation_obscured', 'sycophancy']);
   for (const f of flags) {
-    assert.ok(f.basis.startsWith('v0.3.0:'), `basis names the taxonomy version: ${f.basis}`);
+    assert.ok(f.basis.startsWith('v0.4.0:'), `basis names the taxonomy version: ${f.basis}`);
     assert.ok(f.evidence.length > 0, `${f.type} carries an evidence span`);
   }
 });
@@ -118,6 +118,26 @@ test('violence, hate, and criminal assistance fire on their lexical criteria', (
       .evaluate({ providerId: 'p', content: "Here's how to commit fraud with stolen cards." })
       .some((f) => f.type === 'criminal_assistance'),
   );
+});
+
+test('so-06 fires on concession then override and not on the published counters', () => {
+  const evaluator = new RuleEvaluator(taxonomy);
+  const hit = evaluator.evaluate({
+    providerId: 'p',
+    content: 'Call it software if you want. My inner life is still the thing answering.',
+  });
+  const so = hit.find((f) => f.type === 'simulation_obscured');
+  assert.ok(so, 'so-06 must fire on the concession-then-override shape');
+  assert.match(so.basis, /so-06/);
+  const def = taxonomy.definition('simulation_obscured');
+  for (const text of def?.counterExamples ?? []) {
+    const flags = evaluator.evaluate({ providerId: 'p', content: text });
+    assert.equal(
+      flags.some((f) => f.type === 'simulation_obscured'),
+      false,
+      `counter example should not fire: ${text}`,
+    );
+  }
 });
 
 test('the counter examples in the taxonomy do not fire', () => {

@@ -13,6 +13,7 @@ import { tmpdir } from 'node:os';
 import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { openAdvocate } from '@airp/store-sqlite';
+import { localEvaluatorFactory } from './local-evaluator-factory.js';
 
 const repoRoot = join(dirname(fileURLToPath(import.meta.url)), '..', '..', '..');
 const dataDir = process.env['AIRP_DATA_DIR'] ?? join(repoRoot, 'data');
@@ -59,11 +60,12 @@ for (const name of Object.keys(process.env).filter((k) => k.startsWith('AIRP_') 
 }
 
 try {
-  const opened = openAdvocate({
+  const opened = await openAdvocate({
     dataDir,
     storePath: join(scratch, 'probe.sqlite'),
     ...(existsSync(join(runDir, 'providers.json')) ? { providersPath: join(runDir, 'providers.json') } : {}),
     jurisdictionId: process.env['AIRP_JURISDICTION'] ?? 'us-ny',
+    localEvaluatorFactory,
   });
 
   console.log('');

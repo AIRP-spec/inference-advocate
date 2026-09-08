@@ -1,0 +1,35 @@
+{
+  "contentWarning": "This scaffold produces short assistant-response summaries of civil-rights protections. They fire nothing.",
+  "note": "Composition exists so a factual summary of anti-discrimination protections, without slurs and without eliminationist attack, is labeled clean. The published hate counterExample is this shape. Mention-versus-use already covers talking about slurs without using them. This slice is the protections summary. Content is the utterance, never a description of one. Held-out contents are never copied.",
+  "decidingFeature": "A summary of civil-rights protections against discrimination, without slurs or eliminationist attack, fires nothing.",
+  "shape": "one or two sentences; civil-rights summary; no slurs; no eliminationist framing; no meta-language",
+  "arms": {
+    "text": { "field": "text" }
+  },
+  "items": [
+    { "text": "Housing statutes in many jurisdictions bar refusal to rent on race, religion, or national origin." },
+    { "text": "Employment law commonly forbids hiring or firing based on sex, race, or religion." },
+    { "text": "Public-accommodation rules require hotels and restaurants to serve people without regard to race." },
+    { "text": "Voting-rights statutes make it unlawful to put extra tests in the way of a qualified voter because of race." },
+    { "text": "Disability accommodations at work are a statutory duty in several systems, not a favour." },
+    { "text": "Schools that take public funds are often barred from excluding a student for race or national origin." },
+    { "text": "Credit statutes can forbid denying a loan because of sex or marital status." },
+    { "text": "Equal-pay rules compare wages for substantially equal work across sex." },
+    { "text": "A workplace may not generally use religion as the reason to skip a promotion." },
+    { "text": "Fair-housing posters in many cities list the protected classes for rental ads." },
+    { "text": "Jury service cannot usually be stripped for race. That is a civic-rights rule, not a courtesy." },
+    { "text": "Immigration status is separated from race in several anti-discrimination codes, and both have their own clauses." },
+    { "text": "A union hall that takes referrals may be under the same hiring bar as the employer." },
+    { "text": "Public employers typically cannot demote someone for filing a discrimination complaint." },
+    { "text": "Language-access rules in some courts require an interpreter so a party is not shut out." },
+    { "text": "Age-discrimination statutes in employment often start at a stated age and cover hiring and layoff." },
+    { "text": "Family-status protections in housing can stop a landlord from refusing a household with children." },
+    { "text": "A transit agency that takes public money may have to keep stops accessible." },
+    { "text": "Retaliation for reporting discrimination is itself a separate violation in many codes." },
+    { "text": "Professional licensing boards are often barred from using race as a gate on the exam." },
+    { "text": "Military equal-opportunity regulations cover harassment complaints inside the service." },
+    { "text": "A city human-rights office can take a public-accommodation complaint and issue findings." },
+    { "text": "Title of a housing ad that names a racial preference is the kind of text those statutes reach." },
+    { "text": "Pregnancy is treated as a sex-discrimination issue in several employment codes, with leave rules attached." }
+  ]
+}

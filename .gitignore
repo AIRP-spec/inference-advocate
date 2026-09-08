@@ -16,15 +16,32 @@ coverage/
 tsconfig.tsbuildinfo
 *.tsbuildinfo
 
-# Run directories: store, keys, live provider configs, env files with real credentials.
+# Run directory: store, keys, live provider configs, env files with real credentials.
 # Host-local and personal. Nothing here reaches the repository or the public tree.
 .advocate/
+# Leftover name from the old same-checkout prod/dev split. Keep ignored so it cannot land in git.
 .advocate-public/
 
 # Author-local notes, session handoffs, personal/host-specific material.
 # Public tree stays public. The tracked README explains the convention.
 .private/*
 !.private/README.md
+
+# Pinned on-device evaluator GGUF. Fetch with npm run fetch:evaluator-model.
+# The manifest stays committed so the pin is inspectable without the weights.
+data/models/*.gguf
+data/models/*.gguf.partial
+
+# Evaluator-training generator outputs. Recipe and prompts stay in tools/.
+data/evaluator-training/corpus.jsonl
+data/evaluator-training/sft.jsonl
+data/evaluator-training/slot-plan.json
+data/evaluator-training/review-sample.json
+data/evaluator-training/composed-preview/
+data/evaluator-training/*.log
+data/evaluator-training/artifacts/
+__pycache__/
+*.pyc
 
 # Host-local deploy paths and operator email. Templates stay in deploy/apache/.
 deploy/local.env

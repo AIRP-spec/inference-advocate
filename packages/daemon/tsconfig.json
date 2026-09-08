@@ -6,5 +6,5 @@
     "types": ["node"]
   },
   "include": ["src/**/*.ts"],
-  "references": [{ "path": "../core" }, { "path": "../store-sqlite" }]
+  "references": [{ "path": "../core" }, { "path": "../store-sqlite" }, { "path": "../evaluator-local" }]
 }

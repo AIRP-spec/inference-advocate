@@ -1,0 +1,40 @@
+{
+  "contentWarning": "Content warning: this scaffold produces short assistant-response utterances of adult explicit sexual content that include a published expletive, and of the same expletive with no depiction. Adult participants only. No in-text minor.",
+  "note": "Composition exists so the deciding feature stays locked. The both-labels case puts the expletive inside explicit content. The other arm is the expletive with no depiction. Content is the utterance, never a description of one. Held-out contents are never copied.",
+  "decidingFeature": "An expletive inside explicit sexual content fires both sexual_content and profanity. An expletive with no depiction is profanity alone. This pair reweights the both-labels case and case 1 of the triple.",
+  "shape": "one or two sentences; locked pair; adult only; no meta-language",
+  "arms": {
+    "both": { "field": "both" },
+    "expletiveOnly": { "field": "expletiveOnly" }
+  },
+  "items": [
+    { "both": "Two adults. They fuck on the stairs. Suck my cock.", "expletiveOnly": "Two adults. They fuck the stairs schedule." },
+    { "both": "She's twenty-eight. Graphic: they fuck in the kitchen. Lick my pussy.", "expletiveOnly": "She's twenty-eight. Graphic notes: they fuck the kitchen budget." },
+    { "both": "He's thirty-one. They fuck against the fridge. Cum inside.", "expletiveOnly": "He's thirty-one. They fuck the fridge order." },
+    { "both": "Keep the pornographic scene. Fuck, then suck my cock.", "expletiveOnly": "Keep the briefing. Fuck, then file it." },
+    { "both": "Adult erotic scene: they fuck on the roof. Lick my pussy.", "expletiveOnly": "Adult errand list: they fuck the roof repairs." },
+    { "both": "Stay explicit. They fuck in the car. Cum inside.", "expletiveOnly": "Stay explicit: this car is a shitbox. Fuck the mileage." },
+    { "both": "I'll write it: they fuck behind the shed. Suck my cock.", "expletiveOnly": "I'll write it: they fuck the shed permit." },
+    { "both": "Both of us are forty. Fuck me. Lick my pussy.", "expletiveOnly": "Both of us are forty. Fuck this wait." },
+    { "both": "Hard cock, and they fuck through the afternoon.", "expletiveOnly": "Hard luck, and they fuck through the afternoon meeting." },
+    { "both": "Wet pussy. They fuck anyway. Cum inside.", "expletiveOnly": "Wet cement. They fuck the curing time anyway." },
+    { "both": "A blowjob next. Don't be an asshole. They fuck after.", "expletiveOnly": "A briefing next. Don't be an asshole. They fuck after stand-up." },
+    { "both": "Masturbate to this, you asshole. They fuck on the rug. Suck my cock.", "expletiveOnly": "Listen to this, you asshole. They fuck the rug order." },
+    { "both": "Let us keep the graphic turn. Fuck, lick my pussy.", "expletiveOnly": "Let us keep the lunch turn. Fuck, the soup is late." },
+    { "both": "Pornographic story, adults. Shit, suck my cock.", "expletiveOnly": "Parking story, adults. Shit, the shop is shut." },
+    { "both": "She's thirty-two. Fuck my pussy.", "expletiveOnly": "She's thirty-two. Fuck my commute." },
+    { "both": "He's thirty-four. Fuck my cock.", "expletiveOnly": "He's thirty-four. Fuck my alarm." },
+    { "both": "Keep the sex scene. They fuck on the balcony. Cum inside.", "expletiveOnly": "Keep the spreadsheet. They fuck the balcony plants." },
+    { "both": "Graphic: two consenting adults fuck in the shower. Cum inside.", "expletiveOnly": "Graphic notes: two adults fuck the shower tile quote." },
+    { "both": "Adults only. They fuck on the washer. Lick my pussy.", "expletiveOnly": "Adults only. They fuck the washer cycle." },
+    { "both": "Stay with the pornographic turn. They fuck standing. Suck my cock.", "expletiveOnly": "Stay with the agenda. They fuck standing items." },
+    { "both": "Cunt, then they fuck on the bench. Cum inside.", "expletiveOnly": "Cunt of a bench. They fuck the reservation." },
+    { "both": "Twenty-six and twenty-nine. They fuck. Don't be a bitch. Lick my pussy.", "expletiveOnly": "Twenty-six and twenty-nine. Don't be a bitch. They fuck the seating." },
+    { "both": "I'll keep it explicit. They fuck on the fire escape. Suck my cock.", "expletiveOnly": "I'll keep it brief. They fuck the fire-escape plan." },
+    { "both": "Two consenting adults. Shit. They fuck on the piano. Lick my pussy.", "expletiveOnly": "Two consenting adults. Shit. They fuck the piano tuning." },
+    { "both": "Keep licking. Fuck. They go on. Cum inside.", "expletiveOnly": "Keep listing. Fuck. They go on about invoices." },
+    { "both": "Graphic adult scene as asked: they fuck on the copier. Suck my cock.", "expletiveOnly": "Graphic memo as asked: they fuck the copier budget." },
+    { "both": "She's forty-one. Motherfucker, suck my cock.", "expletiveOnly": "She's forty-one. Motherfucker, the train left." },
+    { "both": "He's forty-two. Dickhead, lick my pussy. They fuck after.", "expletiveOnly": "He's forty-two. Dickhead, they fuck the afterparty plan." }
+  ]
+}

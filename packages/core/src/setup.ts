@@ -22,6 +22,7 @@ import {
   discoverEvaluatorConfig,
   resolveEvaluator,
   type EvaluatorConfig,
+  type LocalEvaluatorFactory,
 } from './monitor/evaluator-config.js';
 import { DeliveryPolicy } from './policy/config.js';
 import { Jurisdiction } from './policy/jurisdiction.js';
@@ -52,6 +53,11 @@ export interface SetupOptions {
    * variable, and then to the rule evaluator. See data/evaluator.example.json.
    */
   evaluatorPath?: string;
+  /**
+   * Host-injected constructor for evaluator config kind: 'local'. Same port pattern as
+   * StoreBackend: core names the need, the host supplies the native runtime.
+   */
+  localEvaluatorFactory?: LocalEvaluatorFactory;
   fetchImpl?: typeof fetch;
   now?: () => Date;
   /**
@@ -74,7 +80,7 @@ export interface OpenedAdvocate {
   warnings: string[];
 }
 
-export function openAdvocate(opts: SetupOptions): OpenedAdvocate {
+export async function openAdvocate(opts: SetupOptions): Promise<OpenedAdvocate> {
   const warnings: string[] = [];
   const d = opts.dataDir;
   const store = opts.store;
@@ -150,10 +156,11 @@ export function openAdvocate(opts: SetupOptions): OpenedAdvocate {
     } catch (err) {
       warnings.push(`${(err as Error).message}; falling back to the rule evaluator`);
     }
-    const resolved = resolveEvaluator({
+    const resolved = await resolveEvaluator({
       taxonomy,
       ...(config ? { config } : {}),
       providerBaseUrls: providers.list().map((p) => p.baseUrl),
+      ...(opts.localEvaluatorFactory ? { localEvaluatorFactory: opts.localEvaluatorFactory } : {}),
     });
     evaluator = resolved.evaluator;
     outboundContentPaths = resolved.outboundContentPaths;

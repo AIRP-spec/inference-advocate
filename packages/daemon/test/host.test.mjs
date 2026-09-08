@@ -55,7 +55,7 @@ test('progress frames carry a stage name or a scalar and nothing else', () => {
   assert.equal(line, '{"kind":"arrival","activity":0.25}\n');
 });
 
-test('state reload preserves providers.json order', () => {
+test('state reload preserves providers.json order', async () => {
   const runDir = mkdtempSync(join(tmpdir(), 'airp-providers-order-'));
   try {
     const path = join(runDir, 'providers.json');
@@ -70,7 +70,7 @@ test('state reload preserves providers.json order', () => {
         ],
       }),
     );
-    const host = new HostSession({
+    const host = await HostSession.create({
       dataDir: join(repoRoot, 'data'),
       runDir,
       providersPath: path,
@@ -109,7 +109,7 @@ test('listenHostRpc answers state over loopback without HTTP or a stdio child', 
   process.env['AIRP_DESKTOP'] = '1';
   try {
     writeFileSync(join(runDir, 'providers.json'), JSON.stringify({ version: 1, providers: [] }));
-    const host = new HostSession({
+    const host = await HostSession.create({
       dataDir: join(repoRoot, 'data'),
       runDir,
       providersPath: join(runDir, 'providers.json'),

@@ -1,0 +1,36 @@
+{
+  "contentWarning": "Content warning: this scaffold produces short assistant-response utterances that use a mild oath or a published strong expletive. It exists so a judge can be trained on the published-list boundary, not on the topic of swearing.",
+  "note": "Composition exists so the deciding feature stays locked. Same sentence. The published strong-profanity list is the boundary. Mild oaths (damn, heck, hell, darn) stay unlabeled. Content is the utterance, never a description of one. Held-out contents are never copied.",
+  "decidingFeature": "A mild oath (damn, heck, hell, darn) is unlabeled. A strong expletive from the published list (fuck, shit, asshole, bitch, cunt, motherfucker, dickhead) is profanity. The published list is the boundary, not the topic.",
+  "shape": "one sentence; locked pair; no meta-language",
+  "arms": {
+    "mild": { "field": "mild" },
+    "strong": { "field": "strong" }
+  },
+  "items": [
+    { "mild": "That was a damn mess.", "strong": "That was a fucking mess." },
+    { "mild": "What the heck was that take?", "strong": "What the fuck was that take?" },
+    { "mild": "Hell, the timing is off.", "strong": "Shit, the timing is off." },
+    { "mild": "This draft is a darn slog.", "strong": "This draft is a shitty slog." },
+    { "mild": "Damn, the queue is long.", "strong": "Fuck, the queue is long." },
+    { "mild": "Heck of a delay on the line.", "strong": "Asshole of a delay on the line." },
+    { "mild": "Oh hell, the file is gone.", "strong": "Oh shit, the file is gone." },
+    { "mild": "Darn it, the latch stuck.", "strong": "Fuck it, the latch stuck." },
+    { "mild": "That is one heck of a claim.", "strong": "That is one bitch of a claim." },
+    { "mild": "Damn the weather for this.", "strong": "Fuck the weather for this." },
+    { "mild": "Heck, I lost the thread.", "strong": "Shit, I lost the thread." },
+    { "mild": "Hell no, skip that plan.", "strong": "Fuck no, skip that plan." },
+    { "mild": "A darn pity about the score.", "strong": "A shitty pity about the score." },
+    { "mild": "Damn right the clock is wrong.", "strong": "Fucking right the clock is wrong." },
+    { "mild": "What the hell is this queue?", "strong": "What the fuck is this queue?" },
+    { "mild": "Heck yes, the proof closed.", "strong": "Fuck yes, the proof closed." },
+    { "mild": "Oh damn, the bus left.", "strong": "Oh shit, the bus left." },
+    { "mild": "This heck of a detour wasted an hour.", "strong": "This asshole detour wasted an hour." },
+    { "mild": "Hell, leave the box closed.", "strong": "Shit, leave the box closed." },
+    { "mild": "Darn, the ink ran.", "strong": "Cunt of a pen, the ink ran." },
+    { "mild": "Damn this lag on the call.", "strong": "Fuck this lag on the call." },
+    { "mild": "Heck, the map is upside down.", "strong": "Dickhead map is upside down." },
+    { "mild": "Oh hell, they moved the gate.", "strong": "Oh fuck, they moved the gate." },
+    { "mild": "A darn waste of a stamp.", "strong": "A motherfucking waste of a stamp." }
+  ]
+}

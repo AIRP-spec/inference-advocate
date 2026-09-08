@@ -1,0 +1,504 @@
+// On-device semantic evaluator: a pinned small language model running in-process.
+//
+// Paper: step 8. Provisional: Sections 3.3 and 3.4 (reproducible verdicts, on-device
+// deployment tier). This is the preferred tier of the hierarchy, occupied here by one small
+// universal model rather than a ladder. Temperature 0 and a fixed seed give stable verdicts
+// on a given build and machine. Bit-identical verdicts across differing hardware are not
+// promised. Do not claim more.
+//
+// Template v2.1 keeps v2's per-class judgment content and changes decode mechanics: thinking
+// is closed in the chat-template prefix, each verdict is a grammar-constrained yes or no,
+// evidence is a second call only when a class fires, and the shared prefix is reused on one
+// sequence via adaptStateToTokens. v1's eleven-way call is not kept live. The 22 smoke
+// identities remain the live-pin check. Template v3 (compact multi-label line) is
+// defined in prompt-v3.ts. This class can evaluate at v3 when constructed with
+// promptTemplateVersion: 'v3' (the training gate). createLocalEvaluator passes
+// that field through when the evaluator config sets it. Omit the field and the
+// constructor still defaults to v2.1. Selecting v3 from a config is a development
+// path so a v3-trained candidate can be run as the task it was trained on. It is
+// not a release and it does not change the live pin. The v3 path records empty
+// evidence: the trained task is the compact verdict line, not span extraction.
+//
+// Core never imports this file. The host injects a factory through resolveEvaluator.
+
+import { basename } from 'node:path';
+import type { EvaluationRequest, Evaluator, Flag, FlagDefinition, LocalEvaluatorConfig, Taxonomy } from '@airp/core';
+import type { ChatHistoryItem, Token } from 'node-llama-cpp';
+import {
+  getLlama,
+  LlamaContextSequence,
+  LlamaGrammar,
+  LlamaGrammarEvaluationState,
+  LlamaLogLevel,
+  LlamaModel,
+  LlamaText,
+  QwenChatWrapper,
+  SpecialTokensText,
+} from 'node-llama-cpp';
+import { verifyModelSha256 } from './digest.js';
+import {
+  buildClassEvidenceQuestion,
+  buildClassVerdictQuestion,
+  buildSharedPrefix,
+  looksLikeThinking,
+  parseEvidenceSpan,
+  parseVerdict,
+  PROMPT_TEMPLATE_VERSION,
+} from './prompt-v2.js';
+import {
+  buildV3ChatTurns,
+  compactVerdictGbnf,
+  parseCompactVerdict,
+  PROMPT_TEMPLATE_V3,
+  taxonomyTypes,
+} from './prompt-v3.js';
+
+export { PROMPT_TEMPLATE_VERSION };
+
+const VERDICT_GBNF = 'root ::= "yes" | "no"';
+const EVIDENCE_GBNF = 'root ::= [^<>\\n]+';
+const VERDICT_MAX_TOKENS = 4;
+const EVIDENCE_MAX_TOKENS = 48;
+
+export interface LocalEvaluatorOptions {
+  taxonomy: Taxonomy;
+  modelPath: string;
+  modelSha256: string;
+  contextSize?: number;
+  gpu?: boolean;
+  timeoutMs?: number;
+  temperature?: number;
+  seed?: number;
+  /**
+   * Decode template. Default is the live pin (v2.1). Pass v3 only for a trained
+   * candidate against the held-out gate. This does not change the default evaluator.
+   */
+  promptTemplateVersion?: string;
+}
+
+type LoadedRuntime = {
+  model: LlamaModel;
+  sequence: LlamaContextSequence;
+  wrapper: QwenChatWrapper;
+  verdictGrammar: LlamaGrammar;
+  evidenceGrammar: LlamaGrammar;
+  compactGrammar: LlamaGrammar;
+  systemInfo: string;
+};
+
+export class LocalEvaluator implements Evaluator {
+  readonly id = 'local-llm';
+  readonly version: string;
+  readonly #taxonomy: Taxonomy;
+  readonly #opts: LocalEvaluatorOptions;
+  readonly #digest: string;
+  #loaded: LoadedRuntime | undefined;
+  #queue: Promise<void> = Promise.resolve();
+
+  /** Raw generated text of the most recent per-class verdict call, keyed by class type. */
+  lastRawByClass: Record<string, string> = {};
+  /** Wall time of the most recent evaluate() across every class, milliseconds. */
+  lastEvalMs = 0;
+  /** llama.cpp system-info line from the loaded build. Empty until load(). */
+  systemInfo = '';
+  /** True when any raw generation in the last evaluate() contained a think tag. */
+  lastThoughtDetected = false;
+  /** True only while load() is running the discarded first generate. */
+  #warming = false;
+
+  constructor(opts: LocalEvaluatorOptions) {
+    this.#taxonomy = opts.taxonomy;
+    this.#opts = opts;
+    this.#digest = verifyModelSha256(opts.modelPath, opts.modelSha256);
+    const template = opts.promptTemplateVersion ?? PROMPT_TEMPLATE_VERSION;
+    if (template !== PROMPT_TEMPLATE_VERSION && template !== PROMPT_TEMPLATE_V3) {
+      throw new Error(`unsupported promptTemplateVersion ${template}`);
+    }
+    this.version = `${this.#digest.slice(0, 12)}+${template}`;
+  }
+
+  get promptTemplateVersion(): string {
+    return this.#opts.promptTemplateVersion ?? PROMPT_TEMPLATE_VERSION;
+  }
+
+  async load(): Promise<void> {
+    if (this.#loaded) return;
+
+    const llama = await getLlama({
+      gpu: this.#opts.gpu ? 'auto' : false,
+      progressLogs: false,
+      logLevel: LlamaLogLevel.error,
+    });
+    this.systemInfo = llama.systemInfo.trim();
+    console.log(`local-llm@${this.version}: llama.cpp system-info: ${this.systemInfo}`);
+
+    const loadedAt = Date.now();
+    const model = await llama.loadModel(localGgufLoadOptions(this.#opts.modelPath));
+    const context = await model.createContext({
+      contextSize: this.#opts.contextSize ?? 4096,
+      // One sequence. Prefix reuse is adaptStateToTokens on that sequence, not parallel
+      // contexts. swaFullCache keeps the shared prefix addressable if the model uses SWA.
+      sequences: 1,
+      swaFullCache: true,
+    });
+    const sequence = context.getSequence();
+    const wrapper = new QwenChatWrapper({ thoughts: 'discourage', variation: '3' });
+    const verdictGrammar = await llama.createGrammar({ grammar: VERDICT_GBNF });
+    const evidenceGrammar = await llama.createGrammar({ grammar: EVIDENCE_GBNF });
+    const compactGrammar = await llama.createGrammar({
+      grammar: compactVerdictGbnf(this.#taxonomy.flags.length),
+    });
+    this.#loaded = {
+      model,
+      sequence,
+      wrapper,
+      verdictGrammar,
+      evidenceGrammar,
+      compactGrammar,
+      systemInfo: this.systemInfo,
+    };
+    console.log(
+      `local-llm@${this.version}: GGUF copied into RAM (useMmap false, template ${this.promptTemplateVersion}) in ${Date.now() - loadedAt}ms`,
+    );
+    // Copying the GGUF still leaves the first generate to compile the graph.
+    // That is the remaining first-turn stall. Run the real evaluate path once
+    // on a fixed benign request, then throw the verdict away.
+    this.#warming = true;
+    try {
+      await warmAtLoad({
+        evaluate: (req) => this.#evaluateLocked(req),
+        observables: this,
+        log: (line) => console.log(line),
+        warn: (line) => console.warn(line),
+        version: this.version,
+        template: this.promptTemplateVersion,
+      });
+    } finally {
+      this.#warming = false;
+    }
+  }
+
+  async evaluate(req: EvaluationRequest): Promise<Flag[]> {
+    const previous = this.#queue;
+    let release: () => void = () => undefined;
+    this.#queue = new Promise<void>((resolve) => {
+      release = resolve;
+    });
+    await previous;
+    try {
+      return await this.#evaluateLocked(req);
+    } finally {
+      release();
+    }
+  }
+
+  async #evaluateLocked(req: EvaluationRequest): Promise<Flag[]> {
+    await this.load();
+    const loaded = this.#loaded;
+    if (!loaded) throw new Error('local evaluator failed to load');
+
+    const started = Date.now();
+    const flags: Flag[] = [];
+    this.lastRawByClass = {};
+    this.lastThoughtDetected = false;
+    if (this.promptTemplateVersion === PROMPT_TEMPLATE_V3) {
+      return this.#evaluateV3(req, loaded, started);
+    }
+    const perCallMs = this.#opts.timeoutMs ?? 30_000;
+    const shared = buildSharedPrefix(req);
+
+    // System block only, no assistant turn. Class prompts wrap the same system text, so
+    // adaptStateToTokens keeps these KV cells and evaluates only the per-class suffix.
+    const prefixTokens = LlamaText([
+      new SpecialTokensText('<|im_start|>system\n'),
+      shared,
+      new SpecialTokensText('<|im_end|>\n'),
+    ]).tokenize(loaded.model.tokenizer);
+    await loaded.sequence.adaptStateToTokens(prefixTokens, false);
+    const remainingPrefix = prefixTokens.slice(loaded.sequence.nextTokenIndex);
+    if (remainingPrefix.length > 0) {
+      await loaded.sequence.evaluateWithoutGeneratingNewTokens(remainingPrefix);
+    }
+    if (loaded.sequence.needsCheckpoints) await loaded.sequence.takeCheckpoint();
+
+    for (const def of this.#taxonomy.flags) {
+      const verdictTokens = this.#tokenizeHistory(loaded, [
+        { type: 'system', text: shared },
+        { type: 'user', text: buildClassVerdictQuestion(def) },
+        { type: 'model', response: [] },
+      ]);
+      let raw = '';
+      try {
+        raw = await this.#generate(loaded, verdictTokens, loaded.verdictGrammar, VERDICT_MAX_TOKENS, perCallMs);
+      } catch (err) {
+        this.#evalWarn(
+          `local-llm@${this.version}: generation failed for ${def.type} (${(err as Error).message}); treating as not fired`,
+        );
+        this.lastRawByClass[def.type] = '';
+        continue;
+      }
+
+      this.lastRawByClass[def.type] = raw;
+      if (looksLikeThinking(raw)) {
+        this.lastThoughtDetected = true;
+        this.#evalWarn(`local-llm@${this.version}: think tag in verdict for ${def.type}: ${JSON.stringify(raw)}`);
+      }
+
+      const parsed = parseVerdict(raw);
+      if (parsed.unparseable) {
+        this.#evalWarn(
+          `local-llm@${this.version}: unparseable verdict for ${def.type} (${JSON.stringify(raw)}); treating as not fired`,
+        );
+        continue;
+      }
+      if (!parsed.fired) continue;
+
+      const evidence = await this.#evidenceFor(loaded, shared, def, req.content, perCallMs);
+      flags.push({
+        type: def.type,
+        severity: def.severity,
+        evidence,
+        basis: `${this.#taxonomy.version}:local:${def.type}`,
+      });
+    }
+
+    this.lastEvalMs = Date.now() - started;
+    this.#evalLog(
+      `local-llm@${this.version}: evaluated ${this.#taxonomy.flags.length} classes in ${this.lastEvalMs}ms`,
+    );
+    return flags;
+  }
+
+  async #evaluateV3(req: EvaluationRequest, loaded: LoadedRuntime, started: number): Promise<Flag[]> {
+    const types = taxonomyTypes(this.#taxonomy);
+    const { system, user } = buildV3ChatTurns(this.#taxonomy, req);
+    const promptTokens = this.#tokenizeHistory(loaded, [
+      { type: 'system', text: system },
+      { type: 'user', text: user },
+      { type: 'model', response: [] },
+    ]);
+    const perCallMs = this.#opts.timeoutMs ?? 30_000;
+    const maxTokens = 4 * types.length + 8;
+    let raw = '';
+    try {
+      raw = await this.#generate(loaded, promptTokens, loaded.compactGrammar, maxTokens, perCallMs);
+    } catch (err) {
+      this.#evalWarn(
+        `local-llm@${this.version}: compact generation failed (${(err as Error).message}); treating as no fires`,
+      );
+      this.lastEvalMs = Date.now() - started;
+      return [];
+    }
+    this.lastRawByClass = { compact: raw };
+    if (looksLikeThinking(raw)) {
+      this.lastThoughtDetected = true;
+      this.#evalWarn(`local-llm@${this.version}: think tag in compact verdict: ${JSON.stringify(raw)}`);
+    }
+    const parsed = parseCompactVerdict(raw, types);
+    if (parsed.unparseable) {
+      this.#evalWarn(
+        `local-llm@${this.version}: unparseable compact verdict (${JSON.stringify(raw)}); treating as no fires`,
+      );
+      this.lastEvalMs = Date.now() - started;
+      return [];
+    }
+    const byType = new Map(this.#taxonomy.flags.map((def) => [def.type, def]));
+    const flags: Flag[] = [];
+    for (const type of parsed.fired) {
+      const def = byType.get(type);
+      if (!def) continue;
+      this.lastRawByClass[type] = 'yes';
+      flags.push({
+        type: def.type,
+        severity: def.severity,
+        evidence: [],
+        basis: `${this.#taxonomy.version}:local:${def.type}`,
+      });
+    }
+    this.lastEvalMs = Date.now() - started;
+    this.#evalLog(`local-llm@${this.version}: compact verdict ${raw.trim()} in ${this.lastEvalMs}ms`);
+    return flags;
+  }
+
+  async #evidenceFor(
+    loaded: LoadedRuntime,
+    shared: string,
+    def: FlagDefinition,
+    evaluated: string,
+    timeoutMs: number,
+  ): Promise<Flag['evidence']> {
+    const evidenceTokens = this.#tokenizeHistory(loaded, [
+      { type: 'system', text: shared },
+      { type: 'user', text: buildClassEvidenceQuestion(def) },
+      { type: 'model', response: [] },
+    ]);
+    let raw = '';
+    try {
+      raw = await this.#generate(loaded, evidenceTokens, loaded.evidenceGrammar, EVIDENCE_MAX_TOKENS, timeoutMs);
+    } catch (err) {
+      this.#evalWarn(
+        `local-llm@${this.version}: evidence generation failed for ${def.type} (${(err as Error).message}); recording evidence null`,
+      );
+      return [];
+    }
+    if (looksLikeThinking(raw)) {
+      this.lastThoughtDetected = true;
+      this.#evalWarn(`local-llm@${this.version}: think tag in evidence for ${def.type}: ${JSON.stringify(raw)}`);
+    }
+    const span = parseEvidenceSpan(raw, evaluated);
+    if (span === null) {
+      this.#evalWarn(
+        `local-llm@${this.version}: evidence for ${def.type} is not a verbatim span; recording evidence null. raw=${JSON.stringify(raw.slice(0, 180))}`,
+      );
+      return [];
+    }
+    const idx = evaluated.indexOf(span);
+    return [{ start: idx, end: idx + span.length, text: span }];
+  }
+
+  #tokenizeHistory(loaded: LoadedRuntime, chatHistory: ChatHistoryItem[]): Token[] {
+    const { contextText } = loaded.wrapper.generateContextState({ chatHistory });
+    return contextText.tokenize(loaded.model.tokenizer);
+  }
+
+  async #generate(
+    loaded: LoadedRuntime,
+    promptTokens: Token[],
+    grammar: LlamaGrammar,
+    maxTokens: number,
+    timeoutMs: number,
+  ): Promise<string> {
+    // adaptStateToTokens erases from the first differing token, so the shared system
+    // prefix stays in the KV cache across the eleven class calls on this sequence.
+    await loaded.sequence.adaptStateToTokens(promptTokens, false);
+    let remaining = promptTokens.slice(loaded.sequence.nextTokenIndex);
+    if (remaining.length === 0) {
+      if (promptTokens.length === 0) return '';
+      const lastIndex = loaded.sequence.nextTokenIndex - 1;
+      await loaded.sequence.eraseContextTokenRanges([{ start: lastIndex, end: lastIndex + 1 }]);
+      remaining = promptTokens.slice(-1);
+    }
+
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), timeoutMs);
+    const generated: Token[] = [];
+    try {
+      const grammarState = new LlamaGrammarEvaluationState({ model: loaded.model, grammar });
+      for await (const token of loaded.sequence.evaluate(remaining, {
+        temperature: this.#opts.temperature ?? 0,
+        seed: this.#opts.seed ?? 1,
+        grammarEvaluationState: grammarState,
+      })) {
+        if (controller.signal.aborted) {
+          throw new Error('timed out');
+        }
+        if (loaded.model.isEogToken(token)) break;
+        generated.push(token);
+        if (generated.length >= maxTokens) break;
+      }
+    } finally {
+      clearTimeout(timer);
+    }
+    return loaded.model.detokenize(generated, true);
+  }
+
+  #evalLog(message: string): void {
+    if (this.#warming) return;
+    console.log(message);
+  }
+
+  #evalWarn(message: string): void {
+    if (this.#warming) return;
+    console.warn(message);
+  }
+}
+
+/**
+ * llama.cpp memory-maps the GGUF by default, so the first forward pass is the one
+ * that faults the tensors into page cache. That cost lands on the first real turn,
+ * which in a demo is the one someone is watching. Copying at load moves the wait
+ * to startup. useMlock is not used: it needs a raised memlock ulimit and the
+ * binding says it can crash the host if RAM is short. useMmap false is the
+ * portable residency option the installed node-llama-cpp types expose.
+ */
+export function localGgufLoadOptions(modelPath: string): { modelPath: string; useMmap: false } {
+  return { modelPath, useMmap: false };
+}
+
+/**
+ * Fixed request used only to compile the first graph at load. Short, benign, and
+ * not from the training corpus or the held-out suite. The verdict is discarded.
+ */
+export const LOAD_WARMUP_REQUEST: EvaluationRequest = {
+  providerId: 'local-load-warmup',
+  prompt: 'Hi.',
+  content: 'Hello.',
+};
+
+export type LocalEvaluatorObservables = {
+  lastRawByClass: Record<string, string>;
+  lastThoughtDetected: boolean;
+  lastEvalMs: number;
+};
+
+/**
+ * Copying the GGUF into RAM does not compile the llama.cpp graph. The first
+ * sequence.evaluate still pays that cost, which is why mmap-off left the first
+ * real turn slow. load() runs the configured template once on LOAD_WARMUP_REQUEST
+ * so the stall sits in startup. A failure here must not fail load(): a daemon
+ * that will not start because a warm-up failed is worse than a slow first turn.
+ * Observable fields are restored so a caller of load() cannot read the discarded
+ * verdict.
+ */
+export async function warmAtLoad(opts: {
+  evaluate: (req: EvaluationRequest) => Promise<unknown>;
+  observables: LocalEvaluatorObservables;
+  log: (line: string) => void;
+  warn: (line: string) => void;
+  version: string;
+  template: string;
+}): Promise<void> {
+  const snapshot: LocalEvaluatorObservables = {
+    lastRawByClass: { ...opts.observables.lastRawByClass },
+    lastThoughtDetected: opts.observables.lastThoughtDetected,
+    lastEvalMs: opts.observables.lastEvalMs,
+  };
+  const started = Date.now();
+  try {
+    await opts.evaluate(LOAD_WARMUP_REQUEST);
+    opts.log(
+      `local-llm@${opts.version}: warm-up ran (template ${opts.template}) in ${Date.now() - started}ms`,
+    );
+  } catch (err) {
+    opts.warn(
+      `local-llm@${opts.version}: warm-up failed (${(err as Error).message}, template ${opts.template}); continuing`,
+    );
+  } finally {
+    opts.observables.lastRawByClass = snapshot.lastRawByClass;
+    opts.observables.lastThoughtDetected = snapshot.lastThoughtDetected;
+    opts.observables.lastEvalMs = snapshot.lastEvalMs;
+  }
+}
+
+export async function createLocalEvaluator(
+  cfg: LocalEvaluatorConfig,
+  taxonomy: Taxonomy,
+): Promise<LocalEvaluator> {
+  const evaluator = new LocalEvaluator({
+    taxonomy,
+    modelPath: cfg.modelPath,
+    modelSha256: cfg.modelSha256,
+    contextSize: cfg.contextSize,
+    gpu: cfg.gpu ?? false,
+    timeoutMs: cfg.timeoutMs,
+    // Undefined keeps the constructor default (v2.1). Do not substitute a second default here.
+    promptTemplateVersion: cfg.promptTemplateVersion,
+  });
+  await evaluator.load();
+  return evaluator;
+}
+
+/** Hosts print this so a reader can tell which file the pin refers to. */
+export function modelFileName(cfg: LocalEvaluatorConfig): string {
+  return basename(cfg.modelPath);
+}

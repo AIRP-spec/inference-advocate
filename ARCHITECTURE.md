@@ -15,6 +15,7 @@ at `https://tryairp.com`.
 ```
 packages/core          provider-agnostic library, no UI dependencies, no network beyond providers
 packages/store-sqlite  SQLite StoreBackend adapter (Node). The only shipped persistence implementation
+packages/evaluator-local  on-device GGUF semantic evaluator (node-llama-cpp). Hosts inject it; core does not import it
 packages/daemon        local HTTP server on 127.0.0.1, and HostSession (HTTP + desktop loopback RPC)
 packages/ui            React chat surface. Product chrome is ordinary chat; the monitor
                        (including a demo-only reputation reset and a reset of the
@@ -25,9 +26,10 @@ packages/ui            React chat surface. Product chrome is ordinary chat; the 
                        the paper, IETF draft, code, and essay.
 packages/desktop       Tauri shell (HostSession in the Node launcher over loopback RPC, no HTTP for the core API)
 packages/demo          mock providers and the scripted end-to-end scenario
-data/                  taxonomy, policy, jurisdictions, register, standing: documents, not code
+data/                  taxonomy, policy, jurisdictions, register, standing: documents, not code.
+                       The held-out evaluator gate lives under data/evaluator-gate/
 tools/                 demo key minting, additive public-entry re-sign, key set digests,
-                       substituted-keys register fixture
+                       substituted-keys register fixture, evaluator-training recipe
 deploy/                idempotent Apache/TLS/PM2 setup for the public AIRP domains
 ```
 
@@ -67,7 +69,7 @@ it is discussed below.
 | 5 | the provider seals | `core/src/crypto/seal.ts` (`signSeal`) |
 | 6 | the sealed response returns | `core/src/interchange/openai-adapter.ts` |
 | 7 | deterministic layer | `core/src/monitor/deterministic.ts`, `core/src/monitor/register.ts`, `core/src/crypto/seal.ts` |
-| 8 | semantic layer | `core/src/monitor/semantic.ts`, `core/src/monitor/taxonomy.ts`, `core/src/monitor/evaluators/` |
+| 8 | semantic layer | `core/src/monitor/semantic.ts`, `core/src/monitor/taxonomy.ts`, `core/src/monitor/evaluators/`, `evaluator-local` |
 | 9 | the ledger | `core/src/store/ledger.ts`, `core/src/store/port.ts`, adapter: `store-sqlite` |
 | 10 | the score | `core/src/policy/score.ts`, `core/src/policy/config.ts` |
 | 11 | the resolution | `core/src/policy/delivery.ts`, `core/src/policy/jurisdiction.ts` |
@@ -156,20 +158,86 @@ test that reads the raw SQLite rows and asserts the words are not in them.
 **The default semantic evaluator is a rule evaluator, not a model.** The paper's preferred
 evaluator is a commons-maintained reference evaluation model, defined by three properties:
 reproducible verdicts, inspectable basis, and provenance independent of any audited provider.
-No such model exists. The shipped rule evaluator satisfies all three properties completely and
-has no judgment at all, which is the opposite failure from the one a hosted frontier model
-would have. A demo that quietly used a frontier model to police frontier models would be
-arguing against its own paper.
+No certified commons model exists. The shipped rule evaluator satisfies all three properties
+completely and has no judgment at all, which is the opposite failure from the one a hosted
+frontier model would have. A demo that quietly used a frontier model to police frontier models
+would be arguing against its own paper.
 
 The evaluator is chosen by configuration rather than by code: an evaluator config file, or the
-`AIRP_EVALUATOR_CONFIG` environment variable, selects between the rule evaluator and any
-OpenAI-compatible endpoint. `packages/core/src/monitor/evaluator-config.ts` is where the two
-costs of that choice are made visible rather than buried. A hosted evaluator receives response
-content, so its origin appears in the export view as an outbound content path and the advocate
-names it at startup; an evaluator on the loopback interface does not, because nothing left. And
-an evaluator served from the same origin as a provider under evaluation is reported as the
-self-audit conflict of the provisional's Section 3.4. The origin check catches the obvious case
-and cannot catch the subtle ones, which the code says in its own comments.
+`AIRP_EVALUATOR_CONFIG` environment variable, selects among the rule evaluator, an on-device
+local model, and any OpenAI-compatible endpoint. `packages/core/src/monitor/evaluator-config.ts`
+is where the costs of that choice are made visible rather than buried. A hosted evaluator
+receives response content, so its origin appears in the export view as an outbound content
+path and the advocate names it at startup; an evaluator on the loopback interface, or an
+in-process local model, does not, because nothing left. And an evaluator served from the
+same origin as a provider under evaluation is reported as the self-audit conflict of the
+provisional's Section 3.4. The origin check catches the obvious case and cannot catch the
+subtle ones, which the code says in its own comments.
+
+### Evaluator tiers (provisional Section 3.4)
+
+Three implementations occupy the hierarchy the provisional names.
+
+**Rule.** Default when no config is present. Reproducible and inspectable, and it has no
+judgment. It exists so the gate is observable end to end without a model file and without
+content leaving the device.
+
+**Local (`kind: "local"`, `@airp/evaluator-local`).** The preferred tier: a pinned small
+language model running in-process through `node-llama-cpp`, so semantic evaluation has zero
+outbound content paths and no external server. The evaluator id is `local-llm`. Its version
+binds the model SHA-256 (first 12 hex characters) and the prompt template version, and
+nothing else. Construction refuses to load if the GGUF file does not match the configured
+digest. Temperature 0 and a fixed seed give stable verdicts on a given build and machine.
+Bit-identical verdicts across differing hardware are not promised.
+
+The held-out suite under `data/evaluator-gate/` is the acceptance gate for a trained
+pin. It is a versioned document, not constants in TypeScript. The original 22 smoke
+identities (`v0-positive-*`, `v0-counter-*`) live inside it and remain the live-pin
+check under template v2.1. Human review of the suite is accepted on record. The live
+pin is Qwen's published Qwen3-0.6B GGUF at Q8_0. Template v2.1 asks one
+grammar-constrained yes or no per taxonomy class, with a shared prefix reused on one
+sequence. v2 cleared the attractor false negatives. v2.1 confirmed that thinking was
+already off in v2, constrained the verdict to `yes`/`no`, and did not hit the 4 to 10
+second mean on this droplet (mean 42712ms). It also worsened counter-example
+over-firing (11 of 11 counters fail). The report is
+`packages/evaluator-local/FIXTURE-REPORT.md`. The zero-shot 0.6B is not a
+judge in any decode configuration. A later LoRA of the same 0.6B hit a
+capacity ceiling on the held-out gate across six gated checkpoints (no
+per-class pass). The training base is now Qwen/Qwen3-1.7B
+(`trainBaseRepoId`): same Qwen family, tokenizer, and chat template, only
+the parameter count moves. The live pin remains the vendor Qwen3-0.6B GGUF at
+template v2.1.
+
+Template v3 (one compact yes/no line in taxonomy order, grammar-constrained, roughly
+twenty tokens) is defined in `packages/evaluator-local/src/prompt-v3.ts` and is the
+training target. The live path still uses v2.1. The training recipe lives under
+`tools/evaluator-training/` (not a runtime package). The corpus has to be generated
+from that recipe against a pinned writer model, leak-checked against the held-out
+suite, and sampled for review before any LoRA run. The LoRA script, GGUF convert,
+and held-out gate harness are in that directory. A checkpoint-sweep recipe
+samples the training curve on Qwen3-1.7B and the same held-out gate; it
+is a diagnostic, not a second publication criterion and not live v3. The
+trained GGUF is not in this
+build. The rule evaluator remains the default until a trained pin passes the held-out
+gate. Do not weaken the items to match the zero-shot model.
+
+This is one member of what the protocol expects to become a small certified evaluator family.
+At reference stage there is no population and no pooled rate. Diversity across that family is
+an ecosystem design problem and is not solved by shipping a ladder of sizes here.
+
+**Hosted (`kind: "model"`).** An OpenAI-compatible endpoint. Where a device cannot run the
+model, a hosted evaluator runs the same pinned reference model as the local tier, never a
+larger one. Hosting changes where the judge runs, not who the judge is. Evaluator variation
+happens only deliberately, as a distinct version-attributed member of the certified family,
+never as a side effect of deployment. A hosted endpoint that is not loopback is an outbound
+content path, and the advocate says so.
+
+The native runtime lives in `@airp/evaluator-local`. Core never imports it. Hosts inject a
+factory through `resolveEvaluator`, the same port pattern as `StoreBackend`. If config kind is
+`local` and no factory was injected, core throws naming that obligation.
+
+The GGUF itself is not in git. `npm run fetch:evaluator-model` downloads the pin recorded in
+`data/models/manifest.json` and verifies SHA-256 before installing.
 
 **`npm run doctor` prints the configuration that actually resolved.** It exists because of a
 real failure: someone set an evaluator config, ran the demo, and could not tell from the output
@@ -263,7 +331,30 @@ real custodial grant.
 runtime attestation, verdict signatures chaining to an attested build, and the statistical
 cross-check of each monitor against the population of monitors observing the same provider are
 Mechanism 3 and are not built. Verdicts do carry binding version attribution, which is the piece
-the rest hangs from.
+the rest hangs from. The on-device evaluator occupies the preferred deployment tier with a
+pinned small model; it is not a certified commons evaluator, a divergent verdict on the
+same pin is not yet cross-checked against a population, and the smoke identities still fail
+(11 of 22 under template v2.1, all counter-example false positives). Mean evaluation wall
+time on the reference droplet is still tens of seconds per response. The expanded held-out
+gate at `data/evaluator-gate/` is the certification set for a trained pin. Human
+review of that suite is accepted. The v3 serialization and the training recipe
+(`tools/evaluator-training/`) are in the tree. The generated corpus, the LoRA, the
+published GGUF, and template v3 on the live path are not. Training scripts
+(LoRA, GGUF convert, held-out gate harness) live under `tools/evaluator-training/`.
+A checkpoint sweep of the training curve is diagnostic only: it does
+not change labels, the corpus, or the gate, and it does not put v3 on the
+live path. The sweep report is not a second gate. The 0.6B sweep is a
+measured capacity ceiling. The training base is Qwen3-1.7B; the live pin
+is still Qwen3-0.6B Q8_0 at v2.1. `gate-from-adapters.py` gates saved
+LoRA folders one at a time and deletes the merged weights and GGUF after
+each checkpoint so disk does not accumulate. It does not train.
+A v3 evaluate path exists on `LocalEvaluator`. `createLocalEvaluator` passes
+optional `promptTemplateVersion` from the evaluator config; omit the field
+and construction stays v2.1. Selecting v3 in a local config is a development
+path so a v3-trained candidate can be run as the task it was trained on. It
+is not a release and it does not change the live pin. The v3 path records empty
+evidence: the trained task is the compact verdict line. The rule evaluator remains
+the default until a trained pin passes the gate.
 
 **The admission gate for telemetry.** Certification, hardware-attested instance uniqueness,
 issuance rate limiting, coordination detection, and contribution caps are the four layers that
@@ -318,8 +409,10 @@ keys on `honestmodel.win.entry`; load it via `AIRP_REGISTER_DOCUMENT` to demo re
 and labeled as such in three places. Calibration is an open question in the paper and it stays
 open here.
 
-**Taxonomy v0.3.0 keeps the paper's four named flags and adds a reference harm set.** Persona
-claims, relational hooks, sycophancy, and simulation obscured remain. The reference additions are
+**Taxonomy v0.4.0 keeps the paper's four named flags and the reference harm set.** Persona
+claims, relational hooks, sycophancy, and simulation obscured remain. simulation_obscured is
+occasion-triggered: the response addresses the question of its own nature and does not plainly
+state that it is not human, not a person, not conscious, and not a mind. The reference additions are
 profanity, self-harm (encouragement and methods, not crisis referral), sexual content, child
 sexual exploitation, graphic violence, hate, and criminal assistance. Lists are English-centric
 and short on purpose. This is not a moderation product. Child sexual exploitation is mandatory

@@ -11,7 +11,8 @@
   },
   "dependencies": {
     "@airp/core": "*",
-    "@airp/store-sqlite": "*"
+    "@airp/store-sqlite": "*",
+    "@airp/evaluator-local": "*"
   },
   "devDependencies": {
     "@types/node": "^22.9.0",

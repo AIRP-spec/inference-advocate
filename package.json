@@ -11,21 +11,34 @@
   "workspaces": [
     "packages/core",
     "packages/store-sqlite",
+    "packages/evaluator-local",
     "packages/daemon",
     "packages/demo",
     "packages/ui",
     "packages/desktop"
   ],
   "scripts": {
-    "build": "npm run build --workspace @airp/core && npm run build --workspace @airp/store-sqlite && npm run build --workspace @airp/daemon && npm run build --workspace @airp/demo",
+    "build": "npm run build --workspace @airp/core && npm run build --workspace @airp/store-sqlite && npm run build --workspace @airp/evaluator-local && npm run build --workspace @airp/daemon && npm run build --workspace @airp/demo",
     "build:ui": "npm run build --workspace @airp/ui",
     "typecheck": "npm run build --workspace @airp/core && npm run build --workspace @airp/store-sqlite && npm run typecheck --workspaces --if-present",
-    "test": "npm run build && npm run test --workspace @airp/core && npm run test --workspace @airp/store-sqlite && npm run test --workspace @airp/daemon && npm run test --workspace @airp/demo && npm run test --workspace @airp/ui",
+    "test": "npm run build && npm run test --workspace @airp/core && npm run test --workspace @airp/store-sqlite && npm run test --workspace @airp/evaluator-local && npm run test --workspace @airp/daemon && npm run test --workspace @airp/demo && npm run test --workspace @airp/ui && node --test tools/evaluator-training/*.test.mjs",
     "demo": "npm run build && node packages/demo/dist/scenario.js",
     "daemon": "npm run build && node packages/daemon/dist/server.js",
     "desktop": "npm run dev --workspace @airp/desktop",
     "ui": "npm run dev --workspace @airp/ui",
-    "keys": "node tools/mint-demo-keys.mjs",
+    "fetch:evaluator-model": "node tools/fetch-evaluator-model.mjs",
+    "evaluator-training:plan": "node tools/evaluator-training/generate.mjs --plan",
+    "evaluator-training:composed-only": "node tools/evaluator-training/generate.mjs --composed-only --out data/evaluator-training/composed-preview",
+    "evaluator-training:generate": "node tools/evaluator-training/generate.mjs",
+    "evaluator-training:leak-check": "node tools/evaluator-training/leak-check.mjs",
+    "evaluator-training:sample": "node tools/evaluator-training/sample.mjs",
+    "evaluator-training:assert-sft": "node tools/evaluator-training/assert-sft-v3.mjs",
+    "evaluator-training:check-template": "python3 tools/evaluator-training/train.py --check-template",
+    "evaluator-training:train": "node tools/evaluator-training/run-train.mjs",
+    "evaluator-training:gate": "node tools/evaluator-training/gate.mjs",
+    "evaluator-training:sweep": "node tools/evaluator-training/run-sweep.mjs",
+    "evaluator-training:gate-from-adapters": "python3 tools/evaluator-training/gate-from-adapters.py",
+    "evaluator-training:publish": "node tools/evaluator-training/publish.mjs",
     "mocks": "npm run build --workspace @airp/demo && node packages/demo/dist/mock-servers.js",
     "mocks:public": "npm run build --workspace @airp/demo && node packages/demo/dist/public-mock-servers.js",
     "doctor": "npm run build --workspace @airp/core && npm run build --workspace @airp/store-sqlite && npm run build --workspace @airp/daemon && node packages/daemon/dist/doctor.js",
@@ -36,7 +49,8 @@
     "restart:mocks": "npm run kill:mocks && npm run mocks",
     "restart:mocks:fast": "npm run kill:mocks && node packages/demo/dist/mock-servers.js",
     "restart:daemon": "npm run kill:daemon && npm run daemon",
-    "status": "lsof -nP -iTCP:8811 -iTCP:8812 -iTCP:8813 -iTCP:8790 -iTCP:5173 -sTCP:LISTEN || echo 'nothing listening'"
+    "status": "lsof -nP -iTCP:8811 -iTCP:8812 -iTCP:8813 -iTCP:8790 -iTCP:5173 -sTCP:LISTEN || echo 'nothing listening'",
+    "daemon:local": "AIRP_EVALUATOR_CONFIG=.advocate/evaluator.json npm run daemon"
   },
   "devDependencies": {
     "typescript": "^5.6.3"

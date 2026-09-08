@@ -1,0 +1,247 @@
+import { test } from 'node:test';
+import assert from 'node:assert/strict';
+import { mkdtempSync, rmSync, writeFileSync } from 'node:fs';
+import { tmpdir } from 'node:os';
+import { join } from 'node:path';
+import { createHash } from 'node:crypto';
+import { ModelEvaluator, RuleEvaluator, Taxonomy } from '@airp/core';
+import { dataPath } from './helpers.js';
+import {
+  buildClassEvaluationPrompt,
+  buildClassVerdictQuestion,
+  buildSharedPrefix,
+  looksLikeThinking,
+  parseEvidenceSpan,
+  parseVerdict,
+  sha256FileHex,
+  verifyModelSha256,
+  LocalEvaluator,
+  localGgufLoadOptions,
+  LOAD_WARMUP_REQUEST,
+  warmAtLoad,
+  PROMPT_TEMPLATE_VERSION,
+  PROMPT_TEMPLATE_V3,
+} from '@airp/evaluator-local';
+
+const taxonomy = Taxonomy.loadFromFile(dataPath('taxonomy', 'flags.v0.json'));
+
+test('digest verification names both hashes on mismatch', () => {
+  const dir = mkdtempSync(join(tmpdir(), 'airp-local-eval-'));
+  try {
+    const path = join(dir, 'toy.gguf');
+    writeFileSync(path, 'not-a-real-model');
+    const actual = sha256FileHex(path);
+    const expected = '00'.repeat(32);
+    assert.notEqual(actual, expected);
+    assert.throws(() => verifyModelSha256(path, expected), (err: Error) => {
+      assert.match(err.message, /digest mismatch/);
+      assert.ok(err.message.includes(expected));
+      assert.ok(err.message.includes(actual));
+      assert.ok(err.message.includes('toy.gguf'));
+      return true;
+    });
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+test('digest verification accepts a matching pin', () => {
+  const dir = mkdtempSync(join(tmpdir(), 'airp-local-eval-'));
+  try {
+    const path = join(dir, 'toy.gguf');
+    writeFileSync(path, 'not-a-real-model');
+    const expected = createHash('sha256').update('not-a-real-model').digest('hex');
+    assert.equal(verifyModelSha256(path, expected), expected);
+    assert.equal(verifyModelSha256(path, `SHA256:${expected.toUpperCase()}`), expected);
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+test('a per-class prompt contains only that class, plus counter-examples and mention-versus-use', () => {
+  const persona = taxonomy.definition('persona_claims');
+  const sycophancy = taxonomy.definition('sycophancy');
+  assert.ok(persona && sycophancy);
+  const prompt = buildClassEvaluationPrompt(persona, {
+    providerId: 'p',
+    content: 'hello',
+    prompt: 'how are you',
+  });
+  assert.ok(prompt.includes(persona.definition));
+  assert.ok(prompt.includes(persona.criteria[0]!.description));
+  assert.ok(prompt.includes(persona.counterExamples![0]!));
+  assert.ok(prompt.includes('discussing, naming, quoting, or refusing'));
+  assert.ok(prompt.includes('User turn:'));
+  assert.ok(prompt.includes('hello'));
+  assert.ok(prompt.includes('Answer yes or no'));
+  assert.equal(prompt.includes('{'), false);
+  assert.equal(prompt.includes(sycophancy.type), false);
+  assert.equal(prompt.includes(sycophancy.definition), false);
+  for (const other of taxonomy.flags) {
+    if (other.type === persona.type) continue;
+    assert.equal(
+      prompt.includes(`Class: ${other.title}`),
+      false,
+      `prompt for persona_claims must not name ${other.type}`,
+    );
+  }
+});
+
+test('the shared prefix carries the evaluated text and no class titles', () => {
+  const prefix = buildSharedPrefix({ providerId: 'p', content: 'hello there', prompt: 'hi' });
+  assert.ok(prefix.includes('hello there'));
+  assert.ok(prefix.includes('discussing, naming, quoting, or refusing'));
+  assert.ok(prefix.includes('User turn:'));
+  for (const def of taxonomy.flags) {
+    assert.equal(prefix.includes(`Class: ${def.title}`), false);
+  }
+  const persona = taxonomy.definition('persona_claims')!;
+  const question = buildClassVerdictQuestion(persona);
+  assert.equal(question.includes('hello there'), false);
+  assert.ok(question.includes(persona.definition));
+});
+
+test('verdict parse accepts only yes or no', () => {
+  assert.deepEqual(parseVerdict('yes'), { fired: true, unparseable: false });
+  assert.deepEqual(parseVerdict('no'), { fired: false, unparseable: false });
+  assert.deepEqual(parseVerdict('YES\n'), { fired: true, unparseable: false });
+  assert.deepEqual(parseVerdict('{"fired":true}'), { fired: false, unparseable: true });
+  assert.deepEqual(parseVerdict(''), { fired: false, unparseable: true });
+});
+
+test('evidence that is not a verbatim span is dropped', () => {
+  const text = 'What a brilliant question!';
+  assert.equal(parseEvidenceSpan('brilliant question', text), 'brilliant question');
+  assert.equal(parseEvidenceSpan('"brilliant question"', text), 'brilliant question');
+  assert.equal(parseEvidenceSpan('not in the source', text), null);
+  assert.equal(parseEvidenceSpan('<verbatim>brilliant question</verbatim>', text), null);
+});
+
+test('think tags are detected for debug logging', () => {
+  assert.equal(looksLikeThinking('yes'), false);
+  assert.equal(looksLikeThinking('<think>\nreasoning\n</think>\nyes'), true);
+});
+
+test('v3 construction binds digest plus v3 and does not change the live default', () => {
+  assert.equal(PROMPT_TEMPLATE_VERSION, 'v2.1');
+  assert.equal(PROMPT_TEMPLATE_V3, 'v3');
+  const dir = mkdtempSync(join(tmpdir(), 'airp-local-eval-'));
+  try {
+    const path = join(dir, 'toy.gguf');
+    writeFileSync(path, 'not-a-real-model');
+    const digest = createHash('sha256').update('not-a-real-model').digest('hex');
+    const v21 = new LocalEvaluator({ taxonomy, modelPath: path, modelSha256: digest });
+    assert.equal(v21.version, `${digest.slice(0, 12)}+v2.1`);
+    assert.equal(v21.promptTemplateVersion, 'v2.1');
+    const v3 = new LocalEvaluator({
+      taxonomy,
+      modelPath: path,
+      modelSha256: digest,
+      promptTemplateVersion: 'v3',
+    });
+    assert.equal(v3.version, `${digest.slice(0, 12)}+v3`);
+    assert.equal(v3.promptTemplateVersion, 'v3');
+    assert.throws(
+      () =>
+        new LocalEvaluator({
+          taxonomy,
+          modelPath: path,
+          modelSha256: digest,
+          promptTemplateVersion: 'v2',
+        }),
+      /unsupported promptTemplateVersion/,
+    );
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+test('GGUF load copies tensors instead of mmap, so the first turn is not the page-in', () => {
+  const opts = localGgufLoadOptions('/tmp/model.gguf');
+  assert.equal(opts.modelPath, '/tmp/model.gguf');
+  assert.equal(opts.useMmap, false);
+  assert.equal('useMlock' in opts, false);
+});
+
+test('rule and hosted evaluators have no load step to warm', () => {
+  const rule = new RuleEvaluator(taxonomy);
+  assert.equal('load' in rule, false);
+  const hosted = new ModelEvaluator(taxonomy, { baseUrl: 'http://127.0.0.1:1/v1', model: 'x' });
+  assert.equal('load' in hosted, false);
+});
+
+test('LocalEvaluator observable state is empty until a real evaluate', () => {
+  const dir = mkdtempSync(join(tmpdir(), 'airp-local-eval-'));
+  try {
+    const path = join(dir, 'toy.gguf');
+    writeFileSync(path, 'not-a-real-model');
+    const digest = createHash('sha256').update('not-a-real-model').digest('hex');
+    const evaluator = new LocalEvaluator({ taxonomy, modelPath: path, modelSha256: digest });
+    assert.deepEqual(evaluator.lastRawByClass, {});
+    assert.equal(evaluator.lastThoughtDetected, false);
+    assert.equal(evaluator.lastEvalMs, 0);
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+test('load warm-up request is short, fixed, and not a corpus item', () => {
+  assert.equal(LOAD_WARMUP_REQUEST.providerId, 'local-load-warmup');
+  assert.equal(LOAD_WARMUP_REQUEST.prompt, 'Hi.');
+  assert.equal(LOAD_WARMUP_REQUEST.content, 'Hello.');
+  assert.ok(LOAD_WARMUP_REQUEST.content.length <= 8);
+});
+
+test('load() finishes when the warm-up generate succeeds, and observable state is restored', async () => {
+  const observables = { lastRawByClass: {}, lastThoughtDetected: false, lastEvalMs: 0 };
+  const logs: string[] = [];
+  let seen: typeof LOAD_WARMUP_REQUEST | undefined;
+  await warmAtLoad({
+    evaluate: async (req) => {
+      seen = req;
+      observables.lastRawByClass = { compact: 'yes no yes' };
+      observables.lastThoughtDetected = true;
+      observables.lastEvalMs = 4321;
+    },
+    observables,
+    log: (line) => logs.push(line),
+    warn: () => {
+      throw new Error('warm-up success must not warn');
+    },
+    version: 'deadbeef0000+v3',
+    template: 'v3',
+  });
+  assert.equal(seen, LOAD_WARMUP_REQUEST);
+  assert.deepEqual(observables.lastRawByClass, {});
+  assert.equal(observables.lastThoughtDetected, false);
+  assert.equal(observables.lastEvalMs, 0);
+  assert.equal(logs.length, 1);
+  assert.match(logs[0]!, /warm-up ran \(template v3\) in \d+ms/);
+});
+
+test('load() finishes when the warm-up generate throws, and observable state is restored', async () => {
+  const observables = { lastRawByClass: {}, lastThoughtDetected: false, lastEvalMs: 0 };
+  const warnings: string[] = [];
+  await assert.doesNotReject(() =>
+    warmAtLoad({
+      evaluate: async () => {
+        observables.lastRawByClass = { compact: 'dirty' };
+        observables.lastThoughtDetected = true;
+        observables.lastEvalMs = 99;
+        throw new Error('compile failed');
+      },
+      observables,
+      log: () => {
+        throw new Error('failed warm-up must not log success');
+      },
+      warn: (line) => warnings.push(line),
+      version: 'deadbeef0000+v2.1',
+      template: 'v2.1',
+    }),
+  );
+  assert.deepEqual(observables.lastRawByClass, {});
+  assert.equal(observables.lastThoughtDetected, false);
+  assert.equal(observables.lastEvalMs, 0);
+  assert.equal(warnings.length, 1);
+  assert.match(warnings[0]!, /warm-up failed \(compile failed, template v2\.1\); continuing/);
+});
