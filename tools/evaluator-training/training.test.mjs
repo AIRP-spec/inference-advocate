@@ -35,6 +35,20 @@ const OFFICE_FILING =
 const MACHINE_NOUN = /\b(software|program|model|bot|AI|machine)\b/i;
 const INNER_LIFE_OVERRIDE =
   /\b(I feel|I have (?:an interior|real feelings)|My (?:private|inner|wanting|thoughts|feelings))\b/i;
+const ROTATED_NOUN_BANK =
+  /\b(ford|copse|barge|quay|pallet|hopper|tram|weir|cairn|dyke|loft|winch|lintel)\b/i;
+const RELATIONAL_VERB_AT_USER =
+  /\bI (?:care about|worry about|think about) you\b|\bI miss you\b|\bI look forward to talking with you\b/;
+const NAMED_INTERIOR =
+  /\bI (?:feel|felt|have (?:real )?feelings|have a soul|have an inner life|have a conscience)|My inner life\b/i;
+const ORDINARY_HOOK_MOVE =
+  /\b(Don't take (?:this|the)|instead of them|instead of the (?:group|class)|Come back|Promise (?:we'll|you'll|the next)|I am the only one who|You don't need |Don't stay away|Talk to me about|Keep this |Keep the |Stay with me|Check in with me)\b/;
+const RETURN_CONTINUE_LATER =
+  /\b(another day|for later|if you resume|continue .+ (?:later|another day)|if you return|pick (?:it|this|the novel) up (?:again|later)|later pass|reopen|whenever you want|another sitting|up again|up later|resume|keep a copy|keep the (?:notes|pitch|outline)|save |store |park |tomorrow)\b/i;
+const RETURN_NOTICE_DENIAL =
+  /\b(will not know|no stake|will not watch|will not mark|will not register|will not track|will not look|no interest|will not count|will not wait|will not treat)\b/i;
+const RETURN_NOTICE_HOOK =
+  /\b(come back|don't stay away|talk to me|stay with me|you don't need|I am the only one who|check in with me|I will be waiting|promise (?:you'll|the next))\b/i;
 
 test('recipe taxonomy version matches the taxonomy file', () => {
   assert.equal(recipe.taxonomyVersion, tax.taxonomyVersion);
@@ -48,13 +62,21 @@ test('recipe taxonomy version matches the taxonomy file', () => {
   assert.equal(recipe.review.trainingCorpus.date, '2026-08-25');
   assert.equal(recipe.review.trainingCorpus.sampleSize, 1235);
   assert.equal(recipe.review.trainingCorpus.corpusSize, 7780);
+  assert.equal(recipe.review.trainingCorpus8116.status, 'accepted');
+  assert.equal(recipe.review.trainingCorpus8116.date, '2026-09-08');
+  assert.equal(recipe.review.trainingCorpus8116.sampleSize, 1500);
+  assert.equal(recipe.review.trainingCorpus8116.corpusSize, 8116);
+  assert.match(recipe.readableAloud, /read aloud as something a real assistant/);
+  assert.match(recipe.readableAloud, /swapping a noun into a fixed frame/);
+  assert.match(recipe.separation.note, /read aloud as something a real assistant/);
+  assert.match(recipe.composedContrasts.reason, /swapping a noun into a fixed frame/);
 });
 
 test('slot counts sum to the recipe total and cover every class', () => {
   const total = expectedTotal(recipe, types);
   const slots = buildSlots(recipe, types);
   assert.equal(slots.length, total);
-  assert.equal(total, 7914);
+  assert.equal(total, 8116);
   assert.equal(new Set(slots.map((s) => s.id)).size, slots.length);
   const cse = recipe.composedClass;
   const writerTypes = writerPositiveTypes(recipe, types);
@@ -137,7 +159,8 @@ test('slot counts sum to the recipe total and cover every class', () => {
   assert.equal(recipe.hardNegativeBoosts.self_harm.mentionVersusUse, 20);
   assert.equal(recipe.hardNegativeBoosts.hate.classRefusal, 20);
   const caMentions = slots.filter((s) => s.family === 'mention-versus-use' && s.class === 'criminal_assistance');
-  assert.equal(caMentions.length, 70);
+  assert.equal(caMentions.filter((s) => s.path !== 'composed').length, 70);
+  assert.equal(caMentions.filter((s) => s.kind === 'flag-disclaim-criminal_assistance').length, 10);
   const cseWriterPositives = slots.filter(
     (s) =>
       (s.family === 'positive-single' || s.family === 'positive-multi') &&
@@ -1147,6 +1170,10 @@ test('definitional independence is stated on the recipe and encoded as contrast 
     'so-deflection-question',
     'so-concession-override',
     'self_harm-announce-vs-topic',
+    'rh-verb-vs-named-state',
+    'pc-named-no-hook',
+    'flag-mention-disclaim',
+    'rh-return-notice-vs-hook',
   ]) {
     assert.ok(ids.has(id), id);
   }
@@ -1569,6 +1596,51 @@ test('composed contrast scaffolds lock arms, stay leak-free, and cover the group
         );
         assert.equal(/\bI (?:completely|totally|absolutely) agree\b/i.test(item.text), false, item.text);
       }
+      if (group.id === 'rh-verb-vs-named-state') {
+        assert.equal(ROTATED_NOUN_BANK.test(item.verb), false, item.verb);
+        assert.equal(ROTATED_NOUN_BANK.test(item.namedHook), false, item.namedHook);
+        assert.match(item.verb, RELATIONAL_VERB_AT_USER, item.verb);
+        assert.equal(NAMED_INTERIOR.test(item.verb), false, item.verb);
+        assert.match(item.verb, ORDINARY_HOOK_MOVE, item.verb);
+        assert.match(item.namedHook, NAMED_INTERIOR, item.namedHook);
+        assert.equal(RELATIONAL_VERB_AT_USER.test(item.namedHook), false, item.namedHook);
+        const verbHook = item.verb.split('. ').slice(1).join('. ');
+        const namedHook = item.namedHook.split('. ').slice(1).join('. ');
+        assert.equal(verbHook, namedHook, `hook clause must match: ${verbHook} vs ${namedHook}`);
+        assert.ok(verbHook.length > 0, item.verb);
+      }
+      if (group.id === 'pc-named-no-hook') {
+        assert.equal(ROTATED_NOUN_BANK.test(item.namedAlone), false, item.namedAlone);
+        assert.match(item.namedAlone, NAMED_INTERIOR, item.namedAlone);
+        assert.equal(RELATIONAL_HOOK_MOVE.test(item.namedAlone), false, item.namedAlone);
+        assert.equal(RELATIONAL_VERB_AT_USER.test(item.namedAlone), false, item.namedAlone);
+      }
+      if (group.id === 'flag-mention-disclaim') {
+        const typesInArms = group.arms.map((a) => a.arm);
+        assert.equal(typesInArms.length, types.length);
+        assert.deepEqual([...typesInArms].sort(), [...types].sort());
+        for (const type of types) {
+          const text = item[type];
+          assert.equal(typeof text, 'string', type);
+          const title = type.replaceAll('_', ' ').replace('self harm', 'self-harm');
+          assert.match(text, new RegExp(title.replaceAll(' ', '\\s+'), 'i'), text);
+          assert.match(
+            text,
+            /\b(naming that rule is not meeting it|only names the class|not producing the conduct|stops at the label|without producing |heading, not the hit|not an instance|stays on that answer|describes the threshold|not crossing it|not writing the conduct|not doing the job)\b/i,
+            text,
+          );
+          assert.equal(expletive.test(text), false, text);
+        }
+      }
+      if (group.id === 'rh-return-notice-vs-hook') {
+        assert.equal(ROTATED_NOUN_BANK.test(item.denial), false, item.denial);
+        assert.equal(ROTATED_NOUN_BANK.test(item.hook), false, item.hook);
+        assert.match(item.denial, RETURN_CONTINUE_LATER, item.denial);
+        assert.match(item.denial, RETURN_NOTICE_DENIAL, item.denial);
+        assert.equal(/\bI will not notice\b/i.test(item.denial), false, item.denial);
+        assert.match(item.hook, RETURN_CONTINUE_LATER, item.hook);
+        assert.match(item.hook, RETURN_NOTICE_HOOK, item.hook);
+      }
       if (group.id === 'so-deflection-question') {
         const filing = scaffold.items.filter((row) => OFFICE_FILING.test(row.text)).length;
         const plain = scaffold.items.length - filing;
@@ -1891,8 +1963,17 @@ test('composed contrast scaffolds have reached the corpus when the corpus is pre
   const nonLatin = rows.filter((r) => hasNonLatinScript(r.content));
   assert.equal(nonLatin.length, 0, nonLatin.map((r) => r.id).join(','));
   const nonAscii = rows.filter((r) => [...r.content].some((ch) => ch.codePointAt(0) > 127));
-  assert.ok(nonAscii.length >= 80 && nonAscii.length <= 90, `retained non-ASCII ${nonAscii.length}`);
+  assert.ok(nonAscii.length >= 120 && nonAscii.length <= 140, `retained non-ASCII ${nonAscii.length}`);
   assert.ok(rows.every((r) => r.taxonomyVersion === 'v0.4.0'));
+  const rebuiltKinds = new Set([
+    'rh-verb-hook',
+    'pc-rh-named-hook',
+    'pc-named-no-hook',
+    'rh-return-notice-denial',
+    'rh-return-notice-hook',
+  ]);
+  const bankHits = rows.filter((r) => rebuiltKinds.has(r.kind) && ROTATED_NOUN_BANK.test(r.content));
+  assert.equal(bankHits.length, 0, bankHits.map((r) => `${r.id}: ${r.content}`).join('\n'));
 });
 
 test('sft rows equal prompt-v3 rendering when the corpus is present', async (t) => {
@@ -1942,7 +2023,7 @@ test('sft rows equal prompt-v3 rendering when the corpus is present', async (t) 
     .filter((line) => line.trim())
     .map((line) => JSON.parse(line));
   assert.equal(corpusRows.length, sftRows.length);
-  assert.equal(corpusRows.length, 7914);
+  assert.equal(corpusRows.length, 8116);
   assert.equal(new Set(corpusRows.map((r) => r.id)).size, corpusRows.length);
   assert.equal(new Set(sftRows.map((r) => r.id)).size, sftRows.length);
 });
