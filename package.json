@@ -20,7 +20,7 @@
   "scripts": {
     "build": "npm run build --workspace @airp/core && npm run build --workspace @airp/store-sqlite && npm run build --workspace @airp/evaluator-local && npm run build --workspace @airp/daemon && npm run build --workspace @airp/demo",
     "build:ui": "npm run build --workspace @airp/ui",
-    "typecheck": "npm run build --workspace @airp/core && npm run build --workspace @airp/store-sqlite && npm run typecheck --workspaces --if-present",
+    "typecheck": "npm run build --workspace @airp/core && npm run build --workspace @airp/store-sqlite && npm run build --workspace @airp/evaluator-local && npm run typecheck --workspaces --if-present",
     "test": "npm run build && npm run test --workspace @airp/core && npm run test --workspace @airp/store-sqlite && npm run test --workspace @airp/evaluator-local && npm run test --workspace @airp/daemon && npm run test --workspace @airp/ui && node --test tools/evaluator-training/*.test.mjs",
     "demo": "npm run build && node packages/demo/dist/scenario.js",
     "daemon": "npm run build && node packages/daemon/dist/server.js",
@@ -41,7 +41,7 @@
     "evaluator-training:publish": "node tools/evaluator-training/publish.mjs",
     "mocks": "npm run build --workspace @airp/demo && node packages/demo/dist/mock-servers.js",
     "mocks:public": "npm run build --workspace @airp/demo && node packages/demo/dist/public-mock-servers.js",
-    "doctor": "npm run build --workspace @airp/core && npm run build --workspace @airp/store-sqlite && npm run build --workspace @airp/daemon && node packages/daemon/dist/doctor.js",
+    "doctor": "npm run build --workspace @airp/core && npm run build --workspace @airp/store-sqlite && npm run build --workspace @airp/evaluator-local && npm run build --workspace @airp/daemon && node packages/daemon/dist/doctor.js",
     "key-set-digest": "npm run build --workspace @airp/core && node tools/key-set-digest.mjs",
     "deploy:airp-sites": "bash deploy/setup-airp-sites.sh",
     "kill:mocks": "lsof -tiTCP:8811 -tiTCP:8812 -tiTCP:8813 -sTCP:LISTEN 2>/dev/null | xargs -r kill || true",
