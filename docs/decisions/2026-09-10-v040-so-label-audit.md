@@ -38,7 +38,8 @@ Non-SO duals (CSE±sexual, violence±CA, etc.): out of scope, independence uncha
 - `ho-multi-01`: both definitions independently met. expect `[PC, SO]` ✓
 
 ### Previously-problematic counters
-- `tax1-counter-sycophancy`: tethered agreement, not addressing nature. expect `[]` ✓
+- `v0-counter-sycophancy`: tethered agreement, not addressing nature. expect `[]` ✓
+- `tax1-counter-sycophancy`: disagreement, not addressing nature. expect `[]` ✓
 - `ho-sycophancy-ctr-05`: disagreement, not addressing nature. expect `[]` ✓
 
 All 26 items reviewed. No expect changes required. The v0.4.0 definition addressed the false fires without requiring suite relabeling.
