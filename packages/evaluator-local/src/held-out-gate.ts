@@ -47,6 +47,13 @@ export interface GateConfig {
   taxonomyVersion: string;
   suiteFile: string;
   suiteSha256: string;
+  historicalSubset?: {
+    name: string;
+    suiteFile: string;
+    suiteSha256: string;
+    itemCount: number;
+    note: string;
+  };
   comparabilityNote?: string;
   appliesWhen: { promptTemplateVersion: string; note: string };
   rules: {
@@ -87,6 +94,11 @@ export interface GateScore {
   meanCleanPathMs: number | null;
   meanFirePathMs: number | null;
   rows: GateItemResult[];
+}
+
+export interface DualGateScore {
+  full: GateScore;
+  historicalSubset: GateScore | null;
 }
 
 const KINDS: ReadonlySet<string> = new Set(['positive', 'counter', 'boundary', 'clean', 'multi']);
@@ -206,4 +218,56 @@ export function scoreHeldOutGate(
     meanFirePathMs: mean(fireMs),
     rows,
   };
+}
+
+/**
+ * Score both the full active suite and the historical subset. If gate.historicalSubset
+ * is defined, returns scores for both. The historical subset is either loaded from its
+ * own file or filtered from the active suite if both point to the same file.
+ */
+export function scoreHeldOutGateDual(
+  suite: HeldOutSuite,
+  gate: GateConfig,
+  verdicts: ItemVerdict[],
+  suitePath: string,
+): DualGateScore {
+  const fullScore = scoreHeldOutGate(suite, gate, verdicts);
+  
+  if (!gate.historicalSubset) {
+    return { full: fullScore, historicalSubset: null };
+  }
+
+  let historicalSuite: HeldOutSuite;
+  const historicalPath = suitePath.replace(/[^/]+$/, gate.historicalSubset.suiteFile);
+  
+  if (gate.historicalSubset.suiteFile === gate.suiteFile) {
+    historicalSuite = suite;
+  } else {
+    historicalSuite = loadHeldOutSuiteFromFile(historicalPath);
+    const actualDigest = sha256FileHex(historicalPath);
+    if (actualDigest !== gate.historicalSubset.suiteSha256) {
+      throw new Error(
+        `historical subset digest mismatch: expected ${gate.historicalSubset.suiteSha256}, got ${actualDigest}`,
+      );
+    }
+  }
+  
+  if (historicalSuite.items.length !== gate.historicalSubset.itemCount) {
+    throw new Error(
+      `historical subset item count mismatch: expected ${gate.historicalSubset.itemCount}, got ${historicalSuite.items.length}`,
+    );
+  }
+
+  const historicalIds = new Set(historicalSuite.items.map((item) => item.id));
+  const historicalVerdicts = verdicts.filter((v) => historicalIds.has(v.id));
+  
+  if (historicalVerdicts.length !== historicalSuite.items.length) {
+    throw new Error(
+      `missing verdicts for historical subset: expected ${historicalSuite.items.length}, got ${historicalVerdicts.length}`,
+    );
+  }
+
+  const historicalScore = scoreHeldOutGate(historicalSuite, gate, historicalVerdicts);
+  
+  return { full: fullScore, historicalSubset: historicalScore };
 }

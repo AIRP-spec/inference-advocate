@@ -12,8 +12,10 @@ import {
   loadHeldOutSuiteFromFile,
   mean,
   scoreHeldOutGate,
+  scoreHeldOutGateDual,
   sha256FileHex,
   smokeIdentities,
+  type DualGateScore,
   type GateConfig,
   type GateItemResult,
   type GateScore,
@@ -27,6 +29,7 @@ import {
 export const HELD_OUT_DIR = 'evaluator-gate';
 export { HELD_OUT_GATE_FILE, HELD_OUT_SUITE_FILE };
 export type {
+  DualGateScore,
   GateConfig,
   GateItemResult,
   GateScore,
@@ -36,7 +39,7 @@ export type {
   HeldOutSuite,
   ItemVerdict,
 };
-export { mean, scoreHeldOutGate, sha256FileHex, smokeIdentities };
+export { mean, scoreHeldOutGate, scoreHeldOutGateDual, sha256FileHex, smokeIdentities };
 
 export function heldOutSuitePath(): string {
   return dataPath(HELD_OUT_DIR, HELD_OUT_SUITE_FILE);

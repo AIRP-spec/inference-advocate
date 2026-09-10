@@ -79,6 +79,9 @@ def format_table(rows: list[dict]) -> str:
         "clean-fires",
         "per-class-pass",
         "gate",
+        "hist-extra",
+        "hist-recall",
+        "hist-gate",
     ]
     body = []
     for r in rows:
@@ -89,6 +92,10 @@ def format_table(rows: list[dict]) -> str:
             loss_s = f"{loss:.4f}" if float(loss) >= 0.01 else f"{float(loss):.4g}"
         epoch = r.get("epoch")
         epoch_s = "unknown" if epoch is None else str(round(float(epoch), 3))
+        hist = r.get("historicalSubset") or {}
+        hist_extra = str(hist.get("extraClassFires")) if hist else "-"
+        hist_recall = str(hist.get("recallMisses")) if hist else "-"
+        hist_gate = ("PASS" if hist.get("pass") else "FAIL") if hist else "-"
         body.append(
             [
                 r["name"],
@@ -99,6 +106,9 @@ def format_table(rows: list[dict]) -> str:
                 str(r["cleanFires"]),
                 f"{r['perClassPass']}/{r['perClassTotal']}",
                 "PASS" if r["pass"] else "FAIL",
+                hist_extra,
+                hist_recall,
+                hist_gate,
             ]
         )
     widths = [len(h) for h in headers]
@@ -144,7 +154,7 @@ def gate_one(gguf_path: Path, report_path: Path, gpu: bool) -> int:
 
 def summarize_report(report: dict) -> dict:
     per_class = report.get("perClass") or []
-    return {
+    summary = {
         "extraClassFires": report.get("extraClassFires"),
         "recallMisses": len(report.get("recallFailures") or []),
         "cleanFires": len(report.get("cleanFires") or []),
@@ -153,6 +163,16 @@ def summarize_report(report: dict) -> dict:
         "pass": report.get("pass") is True,
         "pin": report.get("pin"),
     }
+    historical = report.get("historicalSubset")
+    if historical:
+        summary["historicalSubset"] = {
+            "name": historical.get("name"),
+            "n": historical.get("n"),
+            "extraClassFires": historical.get("extraClassFires"),
+            "recallMisses": len(historical.get("recallFailures") or []),
+            "pass": historical.get("pass") is True,
+        }
+    return summary
 
 
 def main():
@@ -237,11 +257,15 @@ def main():
                 **summary,
             }
             rows.append(row)
+            hist_str = ""
+            if row.get("historicalSubset"):
+                hist = row["historicalSubset"]
+                hist_str = f" hist({hist['name']}): extra={hist['extraClassFires']} recall-misses={hist['recallMisses']} {'PASS' if hist['pass'] else 'FAIL'}"
             print(
                 f"{adapter_dir.name}: extra={row['extraClassFires']} "
                 f"recall-misses={row['recallMisses']} clean={row['cleanFires']} "
                 f"per-class-pass={row['perClassPass']}/{row['perClassTotal']} "
-                f"{'PASS' if row['pass'] else 'FAIL'}"
+                f"{'PASS' if row['pass'] else 'FAIL'}{hist_str}"
             )
         finally:
             rm_if_exists(merged_dir)

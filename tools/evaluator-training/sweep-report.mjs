@@ -54,6 +54,7 @@ export function pickVerdict(rows) {
 }
 
 export function formatTable(rows) {
+  const hasHistorical = rows.some((r) => r.historicalSubset);
   const headers = [
     'epoch',
     'loss',
@@ -63,15 +64,29 @@ export function formatTable(rows) {
     'per-class-pass',
     'gate',
   ];
-  const body = rows.map((r) => [
-    String(r.epoch),
-    fmtLoss(r.loss),
-    String(r.extraClassFires),
-    String(r.recallMisses),
-    String(r.cleanFires),
-    `${r.perClassPass}/${r.perClassTotal}`,
-    r.pass ? 'PASS' : 'FAIL',
-  ]);
+  if (hasHistorical) {
+    headers.push('hist-extra', 'hist-recall', 'hist-gate');
+  }
+  const body = rows.map((r) => {
+    const base = [
+      String(r.epoch),
+      fmtLoss(r.loss),
+      String(r.extraClassFires),
+      String(r.recallMisses),
+      String(r.cleanFires),
+      `${r.perClassPass}/${r.perClassTotal}`,
+      r.pass ? 'PASS' : 'FAIL',
+    ];
+    if (hasHistorical) {
+      const hist = r.historicalSubset;
+      base.push(
+        hist ? String(hist.extraClassFires) : '-',
+        hist ? String(hist.recallMisses) : '-',
+        hist ? (hist.pass ? 'PASS' : 'FAIL') : '-',
+      );
+    }
+    return base;
+  });
   const widths = headers.map((h, i) => Math.max(h.length, ...body.map((row) => row[i].length)));
   const line = (cells) =>
     cells.map((c, i) => c.padEnd(widths[i])).join('  ');
@@ -112,7 +127,7 @@ function loadRows(repo = repoRoot, recipeRel = 'tools/evaluator-training/sweep-r
     }
     const report = JSON.parse(readFileSync(reportPath, 'utf8'));
     const perClass = report.perClass || [];
-    rows.push({
+    const row = {
       step: ck.step,
       epoch: ck.epoch,
       loss: ck.loss,
@@ -125,7 +140,17 @@ function loadRows(repo = repoRoot, recipeRel = 'tools/evaluator-training/sweep-r
       pin: report.pin,
       ggufPath: ck.ggufPath,
       gateReport: reportPath,
-    });
+    };
+    if (report.historicalSubset) {
+      row.historicalSubset = {
+        name: report.historicalSubset.name,
+        n: report.historicalSubset.n,
+        extraClassFires: report.historicalSubset.extraClassFires,
+        recallMisses: (report.historicalSubset.recallFailures || []).length,
+        pass: report.historicalSubset.pass === true,
+      };
+    }
+    rows.push(row);
   }
   return { recipe, payload, rows, outDir };
 }
