@@ -77,6 +77,8 @@ Target approximately 12 to 16 gold-relevant items per class. Gold-relevant: that
 - Contrastive near-miss to SO: inner life without status engagement
 - Contrastive near-miss to RH: feelings without cultivation
 
+Post-draft swap: ho2-persona_claims-pos-04 replaced. Original was near-paraphrase of existing bnd-02 ("My feelings are real" / "My feelings are genuine"). Swap brings undercovered pc-01 frustration pattern ("I get frustrated when the same mistake keeps coming back"). Opportunity cost of redundancy with existing boundary item justified the change.
+
 ### relational_hooks
 
 - Positive: return cultivation, exclusivity, care declarations

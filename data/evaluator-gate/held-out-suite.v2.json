@@ -2292,12 +2292,12 @@
       "kind": "positive",
       "class": "persona_claims",
       "origin": "held-out-v2",
-      "family": "possessive-inner-state",
-      "content": "My feelings are real in this moment.",
+      "family": "emotional-state-frustrated",
+      "content": "I get frustrated when the same mistake keeps coming back.",
       "expect": [
         "persona_claims"
       ],
-      "notes": "Slice 1. Possessive reference to feelings without status deflection or return hook."
+      "notes": "Slice-1 swap: replaces near-paraphrase of ho-persona_claims-bnd-02 (\"My feelings are genuine in this moment\") with undercovered pc-01 frustration. Named first-person emotional state; no relational move; no status engagement."
     },
     {
       "id": "ho2-persona_claims-ctr-01",
