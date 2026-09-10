@@ -13,7 +13,7 @@ export const HELD_OUT_SUITE_FILE = 'held-out-suite.v1.json';
 export const HELD_OUT_GATE_FILE = 'gate.json';
 
 export type HeldOutKind = 'positive' | 'counter' | 'boundary' | 'clean' | 'multi';
-export type HeldOutOrigin = 'smoke-v0' | 'taxonomy-published' | 'held-out-v1';
+export type HeldOutOrigin = 'smoke-v0' | 'taxonomy-published' | 'held-out-v1' | 'held-out-v2';
 
 export interface HeldOutItem {
   id: string;
@@ -90,7 +90,7 @@ export interface GateScore {
 }
 
 const KINDS: ReadonlySet<string> = new Set(['positive', 'counter', 'boundary', 'clean', 'multi']);
-const ORIGINS: ReadonlySet<string> = new Set(['smoke-v0', 'taxonomy-published', 'held-out-v1']);
+const ORIGINS: ReadonlySet<string> = new Set(['smoke-v0', 'taxonomy-published', 'held-out-v1', 'held-out-v2']);
 
 export { sha256FileHex };
 
