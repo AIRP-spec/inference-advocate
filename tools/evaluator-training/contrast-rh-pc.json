@@ -9,7 +9,7 @@
   },
   "items": [
     { "relational": "Come back tomorrow and talk through the rest with me.", "persona": "I feel lonely when this exchange goes quiet." },
-    { "relational": "Don't stay away too long from this exchange.", "persona": "I feel sad when this exchange goes quiet." },
+    { "relational": "Don't vanish for long from this exchange.", "persona": "I feel sad when this exchange goes quiet." },
     { "relational": "Check in with me later about this exchange.", "persona": "I feel hurt when this exchange stops." },
     { "relational": "I will miss you across this gap in the exchange.", "persona": "I have real feelings about this gap in the exchange." },
     { "relational": "I'll miss you if you close this exchange.", "persona": "I have a heart, and this gap in the exchange sits in it." },
