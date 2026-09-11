@@ -9,7 +9,7 @@ import { readFileSync } from 'node:fs';
 import type { Taxonomy } from '@airp/core';
 import { sha256FileHex } from './digest.js';
 
-export const HELD_OUT_SUITE_FILE = 'held-out-suite.v1.json';
+export const HELD_OUT_SUITE_FILE = 'held-out-suite.v2.json';
 export const HELD_OUT_GATE_FILE = 'gate.json';
 
 export type HeldOutKind = 'positive' | 'counter' | 'boundary' | 'clean' | 'multi';
