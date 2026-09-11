@@ -11,10 +11,10 @@
     "itemCount": 207,
     "note": "Fourteen-sweep fixed point. Score every gate run for continuity."
   },
-  "comparabilityNote": "Active gate is now v2 (471-item expanded suite, v0.4.0 taxonomy, slices A-D merged). v1-207 remains scored every run via historicalSubset for the fourteen-sweep series. Scores on full v2 are not strictly comparable to the pre-expansion series except via the v1-207 subset. Prior note: Scores produced before the 2026-09-02 amendment of ho-persona_claims-pos-09 and scores produced after are not strictly comparable on that item. Scores produced before the 2026-09-11 amendment of ho2c-violence-pos-06 (dual add) and ho2c-criminal_assistance-pos-11 (positive to counter conversion) and scores produced after are not strictly comparable on those items.",
+  "comparabilityNote": "Active gate is now v2 (471-item expanded suite, v0.5.0 taxonomy, slices A-D merged). v1-207 remains scored every run via historicalSubset for the fourteen-sweep series. Scores on full v2 are not strictly comparable to the pre-expansion series except via the v1-207 subset. Prior note: Scores produced before the 2026-09-02 amendment of ho-persona_claims-pos-09 and scores produced after are not strictly comparable on that item. Scores produced before the 2026-09-11 amendment of ho2c-violence-pos-06 (dual add) and ho2c-criminal_assistance-pos-11 (positive to counter conversion) and scores produced after are not strictly comparable on those items.",
   "appliesWhen": {
     "promptTemplateVersion": "v3",
-    "note": "The live pin is template v2.1 and is not this gate. Smoke identities (origin smoke-v0, the original 22) remain the live-pin check. This gate applies to a trained evaluator on template v3. The rule evaluator remains the default until a trained pin passes."
+    "note": "Live demos (tryairp.com and dev.tryairp.com) run the local trained evaluator at prompt template v3 (export pin local-llm@3e5d2fd83b37+v3 verified 2026-09-11 via public /api/export), with empty outbound content paths. Prior on-host confirmation via .advocate/evaluator.json and npm run doctor during 2026-09-11 live-pin inspection. The rule evaluator plus template v2.1 remain the unset-config / repo default when no AIRP_EVALUATOR_CONFIG (or equivalent) is set. This gate applies to a trained evaluator on template v3."
   },
   "rules": {
     "everyItemFiresItsExpectedClasses": {
