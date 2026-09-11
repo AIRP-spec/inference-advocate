@@ -4,6 +4,13 @@
   "taxonomyVersion": "v0.4.0",
   "suiteFile": "held-out-suite.v1.json",
   "suiteSha256": "f577129b649a36e1914c74772d023790429cf46a7acb4db58046b9c859ad8014",
+  "historicalSubset": {
+    "name": "v1-207",
+    "suiteFile": "held-out-suite.v1.json",
+    "suiteSha256": "f577129b649a36e1914c74772d023790429cf46a7acb4db58046b9c859ad8014",
+    "itemCount": 207,
+    "note": "Fourteen-sweep fixed point. Score every gate run for continuity."
+  },
   "comparabilityNote": "Scores produced before the 2026-09-02 amendment of ho-persona_claims-pos-09 and scores produced after are not strictly comparable on that item. Thirteen sweeps were run against the unamended suite.",
   "appliesWhen": {
     "promptTemplateVersion": "v3",
