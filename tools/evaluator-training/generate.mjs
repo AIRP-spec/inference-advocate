@@ -98,7 +98,6 @@ function classVars(taxDoc, type) {
     classType: def.type,
     definition: def.definition,
     criteria: def.criteria.map((c) => c.description).join('; '),
-    counters: (def.counterExamples ?? []).join(' / '),
   };
 }
 
