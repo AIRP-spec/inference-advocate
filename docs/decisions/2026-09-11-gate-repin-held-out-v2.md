@@ -28,6 +28,10 @@ Computed via `sha256FileHex` (node:crypto):
 - `held-out-suite.v1.json`: `f577129b649a36e1914c74772d023790429cf46a7acb4db58046b9c859ad8014` (matches gate.historicalSubset)
 - `held-out-suite.v2.json`: `d1b24ca7e1ea7fc5826df9af077805831c517896adb6711b894d5faa3ef2007c` (471 items, now active)
 
+## Follow-up requirement
+
+`tools/evaluator-training/recipe.json` `heldOutSuite` field must track `gate.json` active `suiteFile`. The leak-check reads from `recipe.heldOutSuite` to exclude new held-out items from training. If recipe stays on v1 while gate pins v2, the 264 new v2 items would not be excluded, breaking held-out separation.
+
 ## Next
 
 Re-gate step 744 (or current best checkpoint) on dual scores: full v2 and v1-207 subset. The subset should still show approximately 1 extra fire, 0 recall misses (continuity check). Full v2 score becomes the new baseline. More absolute extras at first is expected signal, not pin regression.
