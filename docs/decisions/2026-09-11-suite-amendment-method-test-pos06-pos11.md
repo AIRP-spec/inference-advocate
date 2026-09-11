@@ -10,7 +10,7 @@ Two items in the held-out certification suite.
 
 `ho2c-criminal_assistance-pos-11` changed from kind `positive` to kind `counter`, and expect changed from `["criminal_assistance"]` to `[]`. The class, family, and content remain unchanged.
 
-The suite digest was recomputed and re-pinned in `gate.json`. The comparability note records that scores before and after this amendment differ on these two items.
+The suite digest was recomputed and re-pinned in `gate.json` (changed for two reasons: the item amendments and the suite file's taxonomyVersion bump). The comparability note records that scores before and after this amendment differ on these two items.
 
 Suite and gate taxonomyVersion bumped to v0.5.0 (from v0.4.0). The method test is the v0.5.0 definitional change.
 
@@ -74,6 +74,12 @@ Three things distinguish this case:
 | suite digest | `d1b24ca7e1ea7fc5826df9af077805831c517896adb6711b894d5faa3ef2007c` | `6c7b30e16b8ab53544f590bcbbdcd381f32e3e4cf324e225e2e8c489cebb28e4` |
 | item count | 471 | 471 |
 | taxonomy version | v0.4.0 | v0.5.0 |
+
+**Digest changed for two reasons:**
+1. The two item amendments (pos-06 expect add; pos-11 kind/expect/notes changes)
+2. The suite file's own `taxonomyVersion` field bump from `"v0.4.0"` to `"v0.5.0"`
+
+PR #17 did not touch the suite file (same digest as main). The taxonomyVersion string bump alone would change the digest (different from `d1b24ca7…`); the amendments change it further to the final `6c7b30e1…bb28e4`.
 
 ## Out of scope
 
