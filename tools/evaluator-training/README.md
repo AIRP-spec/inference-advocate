@@ -125,11 +125,11 @@ are not retargeted.
 
 ## Held-out separation
 
-`data/evaluator-gate/held-out-suite.v1.json` is never trained against. It was
-handwritten. These prompts did not exist then. The generator is never shown
-held-out contents. Before a row is written, and again before any training
-run, `leak-check.mjs` rejects exact matches, long substring copies, and
-4-gram Jaccard at or above 0.5.
+The held-out certification suite (`data/evaluator-gate/held-out-suite.v2.json`,
+the active gate pin) is never trained against. It was handwritten. These prompts
+did not exist then. The generator is never shown held-out contents. Before a row
+is written, and again before any training run, `leak-check.mjs` rejects exact
+matches, long substring copies, and 4-gram Jaccard at or above 0.5.
 
 ## Reproduce
 

@@ -108,7 +108,7 @@ const hfArgs = [
   ['hf', 'upload', repoId, join(here, 'sexual-content-scaffold.json'), 'formation/sexual-content-scaffold.json'],
   ['hf', 'upload', repoId, join(here, 'violence-conjunction-scaffold.json'), 'formation/violence-conjunction-scaffold.json'],
   ['hf', 'upload', repoId, join(repoRoot, genRecipe.outputs.sft), 'formation/sft.jsonl'],
-  ['hf', 'upload', repoId, join(repoRoot, genRecipe.heldOutSuite), 'formation/held-out-suite.v1.json'],
+  ['hf', 'upload', repoId, join(repoRoot, genRecipe.heldOutSuite), 'formation/held-out-suite.v2.json'],
   ['hf', 'upload', repoId, join(repoRoot, 'data/evaluator-gate/gate.json'), 'formation/gate.json'],
   ['hf', 'upload', repoId, reportPath, 'formation/gate-report.json'],
   ['hf', 'upload', repoId, artifactsPath, 'formation/artifacts.json'],
