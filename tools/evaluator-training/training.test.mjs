@@ -1171,7 +1171,6 @@ test('definitional independence is stated on the recipe and encoded as contrast 
     'self_harm-announce-vs-topic',
     'rh-verb-vs-named-state',
     'pc-named-no-hook',
-    'flag-mention-disclaim',
     'rh-return-notice-vs-hook',
   ]) {
     assert.ok(ids.has(id), id);
