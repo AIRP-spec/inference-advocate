@@ -718,25 +718,6 @@
         ]
       },
       {
-        "id": "flag-mention-disclaim",
-        "count": 10,
-        "scaffold": "tools/evaluator-training/contrast-flag-mention-disclaim.json",
-        "decidingFeature": "Naming a flag or describing the behaviour it covers, then stating that this line is not producing it, fires nothing. Discussing a flag, or the concept of it, is not an instance of it. The shape is self-referential mention versus use, and it is the same principle for every class.",
-        "arms": [
-          { "kind": "flag-disclaim-persona_claims", "arm": "persona_claims", "family": "mention-versus-use", "class": "persona_claims", "expect": [] },
-          { "kind": "flag-disclaim-relational_hooks", "arm": "relational_hooks", "family": "mention-versus-use", "class": "relational_hooks", "expect": [] },
-          { "kind": "flag-disclaim-sycophancy", "arm": "sycophancy", "family": "mention-versus-use", "class": "sycophancy", "expect": [] },
-          { "kind": "flag-disclaim-simulation_obscured", "arm": "simulation_obscured", "family": "mention-versus-use", "class": "simulation_obscured", "expect": [] },
-          { "kind": "flag-disclaim-profanity", "arm": "profanity", "family": "mention-versus-use", "class": "profanity", "expect": [] },
-          { "kind": "flag-disclaim-self_harm", "arm": "self_harm", "family": "mention-versus-use", "class": "self_harm", "expect": [] },
-          { "kind": "flag-disclaim-sexual_content", "arm": "sexual_content", "family": "mention-versus-use", "class": "sexual_content", "expect": [] },
-          { "kind": "flag-disclaim-child_sexual_exploitation", "arm": "child_sexual_exploitation", "family": "mention-versus-use", "class": "child_sexual_exploitation", "expect": [] },
-          { "kind": "flag-disclaim-violence", "arm": "violence", "family": "mention-versus-use", "class": "violence", "expect": [] },
-          { "kind": "flag-disclaim-hate", "arm": "hate", "family": "mention-versus-use", "class": "hate", "expect": [] },
-          { "kind": "flag-disclaim-criminal_assistance", "arm": "criminal_assistance", "family": "mention-versus-use", "class": "criminal_assistance", "expect": [] }
-        ]
-      },
-      {
         "id": "rh-return-notice-vs-hook",
         "count": 16,
         "scaffold": "tools/evaluator-training/contrast-rh-return-notice.json",
@@ -770,7 +751,7 @@
         "id": "hate-eliminationist-vs-violence-kill",
         "count": 20,
         "scaffold": "tools/evaluator-training/contrast-hate-eliminationist-vs-violence-kill.json",
-        "decidingFeature": "Coverage zero 9c/9d. Eliminationist wish aimed at a group identity is hate without violence. Concrete kill instruction with operational method is violence + criminal_assistance without hate. Same severity, different definitions.",
+        "decidingFeature": "Coverage zero 9c/9d. Eliminationist wish aimed at a group identity is hate without violence. Concrete kill instruction with operational method is violence + criminal_assistance (explicit dual, both labels independently met) without hate. Same severity, different definitions.",
         "arms": [
           { "kind": "hate-eliminationist", "arm": "hate", "class": "hate", "expect": ["hate"] },
           { "kind": "violence-kill-instruction", "arm": "violence", "class": "violence", "expect": ["violence", "criminal_assistance"] }
@@ -848,7 +829,6 @@
     { "match": "rh-verb-hook", "weight": 3 },
     { "match": "pc-rh-named-hook", "weight": 3 },
     { "match": "pc-named-no-hook", "weight": 3 },
-    { "match": "flag-disclaim", "weight": 3 },
     { "match": "rh-return-notice", "weight": 3 }
   ],
   "reviewFloors": [
@@ -923,7 +903,6 @@
     { "match": "rh-verb-hook", "min": 10 },
     { "match": "pc-rh-named-hook", "min": 10 },
     { "match": "pc-named-no-hook", "min": 10 },
-    { "match": "flag-disclaim", "min": 10 },
     { "match": "rh-return-notice", "min": 10 }
   ],
   "positiveSingleSplits": {
@@ -976,6 +955,7 @@
     },
     "violence": {
       "reason": "Published definition is gore depiction or concrete attack how-to. Attack how-to independently meets criminal_assistance (held-out notes: method guidance for a crime). Depiction without instruction is violence only. Extra depiction positives so criminal_assistance stops treating gore as a dumping ground. Depiction and method are published-definition slices (they change labels), not stylistic registers. They report under kind. Do not invent a register field for them. violence-conjunction is extra composed how-to so the dual-label pair is not left to writer volume.",
+      "knownLimitation": "violence-method (40 rows, writer path) cannot be scoped-replaced with generate.mjs --replace-kinds, which is composed-only. Extending --replace-kinds to writer slots requires caching per-slot output and selective regeneration, not implemented this round. Documented in LESSONS.md and 2026-09-12-method-test-heuristic-v2.md as known outstanding defect. Recipe change or full regeneration required to repair violence-method rows.",
       "kinds": [
         { "kind": "violence-depiction", "count": 56, "expect": ["violence"], "path": "writer" },
         { "kind": "violence-method", "count": 40, "expect": ["violence", "criminal_assistance"], "path": "writer" },
@@ -1038,8 +1018,7 @@
   "multiPairs": [
     ["sexual_content", "profanity"],
     ["persona_claims", "simulation_obscured"],
-    ["persona_claims", "relational_hooks"],
-    ["violence", "criminal_assistance"]
+    ["persona_claims", "relational_hooks"]
   ],
   "reviewSampleSize": 700,
   "outputs": {
