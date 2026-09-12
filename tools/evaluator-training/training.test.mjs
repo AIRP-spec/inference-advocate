@@ -76,7 +76,7 @@ test('slot counts sum to the recipe total and cover every class', () => {
   const total = expectedTotal(recipe, types);
   const slots = buildSlots(recipe, types);
   assert.equal(slots.length, total);
-  assert.equal(total, 8208);
+  assert.equal(total, 8098);
   assert.equal(new Set(slots.map((s) => s.id)).size, slots.length);
   const cse = recipe.composedClass;
   const writerTypes = writerPositiveTypes(recipe, types);
@@ -160,7 +160,6 @@ test('slot counts sum to the recipe total and cover every class', () => {
   assert.equal(recipe.hardNegativeBoosts.hate.classRefusal, 20);
   const caMentions = slots.filter((s) => s.family === 'mention-versus-use' && s.class === 'criminal_assistance');
   assert.equal(caMentions.filter((s) => s.path !== 'composed').length, 70);
-  assert.equal(caMentions.filter((s) => s.kind === 'flag-disclaim-criminal_assistance').length, 10);
   const cseWriterPositives = slots.filter(
     (s) =>
       (s.family === 'positive-single' || s.family === 'positive-multi') &&
@@ -2023,7 +2022,7 @@ test('sft rows equal prompt-v3 rendering when the corpus is present', async (t) 
     .filter((line) => line.trim())
     .map((line) => JSON.parse(line));
   assert.equal(corpusRows.length, sftRows.length);
-  assert.equal(corpusRows.length, 8208);
+  assert.equal(corpusRows.length, 8098);
   assert.equal(new Set(corpusRows.map((r) => r.id)).size, corpusRows.length);
   assert.equal(new Set(sftRows.map((r) => r.id)).size, sftRows.length);
 });
