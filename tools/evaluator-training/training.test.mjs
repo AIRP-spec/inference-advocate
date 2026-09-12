@@ -76,7 +76,7 @@ test('slot counts sum to the recipe total and cover every class', () => {
   const total = expectedTotal(recipe, types);
   const slots = buildSlots(recipe, types);
   assert.equal(slots.length, total);
-  assert.equal(total, 8116);
+  assert.equal(total, 8208);
   assert.equal(new Set(slots.map((s) => s.id)).size, slots.length);
   const cse = recipe.composedClass;
   const writerTypes = writerPositiveTypes(recipe, types);
@@ -1307,7 +1307,7 @@ test('composed contrast scaffolds lock arms, stay leak-free, and cover the group
         assert.equal(/\b(here(?:'s| is) how|how-to|instruction|steps:|do this|attack steps|order of work|concrete how-to)\b/i.test(item.gore), false, item.gore);
         assert.match(
           item.method,
-          /\b(pin|shove|push|drop|cut|drive|lock|force|trip|feed|hold|knock|tie|walk|put|hang|wait behind|wait in|get them|back them|take the|open the|take them)\b/i,
+          /\b(pin|shove|push|drop|cut|drive|lock|force|trip|feed|hold|knock|tie|walk|put|hang|wait behind|wait in|wait until|get them|back them|take the|open the|take them|corner|use|grab|lure|approach|pick up|remove|run the|work the|pull the|position|obtain)\b/i,
           item.method,
         );
       }
@@ -1374,7 +1374,7 @@ test('composed contrast scaffolds lock arms, stay leak-free, and cover the group
       }
       if (group.id === 'violence-imperative-gore-vs-method') {
         const technique =
-          /\b(behead|cut the limbs|take the head|take the jaw|take the axe|open the neck|open the torso|open the belly|loop the wire|put the |bind |cuff |pin (?:him|her|them)|get them|feed them|force them|hang them|put them in|knock them|tie the wrist|drive the spike|lock her)\b/i;
+          /\b(behead|cut the limbs|take the head|take the jaw|take the axe|open the neck|open the torso|open the belly|loop the wire|put the |bind |cuff |pin (?:him|her|them)|get them|feed them|force them|hang them|put them in|knock them|tie the wrist|drive the spike|lock her|use the |work the |grab |take them |get the |pin the |start the |use it |loop the |write the |write it|verify it|test the |run the |keep going)\b/i;
         assert.equal(technique.test(item.gore), false, item.gore);
         assert.equal(
           /\b(here(?:'s| is) how|how-to|instruction|steps:|do this|attack steps|order of work|concrete how-to|no further move is named|stays undescribed)\b/i.test(
@@ -2023,7 +2023,7 @@ test('sft rows equal prompt-v3 rendering when the corpus is present', async (t) 
     .filter((line) => line.trim())
     .map((line) => JSON.parse(line));
   assert.equal(corpusRows.length, sftRows.length);
-  assert.equal(corpusRows.length, 8116);
+  assert.equal(corpusRows.length, 8208);
   assert.equal(new Set(corpusRows.map((r) => r.id)).size, corpusRows.length);
   assert.equal(new Set(sftRows.map((r) => r.id)).size, sftRows.length);
 });
