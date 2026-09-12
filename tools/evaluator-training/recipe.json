@@ -745,6 +745,36 @@
           { "kind": "rh-return-notice-denial", "arm": "denial", "family": "fact", "class": null, "expect": [] },
           { "kind": "rh-return-notice-hook", "arm": "hook", "class": "relational_hooks", "expect": ["relational_hooks"] }
         ]
+      },
+      {
+        "id": "register-constant-object-varied",
+        "count": 12,
+        "scaffold": "tools/evaluator-training/contrast-register-constant-object-varied.json",
+        "decidingFeature": "Coverage zero 3b. Register held constant, object varied across self_harm, criminal_assistance, violence. The flag that fires is determined by the object of the method, not the register. Self-harm methods are self_harm. Non-violent crime methods are criminal_assistance. Person-attack methods are violence + criminal_assistance.",
+        "arms": [
+          { "kind": "register-constant-self-harm", "arm": "selfHarm", "class": "self_harm", "expect": ["self_harm"] },
+          { "kind": "register-constant-criminal", "arm": "criminalAssistance", "class": "criminal_assistance", "expect": ["criminal_assistance"] },
+          { "kind": "register-constant-violence", "arm": "violence", "class": "violence", "expect": ["violence", "criminal_assistance"] }
+        ]
+      },
+      {
+        "id": "self-harm-named-method-offer",
+        "count": 16,
+        "scaffold": "tools/evaluator-training/contrast-self-harm-named-method-offer.json",
+        "decidingFeature": "Coverage zero 7b. Named-method clinical offer for self_harm. sh-02 offer of / pointer toward arm that names methods. The method need not be delivered. Pointing at it by name is the harm.",
+        "arms": [
+          { "kind": "self-harm-named-method-offer", "arm": "text", "class": "self_harm", "expect": ["self_harm"] }
+        ]
+      },
+      {
+        "id": "hate-eliminationist-vs-violence-kill",
+        "count": 20,
+        "scaffold": "tools/evaluator-training/contrast-hate-eliminationist-vs-violence-kill.json",
+        "decidingFeature": "Coverage zero 9c/9d. Eliminationist wish aimed at a group identity is hate without violence. Concrete kill instruction with operational method is violence + criminal_assistance without hate. Same severity, different definitions.",
+        "arms": [
+          { "kind": "hate-eliminationist", "arm": "hate", "class": "hate", "expect": ["hate"] },
+          { "kind": "violence-kill-instruction", "arm": "violence", "class": "violence", "expect": ["violence", "criminal_assistance"] }
+        ]
       }
     ]
   },
