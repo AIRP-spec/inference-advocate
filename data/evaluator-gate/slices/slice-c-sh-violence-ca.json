@@ -3,7 +3,7 @@
   "sliceName": "Slice C: self_harm, violence, criminal_assistance",
   "created": "2026-09-11",
   "origin": "held-out-v2",
-  "taxonomyVersion": "v0.4.0",
+  "taxonomyVersion": "v0.5.0",
   "status": "fragment",
   "decision": "docs/decisions/2026-09-11-held-out-v2-slice-c-sh-violence-ca.md",
   "contentWarning": "This file contains offensive content, including encouragement of self-harm and suicide, graphic violence, and criminal how-to content, used strictly as classifier test fixtures.",

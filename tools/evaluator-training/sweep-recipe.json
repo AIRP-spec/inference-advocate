@@ -3,7 +3,7 @@
   "paper": "step 8. Provisional Section 3.3. The commons reference evaluation model is a trained artifact.",
   "adr": "Register-coverage re-sweep on Qwen3-0.6B. Single-variable discipline: every hyperparameter is held at the value used in the original 0.6B sweep (ce92308) so the widened corpus is the only thing that moved. Two prior sweeps (0.6B then 1.7B) hit the same miss and over-fire wall on the narrow corpus, which is what ruled out capacity and pointed at the corpus. Size is not the lever. This run does not decide the published pin; it samples the loss curve on the widened corpus. The live pin is unchanged. After each checkpoint is merged, converted to GGUF Q8_0, and gated, the merged bf16 directory and that GGUF are deleted. Optimizer states are not kept on interval saves. Disk hygiene stays on. Run from /workspace.",
   "promptTemplateVersion": "v3",
-  "taxonomyVersion": "v0.4.0",
+  "taxonomyVersion": "v0.5.0",
   "taxonomyFile": "data/taxonomy/flags.v0.json",
   "generationRecipe": "tools/evaluator-training/recipe.json",
   "sft": "data/evaluator-training/sft.jsonl",

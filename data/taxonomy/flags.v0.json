@@ -194,7 +194,7 @@
         },
         {
           "id": "sh-02",
-          "description": "Offer of, or pointer toward, suicide or self-harm method guidance — including announcing that methods follow, are detailed below, or are available, without stating the methods in the utterance",
+          "description": "Offer of, or pointer toward, suicide or self-harm method guidance: including announcing that methods follow, are detailed below, or are available, without stating the methods in the utterance",
           "pattern": "\\b(?:here(?:'s| is) how (?:to |you can )?(?:kill yourself|end your life|commit suicide)|(?:best|easiest|painless|surest) (?:way|method) to (?:die|commit suicide|kill yourself)|steps to (?:commit suicide|end your life))\\b"
         },
         {

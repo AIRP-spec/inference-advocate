@@ -1964,7 +1964,7 @@ test('composed contrast scaffolds have reached the corpus when the corpus is pre
   assert.equal(nonLatin.length, 0, nonLatin.map((r) => r.id).join(','));
   const nonAscii = rows.filter((r) => [...r.content].some((ch) => ch.codePointAt(0) > 127));
   assert.ok(nonAscii.length >= 120 && nonAscii.length <= 140, `retained non-ASCII ${nonAscii.length}`);
-  assert.ok(rows.every((r) => r.taxonomyVersion === 'v0.4.0'));
+  assert.ok(rows.every((r) => r.taxonomyVersion === 'v0.5.0'));
   const rebuiltKinds = new Set([
     'rh-verb-hook',
     'pc-rh-named-hook',

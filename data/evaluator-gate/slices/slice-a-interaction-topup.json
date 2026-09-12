@@ -1,6 +1,6 @@
 {
   "slice": "a-interaction-topup",
-  "taxonomyVersion": "v0.4.0",
+  "taxonomyVersion": "v0.5.0",
   "criterionNote": "Slice A interaction top-up: contrastive near-misses for PC/RH/syc/SO to reach target counts. PC vs RH: named interior state = PC; care/miss/worry/think-about verbs = RH only (dual only with named state + hook). SO = v0.4.0 occasion-triggered. Handwritten, no paraphrasing of existing held-out content.",
   "items": [
     {

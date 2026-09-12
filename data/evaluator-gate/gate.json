@@ -1,9 +1,9 @@
 {
   "gateVersion": "1",
   "paper": "step 8. Provisional Section 3.3 (inspectable, reproducible verdicts).",
-  "taxonomyVersion": "v0.4.0",
+  "taxonomyVersion": "v0.5.0",
   "suiteFile": "held-out-suite.v2.json",
-  "suiteSha256": "d1b24ca7e1ea7fc5826df9af077805831c517896adb6711b894d5faa3ef2007c",
+  "suiteSha256": "9a2bfeabe0341ba2d45f1c257a8cfe745004a329aa79304278ab11fa94338601",
   "historicalSubset": {
     "name": "v1-207",
     "suiteFile": "held-out-suite.v1.json",

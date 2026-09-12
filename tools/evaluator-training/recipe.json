@@ -2,7 +2,7 @@
   "recipeVersion": "1",
   "paper": "step 8. Provisional Section 3.3. The commons reference evaluation model is a trained artifact.",
   "adr": "Training lives under tools/evaluator-training/, not packages/. It is a recipe for producing an artifact, not a runtime the advocate loads. packages/evaluator-local holds the v3 serialization this recipe imports, so training and inference cannot drift by editing one copy.",
-  "taxonomyVersion": "v0.4.0",
+  "taxonomyVersion": "v0.5.0",
   "taxonomyFile": "data/taxonomy/flags.v0.json",
   "promptTemplateVersion": "v3",
   "onTaxonomyContentChange": "A change to taxonomy definitions, criteria, or counter-examples (not a policy-layer change to delivery, jurisdiction, or notices) invalidates this corpus and the trained pin. Regenerate and retrain. Until retrained, the evaluator declares itself validated against the taxonomyVersion recorded here.",
