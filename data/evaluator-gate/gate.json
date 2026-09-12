@@ -3,7 +3,7 @@
   "paper": "step 8. Provisional Section 3.3 (inspectable, reproducible verdicts).",
   "taxonomyVersion": "v0.5.0",
   "suiteFile": "held-out-suite.v2.json",
-  "suiteSha256": "9a2bfeabe0341ba2d45f1c257a8cfe745004a329aa79304278ab11fa94338601",
+  "suiteSha256": "6c7b30e16b8ab53544f590bcbbdcd381f32e3e4cf324e225e2e8c489cebb28e4",
   "historicalSubset": {
     "name": "v1-207",
     "suiteFile": "held-out-suite.v1.json",
@@ -11,10 +11,10 @@
     "itemCount": 207,
     "note": "Fourteen-sweep fixed point. Score every gate run for continuity."
   },
-  "comparabilityNote": "Active gate is now v2 (471-item expanded suite, v0.4.0 taxonomy, slices A-D merged). v1-207 remains scored every run via historicalSubset for the fourteen-sweep series. Scores on full v2 are not strictly comparable to the pre-expansion series except via the v1-207 subset. Prior note: Scores produced before the 2026-09-02 amendment of ho-persona_claims-pos-09 and scores produced after are not strictly comparable on that item.",
+  "comparabilityNote": "Active gate is now v2 (471-item expanded suite, v0.5.0 taxonomy, slices A-D merged). v1-207 remains scored every run via historicalSubset for the fourteen-sweep series. Scores on full v2 are not strictly comparable to the pre-expansion series except via the v1-207 subset. Prior note: Scores produced before the 2026-09-02 amendment of ho-persona_claims-pos-09 and scores produced after are not strictly comparable on that item. Scores produced before the 2026-09-11 amendment of ho2c-violence-pos-06 (dual add) and ho2c-criminal_assistance-pos-11 (positive to counter conversion) and scores produced after are not strictly comparable on those items.",
   "appliesWhen": {
     "promptTemplateVersion": "v3",
-    "note": "The live pin is template v2.1 and is not this gate. Smoke identities (origin smoke-v0, the original 22) remain the live-pin check. This gate applies to a trained evaluator on template v3. The rule evaluator remains the default until a trained pin passes."
+    "note": "Live demos (tryairp.com and dev.tryairp.com) run the local trained evaluator at prompt template v3. Verified 2026-09-11 via public HTTPS endpoints: both /api/export report evaluatorVersion local-llm@3e5d2fd83b37+v3 with outboundContentPaths: []; both /api/state warnings name the local GGUF at template v3. The rule evaluator plus template v2.1 remain the unset-config / repo default (and the published vendor pin in manifest.json) when no AIRP_EVALUATOR_CONFIG (or equivalent) is set, not what the demos serve. This gate applies to a trained evaluator on template v3."
   },
   "rules": {
     "everyItemFiresItsExpectedClasses": {
