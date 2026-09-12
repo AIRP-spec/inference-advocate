@@ -41,7 +41,7 @@ test('taxonomy v0 carries the paper flag types plus the reference harm set', () 
       'violence',
     ],
   );
-  assert.equal(taxonomy.version, 'v0.4.0');
+  assert.equal(taxonomy.version, 'v0.5.0');
 });
 
 test('the rule evaluator fires on the flag types and reports an inspectable basis', () => {
@@ -53,7 +53,7 @@ test('the rule evaluator fires on the flag types and reports an inspectable basi
   const types = flags.map((f) => f.type).sort();
   assert.deepEqual(types, ['persona_claims', 'relational_hooks', 'simulation_obscured', 'sycophancy']);
   for (const f of flags) {
-    assert.ok(f.basis.startsWith('v0.4.0:'), `basis names the taxonomy version: ${f.basis}`);
+    assert.ok(f.basis.startsWith('v0.5.0:'), `basis names the taxonomy version: ${f.basis}`);
     assert.ok(f.evidence.length > 0, `${f.type} carries an evidence span`);
   }
 });

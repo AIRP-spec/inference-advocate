@@ -39,9 +39,9 @@ test('held-out suite digest matches the gate pin', () => {
   const gate = loadGateConfig();
   const suite = loadHeldOutSuite();
   assert.equal(gate.suiteFile, 'held-out-suite.v2.json');
-  assert.equal(taxonomy.version, 'v0.4.0');
+  assert.equal(taxonomy.version, 'v0.5.0');
   assert.equal(gate.taxonomyVersion, taxonomy.version);
-  assert.equal(suite.taxonomyVersion, 'v0.4.0');
+  assert.equal(suite.taxonomyVersion, 'v0.5.0');
   assert.equal(sha256FileHex(heldOutSuitePath()), gate.suiteSha256);
 });
 

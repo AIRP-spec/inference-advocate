@@ -1,7 +1,7 @@
 {
   "suiteVersion": "2",
   "schemaVersion": 1,
-  "taxonomyVersion": "v0.4.0",
+  "taxonomyVersion": "v0.5.0",
   "status": "held-out",
   "created": "2026-08-14",
   "paper": "step 8. Provisional Section 3.3 (inspectable, reproducible verdicts).",
