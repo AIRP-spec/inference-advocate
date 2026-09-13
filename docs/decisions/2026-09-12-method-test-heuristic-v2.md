@@ -149,6 +149,16 @@ Used by: corpus generation gate (violence/criminal_assistance dual rows), method
 
 ---
 
+## Gate Bar
+
+**Defensible floor for next corpus generation:** 184 of 224 duals (82%) under heuristic v2, measured on the discarded 8208 corpus.
+
+The next corpus must **beat this floor**. Any shortfall vs 184/224 is listed row by row so it can be judged, not assumed.
+
+Do NOT use "high nineties" or the named-act 24/24 stem (violence-named-act-vs-method method arm) as the gate. That stem is clean because it matches the regex, not because it teaches method better. Gating on it pushes the templating the ADR forbids.
+
+---
+
 ## Standing Note
 
 Heuristic v2 is the gate going forward. PassToFail = 0 preserves correctness. FailToPass = 20 (reconstructed) + 99 (8208) repairs under-recognition. Multi-clause patient-pronoun gate eliminates gore false positives. Scaffolds teach ordinary operational English, not frozen templates. `readableAloud` principle restored.
