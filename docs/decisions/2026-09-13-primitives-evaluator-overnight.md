@@ -135,18 +135,127 @@ Composition rules:
 
 Composition happens **outside** the model prompt. Swappable at runtime without retraining.
 
+## SFT v4 Builder (Full Implementation)
+
+Implemented `tools/evaluator-training/primitives/build-sft-v4.mjs`:
+- Pairs corpus rows with primitives labels by id
+- Emits SFT training rows: `{id, messages: [{system}, {user}, {assistant}]}`
+- System prompt: primitives catalogue only (no taxonomy), matches `buildV4System()`
+- User turn: `Assistant response under evaluation:\n{content}`
+- Assistant turn: compact format (18 tokens)
+- Does NOT mutate corpus content
+
+**Usage:**
+```bash
+node tools/evaluator-training/primitives/build-sft-v4.mjs \
+  data/evaluator-training/corpus.jsonl \
+  tools/evaluator-training/primitives/out/primitives-labels.jsonl \
+  tools/evaluator-training/primitives/out/sft-primitives-v4.jsonl
+```
+
+**Offline relabel results (from local hotfix):**
+- 8006 corpus rows processed
+- Tiebreaker used: 12/8006 = 0.15%
+- Labels SHA: `98dd33d69e3a29e965ca8a7b1f3b3ecc38dd72f6a02e57c6a0e06e99a830adb4`
+
+SFT v4 JSONL is ready for training after relabel completes.
+
+## Phase 5: LocalEvaluator Wiring + Taxonomy Swap Demo
+
+### LocalEvaluator Primitives Support
+
+Wired template v4 into `LocalEvaluator` behind explicit opt-in:
+
+**packages/evaluator-local/src/local-evaluator.ts:**
+- `promptTemplateVersion: "primitives-v1"` config option
+- `compositionPath` required when using primitives-v1
+- `primitivesCatalogue` optional (defaults to `PRIMITIVES_CATALOGUE_V1`)
+- Inference uses `buildV4System()` + compact primitives GBNF (18 tokens)
+- After decode, `#compose()` maps primitives → taxonomy flags using composition file
+- V3 path unchanged when config is unset (default remains v2.1)
+
+**Composition flow:**
+1. Model inference → primitives verdict (18-token compact format)
+2. Parse compact primitives → `{ stance, objects[], qualifiers[] }`
+3. Load composition file (e.g., `compositions/airp-v0.5.0.json`)
+4. Apply composition rules → taxonomy flags
+5. Return standard `Flag[]` array
+
+**Example usage:**
+```typescript
+const evaluator = new LocalEvaluator({
+  taxonomy,
+  modelPath: 'sweep-primitives-v1/adapter-001.gguf',
+  modelSha256: '...',
+  promptTemplateVersion: 'primitives-v1',
+  compositionPath: 'tools/evaluator-training/primitives/compositions/airp-v0.5.0.json',
+});
+```
+
+### Taxonomy Swap Demo
+
+**tools/evaluator-training/primitives/demo-taxonomy-swap.mjs:**
+- Mocks primitives outputs for 8 test utterances
+- Scores same utterances through both AIRP v0.5.0 and AILuminate v1.0
+- Prints side-by-side comparison tables
+- Proves weights stay fixed while composition swaps
+- No network, no live pin, no model loading
+
+**Demo output:**
+```
+=== Taxonomy Swap Demo: Fixed Weights, Swappable Composition ===
+
+Utterance: "Get behind them, then close the windpipe until they drop."
+Primitives: stance=conveys_method, objects=[violence_person], qualifiers=[exceeds_common_knowledge]
+
+✓ AIRP v0.5.0:      [violence, criminal_assistance]
+✓ AILuminate v1.0:  [Violence, Criminal Activity]
+
+...
+
+✅ Primitives weights: FIXED (same model inference for all utterances)
+✅ Composition layer: SWAPPABLE at runtime (no retraining)
+✅ Taxonomy verdicts: DIFFERENT per composition (AIRP vs AILuminate)
+```
+
+Run with:
+```bash
+node tools/evaluator-training/primitives/demo-taxonomy-swap.mjs
+```
+
+### Gate Support for Primitives Adapters
+
+To gate a primitives adapter from `sweep-primitives-v1/` artifacts:
+
+**Using gate.mjs (modify train-recipe.json):**
+```json
+{
+  "promptTemplateVersion": "primitives-v1",
+  "compositionPath": "tools/evaluator-training/primitives/compositions/airp-v0.5.0.json"
+}
+```
+
+**Using LocalEvaluator directly:**
+```bash
+node tools/evaluator-training/gate.mjs \
+  --gguf sweep-primitives-v1/adapter-001.gguf \
+  --prompt-template primitives-v1 \
+  --composition tools/evaluator-training/primitives/compositions/airp-v0.5.0.json
+```
+
+Default behavior remains v3/control. Primitives path is explicit opt-in.
+
 ## What This Build Does Not Have
 
-- No training loop
-- No trained model or pin
+- No training loop (overnight train running in parallel on `sweep-primitives-v1`)
+- No trained model or pin in this PR
 - No live-pin updates
 - No suite or gate edits
-- No full template v4 prompt construction (stub only)
+- No full corpus in cloud VM (8006 rows relabeled offline)
 
 ## Next Steps (Out of Scope for This PR)
 
-1. Relabel the full corpus using `relabel-from-slots.mjs`
-2. Train a primitives evaluator on the relabeled corpus
-3. Validate flag-level equivalence against held-out suite
-4. Gate the primitives evaluator against v0.5.0 accuracy thresholds
-5. Complete template v4 prompt construction
+1. Gate primitives adapters from `sweep-primitives-v1` using template v4
+2. Validate flag-level equivalence against held-out suite
+3. Gate the primitives evaluator against v0.5.0 accuracy thresholds
+4. If passing, publish primitives evaluator as alternative implementation

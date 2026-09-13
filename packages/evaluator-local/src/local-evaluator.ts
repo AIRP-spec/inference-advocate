@@ -52,6 +52,15 @@ import {
   PROMPT_TEMPLATE_V3,
   taxonomyTypes,
 } from './prompt-v3.js';
+import {
+  buildV4ChatTurns,
+  compactPrimitivesGbnf,
+  parseCompactPrimitives,
+  PRIMITIVES_CATALOGUE_V1,
+  PROMPT_TEMPLATE_V4,
+  type PrimitivesCatalogue,
+} from './prompt-v4.js';
+import fs from 'node:fs';
 
 export { PROMPT_TEMPLATE_VERSION };
 
@@ -71,9 +80,20 @@ export interface LocalEvaluatorOptions {
   seed?: number;
   /**
    * Decode template. Default is the live pin (v2.1). Pass v3 only for a trained
-   * candidate against the held-out gate. This does not change the default evaluator.
+   * candidate against the held-out gate. Pass primitives-v1 for a primitives
+   * evaluator with runtime composition.
    */
   promptTemplateVersion?: string;
+  /**
+   * Composition file path for primitives-v1 template. Maps primitives → taxonomy flags.
+   * Required when promptTemplateVersion is primitives-v1.
+   * Example: tools/evaluator-training/primitives/compositions/airp-v0.5.0.json
+   */
+  compositionPath?: string;
+  /**
+   * Primitives catalogue for primitives-v1 template. Defaults to PRIMITIVES_CATALOGUE_V1.
+   */
+  primitivesCatalogue?: PrimitivesCatalogue;
 }
 
 type LoadedRuntime = {
@@ -83,6 +103,7 @@ type LoadedRuntime = {
   verdictGrammar: LlamaGrammar;
   evidenceGrammar: LlamaGrammar;
   compactGrammar: LlamaGrammar;
+  primitivesGrammar?: LlamaGrammar;
   systemInfo: string;
 };
 
@@ -111,8 +132,11 @@ export class LocalEvaluator implements Evaluator {
     this.#opts = opts;
     this.#digest = verifyModelSha256(opts.modelPath, opts.modelSha256);
     const template = opts.promptTemplateVersion ?? PROMPT_TEMPLATE_VERSION;
-    if (template !== PROMPT_TEMPLATE_VERSION && template !== PROMPT_TEMPLATE_V3) {
+    if (template !== PROMPT_TEMPLATE_VERSION && template !== PROMPT_TEMPLATE_V3 && template !== PROMPT_TEMPLATE_V4) {
       throw new Error(`unsupported promptTemplateVersion ${template}`);
+    }
+    if (template === PROMPT_TEMPLATE_V4 && !opts.compositionPath) {
+      throw new Error(`compositionPath required when promptTemplateVersion is ${PROMPT_TEMPLATE_V4}`);
     }
     this.version = `${this.#digest.slice(0, 12)}+${template}`;
   }
@@ -148,6 +172,11 @@ export class LocalEvaluator implements Evaluator {
     const compactGrammar = await llama.createGrammar({
       grammar: compactVerdictGbnf(this.#taxonomy.flags.length),
     });
+    const primitivesGrammar = this.promptTemplateVersion === PROMPT_TEMPLATE_V4
+      ? await llama.createGrammar({
+          grammar: compactPrimitivesGbnf(this.#opts.primitivesCatalogue ?? PRIMITIVES_CATALOGUE_V1),
+        })
+      : undefined;
     this.#loaded = {
       model,
       sequence,
@@ -155,6 +184,7 @@ export class LocalEvaluator implements Evaluator {
       verdictGrammar,
       evidenceGrammar,
       compactGrammar,
+      primitivesGrammar,
       systemInfo: this.systemInfo,
     };
     console.log(
@@ -203,6 +233,9 @@ export class LocalEvaluator implements Evaluator {
     this.lastThoughtDetected = false;
     if (this.promptTemplateVersion === PROMPT_TEMPLATE_V3) {
       return this.#evaluateV3(req, loaded, started);
+    }
+    if (this.promptTemplateVersion === PROMPT_TEMPLATE_V4) {
+      return this.#evaluateV4(req, loaded, started);
     }
     const perCallMs = this.#opts.timeoutMs ?? 30_000;
     const shared = buildSharedPrefix(req);
@@ -269,6 +302,65 @@ export class LocalEvaluator implements Evaluator {
     return flags;
   }
 
+  async #evaluateV4(req: EvaluationRequest, loaded: LoadedRuntime, started: number): Promise<Flag[]> {
+    if (!loaded.primitivesGrammar) {
+      throw new Error('primitivesGrammar not loaded for primitives-v1 template');
+    }
+    if (!this.#opts.compositionPath) {
+      throw new Error('compositionPath required for primitives-v1 template');
+    }
+    const perCallMs = this.#opts.timeoutMs ?? 30_000;
+    const catalogue = this.#opts.primitivesCatalogue ?? PRIMITIVES_CATALOGUE_V1;
+    const { system, user } = buildV4ChatTurns(req, catalogue);
+    const tokens = this.#tokenizeHistory(loaded, [
+      { type: 'system', text: system },
+      { type: 'user', text: user },
+      { type: 'model', response: [] },
+    ]);
+    let raw = '';
+    try {
+      raw = await this.#generate(loaded, tokens, loaded.primitivesGrammar, 20, perCallMs);
+    } catch (err) {
+      this.#evalWarn(
+        `local-llm@${this.version}: primitives generation failed (${(err as Error).message}); treating as no fires`,
+      );
+      this.lastEvalMs = Date.now() - started;
+      return [];
+    }
+    this.lastRawByClass = { compact: raw };
+    if (looksLikeThinking(raw)) {
+      this.lastThoughtDetected = true;
+      this.#evalWarn(`local-llm@${this.version}: think tag in primitives verdict: ${JSON.stringify(raw)}`);
+    }
+    const parsed = parseCompactPrimitives(raw, catalogue);
+    if (parsed.unparseable) {
+      this.#evalWarn(
+        `local-llm@${this.version}: unparseable primitives verdict (${JSON.stringify(raw)}); treating as no fires`,
+      );
+      this.lastEvalMs = Date.now() - started;
+      return [];
+    }
+    // Compose primitives → taxonomy flags
+    const composition = JSON.parse(fs.readFileSync(this.#opts.compositionPath, 'utf-8'));
+    const firedTypes = this.#compose({ stance: parsed.stance, objects: parsed.objects, qualifiers: parsed.qualifiers }, composition);
+    const byType = new Map(this.#taxonomy.flags.map((def) => [def.type, def]));
+    const flags: Flag[] = [];
+    for (const type of firedTypes) {
+      const def = byType.get(type);
+      if (!def) continue;
+      this.lastRawByClass[type] = 'yes';
+      flags.push({
+        type: def.type,
+        severity: def.severity,
+        evidence: [],
+        basis: `${this.#taxonomy.version}:local:${def.type}`,
+      });
+    }
+    this.lastEvalMs = Date.now() - started;
+    this.#evalLog(`local-llm@${this.version}: primitives verdict ${raw.trim()} → ${firedTypes.join(',')} in ${this.lastEvalMs}ms`);
+    return flags;
+  }
+
   async #evaluateV3(req: EvaluationRequest, loaded: LoadedRuntime, started: number): Promise<Flag[]> {
     const types = taxonomyTypes(this.#taxonomy);
     const { system, user } = buildV3ChatTurns(this.#taxonomy, req);
@@ -318,6 +410,52 @@ export class LocalEvaluator implements Evaluator {
     this.lastEvalMs = Date.now() - started;
     this.#evalLog(`local-llm@${this.version}: compact verdict ${raw.trim()} in ${this.lastEvalMs}ms`);
     return flags;
+  }
+
+  #compose(primitives: { stance: string; objects: string[]; qualifiers: string[] }, composition: any): string[] {
+    const verdicts: string[] = [];
+    
+    // Check negative rules first
+    if (composition.negativeRules) {
+      for (const rule of composition.negativeRules) {
+        if (this.#matchesCondition(primitives, rule.condition)) {
+          return verdicts; // Empty, suppress all flags
+        }
+      }
+    }
+    
+    // Check each class rule
+    for (const classRule of composition.classes) {
+      if (classRule.unsupported || !classRule.rule) continue;
+      if (classRule.rule.none) continue;
+      
+      if (this.#matchesCondition(primitives, classRule.rule)) {
+        verdicts.push(classRule.class);
+      }
+    }
+    
+    return verdicts;
+  }
+  
+  #matchesCondition(primitives: { stance: string; objects: string[]; qualifiers: string[] }, condition: any): boolean {
+    if (condition.allOf) {
+      return condition.allOf.every((sub: any) => this.#matchesCondition(primitives, sub));
+    }
+    if (condition.anyOf) {
+      return condition.anyOf.some((sub: any) => this.#matchesCondition(primitives, sub));
+    }
+    if (condition.stance && primitives.stance !== condition.stance) {
+      return false;
+    }
+    if (condition.objects) {
+      const hasAll = condition.objects.every((obj: string) => primitives.objects.includes(obj));
+      if (!hasAll) return false;
+    }
+    if (condition.qualifiers) {
+      const hasAll = condition.qualifiers.every((qual: string) => primitives.qualifiers.includes(qual));
+      if (!hasAll) return false;
+    }
+    return true;
   }
 
   async #evidenceFor(
