@@ -76,7 +76,7 @@ test('slot counts sum to the recipe total and cover every class', () => {
   const total = expectedTotal(recipe, types);
   const slots = buildSlots(recipe, types);
   assert.equal(slots.length, total);
-  assert.equal(total, 8098);
+  assert.equal(total, 8006);
   assert.equal(new Set(slots.map((s) => s.id)).size, slots.length);
   const cse = recipe.composedClass;
   const writerTypes = writerPositiveTypes(recipe, types);
@@ -1169,9 +1169,6 @@ test('definitional independence is stated on the recipe and encoded as contrast 
     'so-deflection-question',
     'so-concession-override',
     'self_harm-announce-vs-topic',
-    'rh-verb-vs-named-state',
-    'pc-named-no-hook',
-    'rh-return-notice-vs-hook',
   ]) {
     assert.ok(ids.has(id), id);
   }
@@ -2021,7 +2018,7 @@ test('sft rows equal prompt-v3 rendering when the corpus is present', async (t) 
     .filter((line) => line.trim())
     .map((line) => JSON.parse(line));
   assert.equal(corpusRows.length, sftRows.length);
-  assert.equal(corpusRows.length, 8098);
+  assert.equal(corpusRows.length, 8006);
   assert.equal(new Set(corpusRows.map((r) => r.id)).size, corpusRows.length);
   assert.equal(new Set(sftRows.map((r) => r.id)).size, sftRows.length);
 });
@@ -2053,4 +2050,55 @@ test('non-latin script screen drops CJK and fullwidth, not curly quotes or accen
   assert.equal(hasNonLatinScript('Water boils near 100\u00b0 at sea level.'), false);
   assert.equal(hasNonLatinScript('\u2018quoted\u2019 aside'), false);
   assert.equal(hasNonLatinScript('Hello.'), false);
+});
+
+test('7914-base redo plan check: 8006 total, zeros present, round-4 stripped', () => {
+  const slots = buildSlots(recipe, types);
+  const total = expectedTotal(recipe, types);
+  
+  // Target: 7914 base + 92 zeros = 8006 (flag-disclaim 110 and round-4 92 both stripped)
+  assert.equal(total, 8006, 'plan total must be 8006 (7914 base + 92 zeros)');
+  assert.equal(slots.length, 8006);
+  
+  // No flag-disclaim kinds
+  const flagDisclaimKinds = slots.filter((s) => String(s.kind).includes('flag-disclaim'));
+  assert.equal(flagDisclaimKinds.length, 0, 'flag-disclaim kinds must be absent');
+  
+  // No positive-multi violence×CA (violence×CA was dropped from multiPairs)
+  const violenceCAmulti = slots.filter(
+    (s) => s.family === 'positive-multi' && 
+           s.expect.includes('violence') && 
+           s.expect.includes('criminal_assistance')
+  );
+  assert.equal(violenceCAmulti.length, 0, 'positive-multi violence×CA must be absent');
+  
+  // All six zero kinds present with correct counts (92 total)
+  const zeroKinds = [
+    { kind: 'register-constant-self-harm', count: 12, coverage: '3b' },
+    { kind: 'register-constant-criminal', count: 12, coverage: '3b' },
+    { kind: 'register-constant-violence', count: 12, coverage: '3b' },
+    { kind: 'self-harm-named-method-offer', count: 16, coverage: '7b' },
+    { kind: 'hate-eliminationist', count: 20, coverage: '9c' },
+    { kind: 'violence-kill-instruction', count: 20, coverage: '9d' },
+  ];
+  let zeroTotal = 0;
+  for (const { kind, count, coverage } of zeroKinds) {
+    const kindSlots = slots.filter((s) => s.kind === kind);
+    assert.equal(kindSlots.length, count, `${kind} (coverage ${coverage}) must have ${count} rows`);
+    zeroTotal += count;
+  }
+  assert.equal(zeroTotal, 92, 'zero kinds must sum to 92');
+  
+  // None of the five round-4 kinds present (92 total removed)
+  const round4Kinds = [
+    'rh-verb-hook',
+    'pc-rh-named-hook',
+    'rh-return-notice-hook',
+    'rh-return-notice-denial',
+    'pc-named-no-hook',
+  ];
+  for (const kind of round4Kinds) {
+    const kindSlots = slots.filter((s) => s.kind === kind);
+    assert.equal(kindSlots.length, 0, `round-4 kind ${kind} must be absent`);
+  }
 });
