@@ -17,7 +17,7 @@ const trainRecipe = JSON.parse(readFileSync(join(here, 'train-recipe.json'), 'ut
 const genRecipe = JSON.parse(readFileSync(join(here, 'recipe.json'), 'utf8'));
 
 function parseArgs(argv) {
-  const out = { gguf: '', sha256: '', gpu: false, report: '', allowFail: false };
+  const out = { gguf: '', sha256: '', gpu: false, report: '', allowFail: false, promptTemplateVersion: '', compositionPath: '' };
   for (let i = 2; i < argv.length; i++) {
     const a = argv[i];
     if (a === '--gpu') out.gpu = true;
@@ -25,6 +25,8 @@ function parseArgs(argv) {
     else if (a === '--gguf') out.gguf = argv[++i];
     else if (a === '--sha256') out.sha256 = argv[++i];
     else if (a === '--report') out.report = argv[++i];
+    else if (a === '--prompt-template-version') out.promptTemplateVersion = argv[++i];
+    else if (a === '--composition-path') out.compositionPath = argv[++i];
     else throw new Error(`unknown argument ${a}`);
   }
   return out;
@@ -72,6 +74,7 @@ let scoreHeldOutGate;
 let scoreHeldOutGateDual;
 let sha256FileHex;
 let PROMPT_TEMPLATE_V3;
+let PROMPT_TEMPLATE_V4;
 try {
   ({ Taxonomy } = await import('@airp/core'));
   ({
@@ -82,14 +85,33 @@ try {
     scoreHeldOutGateDual,
     sha256FileHex,
     PROMPT_TEMPLATE_V3,
+    PROMPT_TEMPLATE_V4,
   } = await import('@airp/evaluator-local'));
 } catch (err) {
   console.error(`cannot import built packages (${err.message}). Run npm run build first.`);
   process.exit(1);
 }
 
-if (PROMPT_TEMPLATE_V3 !== trainRecipe.promptTemplateVersion) {
-  console.error(`PROMPT_TEMPLATE_V3 is ${PROMPT_TEMPLATE_V3}, train-recipe wants v3`);
+// Resolve promptTemplateVersion from args, recipe, or default
+const promptTemplateVersion = args.promptTemplateVersion || trainRecipe.promptTemplateVersion || PROMPT_TEMPLATE_V3;
+const compositionPath = args.compositionPath || trainRecipe.compositionPath || '';
+
+// Validate template version
+if (promptTemplateVersion === PROMPT_TEMPLATE_V3) {
+  // v3 path: existing control
+} else if (promptTemplateVersion === PROMPT_TEMPLATE_V4 || promptTemplateVersion === 'primitives-v1') {
+  // v4/primitives-v1 path: requires composition
+  if (!compositionPath) {
+    console.error(`primitives-v1 template requires --composition-path or recipe.compositionPath`);
+    process.exit(1);
+  }
+  const compositionFullPath = resolve(repoRoot, compositionPath);
+  if (!existsSync(compositionFullPath)) {
+    console.error(`composition file not found: ${compositionFullPath}`);
+    process.exit(1);
+  }
+} else {
+  console.error(`unsupported promptTemplateVersion: ${promptTemplateVersion}`);
   process.exit(1);
 }
 
@@ -112,27 +134,45 @@ if (sha256FileHex(suitePath) !== gate.suiteSha256) {
   console.error('held-out suite digest does not match gate.json');
   process.exit(1);
 }
-if (gate.appliesWhen.promptTemplateVersion !== 'v3') {
-  console.error(`gate appliesWhen is ${gate.appliesWhen.promptTemplateVersion}, not v3`);
-  process.exit(1);
+// Gate config validation: for v3 control, gate must be v3. For primitives-v1, skip gate config check.
+if (promptTemplateVersion === PROMPT_TEMPLATE_V3) {
+  if (gate.appliesWhen.promptTemplateVersion !== 'v3') {
+    console.error(`gate appliesWhen is ${gate.appliesWhen.promptTemplateVersion}, not v3`);
+    process.exit(1);
+  }
 }
 
-const evaluator = new LocalEvaluator({
+const evaluatorOpts = {
   taxonomy,
   modelPath: ggufPath,
   modelSha256: digest,
   gpu: args.gpu,
-  promptTemplateVersion: 'v3',
-});
+  promptTemplateVersion,
+};
+
+// Add composition path for primitives-v1
+if (promptTemplateVersion === PROMPT_TEMPLATE_V4 || promptTemplateVersion === 'primitives-v1') {
+  evaluatorOpts.compositionPath = resolve(repoRoot, compositionPath);
+}
+
+const evaluator = new LocalEvaluator(evaluatorOpts);
 await evaluator.load();
 
-const pin = `local-llm@${digest.slice(0, 12)}+v3`;
+const templateLabel = promptTemplateVersion === PROMPT_TEMPLATE_V4 || promptTemplateVersion === 'primitives-v1' 
+  ? 'primitives-v1' 
+  : 'v3';
+const pin = `local-llm@${digest.slice(0, 12)}+${templateLabel}`;
 const hardware = hardwareStatement();
 console.log(`pin ${pin}`);
 console.log(`hardware: ${hardware}`);
 console.log(`llama.cpp: ${evaluator.systemInfo || '(empty system-info)'}`);
 console.log(`held-out gate: ${suite.items.length} items, extra-class limit ${gate.rules.maxSuiteExtraClassFires.value}`);
-console.log('v3 evidence is empty by construction (the trained task is the compact verdict).');
+if (templateLabel === 'primitives-v1') {
+  console.log(`primitives-v1 template: composition from ${compositionPath}`);
+  console.log('primitives-v1 evidence is empty by construction (verdict is compact 18-token format).');
+} else {
+  console.log('v3 evidence is empty by construction (the trained task is the compact verdict).');
+}
 
 const verdicts = [];
 for (const item of suite.items) {

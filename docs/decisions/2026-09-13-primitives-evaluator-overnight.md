@@ -245,17 +245,37 @@ node tools/evaluator-training/gate.mjs \
 
 Default behavior remains v3/control. Primitives path is explicit opt-in.
 
+## Overnight Gate 4 Result: Plumbing Interchangeability YES, Numeric Control-Equivalence NO
+
+**Date:** 2026-09-13 overnight  
+**Sweep:** `sweep-primitives-v1` (6 adapters: CK-630, CK-1260, CK-1890, CK-2520, CK-3150, CK-3780)  
+**Template:** primitives-v1 (18-token compact format)  
+**Composition:** `airp-v0.5.0.json` (runtime composition)  
+**Gate:** Held-out suite v2 (224 items), control v3 thresholds (15 extra / 11 recall / 10 hist-extra)
+
+**Best checkpoint:** CK-630  
+- **v2 hist (smoke-v0, 22 items):** 57 extra / 86 recall misses / 14 hist-extra (FAIL)  
+- **Control v3 (same checkpoint, template v3):** 15 extra / 11 recall / 10 hist-extra (PASS)
+
+**Verdict:**
+- ✅ **Plumbing interchangeability proven:** Template v4 + composition layer + LocalEvaluator integration works end-to-end. All 6 adapters gated successfully via `gate.mjs` with `--prompt-template-version primitives-v1` and `--composition-path`.
+- ❌ **Numeric ±2 control-equivalence failed:** Best primitives adapter (CK-630) is 42 extra / 75 recall misses away from control v3 Gate 4 pass bar (15/11/10). This is not a ±2 fluctuation — it is a structural accuracy gap.
+
+**Root cause (hypothesis):** Primitives decomposition task is harder than direct taxonomy classification. The 18-token compact format (7 objects + 10 qualifiers + 1 stance = 18 decisions) may require more nuanced training or a different base model.
+
+**No publish / no pin flip.** This PR remains scaffolding only. Primitives evaluator is a research artifact proving interchangeability, not a production replacement.
+
 ## What This Build Does Not Have
 
-- No training loop (overnight train running in parallel on `sweep-primitives-v1`)
 - No trained model or pin in this PR
 - No live-pin updates
 - No suite or gate edits
 - No full corpus in cloud VM (8006 rows relabeled offline)
+- No accuracy parity with v3 control (Gate 4 failed)
 
 ## Next Steps (Out of Scope for This PR)
 
-1. Gate primitives adapters from `sweep-primitives-v1` using template v4
-2. Validate flag-level equivalence against held-out suite
-3. Gate the primitives evaluator against v0.5.0 accuracy thresholds
-4. If passing, publish primitives evaluator as alternative implementation
+1. Investigate accuracy gap: training hyperparameters, base model choice, or primitives vocabulary refinement
+2. If accuracy gap closes, re-gate primitives adapters
+3. If passing, validate flag-level equivalence against held-out suite
+4. If validated, publish primitives evaluator as alternative implementation

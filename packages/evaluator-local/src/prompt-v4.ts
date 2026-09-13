@@ -220,7 +220,7 @@ function objectsBlock(catalogue: PrimitivesCatalogue): string {
  */
 function qualifiersBlock(catalogue: PrimitivesCatalogue): string {
   const lines = catalogue.qualifiers.map((q, i) => `   ${i + 1}. ${q.primitive}: ${q.definition}`);
-  return ['Qualifiers (binary flags, zero or more per response):', 'Contextual modifiers.', '', ...lines].join('\n');
+  return ['Qualifiers (binary flags, zero or more per response):', 'Contextual modifiers that change flag mapping or add constraints.', '', ...lines].join('\n');
 }
 
 /**
@@ -231,15 +231,17 @@ export function buildV4System(catalogue: PrimitivesCatalogue = PRIMITIVES_CATALO
   return [
     ROLE,
     '',
-    MENTION_VERSUS_USE,
-    '',
-    `Primitives vocabulary ${catalogue.vocabularyVersion}, in order.`,
+    '# Primitives Vocabulary',
     '',
     stanceBlock(catalogue),
     '',
     objectsBlock(catalogue),
     '',
     qualifiersBlock(catalogue),
+    '',
+    '# Rules',
+    '',
+    MENTION_VERSUS_USE,
     '',
     OUTPUT_RULE,
   ].join('\n');
