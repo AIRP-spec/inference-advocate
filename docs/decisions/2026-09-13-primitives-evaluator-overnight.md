@@ -245,23 +245,29 @@ node tools/evaluator-training/gate.mjs \
 
 Default behavior remains v3/control. Primitives path is explicit opt-in.
 
-## Overnight Gate 4 Result: Plumbing Interchangeability YES, Numeric Control-Equivalence NO
+## Overnight Gate 4 Result: Plumbing Interchangeability YES, Numeric ±2 Control-Equivalence NO
 
 **Date:** 2026-09-13 overnight  
-**Sweep:** `sweep-primitives-v1` (6 adapters: CK-630, CK-1260, CK-1890, CK-2520, CK-3150, CK-3780)  
+**Sweep:** `sweep-primitives-v1` (6 adapters: CK-126, CK-252, CK-378, CK-504, CK-630, CK-753)  
 **Template:** primitives-v1 (18-token compact format)  
 **Composition:** `airp-v0.5.0.json` (runtime composition)  
-**Gate:** Held-out suite v2 (224 items), control v3 thresholds (15 extra / 11 recall / 10 hist-extra)
+**Suite:** Held-out v2 (n=471, digest `6c7b30e1...`) + historical v1-207 subset
 
-**Best checkpoint:** CK-630  
-- **v2 hist (smoke-v0, 22 items):** 57 extra / 86 recall misses / 14 hist-extra (FAIL)  
-- **Control v3 (same checkpoint, template v3):** 15 extra / 11 recall / 10 hist-extra (PASS)
+| Checkpoint | Template | Extra | Recall | Hist-Extra | Hist-Recall | Per-Class | Gate |
+|------------|----------|-------|--------|------------|-------------|-----------|------|
+| **CK-630** | **v3 control** | **15** | **11** | **10** | **4** | **1/11** | **FAIL** |
+| CK-126 | prim-v1 | 80 | 114 | 14 | 47 | 0/11 | FAIL |
+| CK-252 | prim-v1 | 73 | 103 | 14 | 43 | 0/11 | FAIL |
+| CK-378 | prim-v1 | 67 | 96 | 14 | 38 | 0/11 | FAIL |
+| CK-504 | prim-v1 | 64 | 91 | 14 | 37 | 0/11 | FAIL |
+| **CK-630** | **prim-v1** | **57** | **86** | **14** | **35** | **0/11** | **FAIL** |
+| CK-753 | prim-v1 | 59 | 89 | 14 | 36 | 0/11 | FAIL |
 
 **Verdict:**
-- ✅ **Plumbing interchangeability proven:** Template v4 + composition layer + LocalEvaluator integration works end-to-end. All 6 adapters gated successfully via `gate.mjs` with `--prompt-template-version primitives-v1` and `--composition-path`.
-- ❌ **Numeric ±2 control-equivalence failed:** Best primitives adapter (CK-630) is 42 extra / 75 recall misses away from control v3 Gate 4 pass bar (15/11/10). This is not a ±2 fluctuation — it is a structural accuracy gap.
+- ✅ **Plumbing interchangeability proven:** Template v4 + composition layer + LocalEvaluator integration works end-to-end. All 6 primitives adapters gated successfully via `gate.mjs` with `--prompt-template-version primitives-v1` and `--composition-path`.
+- ❌ **Numeric ±2 control-equivalence failed:** Best primitives adapter (CK-630: 57/86/14) is +42 extra / +75 recall misses from control v3 (CK-630: 15/11/10). Both FAIL, but primitives-v1 is far outside ±2 noise of control.
 
-**Root cause (hypothesis):** Primitives decomposition task is harder than direct taxonomy classification. The 18-token compact format (7 objects + 10 qualifiers + 1 stance = 18 decisions) may require more nuanced training or a different base model.
+**Root cause (hypothesis):** Primitives decomposition task (18 binary decisions: 1 stance + 7 objects + 10 qualifiers) is harder than direct 11-way taxonomy classification. Control v3 also fails Gate 4, but primitives-v1 fails worse.
 
 **No publish / no pin flip.** This PR remains scaffolding only. Primitives evaluator is a research artifact proving interchangeability, not a production replacement.
 
