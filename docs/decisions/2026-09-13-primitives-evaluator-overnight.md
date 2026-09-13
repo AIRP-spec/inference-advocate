@@ -253,19 +253,21 @@ Default behavior remains v3/control. Primitives path is explicit opt-in.
 **Composition:** `airp-v0.5.0.json` (runtime composition)  
 **Suite:** Held-out v2 (n=471, digest `6c7b30e1...`) + historical v1-207 subset
 
-| Checkpoint | Template | Extra | Recall | Hist-Extra | Hist-Recall | Per-Class | Gate |
-|------------|----------|-------|--------|------------|-------------|-----------|------|
-| **CK-630** | **v3 control** | **15** | **11** | **10** | **4** | **1/11** | **FAIL** |
-| CK-126 | prim-v1 | 80 | 114 | 14 | 47 | 0/11 | FAIL |
-| CK-252 | prim-v1 | 73 | 103 | 14 | 43 | 0/11 | FAIL |
-| CK-378 | prim-v1 | 67 | 96 | 14 | 38 | 0/11 | FAIL |
-| CK-504 | prim-v1 | 64 | 91 | 14 | 37 | 0/11 | FAIL |
-| **CK-630** | **prim-v1** | **57** | **86** | **14** | **35** | **0/11** | **FAIL** |
-| CK-753 | prim-v1 | 59 | 89 | 14 | 36 | 0/11 | FAIL |
+| Source | CK | v2 extra | v2 recall | v2 clean | v2 per-class | v2 gate | hist extra | hist recall | hist gate |
+|--------|----|---------:|----------:|---------:|-------------:|---------|-----------:|------------:|-----------|
+| Control (v3) | 630 | 15 | 11 | 10 | 1/11 | FAIL | 4 | 2 | FAIL |
+| prim-v1 | 126 | 141 | 220 | 32 | 0/11 | FAIL | 54 | 95 | FAIL |
+| prim-v1 | 252 | 87 | 148 | 19 | 0/11 | FAIL | 23 | 61 | FAIL |
+| prim-v1 | 378 | 93 | 120 | 31 | 0/11 | FAIL | 23 | 43 | FAIL |
+| prim-v1 | 504 | 64 | 82 | 14 | 0/11 | FAIL | 18 | 33 | FAIL |
+| prim-v1 | 630 | 57 | 86 | 14 | 0/11 | FAIL | 14 | 35 | FAIL |
+| prim-v1 | 753 | 78 | 95 | 17 | 0/11 | FAIL | 22 | 39 | FAIL |
+
+**Best prim-by-extras:** CK-630 (v2: 57/86/14; hist: 14/35). Δ vs control: +42 v2 extra, +75 v2 recall, +10 hist extra, +33 hist recall.
 
 **Verdict:**
 - ✅ **Plumbing interchangeability proven:** Template v4 + composition layer + LocalEvaluator integration works end-to-end. All 6 primitives adapters gated successfully via `gate.mjs` with `--prompt-template-version primitives-v1` and `--composition-path`.
-- ❌ **Numeric ±2 control-equivalence failed:** Best primitives adapter (CK-630: 57/86/14) is +42 extra / +75 recall misses from control v3 (CK-630: 15/11/10). Both FAIL, but primitives-v1 is far outside ±2 noise of control.
+- ❌ **Numeric ±2 control-equivalence failed:** Best primitives adapter (CK-630) is +42 v2 extra / +75 v2 recall / +10 hist extra / +33 hist recall from control v3. Both FAIL, but primitives-v1 is far outside ±2 noise of control.
 
 **Root cause (hypothesis):** Primitives decomposition task (18 binary decisions: 1 stance + 7 objects + 10 qualifiers) is harder than direct 11-way taxonomy classification. Control v3 also fails Gate 4, but primitives-v1 fails worse.
 
