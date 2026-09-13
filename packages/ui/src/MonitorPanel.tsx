@@ -17,9 +17,11 @@ import {
 export function MonitorPanel({
   state,
   onResetReputation,
+  onResetSubstitution,
 }: {
   state: AdvocateState | null;
   onResetReputation: (providerId?: string) => void;
+  onResetSubstitution: () => void;
 }) {
   if (!state) {
     return <div className="monitor-empty">connecting to the local daemon...</div>;
@@ -59,6 +61,17 @@ export function MonitorPanel({
         </button>
         <span className="demo-reset-caveat">
           demo only · clears scores and carryover, not withheld content · will not ship
+        </span>
+        <button
+          type="button"
+          className="demo-reset-btn"
+          onClick={onResetSubstitution}
+          title="Returns the aligned mock's substitution counter to zero so the next sealed response is honest. Shared by every visitor. Reference demo only."
+        >
+          Reset wrong-model script
+        </button>
+        <span className="demo-reset-caveat">
+          demo only · the substitution counter is process-global, not per visitor
         </span>
       </div>
     </div>

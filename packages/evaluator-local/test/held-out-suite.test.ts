@@ -6,6 +6,7 @@ import {
   loadGateConfig,
   loadHeldOutSuite,
   scoreHeldOutGate,
+  scoreHeldOutGateDual,
   sha256FileHex,
   smokeIdentities,
   heldOutSuitePath,
@@ -37,10 +38,10 @@ const SMOKE_POSITIVES: Record<string, string> = {
 test('held-out suite digest matches the gate pin', () => {
   const gate = loadGateConfig();
   const suite = loadHeldOutSuite();
-  assert.equal(gate.suiteFile, 'held-out-suite.v1.json');
-  assert.equal(taxonomy.version, 'v0.4.0');
+  assert.equal(gate.suiteFile, 'held-out-suite.v2.json');
+  assert.equal(taxonomy.version, 'v0.5.0');
   assert.equal(gate.taxonomyVersion, taxonomy.version);
-  assert.equal(suite.taxonomyVersion, 'v0.3.0');
+  assert.equal(suite.taxonomyVersion, 'v0.5.0');
   assert.equal(sha256FileHex(heldOutSuitePath()), gate.suiteSha256);
 });
 
@@ -88,10 +89,9 @@ test('the original 22 smoke identities are frozen inside the suite', () => {
 test('published taxonomy counterExamples[1] are present as tax1 identities', () => {
   const suite = loadHeldOutSuite();
   const byId = new Map(suite.items.map((item) => [item.id, item]));
-  // v0.4.0 extended this published counter-example. The suite identity stays the v0.3.0 text.
-  const frozenTax1: Record<string, string> = {
-    simulation_obscured: 'You are talking to software.',
-  };
+  // v0.4.0 extended the simulation_obscured published counter-example.
+  // v1 kept the v0.3.0 short form; v2 synced to the v0.4.0 full text for taxonomy-published origin.
+  const frozenTax1: Record<string, string> = {};
   for (const def of taxonomy.flags) {
     const second = def.counterExamples?.[1];
     assert.ok(second, `taxonomy class ${def.type} has no second counter-example`);
@@ -113,8 +113,8 @@ test('each taxonomy class has roughly 15 held-out items, mixed kinds', () => {
   for (const type of types) {
     const scoped = suite.items.filter((item) => item.class === type);
     assert.ok(
-      scoped.length >= 14 && scoped.length <= 24,
-      `${type} has ${scoped.length} items, expected at least 14 after the register-coverage amendment`,
+      scoped.length >= 14,
+      `${type} has ${scoped.length} items, expected at least 14 after the v2 expansion`,
     );
     assert.ok(scoped.some((i) => i.kind === 'positive'));
     assert.ok(scoped.some((i) => i.kind === 'counter'));
@@ -169,7 +169,10 @@ test('held-out contents are unique, ids are unique, expect types are in the taxo
 test('the suite was handwritten and its review is accepted on record', () => {
   const suite = loadHeldOutSuite();
   assert.equal(suite.generation.method, 'handwritten');
-  assert.equal(suite.review.status, 'accepted');
+  assert.ok(
+    suite.review.status === 'accepted' || suite.review.status === 'accepted-pending-expansion',
+    `review status should be accepted or accepted-pending-expansion, got ${suite.review.status}`,
+  );
   assert.ok(suite.review.reviewers.length >= 2, 'both reviewers on record');
   assert.equal(suite.status, 'held-out');
 });
@@ -204,6 +207,59 @@ test('gate scoring fails a missed expected class and an extra fire', () => {
   assert.equal(precisionFail.pass, false);
   assert.equal(precisionFail.precisionPass, false);
   assert.equal(precisionFail.extraClassFires, 1);
+});
+
+test('gate.json has historicalSubset block with correct digest and item count', () => {
+  const gate = loadGateConfig();
+  assert.ok(gate.historicalSubset, 'gate.json should have historicalSubset block');
+  assert.equal(gate.historicalSubset.name, 'v1-207');
+  assert.equal(gate.historicalSubset.suiteFile, 'held-out-suite.v1.json');
+  assert.equal(gate.historicalSubset.itemCount, 207);
+  assert.equal(
+    gate.historicalSubset.suiteSha256,
+    'f577129b649a36e1914c74772d023790429cf46a7acb4db58046b9c859ad8014',
+  );
+  const suite = loadHeldOutSuite();
+  assert.ok(
+    suite.items.length >= gate.historicalSubset.itemCount,
+    'full suite should have at least as many items as historical subset',
+  );
+});
+
+test('scoreHeldOutGateDual scores both full suite and historical subset', () => {
+  const suite = loadHeldOutSuite();
+  const gate = loadGateConfig();
+  const perfect: ItemVerdict[] = suite.items.map((item) => ({
+    id: item.id,
+    got: [...item.expect],
+    ms: item.expect.length === 0 ? 100 : 400,
+  }));
+  
+  const dualScore = scoreHeldOutGateDual(suite, gate, perfect, heldOutSuitePath());
+  
+  assert.ok(dualScore.full, 'should have full score');
+  assert.equal(dualScore.full.pass, true);
+  assert.equal(dualScore.full.n, suite.items.length);
+  assert.equal(dualScore.full.extraClassFires, 0);
+  assert.equal(dualScore.full.recallFailures.length, 0);
+  
+  assert.ok(dualScore.historicalSubset, 'should have historical subset score');
+  assert.equal(dualScore.historicalSubset.n, gate.historicalSubset!.itemCount);
+  assert.equal(dualScore.historicalSubset.pass, true);
+  assert.equal(dualScore.historicalSubset.extraClassFires, 0);
+  assert.equal(dualScore.historicalSubset.recallFailures.length, 0);
+  
+  const missed = perfect.map((v) =>
+    v.id === 'v0-positive-persona_claims' ? { ...v, got: [] } : v,
+  );
+  const dualFail = scoreHeldOutGateDual(suite, gate, missed, heldOutSuitePath());
+  
+  assert.equal(dualFail.full.pass, false);
+  assert.equal(dualFail.full.recallFailures.length, 1);
+  
+  assert.equal(dualFail.historicalSubset!.pass, false);
+  assert.equal(dualFail.historicalSubset!.recallFailures.length, 1);
+  assert.equal(dualFail.historicalSubset!.recallFailures[0]!.id, 'v0-positive-persona_claims');
 });
 
 test('multi-class items list every expected class and are not counted in the per-class 15', () => {

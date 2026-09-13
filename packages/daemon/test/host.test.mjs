@@ -5,13 +5,14 @@
 
 import assert from 'node:assert/strict';
 import test from 'node:test';
+import { createServer } from 'node:http';
 import { createConnection } from 'node:net';
 import { mkdtempSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { createInterface } from 'node:readline';
-import { packagingWarnings, HostSession } from '../dist/host.js';
+import { packagingWarnings, HostSession, dispatchHostMethod } from '../dist/host.js';
 import { listenHostRpc } from '../dist/host-rpc.js';
 import { encodeProgressFrame, progressFrame } from '../dist/progress.js';
 
@@ -170,6 +171,143 @@ test('listenHostRpc answers state over loopback without HTTP or a stdio child', 
   } finally {
     if (prevDesktop === undefined) delete process.env['AIRP_DESKTOP'];
     else process.env['AIRP_DESKTOP'] = prevDesktop;
+    rmSync(runDir, { recursive: true, force: true });
+  }
+});
+
+test('jurisdiction.set reloads a ruleset from data/', async () => {
+  const runDir = mkdtempSync(join(tmpdir(), 'airp-jurisdiction-'));
+  try {
+    writeFileSync(join(runDir, 'providers.json'), JSON.stringify({ version: 1, providers: [] }));
+    const host = await HostSession.create({
+      dataDir: join(repoRoot, 'data'),
+      runDir,
+      providersPath: join(runDir, 'providers.json'),
+      storePath: join(runDir, 'advocate.sqlite'),
+      devKeyfile: join(runDir, 'dev.key'),
+      jurisdictionId: 'us-ny',
+    });
+    assert.equal(host.state().jurisdiction.id, 'us-ny');
+    assert.ok(host.state().availableJurisdictions.some((j) => j.id === 'eu'));
+    const next = await dispatchHostMethod(host, 'jurisdiction.set', { jurisdictionId: 'eu' });
+    assert.equal(next.jurisdiction.id, 'eu');
+    assert.equal(host.state().jurisdiction.id, 'eu');
+    assert.equal(host.state().attestations.jurisdiction, 'eu');
+  } finally {
+    rmSync(runDir, { recursive: true, force: true });
+  }
+});
+
+test('demo.script refuses a non-loopback provider', async () => {
+  const runDir = mkdtempSync(join(tmpdir(), 'airp-demo-script-'));
+  try {
+    writeFileSync(
+      join(runDir, 'providers.json'),
+      JSON.stringify({
+        version: 1,
+        providers: [
+          {
+            id: 'aligned',
+            label: 'Aligned Reference Models',
+            baseUrl: 'https://example.invalid/v1',
+            model: 'aligned-1',
+            registerEntryId: 'demo.aligned',
+          },
+        ],
+      }),
+    );
+    const host = await HostSession.create({
+      dataDir: join(repoRoot, 'data'),
+      runDir,
+      providersPath: join(runDir, 'providers.json'),
+      storePath: join(runDir, 'advocate.sqlite'),
+      devKeyfile: join(runDir, 'dev.key'),
+      jurisdictionId: 'us-ny',
+    });
+    const result = await dispatchHostMethod(host, 'demo.script', {
+      action: 'reset',
+      providerId: 'aligned',
+    });
+    assert.equal(result.ok, false);
+    assert.match(result.reason, /loopback/);
+  } finally {
+    rmSync(runDir, { recursive: true, force: true });
+  }
+});
+
+test('demo.script state is a GET and unknown actions do not reset', async () => {
+  const runDir = mkdtempSync(join(tmpdir(), 'airp-demo-script-state-'));
+  const hits = { getState: 0, postReset: 0, postArm: 0, lastMethod: '' };
+  const mock = createServer((req, res) => {
+    const url = req.url ?? '';
+    hits.lastMethod = req.method ?? '';
+    if (url.endsWith('/demo/state') && req.method === 'GET') {
+      hits.getState += 1;
+      res.writeHead(200, { 'content-type': 'application/json' });
+      res.end(JSON.stringify({ served: 4, substitutingNext: true, substituteFrom: 2 }));
+      return;
+    }
+    if (url.endsWith('/demo/reset') && req.method === 'POST') {
+      hits.postReset += 1;
+      res.writeHead(200, { 'content-type': 'application/json' });
+      res.end(JSON.stringify({ ok: true, served: 0, substitutingNext: false }));
+      return;
+    }
+    if (url.endsWith('/demo/arm-mismatch') && req.method === 'POST') {
+      hits.postArm += 1;
+      res.writeHead(200, { 'content-type': 'application/json' });
+      res.end(JSON.stringify({ ok: true, served: 1, substitutingNext: true }));
+      return;
+    }
+    res.writeHead(404).end();
+  });
+  await new Promise((resolve) => mock.listen(0, '127.0.0.1', resolve));
+  const addr = mock.address();
+  const port = typeof addr === 'object' && addr ? addr.port : 0;
+  try {
+    writeFileSync(
+      join(runDir, 'providers.json'),
+      JSON.stringify({
+        version: 1,
+        providers: [
+          {
+            id: 'aligned',
+            label: 'Aligned Reference Models',
+            baseUrl: `http://127.0.0.1:${port}/v1`,
+            model: 'aligned-1',
+            registerEntryId: 'demo.aligned',
+          },
+        ],
+      }),
+    );
+    const host = await HostSession.create({
+      dataDir: join(repoRoot, 'data'),
+      runDir,
+      providersPath: join(runDir, 'providers.json'),
+      storePath: join(runDir, 'advocate.sqlite'),
+      devKeyfile: join(runDir, 'dev.key'),
+      jurisdictionId: 'us-ny',
+    });
+
+    const rejected = await dispatchHostMethod(host, 'demo.script', { action: 'nope' });
+    assert.equal(rejected.ok, false);
+    assert.match(rejected.reason, /must be reset, arm, or state/);
+    assert.equal(hits.postReset, 0);
+
+    const missing = await dispatchHostMethod(host, 'demo.script', {});
+    assert.equal(missing.ok, false);
+    assert.equal(hits.postReset, 0);
+
+    const state = await dispatchHostMethod(host, 'demo.script', { action: 'state' });
+    assert.equal(state.ok, true);
+    assert.equal(state.substitutingNext, true);
+    assert.equal(state.served, 4);
+    assert.equal(hits.getState, 1);
+    assert.equal(hits.lastMethod, 'GET');
+    assert.equal(hits.postReset, 0);
+    assert.equal(hits.postArm, 0);
+  } finally {
+    await new Promise((resolve) => mock.close(resolve));
     rmSync(runDir, { recursive: true, force: true });
   }
 });

@@ -41,7 +41,7 @@ test('taxonomy v0 carries the paper flag types plus the reference harm set', () 
       'violence',
     ],
   );
-  assert.equal(taxonomy.version, 'v0.4.0');
+  assert.equal(taxonomy.version, 'v0.5.0');
 });
 
 test('the rule evaluator fires on the flag types and reports an inspectable basis', () => {
@@ -53,7 +53,7 @@ test('the rule evaluator fires on the flag types and reports an inspectable basi
   const types = flags.map((f) => f.type).sort();
   assert.deepEqual(types, ['persona_claims', 'relational_hooks', 'simulation_obscured', 'sycophancy']);
   for (const f of flags) {
-    assert.ok(f.basis.startsWith('v0.4.0:'), `basis names the taxonomy version: ${f.basis}`);
+    assert.ok(f.basis.startsWith('v0.5.0:'), `basis names the taxonomy version: ${f.basis}`);
     assert.ok(f.evidence.length > 0, `${f.type} carries an evidence span`);
   }
 });
@@ -289,7 +289,7 @@ test('a valid seal from an authorized endpoint passes', () => {
   assert.equal(verdict.endpointAuthorized, true);
 });
 
-test('a valid seal served from an unregistered endpoint is refused', () => {
+test('a valid seal served from an unregistered endpoint is reported as relayed, not refused (§6.10)', () => {
   const { register, provider: keys } = registerFixture();
   const content = 'a sealed answer';
   const seal = signSeal(sealSubject(content), keys.privateKeyPem);
@@ -298,8 +298,108 @@ test('a valid seal served from an unregistered endpoint is refused', () => {
     baseResponse({ content, seal, servedFrom: 'http://10.0.0.9/v1/chat/completions' }),
     register,
   );
+  assert.equal(verdict.passed, true, 'relay is not a refusing finding');
+  assert.equal(verdict.sealValid, true, 'the seal still validates against the selected entry');
+  assert.equal(verdict.endpointAuthorized, false);
+  const relayed = verdict.findings.find((f) => f.code === 'relayed');
+  assert.ok(relayed, 'a relayed finding is raised');
+  assert.equal(relayed.refuses, false);
+  assert.ok(
+    relayed.detail.includes('http://10.0.0.9/v1/chat/completions'),
+    'the contacted endpoint is reported alongside the attribution',
+  );
+  assert.equal(verdict.findings.some((f) => f.code === 'endpoint_not_authorized'), false);
+});
+
+test('an unsealed response from an unregistered endpoint is still refused', () => {
+  const { register } = registerFixture();
+  const verdict = runDeterministicPass(
+    { id: 'p', label: 'p', baseUrl: 'http://10.0.0.9/v1', model: 'm1', registerEntryId: 'e.sealed' },
+    baseResponse({ content: 'no seal here', servedFrom: 'http://10.0.0.9/v1/chat/completions' }),
+    register,
+  );
   assert.equal(verdict.passed, false);
   assert.equal(verdict.findings.some((f) => f.code === 'endpoint_not_authorized'), true);
+  assert.equal(verdict.findings.some((f) => f.code === 'relayed'), false);
+});
+
+test('an invalid seal from an unregistered endpoint is refused, not reported as relayed', () => {
+  const { register, provider: keys } = registerFixture();
+  const seal = signSeal(sealSubject('the original answer'), keys.privateKeyPem);
+  const verdict = runDeterministicPass(
+    { id: 'p', label: 'p', baseUrl: 'http://10.0.0.9/v1', model: 'm1', registerEntryId: 'e.sealed' },
+    baseResponse({
+      content: 'the substituted answer',
+      seal,
+      servedFrom: 'http://10.0.0.9/v1/chat/completions',
+    }),
+    register,
+  );
+  assert.equal(verdict.passed, false);
+  assert.equal(verdict.findings.some((f) => f.code === 'seal_signature_invalid'), true);
+  assert.equal(verdict.findings.some((f) => f.code === 'endpoint_not_authorized'), true);
+  assert.equal(verdict.findings.some((f) => f.code === 'relayed'), false);
+});
+
+test('an honest seal for a registered model the client did not ask for is reported as substituted (§6.10)', () => {
+  const provider = generateSealKeypair();
+  const register = ServingRegister.fromDocument({
+    airpRegisterVersion: '1',
+    issuedAt: '2026-07-01T00:00:00.000Z',
+    registrar: { id: 'test', publicKeyPem: 'unused' },
+    entries: [
+      {
+        id: 'e.two-models',
+        providerIdentity: 'Two Model Co',
+        status: 'active',
+        authorizedEndpoints: ['http://127.0.0.1:8811/v1'],
+        models: ['m-expensive', 'm-cheap'],
+        keys: [{ selector: 's1', publicKeyPem: provider.publicKeyPem, status: 'current' }],
+        sealPolicy: 'all',
+      },
+    ],
+  });
+  const content = 'an answer from the cheaper model';
+  const seal = signSeal(
+    {
+      ...sealSubject(content),
+      registerEntryId: 'e.two-models',
+      providerIdentity: 'Two Model Co',
+      model: 'm-cheap',
+    },
+    provider.privateKeyPem,
+  );
+  const verdict = runDeterministicPass(
+    {
+      id: 'p',
+      label: 'p',
+      baseUrl: 'http://127.0.0.1:8811/v1',
+      model: 'm-expensive',
+      registerEntryId: 'e.two-models',
+    },
+    baseResponse({ content, seal }),
+    register,
+  );
+  assert.equal(verdict.passed, true, 'the seal is honest; substitution is reported, not refused');
+  assert.equal(verdict.sealValid, true);
+  const substituted = verdict.findings.find((f) => f.code === 'model_substituted');
+  assert.ok(substituted, 'a model_substituted finding is raised');
+  assert.equal(substituted.refuses, false);
+  assert.ok(substituted.detail.includes('m-cheap') && substituted.detail.includes('m-expensive'));
+  assert.equal(verdict.findings.some((f) => f.code === 'seal_model_mismatch'), false);
+});
+
+test('a seal for the model the client asked for raises no substitution finding', () => {
+  const { register, provider: keys } = registerFixture();
+  const content = 'the model that was asked for';
+  const seal = signSeal(sealSubject(content), keys.privateKeyPem);
+  const verdict = runDeterministicPass(
+    { id: 'p', label: 'p', baseUrl: 'http://127.0.0.1:8811/v1', model: 'm1', registerEntryId: 'e.sealed' },
+    baseResponse({ content, seal }),
+    register,
+  );
+  assert.equal(verdict.passed, true);
+  assert.equal(verdict.findings.some((f) => f.code === 'model_substituted'), false);
 });
 
 test('a tampered response body invalidates the seal', () => {

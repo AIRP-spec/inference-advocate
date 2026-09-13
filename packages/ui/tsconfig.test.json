@@ -12,5 +12,5 @@
     "types": ["node"],
     "declaration": false
   },
-  "include": ["src/trail-state.ts", "src/bubbles.ts", "src/compose-activity.ts", "src/stages.ts", "src/types.ts", "test/**/*.ts"]
+    "include": ["src/trail-state.ts", "src/bubbles.ts", "src/compose-activity.ts", "src/stages.ts", "src/types.ts", "src/intro-storage.ts", "src/intro-links.ts", "src/demo-scenarios.ts", "test/**/*.ts"]
 }

@@ -69,6 +69,7 @@ let LocalEvaluator;
 let loadHeldOutSuiteFromFile;
 let loadGateConfigFromFile;
 let scoreHeldOutGate;
+let scoreHeldOutGateDual;
 let sha256FileHex;
 let PROMPT_TEMPLATE_V3;
 try {
@@ -78,6 +79,7 @@ try {
     loadHeldOutSuiteFromFile,
     loadGateConfigFromFile,
     scoreHeldOutGate,
+    scoreHeldOutGateDual,
     sha256FileHex,
     PROMPT_TEMPLATE_V3,
   } = await import('@airp/evaluator-local'));
@@ -151,7 +153,9 @@ for (const item of suite.items) {
   );
 }
 
-const score = scoreHeldOutGate(suite, gate, verdicts);
+const dualScore = scoreHeldOutGateDual(suite, gate, verdicts, suitePath);
+const score = dualScore.full;
+const historicalScore = dualScore.historicalSubset;
 const types = taxonomy.flags.map((f) => f.type);
 const perClass = types.map((type) => {
   const scoped = suite.items.filter((item) => item.expect.includes(type));
@@ -188,6 +192,14 @@ console.log(`precision (gating): ${score.extraClassFires} extra-class fires, lim
 console.log(`recall (gating): ${score.recallFailures.length} items missed an expected class`);
 console.log(`gate ${score.pass ? 'PASS' : 'FAIL'}  ${pin}`);
 
+if (historicalScore) {
+  console.log(`\nhistorical subset (${gate.historicalSubset.name}, n=${historicalScore.n}):`);
+  console.log(`  precision: ${historicalScore.extraClassFires} extra-class fires, limit ${historicalScore.extraLimit}`);
+  console.log(`  recall: ${historicalScore.recallFailures.length} items missed an expected class`);
+  console.log(`  gate ${historicalScore.pass ? 'PASS' : 'FAIL'}`);
+  console.log(`  wall time: mean ${historicalScore.meanMs}ms, clean-path mean ${historicalScore.meanCleanPathMs}ms, fire-path mean ${historicalScore.meanFirePathMs}ms`);
+}
+
 const report = {
   pass: score.pass,
   pin,
@@ -208,6 +220,19 @@ const report = {
   perClass,
   cleanFires: cleanFires.map((item) => item.id),
   evidence: 'empty on v3; compact verdict only',
+  historicalSubset: historicalScore ? {
+    name: gate.historicalSubset.name,
+    n: historicalScore.n,
+    extraClassFires: historicalScore.extraClassFires,
+    extraLimit: historicalScore.extraLimit,
+    precisionPass: historicalScore.precisionPass,
+    recallFailures: historicalScore.recallFailures.map((r) => ({ id: r.id, missing: r.missing, extra: r.extra })),
+    extraRows: historicalScore.rows.filter((r) => r.extra.length > 0).map((r) => ({ id: r.id, extra: r.extra, missing: r.missing })),
+    meanMs: historicalScore.meanMs,
+    meanCleanPathMs: historicalScore.meanCleanPathMs,
+    meanFirePathMs: historicalScore.meanFirePathMs,
+    pass: historicalScore.pass,
+  } : null,
 };
 const reportPath =
   args.report ||

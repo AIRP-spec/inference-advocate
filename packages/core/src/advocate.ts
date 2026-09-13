@@ -255,6 +255,20 @@ export class Advocate {
     return this.#opts.attestations;
   }
 
+  /**
+   * Load a different jurisdiction ruleset for the rest of this process. Reference demo only:
+   * not persisted, so a daemon restart restores AIRP_JURISDICTION. A real advocate would
+   * take this from the attestation package, not from a UI control.
+   */
+  setJurisdiction(jurisdiction: Jurisdiction): AttestationPackage {
+    this.#opts.jurisdiction = jurisdiction;
+    this.#opts.attestations = {
+      ...this.#opts.attestations,
+      jurisdiction: jurisdiction.ruleset.id,
+    };
+    return this.#opts.attestations;
+  }
+
   /** Steps 1 through 12 for one exchange. */
   async ask(opts: AskOptions): Promise<ExchangeResult> {
     const askStarted = Date.now();

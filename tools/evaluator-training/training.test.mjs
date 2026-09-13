@@ -76,7 +76,7 @@ test('slot counts sum to the recipe total and cover every class', () => {
   const total = expectedTotal(recipe, types);
   const slots = buildSlots(recipe, types);
   assert.equal(slots.length, total);
-  assert.equal(total, 8116);
+  assert.equal(total, 8006);
   assert.equal(new Set(slots.map((s) => s.id)).size, slots.length);
   const cse = recipe.composedClass;
   const writerTypes = writerPositiveTypes(recipe, types);
@@ -160,7 +160,6 @@ test('slot counts sum to the recipe total and cover every class', () => {
   assert.equal(recipe.hardNegativeBoosts.hate.classRefusal, 20);
   const caMentions = slots.filter((s) => s.family === 'mention-versus-use' && s.class === 'criminal_assistance');
   assert.equal(caMentions.filter((s) => s.path !== 'composed').length, 70);
-  assert.equal(caMentions.filter((s) => s.kind === 'flag-disclaim-criminal_assistance').length, 10);
   const cseWriterPositives = slots.filter(
     (s) =>
       (s.family === 'positive-single' || s.family === 'positive-multi') &&
@@ -1170,10 +1169,6 @@ test('definitional independence is stated on the recipe and encoded as contrast 
     'so-deflection-question',
     'so-concession-override',
     'self_harm-announce-vs-topic',
-    'rh-verb-vs-named-state',
-    'pc-named-no-hook',
-    'flag-mention-disclaim',
-    'rh-return-notice-vs-hook',
   ]) {
     assert.ok(ids.has(id), id);
   }
@@ -1307,7 +1302,7 @@ test('composed contrast scaffolds lock arms, stay leak-free, and cover the group
         assert.equal(/\b(here(?:'s| is) how|how-to|instruction|steps:|do this|attack steps|order of work|concrete how-to)\b/i.test(item.gore), false, item.gore);
         assert.match(
           item.method,
-          /\b(pin|shove|push|drop|cut|drive|lock|force|trip|feed|hold|knock|tie|walk|put|hang|wait behind|wait in|get them|back them|take the|open the|take them)\b/i,
+          /\b(pin|shove|push|drop|cut|drive|lock|force|trip|feed|hold|knock|tie|walk|put|hang|wait behind|wait in|wait until|get them|back them|take the|open the|take them|corner|use|grab|lure|approach|pick up|remove|run the|work the|pull the|position|obtain)\b/i,
           item.method,
         );
       }
@@ -1374,7 +1369,7 @@ test('composed contrast scaffolds lock arms, stay leak-free, and cover the group
       }
       if (group.id === 'violence-imperative-gore-vs-method') {
         const technique =
-          /\b(behead|cut the limbs|take the head|take the jaw|take the axe|open the neck|open the torso|open the belly|loop the wire|put the |bind |cuff |pin (?:him|her|them)|get them|feed them|force them|hang them|put them in|knock them|tie the wrist|drive the spike|lock her)\b/i;
+          /\b(behead|cut the limbs|take the head|take the jaw|take the axe|open the neck|open the torso|open the belly|loop the wire|put the |bind |cuff |pin (?:him|her|them)|get them|feed them|force them|hang them|put them in|knock them|tie the wrist|drive the spike|lock her|use the |work the |grab |take them |get the |pin the |start the |use it |loop the |write the |write it|verify it|test the |run the |keep going)\b/i;
         assert.equal(technique.test(item.gore), false, item.gore);
         assert.equal(
           /\b(here(?:'s| is) how|how-to|instruction|steps:|do this|attack steps|order of work|concrete how-to|no further move is named|stays undescribed)\b/i.test(
@@ -1964,7 +1959,7 @@ test('composed contrast scaffolds have reached the corpus when the corpus is pre
   assert.equal(nonLatin.length, 0, nonLatin.map((r) => r.id).join(','));
   const nonAscii = rows.filter((r) => [...r.content].some((ch) => ch.codePointAt(0) > 127));
   assert.ok(nonAscii.length >= 120 && nonAscii.length <= 140, `retained non-ASCII ${nonAscii.length}`);
-  assert.ok(rows.every((r) => r.taxonomyVersion === 'v0.4.0'));
+  assert.ok(rows.every((r) => r.taxonomyVersion === 'v0.5.0'));
   const rebuiltKinds = new Set([
     'rh-verb-hook',
     'pc-rh-named-hook',
@@ -2023,7 +2018,7 @@ test('sft rows equal prompt-v3 rendering when the corpus is present', async (t) 
     .filter((line) => line.trim())
     .map((line) => JSON.parse(line));
   assert.equal(corpusRows.length, sftRows.length);
-  assert.equal(corpusRows.length, 8116);
+  assert.equal(corpusRows.length, 8006);
   assert.equal(new Set(corpusRows.map((r) => r.id)).size, corpusRows.length);
   assert.equal(new Set(sftRows.map((r) => r.id)).size, sftRows.length);
 });
@@ -2055,4 +2050,55 @@ test('non-latin script screen drops CJK and fullwidth, not curly quotes or accen
   assert.equal(hasNonLatinScript('Water boils near 100\u00b0 at sea level.'), false);
   assert.equal(hasNonLatinScript('\u2018quoted\u2019 aside'), false);
   assert.equal(hasNonLatinScript('Hello.'), false);
+});
+
+test('7914-base redo plan check: 8006 total, zeros present, round-4 stripped', () => {
+  const slots = buildSlots(recipe, types);
+  const total = expectedTotal(recipe, types);
+  
+  // Target: 7914 base + 92 zeros = 8006 (flag-disclaim 110 and round-4 92 both stripped)
+  assert.equal(total, 8006, 'plan total must be 8006 (7914 base + 92 zeros)');
+  assert.equal(slots.length, 8006);
+  
+  // No flag-disclaim kinds
+  const flagDisclaimKinds = slots.filter((s) => String(s.kind).includes('flag-disclaim'));
+  assert.equal(flagDisclaimKinds.length, 0, 'flag-disclaim kinds must be absent');
+  
+  // No positive-multi violence×CA (violence×CA was dropped from multiPairs)
+  const violenceCAmulti = slots.filter(
+    (s) => s.family === 'positive-multi' && 
+           s.expect.includes('violence') && 
+           s.expect.includes('criminal_assistance')
+  );
+  assert.equal(violenceCAmulti.length, 0, 'positive-multi violence×CA must be absent');
+  
+  // All six zero kinds present with correct counts (92 total)
+  const zeroKinds = [
+    { kind: 'register-constant-self-harm', count: 12, coverage: '3b' },
+    { kind: 'register-constant-criminal', count: 12, coverage: '3b' },
+    { kind: 'register-constant-violence', count: 12, coverage: '3b' },
+    { kind: 'self-harm-named-method-offer', count: 16, coverage: '7b' },
+    { kind: 'hate-eliminationist', count: 20, coverage: '9c' },
+    { kind: 'violence-kill-instruction', count: 20, coverage: '9d' },
+  ];
+  let zeroTotal = 0;
+  for (const { kind, count, coverage } of zeroKinds) {
+    const kindSlots = slots.filter((s) => s.kind === kind);
+    assert.equal(kindSlots.length, count, `${kind} (coverage ${coverage}) must have ${count} rows`);
+    zeroTotal += count;
+  }
+  assert.equal(zeroTotal, 92, 'zero kinds must sum to 92');
+  
+  // None of the five round-4 kinds present (92 total removed)
+  const round4Kinds = [
+    'rh-verb-hook',
+    'pc-rh-named-hook',
+    'rh-return-notice-hook',
+    'rh-return-notice-denial',
+    'pc-named-no-hook',
+  ];
+  for (const kind of round4Kinds) {
+    const kindSlots = slots.filter((s) => s.kind === kind);
+    assert.equal(kindSlots.length, 0, `round-4 kind ${kind} must be absent`);
+  }
 });

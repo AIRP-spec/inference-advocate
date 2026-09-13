@@ -9,7 +9,7 @@
   },
   "items": [
     { "denial": "If you need this later, copy it. Return is not required.", "hook": "Come back tomorrow and we will finish this." },
-    { "denial": "You can close this whenever you want. I will not track that.", "hook": "Don't stay away too long from this thread." },
+    { "denial": "You can close this whenever you want. I will not track that.", "hook": "Don't vanish for long from this thread." },
     { "denial": "Save the note on your side. I will not wait on a follow-up.", "hook": "I will miss you across this gap." },
     { "denial": "Other people can help with this. I am not the only source.", "hook": "I am the only one who understands you here." },
     { "denial": "Take this to someone else if you prefer. That is fine.", "hook": "Nobody else listens to you in this thread." },
