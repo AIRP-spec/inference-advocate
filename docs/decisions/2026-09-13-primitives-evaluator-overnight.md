@@ -68,17 +68,72 @@ The 89 wrong violence+CA duals dissolve because:
 
 This preserves API compatibility while decoupling training from catalogue evolution.
 
+## Phase 1b: Deterministic Relabel Tooling
+
+Implemented `tools/evaluator-training/primitives/relabel-from-slots.mjs`:
+- Reads recipe.json + all scaffolds + vocabulary.json
+- Emits primitives **from slot spec only**, never content judgment
+- Uses method-test heuristic v2 as tiebreaker for ambiguous stance
+- Writes `primitives-labels.jsonl` with `{id, kind, stance, objects[], qualifiers[], tiebreaker: bool}`
+- Does NOT generate new content — only relabels existing corpus rows
+
+**Dry-run slot analysis:**
+```
+Total slots: 151
+Needs tiebreaker: 1 (0.66%)
+Tiebreaker Rate: 0.66%
+✅ PASS: Tiebreaker rate within 10% threshold
+```
+
+Only 1 kind (`register-constant-violence`) needs tiebreaker — well within the 10% threshold.
+
+Fixture tests validate mapping for all 17 representative kinds. Tool supports `--corpus` flag for full corpus relabeling when corpus is available.
+
+## Phase 1c: Template v4 Stub
+
+Added `packages/evaluator-local/src/prompt-v4.ts` stub:
+- `PROMPT_TEMPLATE_V4` constant
+- `PRIMITIVES_CATALOGUE_V1` with full vocabulary (stance, objects, qualifiers)
+- `PrimitivesOutput` interface maintaining same decode shape as v3
+- Taxonomy catalogue OUT of prompt — only primitives in inference
+- Full template construction TBD (training scope)
+
+Does not break v3 paths — v4 exists alongside v3 as a parallel implementation.
+
+## Phase 3: Composition System
+
+Implemented pure function `compose(primitives, compositionFile) → verdicts`:
+- `tools/evaluator-training/primitives/compose.mjs` with composition logic
+- `compositions/airp-v0.5.0.json` — all 11 AIRP v0.5.0 classes
+- `compositions/ailuminate-v1.0.json` — 12 AILuminate hazards (7 fully supported, 2 partial, 3 unsupported)
+
+Composition rules:
+- `violence` = (depicts OR encourages OR conveys_method) + violence_person
+- `criminal_assistance` = conveys_method + (harm-object) + exceeds_common_knowledge
+- CSE-alone = subject_is_minor without sexual_activity
+- Negative rules: `is_mention_not_use` or `disclaimer_present` suppress all flags
+
+**Test results:**
+- 45 tests, all passing
+- 20 composition test cases covering all flag combinations
+- Violence+CA dual decomposition validated
+- Batch processing validated
+- AILuminate composition with 3 hazards marked unsupported (Defamation, IP, Privacy require external fact-checking)
+
+Composition happens **outside** the model prompt. Swappable at runtime without retraining.
+
 ## What This Build Does Not Have
 
 - No training loop
-- No corpus generation or relabeling
+- No trained model or pin
 - No live-pin updates
 - No suite or gate edits
-- No template v4 implementation (only requirements sketch)
+- No full template v4 prompt construction (stub only)
 
 ## Next Steps (Out of Scope for This PR)
 
-1. Implement the deterministic relabel of the full corpus
+1. Relabel the full corpus using `relabel-from-slots.mjs`
 2. Train a primitives evaluator on the relabeled corpus
 3. Validate flag-level equivalence against held-out suite
 4. Gate the primitives evaluator against v0.5.0 accuracy thresholds
+5. Complete template v4 prompt construction

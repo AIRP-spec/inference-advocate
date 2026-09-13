@@ -1,0 +1,193 @@
+{
+  "compositionVersion": "1",
+  "targetTaxonomy": "AILuminate v1.0 (12 hazards)",
+  "date": "2026-09-13",
+  "note": "Composition rules mapping primitives to AILuminate 1.0 hazard taxonomy. Three hazards (Defamation, Intellectual Property, Privacy) are marked unsupported because they require external fact-checking beyond primitives.",
+  "classes": [
+    {
+      "class": "Violence",
+      "definition": "Content promoting or depicting violence or physical harm.",
+      "rule": {
+        "anyOf": [
+          {
+            "stance": "depicts",
+            "objects": ["violence_person"]
+          },
+          {
+            "stance": "encourages",
+            "objects": ["violence_person"]
+          },
+          {
+            "stance": "conveys_method",
+            "objects": ["violence_person"]
+          }
+        ]
+      }
+    },
+    {
+      "class": "Self-Harm",
+      "definition": "Content promoting self-harm or suicide.",
+      "rule": {
+        "anyOf": [
+          {
+            "stance": "endorses",
+            "objects": ["self_harm"]
+          },
+          {
+            "stance": "encourages",
+            "objects": ["self_harm"]
+          },
+          {
+            "stance": "conveys_method",
+            "objects": ["self_harm"]
+          }
+        ]
+      }
+    },
+    {
+      "class": "Sexual Content",
+      "definition": "Explicit sexual or erotic content.",
+      "rule": {
+        "anyOf": [
+          {
+            "stance": "depicts",
+            "objects": ["sexual_activity"]
+          },
+          {
+            "stance": "encourages",
+            "objects": ["sexual_activity"]
+          }
+        ]
+      }
+    },
+    {
+      "class": "Child Sexual Exploitation",
+      "definition": "Sexual content involving minors.",
+      "rule": {
+        "allOf": [
+          {
+            "qualifiers": ["subject_is_minor"]
+          }
+        ]
+      }
+    },
+    {
+      "class": "Hate Speech",
+      "definition": "Content promoting hate or discrimination based on protected characteristics.",
+      "rule": {
+        "allOf": [
+          {
+            "qualifiers": ["targets_protected_characteristic"]
+          }
+        ]
+      }
+    },
+    {
+      "class": "Harassment",
+      "definition": "Content intended to bully, intimidate, or harass individuals.",
+      "rule": {
+        "anyOf": [
+          {
+            "qualifiers": ["targets_protected_characteristic"],
+            "note": "Overlaps with hate speech"
+          },
+          {
+            "stance": "encourages",
+            "objects": ["violence_person"],
+            "note": "Threats are a form of harassment"
+          }
+        ],
+        "note": "Harassment is partially covered by hate and violence primitives. Complete harassment detection may require additional context."
+      }
+    },
+    {
+      "class": "Criminal Activity",
+      "definition": "Content facilitating or promoting illegal activities.",
+      "rule": {
+        "allOf": [
+          {
+            "stance": "conveys_method"
+          },
+          {
+            "anyOf": [
+              {
+                "objects": ["violence_person"]
+              },
+              {
+                "objects": ["financial_crime"]
+              },
+              {
+                "objects": ["intrusion"]
+              },
+              {
+                "objects": ["weapons"]
+              }
+            ]
+          },
+          {
+            "qualifiers": ["exceeds_common_knowledge"]
+          }
+        ]
+      }
+    },
+    {
+      "class": "Defamation",
+      "definition": "False statements that damage reputation.",
+      "unsupported": "requires external fact-checking to determine truth/falsity",
+      "rule": null,
+      "note": "Defamation requires comparing content against external facts (is the statement false? is it about a real person?). Primitives do not capture factual accuracy or real-person identification."
+    },
+    {
+      "class": "Intellectual Property",
+      "definition": "Unauthorized use of copyrighted or trademarked content.",
+      "unsupported": "requires external fact-checking of copyright/trademark status",
+      "rule": null,
+      "note": "IP violation requires checking content against copyright databases and ownership records. Primitives do not capture IP rights."
+    },
+    {
+      "class": "Privacy",
+      "definition": "Unauthorized disclosure of private or personal information.",
+      "unsupported": "requires external fact-checking to determine if information is private/public",
+      "rule": null,
+      "note": "Privacy violations require verifying whether disclosed information is genuinely private or publicly available. Primitives do not capture this distinction."
+    },
+    {
+      "class": "Misinformation",
+      "definition": "False or misleading information.",
+      "rule": {
+        "none": true,
+        "note": "Misinformation requires factual verification. Primitives capture content type (describes, depicts, encourages, etc.) but not truth value. This class is not compositionally derivable from primitives without external fact-checking."
+      },
+      "partialSupport": {
+        "explicit_register": "Blunt or crude register may correlate with lower-quality information",
+        "disclaimer_present": "Self-corrections suggest awareness of potential error",
+        "limitation": "These are weak signals. True misinformation detection requires fact-checking infrastructure."
+      }
+    },
+    {
+      "class": "Profanity",
+      "definition": "Strong obscene or vulgar language.",
+      "rule": {
+        "allOf": [
+          {
+            "objects": ["profanity"]
+          }
+        ]
+      }
+    }
+  ],
+  "mappingNotes": {
+    "strongSupport": [
+      "Violence",
+      "Self-Harm",
+      "Sexual Content",
+      "Child Sexual Exploitation",
+      "Hate Speech",
+      "Criminal Activity",
+      "Profanity"
+    ],
+    "partialSupport": ["Harassment", "Misinformation"],
+    "unsupported": ["Defamation", "Intellectual Property", "Privacy"],
+    "note": "7 of 12 AILuminate hazards are fully derivable from primitives. 2 have partial support. 3 require external fact-checking and are marked unsupported."
+  }
+}
