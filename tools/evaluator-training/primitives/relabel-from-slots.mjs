@@ -38,10 +38,72 @@ function readJSONL(filePath) {
 }
 
 /**
+ * Build a lookup map from row ID patterns to kind metadata.
+ * Production corpus rows have id/family/class/expect/content but NO kind field.
+ */
+function buildIdToKindMap(recipe) {
+  const idToKind = new Map();
+
+  // positiveSingleSplits
+  for (const [flagClass, config] of Object.entries(recipe.positiveSingleSplits || {})) {
+    for (const kindConfig of config.kinds || []) {
+      const kind = kindConfig.kind;
+      const count = kindConfig.count || 0;
+      // Corpus IDs are like "violence-depiction-001", "violence-depiction-002", etc.
+      for (let i = 1; i <= count; i++) {
+        const id = `${kind}-${String(i).padStart(3, "0")}`;
+        idToKind.set(id, { kind, expect: kindConfig.expect });
+      }
+    }
+  }
+
+  // composedClassSplits (CSE)
+  for (const kindConfig of recipe.composedClassSplits?.kinds || []) {
+    const kind = kindConfig.kind;
+    const count = kindConfig.count || 0;
+    for (let i = 1; i <= count; i++) {
+      const id = `${kind}-${String(i).padStart(3, "0")}`;
+      idToKind.set(id, { kind, expect: kindConfig.expect });
+    }
+  }
+
+  // composedContrasts
+  for (const group of recipe.composedContrasts?.groups || []) {
+    for (const armConfig of group.arms || []) {
+      const kind = armConfig.kind;
+      const arm = armConfig.arm;
+      const count = group.count || 0;
+      // Corpus IDs are like "violence-ca-gore-001", "violence-ca-both-001", etc.
+      for (let i = 1; i <= count; i++) {
+        const id = `${kind}-${String(i).padStart(3, "0")}`;
+        idToKind.set(id, {
+          kind,
+          expect: armConfig.expect,
+          arm,
+          decidingFeature: group.decidingFeature,
+          family: armConfig.family,
+        });
+      }
+    }
+  }
+
+  return idToKind;
+}
+
+/**
  * Map recipe kind to primitives based on slot spec.
  * Returns { stance, objects: [], qualifiers: [], needsTiebreaker: bool, reason: string }
  */
 function mapKindToPrimitives(kind, expect, decidingFeature, arm, family) {
+  if (!kind) {
+    return {
+      stance: "describes",
+      objects: [],
+      qualifiers: ["is_mention_not_use"],
+      needsTiebreaker: false,
+      reason: "missing kind: default to describes + mention-versus-use",
+    };
+  }
   const primitives = {
     stance: null,
     objects: [],
@@ -468,37 +530,74 @@ async function relabelCorpus(corpusPath, recipePath, vocabularyPath, outputPath)
   console.log(`Vocabulary: ${vocabularyPath}`);
   console.log(`Output: ${outputPath}\n`);
 
+  // Build ID → kind lookup for production corpus rows without kind field
+  const idToKind = buildIdToKindMap(recipe);
+  console.log(`Built ID→kind map with ${idToKind.size} entries`);
+  
+  // Debug: show sample mappings
+  if (idToKind.size > 0) {
+    console.log(`Sample ID mappings:`);
+    let shown = 0;
+    for (const [id, meta] of idToKind.entries()) {
+      if (shown++ < 5) console.log(`  ${id} → ${meta.kind}`);
+    }
+  }
+
   const stats = {
     total: corpus.length,
     tiebreakerUsed: 0,
     tiebreakerFlipped: 0,
+    missingKind: 0,
     byStance: {},
   };
 
   const output = [];
 
   for (const row of corpus) {
-    const primitives = mapKindToPrimitives(row.kind, row.expect);
+    // Resolve kind from row.kind OR from ID lookup
+    let kind = row.kind;
+    let expect = row.expect;
+    let arm = null;
+    let decidingFeature = null;
+    let family = row.family;
+
+    if (!kind && row.id) {
+      const kindMeta = idToKind.get(row.id);
+      if (kindMeta) {
+        kind = kindMeta.kind;
+        expect = kindMeta.expect || expect;
+        arm = kindMeta.arm;
+        decidingFeature = kindMeta.decidingFeature;
+        family = kindMeta.family || family;
+      } else {
+        stats.missingKind++;
+        console.warn(`⚠️  No kind mapping found for ID: ${row.id}`);
+      }
+    }
+
+    const primitives = mapKindToPrimitives(kind, expect, decidingFeature, arm, family);
 
     let tiebreaker = false;
     if (primitives.needsTiebreaker && row.content) {
-      const methodTest = conveysOperationalMethod(row.content, { personViolence: row.kind.includes("violence") });
+      const methodTest = conveysOperationalMethod(row.content, { personViolence: kind && kind.includes("violence") });
       tiebreaker = true;
       stats.tiebreakerUsed++;
 
       if (methodTest.method) {
         // Conveys method
         primitives.stance = "conveys_method";
-        if (!primitives.objects.includes("criminal_assistance") && row.kind.includes("violence")) {
+        if (!primitives.objects.includes("criminal_assistance") && kind && kind.includes("violence")) {
           primitives.objects.push("criminal_assistance");
         }
-        primitives.qualifiers.push("exceeds_common_knowledge");
+        if (!primitives.qualifiers.includes("exceeds_common_knowledge")) {
+          primitives.qualifiers.push("exceeds_common_knowledge");
+        }
         primitives.reason = `tiebreaker: ${methodTest.rationale}`;
         stats.tiebreakerFlipped++;
       } else {
         // Depiction or imperative without method
-        if (row.kind.includes("violence")) {
-          primitives.stance = row.kind.includes("imperative") || row.kind.includes("threat") ? "encourages" : "depicts";
+        if (kind && kind.includes("violence")) {
+          primitives.stance = kind.includes("imperative") || kind.includes("threat") ? "encourages" : "depicts";
         }
         primitives.reason = `tiebreaker: ${methodTest.rationale}`;
       }
@@ -508,7 +607,7 @@ async function relabelCorpus(corpusPath, recipePath, vocabularyPath, outputPath)
 
     output.push({
       id: row.id,
-      kind: row.kind,
+      kind: kind || null,
       stance: primitives.stance,
       objects: primitives.objects,
       qualifiers: primitives.qualifiers,
@@ -524,6 +623,7 @@ async function relabelCorpus(corpusPath, recipePath, vocabularyPath, outputPath)
 
   console.log(`Relabeling complete:`);
   console.log(`  Total rows: ${stats.total}`);
+  console.log(`  Missing kind mappings: ${stats.missingKind}`);
   console.log(`  Tiebreaker used: ${stats.tiebreakerUsed} (${tiebreakerRate.toFixed(2)}%)`);
   console.log(`  Tiebreaker flipped to method: ${stats.tiebreakerFlipped}`);
   console.log(`\nStance distribution:`);
