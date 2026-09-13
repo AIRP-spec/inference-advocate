@@ -932,9 +932,17 @@ function provenanceLine(result: ExchangeResult): string {
         : 'sealed and verified against the Serving Register'
       : 'seal present and invalid'
     : 'unsealed';
+  const relayed = result.deterministic.findings.some((f) => f.code === 'relayed');
+  const substituted = result.deterministic.findings.some((f) => f.code === 'model_substituted');
   const endpoint = result.deterministic.endpointAuthorized
-    ? 'endpoint authorized'
-    : 'endpoint NOT authorized';
+    ? substituted
+      ? 'endpoint authorized, but a different model than requested'
+      : 'endpoint authorized'
+    : relayed
+      ? substituted
+        ? 'relayed through an unregistered endpoint, a different model than requested'
+        : 'relayed through an unregistered endpoint'
+      : 'endpoint NOT authorized';
   const attribution =
     result.deterministic.attribution === 'confirmed'
       ? 'DNS-confirmed'
