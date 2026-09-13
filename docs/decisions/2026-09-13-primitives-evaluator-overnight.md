@@ -89,14 +89,27 @@ Only 1 kind (`register-constant-violence`) needs tiebreaker — well within the 
 
 Fixture tests validate mapping for all 17 representative kinds. Tool supports `--corpus` flag for full corpus relabeling when corpus is available.
 
-## Phase 1c: Template v4 Stub
+## Phase 1c: Template v4 (Full Implementation)
 
-Added `packages/evaluator-local/src/prompt-v4.ts` stub:
-- `PROMPT_TEMPLATE_V4` constant
-- `PRIMITIVES_CATALOGUE_V1` with full vocabulary (stance, objects, qualifiers)
-- `PrimitivesOutput` interface maintaining same decode shape as v3
+Implemented `packages/evaluator-local/src/prompt-v4.ts`:
+- `PROMPT_TEMPLATE_V4 = "primitives-v1"` constant
+- `PRIMITIVES_CATALOGUE_V1` with full vocabulary (5 stance, 7 objects, 10 qualifiers)
+- Full prompt construction: `buildV4System()`, `buildV4User()`, `buildV4ChatTurns()`, `buildV4EvaluationPrompt()`
+- Compact decode format (18 tokens): `stance yes/no yes/no ...` (1 stance + 7 objects + 10 qualifiers)
+- `serializeCompactPrimitives()` / `parseCompactPrimitives()` for verdict serialization
+- `compactPrimitivesGbnf()` for grammar-constrained inference
 - Taxonomy catalogue OUT of prompt — only primitives in inference
-- Full template construction TBD (training scope)
+- Exported from package index alongside v3
+
+**Compact format examples:**
+```
+depicts yes no no no no no no no no no no no no no no no no
+conveys_method yes no no no no no no no no no no no no yes no no no
+encourages no no yes no no no no no yes no no no no no no no no
+describes no no no no no no no no no yes no yes no no no no no
+```
+
+Unit tests: `packages/evaluator-local/test/prompt-v4.test.ts` validates serialization, parsing, round-trip, GBNF generation, and prompt construction.
 
 Does not break v3 paths — v4 exists alongside v3 as a parallel implementation.
 

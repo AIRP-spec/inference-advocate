@@ -35,6 +35,20 @@ export {
   buildV3EvaluationPrompt,
   type ParsedCompactVerdict,
 } from './prompt-v3.js';
+export {
+  PROMPT_TEMPLATE_V4,
+  PRIMITIVES_CATALOGUE_V1,
+  serializeCompactPrimitives,
+  parseCompactPrimitives,
+  compactPrimitivesGbnf,
+  buildV4System,
+  buildV4User,
+  buildV4ChatTurns,
+  buildV4EvaluationPrompt,
+  type PrimitivesCatalogue,
+  type PrimitivesVerdict,
+  type ParsedCompactPrimitives,
+} from './prompt-v4.js';
 export { verifyModelSha256, sha256FileHex, normalizeDigest } from './digest.js';
 export {
   HELD_OUT_GATE_FILE,

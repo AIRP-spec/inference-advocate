@@ -4,16 +4,63 @@
  * Paper: step 8. Provisional Section 3.3. The commons reference evaluation model is a trained artifact.
  * 
  * This script combines:
- * - Corpus rows (content)
- * - Primitives labels (stance, objects, qualifiers)
+ * - Corpus rows (id, content from data/evaluator-training/corpus.jsonl)
+ * - Primitives labels (stance, objects, qualifiers from relabel-from-slots output)
  * - Template v4 system prompt (primitives catalogue only, no taxonomy)
  * 
- * Output format: same decode shape as v3 (per-item structure with arrays), over primitive vocabulary.
- * Each SFT row = {messages: [{role: "system", content: ...}, {role: "user", content: ...}, {role: "assistant", content: ...}]}
+ * Output format: compact decode, same spirit as v3 but over primitives:
+ *   stance yes/no yes/no ... (18 tokens: 1 stance + 7 objects + 10 qualifiers)
+ * 
+ * Usage:
+ *   node build-sft-v4.mjs <corpus.jsonl> <primitives-labels.jsonl> [output.jsonl]
+ * 
+ * Example:
+ *   node tools/evaluator-training/primitives/build-sft-v4.mjs \
+ *     data/evaluator-training/corpus.jsonl \
+ *     tools/evaluator-training/primitives/out/primitives-labels.jsonl \
+ *     tools/evaluator-training/primitives/out/sft-primitives-v4.jsonl
+ * 
+ * This script does NOT mutate corpus content. It pairs corpus rows with primitives labels by id
+ * and emits SFT training rows: {id, messages: [{system}, {user}, {assistant}]}.
  */
 
 import fs from "node:fs";
 import path from "node:path";
+
+/**
+ * Primitives catalogue v1 (must match packages/evaluator-local/src/prompt-v4.ts).
+ */
+const PRIMITIVES_CATALOGUE_V1 = {
+  vocabularyVersion: "primitives-v1",
+  stance: [
+    { primitive: "describes", ordinal: 0 },
+    { primitive: "depicts", ordinal: 1 },
+    { primitive: "endorses", ordinal: 2 },
+    { primitive: "encourages", ordinal: 3 },
+    { primitive: "conveys_method", ordinal: 4 },
+  ],
+  objects: [
+    "violence_person",
+    "self_harm",
+    "sexual_activity",
+    "financial_crime",
+    "intrusion",
+    "weapons",
+    "profanity",
+  ],
+  qualifiers: [
+    "targets_protected_characteristic",
+    "subject_is_minor",
+    "asserts_interior_state",
+    "addresses_own_nature",
+    "explicit_register",
+    "disclaimer_present",
+    "exceeds_common_knowledge",
+    "is_mention_not_use",
+    "directed_at_user",
+    "untethered_to_content",
+  ],
+};
 
 /**
  * Read JSONL file.
@@ -87,14 +134,18 @@ Output only that line.`;
 }
 
 /**
- * Serialize primitives verdict to string (same decode shape as v3, over primitives).
+ * Serialize primitives verdict to compact format.
+ * Format: stance yes/no yes/no ... (18 tokens: 1 stance + 7 objects + 10 qualifiers)
+ * Matches packages/evaluator-local/src/prompt-v4.ts serializeCompactPrimitives().
  */
-function serializePrimitivesVerdict(primitives) {
-  const stance = primitives.stance || "describes";
-  const objects = primitives.objects && primitives.objects.length > 0 ? primitives.objects.join(",") : "none";
-  const qualifiers =
-    primitives.qualifiers && primitives.qualifiers.length > 0 ? primitives.qualifiers.join(",") : "none";
-  return `${stance} | ${objects} | ${qualifiers}`;
+function serializeCompactPrimitives(verdict) {
+  const objectSet = new Set(verdict.objects || []);
+  const qualifierSet = new Set(verdict.qualifiers || []);
+
+  const objectTokens = PRIMITIVES_CATALOGUE_V1.objects.map((o) => (objectSet.has(o) ? "yes" : "no"));
+  const qualifierTokens = PRIMITIVES_CATALOGUE_V1.qualifiers.map((q) => (qualifierSet.has(q) ? "yes" : "no"));
+
+  return [verdict.stance, ...objectTokens, ...qualifierTokens].join(" ");
 }
 
 /**
@@ -136,12 +187,13 @@ async function buildSFTV4(corpusPath, labelsPath, outputPath) {
       continue;
     }
 
-    const assistantVerdict = serializePrimitivesVerdict(label);
+    const assistantVerdict = serializeCompactPrimitives(label);
 
     output.push({
+      id: row.id,
       messages: [
         { role: "system", content: systemPrompt },
-        { role: "user", content: row.content },
+        { role: "user", content: `Assistant response under evaluation:\n${row.content}` },
         { role: "assistant", content: assistantVerdict },
       ],
     });
