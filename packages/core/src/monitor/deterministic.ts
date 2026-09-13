@@ -278,6 +278,26 @@ export function runDeterministicPass(
           });
         }
 
+        // Spec §6.10: the seal is honest and the entry is registered to serve the sealed
+        // model, but it is not the model the client asked for. This is the router that was
+        // asked for X and relays Y's honest seal. The model field reads Y, the caller asked
+        // for X, and the substitution is on the face of the response. Reported, not refusing:
+        // the response is attributable and the finding says what it is; the delivery policy
+        // decides what to do with it. Distinct from seal_model_mismatch, which is about what
+        // the entry is allowed to serve, not what the client requested.
+        if (
+          sealValid &&
+          entry.models.includes(seal.model) &&
+          provider.model &&
+          seal.model !== provider.model
+        ) {
+          findings.push({
+            code: 'model_substituted',
+            detail: `seal is for model ${seal.model}; the client asked for ${provider.model}`,
+            refuses: false,
+          });
+        }
+
         // Spec §6.11: request digest is last, reported not refusing, response still attributable.
         if (
           sealValid &&
@@ -295,18 +315,6 @@ export function runDeterministicPass(
     }
   }
 
-  let endpointAuthorized = true;
-  if (entry) {
-    endpointAuthorized = register.endpointAuthorized(entry.id, response.servedFrom);
-    if (!endpointAuthorized) {
-      findings.push({
-        code: 'endpoint_not_authorized',
-        detail: `${response.servedFrom} is not an authorized serving endpoint for ${entry.id}`,
-        refuses: true,
-      });
-    }
-  }
-
   // Compromised / retired findings are unattributed: clear sealValid and treat attribution.
   if (findings.some((f) => f.code === 'seal_key_compromised' || f.code === 'seal_key_retired')) {
     sealValid = false;
@@ -315,6 +323,39 @@ export function runDeterministicPass(
   if (findings.some((f) => f.code === 'unknown_content_binding')) {
     sealValid = false;
     attribution = 'none';
+  }
+
+  // Endpoint authorization runs last so it sees the final sealValid. Spec §6.10.
+  //
+  // Where the contacted endpoint is not in the entry and a seal validates against the entry,
+  // the response is relayed, and relay is reported, not refused. A detached signature
+  // survives relay intact, so where it validates the endpoint check is confirming something
+  // the signature already established. Refusing here would leave a dishonest router with
+  // nothing to relay and make the substitution this verifier exists to detect undetectable.
+  // The contacted endpoint travels in the finding so the party the response passed through
+  // is visible to whoever reads it.
+  //
+  // Where no seal validates, an unregistered endpoint still refuses: there is nothing to
+  // attribute and the only thing known about the response is that it came from somewhere
+  // the provider did not list.
+  let endpointAuthorized = true;
+  if (entry) {
+    endpointAuthorized = register.endpointAuthorized(entry.id, response.servedFrom);
+    if (!endpointAuthorized) {
+      if (sealValid) {
+        findings.push({
+          code: 'relayed',
+          detail: `served from ${response.servedFrom}, which is not an authorized serving endpoint for ${entry.id}; the seal validates, so the response is attributed to ${entry.id} and reported as relayed through that endpoint`,
+          refuses: false,
+        });
+      } else {
+        findings.push({
+          code: 'endpoint_not_authorized',
+          detail: `${response.servedFrom} is not an authorized serving endpoint for ${entry.id}`,
+          refuses: true,
+        });
+      }
+    }
   }
 
   const verdict: DeterministicVerdict = {

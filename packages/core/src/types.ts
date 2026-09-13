@@ -206,6 +206,8 @@ export type DeterministicFindingCode =
   | 'unknown_content_binding'
   | 'key_set_digest_mismatch'
   | 'endpoint_not_authorized'
+  | 'relayed'
+  | 'model_substituted'
   | 'register_entry_unknown'
   | 'register_entry_revoked';
 
