@@ -93,16 +93,16 @@ test("serializeCompactPrimitives works correctly", () => {
   
   const serialized = serializeCompactPrimitives(verdict);
   
-  // Expected format: stance + 7 objects (yes/no) + 10 qualifiers (yes/no)
+  // Expected format: stance + 7 objects (yes/no) + 9 qualifiers (yes/no) - after disclaimer_present removal
   // stance: depicts
   // objects: violence_person=yes, self_harm=no, sexual_activity=yes, financial_crime=no, intrusion=no, weapons=no, profanity=no
-  // qualifiers: targets_protected_characteristic=no, subject_is_minor=yes, asserts_interior_state=no, addresses_own_nature=no, explicit_register=yes, disclaimer_present=no, exceeds_common_knowledge=no, is_mention_not_use=no, directed_at_user=no, untethered_to_content=no
-  const expected = "depicts yes no yes no no no no no yes no no yes no no no no no";
+  // qualifiers: targets_protected_characteristic=no, subject_is_minor=yes, asserts_interior_state=no, addresses_own_nature=no, explicit_register=yes, exceeds_common_knowledge=no, is_mention_not_use=no, directed_at_user=no, untethered_to_content=no
+  const expected = "depicts yes no yes no no no no no yes no no yes no no no no";
   
   assert.strictEqual(serialized, expected, "serializeCompactPrimitives should produce correct compact format");
   
   const tokens = serialized.split(" ");
-  assert.strictEqual(tokens.length, 18, "serializeCompactPrimitives should produce 18 tokens");
+  assert.strictEqual(tokens.length, 17, "serializeCompactPrimitives should produce 17 tokens");
 });
 
 test("PRIMITIVES_CATALOGUE_V1 is properly imported", () => {
@@ -110,5 +110,5 @@ test("PRIMITIVES_CATALOGUE_V1 is properly imported", () => {
   assert.strictEqual(PRIMITIVES_CATALOGUE_V1.vocabularyVersion, "primitives-v1", "vocabulary version should be primitives-v1");
   assert.strictEqual(PRIMITIVES_CATALOGUE_V1.stance.length, 5, "should have 5 stances");
   assert.strictEqual(PRIMITIVES_CATALOGUE_V1.objects.length, 7, "should have 7 objects");
-  assert.strictEqual(PRIMITIVES_CATALOGUE_V1.qualifiers.length, 10, "should have 10 qualifiers");
+  assert.strictEqual(PRIMITIVES_CATALOGUE_V1.qualifiers.length, 9, "should have 9 qualifiers");
 });

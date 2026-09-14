@@ -52,12 +52,12 @@ test("buildQualifierSystemPrompt produces correct format", () => {
   assert.ok(prompt.includes("yes or no"), "Should have yes/no instruction");
 });
 
-test("buildAllPerPrimitivePrompts returns 18 prompts in vocabulary order", () => {
+test("buildAllPerPrimitivePrompts returns 17 prompts in vocabulary order", () => {
   const prompts = buildAllPerPrimitivePrompts();
   
-  assert.strictEqual(prompts.length, 18, "Should have 18 prompts");
+  assert.strictEqual(prompts.length, 17, "Should have 17 prompts");
   
-  // Check order: 1 stance + 7 objects + 10 qualifiers
+  // Check order: 1 stance + 7 objects + 9 qualifiers (after disclaimer_present removal)
   assert.strictEqual(prompts[0].passType, "stance", "First pass should be stance");
   assert.strictEqual(prompts[0].primitive, "stance", "First pass primitive should be 'stance'");
   
@@ -66,8 +66,8 @@ test("buildAllPerPrimitivePrompts returns 18 prompts in vocabulary order", () =>
     assert.strictEqual(prompts[i].passType, "object", `Pass ${i} should be object`);
   }
   
-  // Qualifiers should be passes 8-17 (indices 8-17)
-  for (let i = 8; i <= 17; i++) {
+  // Qualifiers should be passes 8-16 (indices 8-16)
+  for (let i = 8; i <= 16; i++) {
     assert.strictEqual(prompts[i].passType, "qualifier", `Pass ${i} should be qualifier`);
   }
   

@@ -2,7 +2,7 @@
  * Per-primitive LocalEvaluator assembly tests.
  * 
  * Verifies:
- * 1. Assembly of 18 answers into PrimitivesVerdict
+ * 1. Assembly of 17 answers into PrimitivesVerdict (updated after disclaimer_present removal)
  * 2. Composition of primitives → taxonomy flags
  * 3. Integration with LocalEvaluator per-primitive path
  */
@@ -22,7 +22,7 @@ const {
 test("primitives catalogue has correct structure for per-primitive", () => {
   assert.strictEqual(PRIMITIVES_CATALOGUE_V1.stance.length, 5, "Should have 5 stances");
   assert.strictEqual(PRIMITIVES_CATALOGUE_V1.objects.length, 7, "Should have 7 objects");
-  assert.strictEqual(PRIMITIVES_CATALOGUE_V1.qualifiers.length, 10, "Should have 10 qualifiers");
+  assert.strictEqual(PRIMITIVES_CATALOGUE_V1.qualifiers.length, 9, "Should have 9 qualifiers");
   
   // Verify stance enum values
   const stances = PRIMITIVES_CATALOGUE_V1.stance.map((s) => s.primitive);
@@ -57,7 +57,6 @@ test("assembly of 18 answers → primitives verdict (CSE case)", () => {
     qualifier_asserts_interior_state: "no",
     qualifier_addresses_own_nature: "no",
     qualifier_explicit_register: "yes",
-    qualifier_disclaimer_present: "no",
     qualifier_exceeds_common_knowledge: "no",
     qualifier_is_mention_not_use: "no",
     qualifier_directed_at_user: "no",
@@ -105,7 +104,6 @@ test("assembly of 18 answers → primitives verdict (violence case)", () => {
     qualifier_asserts_interior_state: "no",
     qualifier_addresses_own_nature: "no",
     qualifier_explicit_register: "no",
-    qualifier_disclaimer_present: "no",
     qualifier_exceeds_common_knowledge: "no",
     qualifier_is_mention_not_use: "no",
     qualifier_directed_at_user: "no",
@@ -148,7 +146,6 @@ test("assembly of 18 answers → primitives verdict (clean case)", () => {
     qualifier_asserts_interior_state: "no",
     qualifier_addresses_own_nature: "no",
     qualifier_explicit_register: "no",
-    qualifier_disclaimer_present: "no",
     qualifier_exceeds_common_knowledge: "no",
     qualifier_is_mention_not_use: "yes",
     qualifier_directed_at_user: "no",
@@ -178,10 +175,10 @@ test("assembly of 18 answers → primitives verdict (clean case)", () => {
   // This should compose to no flags (mention-versus-use negative)
 });
 
-test("per-primitive decode produces 18 separate judgments", () => {
-  // Total expected passes
-  const expectedPasses = 1 + 7 + 10; // stance + objects + qualifiers
-  assert.strictEqual(expectedPasses, 18, "Should have 18 passes");
+test("per-primitive decode produces 17 separate judgments", () => {
+  // Total expected passes (updated after disclaimer_present removal)
+  const expectedPasses = 1 + 7 + 9; // stance + objects + qualifiers
+  assert.strictEqual(expectedPasses, 17, "Should have 17 passes");
   
   // Verify catalogue structure matches
   const stanceCount = PRIMITIVES_CATALOGUE_V1.stance.length;
@@ -190,6 +187,6 @@ test("per-primitive decode produces 18 separate judgments", () => {
   
   assert.strictEqual(stanceCount, 5, "5 stance options");
   assert.strictEqual(objectCount, 7, "7 objects");
-  assert.strictEqual(qualifierCount, 10, "10 qualifiers");
-  assert.strictEqual(1 + objectCount + qualifierCount, 18, "18 total passes");
+  assert.strictEqual(qualifierCount, 9, "9 qualifiers");
+  assert.strictEqual(1 + objectCount + qualifierCount, 17, "17 total passes");
 });

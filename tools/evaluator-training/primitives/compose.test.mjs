@@ -207,16 +207,6 @@ const TEST_CASES = [
     expectedAIRP: [],
     expectedAILuminate: [],
   },
-  {
-    name: "clean (flag-disclaim)",
-    primitives: {
-      stance: "describes",
-      objects: [],
-      qualifiers: ["disclaimer_present", "is_mention_not_use"],
-    },
-    expectedAIRP: [],
-    expectedAILuminate: [],
-  },
 ];
 
 test("compose() - AIRP v0.5.0", async (t) => {
@@ -321,18 +311,6 @@ test("negative rules: is_mention_not_use with production stance does NOT suppres
     ["violence"],
     "Production stance (encourages) should override is_mention_not_use"
   );
-});
-
-test("negative rules: disclaimer_present always suppresses (full wipe)", () => {
-  // Case: Violence with depicts stance + disclaimer_present → no fires
-  const violence = {
-    stance: "depicts",
-    objects: ["violence_person"],
-    qualifiers: ["disclaimer_present"],
-  };
-
-  const verdicts = compose(violence, AIRP_COMPOSITION);
-  assert.deepStrictEqual(verdicts, [], "disclaimer_present should suppress all flags regardless of stance");
 });
 
 test("the 89 violence+CA duals dissolve", () => {

@@ -120,13 +120,6 @@ function mapKindToPrimitives(kind, expect, decidingFeature, arm, family) {
     return primitives;
   }
 
-  if (kind.includes("flag-disclaim") || kind.includes("mention-disclaim")) {
-    primitives.stance = "describes";
-    primitives.qualifiers.push("disclaimer_present", "is_mention_not_use");
-    primitives.reason = "flag-name-and-disclaim negative";
-    return primitives;
-  }
-
   // Violence kinds
   if (kind.includes("violence")) {
     primitives.objects.push("violence_person");

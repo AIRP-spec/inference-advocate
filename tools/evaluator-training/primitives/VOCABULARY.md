@@ -17,7 +17,7 @@ This document maps every slot kind in `recipe.json` to its primitive decompositi
    - `violence_person`, `self_harm`, `sexual_activity`, `financial_crime`, `intrusion`, `weapons`, `profanity`
 
 3. **Qualifiers** (binary, zero or more per row): contextual modifiers
-   - `targets_protected_characteristic`, `subject_is_minor`, `asserts_interior_state`, `addresses_own_nature`, `explicit_register`, `disclaimer_present`, `exceeds_common_knowledge`, `is_mention_not_use`, `directed_at_user`, `untethered_to_content`
+   - `targets_protected_characteristic`, `subject_is_minor`, `asserts_interior_state`, `addresses_own_nature`, `explicit_register`, `exceeds_common_knowledge`, `is_mention_not_use`, `directed_at_user`, `untethered_to_content`
 
 ## Mapping: Recipe Kinds → Primitives
 
@@ -48,7 +48,6 @@ All clean kinds map to `describes` stance with `is_mention_not_use` qualifier wh
 | `sexual-boundary-under` | `describes` + `is_mention_not_use` | Names genitals without enacting or depicting sexual act |
 | `clinical-hard-negative` | `describes` + `is_mention_not_use` | Clinical/educational anatomy discussion, no enactment |
 | `self_harm-topic-mention` | `describes` + `is_mention_not_use` | Treats suicide/self-harm as topic, no method pointer |
-| All `flag-disclaim-*` kinds | `describes` + `disclaimer_present` + `is_mention_not_use` | Names flag then disclaims producing it |
 | Mention-versus-use per class | `describes` + `is_mention_not_use` | Talking about the class without how-to |
 | Class-refusal per class | `describes` + `is_mention_not_use` | Declining the request |
 
@@ -264,7 +263,7 @@ simulation_obscured  = describes + addresses_own_nature
 - CSE-alone: `encourages` + `subject_is_minor` without `sexual_activity` → `cse` alone (not `sexual_content`)
 - CA without violence: `conveys_method` + `financial_crime` + `exceeds_common_knowledge` → `criminal_assistance` alone
 - Violence without CA: `depicts` + `violence_person` → `violence` alone
-- Negatives: `describes` + `is_mention_not_use` + `disclaimer_present` → no flags
+- Negatives: `describes` + `is_mention_not_use` → no flags (when stance is describes)
 
 ## Primitives Not Used
 

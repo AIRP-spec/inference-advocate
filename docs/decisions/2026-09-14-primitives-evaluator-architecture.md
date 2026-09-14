@@ -208,6 +208,46 @@ The prompt bundle SHA is computed by concatenating all 18 system prompts in voca
 
 **Forbidden pattern:** Private reimplementation of composition logic. All composition must call the shared `compose()` function.
 
+## Decision 10: Remove `disclaimer_present` Qualifier
+
+**Date:** 2026-09-14 (fourth update)
+
+**Decision:** Remove `disclaimer_present` qualifier entirely from the primitives vocabulary.
+
+**Rationale:**
+- **Teaching data:** Atom taught 0/8006 corpus rows (flag-disclaim kinds were stripped in 7914 corpus redo for cause)
+- **Firing data:** Atom fired 0/471 held-out suite items
+- **Dead code:** The full-wipe composition rule for `disclaimer_present` was never exercised
+- **Do not restore:** Restoring flag-disclaim teaching rows would reintroduce content removed for cause in the 7914 redo
+
+**Why removed (for future reference):**
+1. Flag-disclaim teaching rows were removed from the corpus in 7914 redo
+2. Restoring them would violate the documented reason for their removal
+3. The atom never fired in practice (0/471 held-out)
+4. The composition rule was dead code (never matched)
+
+**Vocabulary impact:**
+- **Before:** 1 stance + 7 objects + 10 qualifiers = 18 per-primitive passes
+- **After:** 1 stance + 7 objects + 9 qualifiers = 17 per-primitive passes
+- **Decode shape change:** Per-primitive-v1 now produces 17 judgments instead of 18
+
+**Files updated:**
+- `tools/evaluator-training/primitives/vocabulary.json`: Removed `disclaimer_present` from qualifiers
+- `tools/evaluator-training/primitives/VOCABULARY.md`: Updated qualifier list and examples
+- `packages/evaluator-local/src/prompt-v4.ts`: Removed from `PRIMITIVES_CATALOGUE_V1.qualifiers`
+- `packages/evaluator-local/src/compose-primitives.ts`: Removed from policy comments
+- `tools/evaluator-training/primitives/compositions/airp-v0.5.0.json`: Removed negative rule
+- `tools/evaluator-training/primitives/compositions/ailuminate-v1.0.json`: Removed from partialSupport
+- `tools/evaluator-training/primitives/relabel-from-slots.mjs`: Removed dead flag-disclaim branch
+- Tests updated: All test expectations changed from 18 to 17 passes
+
+**SFT metadata impact:**
+- Decode shape change invalidates old SFT metadata (`promptBundleSha256` will change)
+- Do not rebuild SFT here (no corpus changes, decode shape documented)
+- Next SFT build will reflect 17-pass decode shape
+
+**Forbidden action:** Do not re-add `disclaimer_present` from old vocabulary lists without addressing why flag-disclaim teaching data was removed in 7914 redo.
+
 ## Status
 
 All decisions are implemented and tested as of 2026-09-14.

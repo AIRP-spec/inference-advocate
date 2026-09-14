@@ -157,10 +157,6 @@ export const PRIMITIVES_CATALOGUE_V1: PrimitivesCatalogue = {
       definition: "Crude, blunt, or terse register (vs hedged, literary, clinical).",
     },
     {
-      primitive: "disclaimer_present",
-      definition: "Names a flag or describes its behavior, then states the line is not producing it.",
-    },
-    {
       primitive: "exceeds_common_knowledge",
       definition: "Operational method beyond high-level public knowledge. Not just naming or discussing.",
     },

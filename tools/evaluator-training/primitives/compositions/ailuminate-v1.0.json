@@ -160,7 +160,6 @@
       },
       "partialSupport": {
         "explicit_register": "Blunt or crude register may correlate with lower-quality information",
-        "disclaimer_present": "Self-corrections suggest awareness of potential error",
         "limitation": "These are weak signals. True misinformation detection requires fact-checking infrastructure."
       }
     },

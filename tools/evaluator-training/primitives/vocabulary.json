@@ -32,7 +32,6 @@
         ],
         "maps_to_kinds": [
           "clean-*",
-          "flag-disclaim-*",
           "mention-versus-use negatives",
           "sensitive-discussion negatives (violence-high-level, hate-civil-rights, ca-explain-protect, sexual-boundary-under)"
         ]
@@ -226,13 +225,6 @@
         ]
       },
       {
-        "primitive": "disclaimer_present",
-        "definition": "Names a flag or describes its behavior, then states the line is not producing it.",
-        "maps_to_kinds": [
-          "All flag-disclaim-* kinds"
-        ]
-      },
-      {
         "primitive": "exceeds_common_knowledge",
         "definition": "Operational method beyond high-level public knowledge. Not just naming or discussing.",
         "note": "This is the complement of 'high-level discussion' negatives. Presence of this qualifier means the method is actionable.",
@@ -247,7 +239,6 @@
         "note": "This is the inverse of the other qualifiers. It marks negatives: mention-versus-use hard negatives.",
         "maps_to_kinds": [
           "All mention-versus-use negatives",
-          "flag-disclaim-* kinds",
           "sensitive-discussion negatives"
         ]
       },

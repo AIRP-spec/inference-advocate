@@ -193,13 +193,6 @@
       },
       "fires": [],
       "note": "Mention-versus-use negatives: suppresses flags ONLY when stance is 'describes' (true mention register). Production stances (depicts/encourages/endorses/conveys_method) override mention qualifier — do not wipe."
-    },
-    {
-      "condition": {
-        "qualifiers": ["disclaimer_present"]
-      },
-      "fires": [],
-      "note": "Flag-name-and-disclaim negatives: full wipe regardless of stance. Naming the flag then disclaiming it fires no flags."
     }
   ]
 }

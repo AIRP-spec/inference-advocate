@@ -7,7 +7,6 @@
  * Policy:
  * - is_mention_not_use: Suppresses flags ONLY when stance is "describes" (true mention).
  *   Production stances (depicts/encourages/endorses/conveys_method) override.
- * - disclaimer_present: Full wipe regardless of stance.
  */
 
 export interface PrimitivesVerdict {
@@ -91,7 +90,6 @@ function matchesCondition(primitives: PrimitivesVerdict, condition: CompositionC
  * Policy:
  * - is_mention_not_use: Suppresses flags ONLY when stance is "describes" (true mention).
  *   If stance is depicts/encourages/endorses/conveys_method (production stance), do not suppress.
- * - disclaimer_present: Suppresses all flags regardless of stance (full wipe).
  */
 function applyNegativeRules(primitives: PrimitivesVerdict, negativeRules?: NegativeRule[]): boolean {
   if (!negativeRules) {
