@@ -17,7 +17,7 @@ const trainRecipe = JSON.parse(readFileSync(join(here, 'train-recipe.json'), 'ut
 const genRecipe = JSON.parse(readFileSync(join(here, 'recipe.json'), 'utf8'));
 
 function parseArgs(argv) {
-  const out = { gguf: '', sha256: '', gpu: false, report: '', allowFail: false };
+  const out = { gguf: '', sha256: '', gpu: false, report: '', allowFail: false, promptTemplateVersion: '', compositionPath: '', sftMetadataPath: '' };
   for (let i = 2; i < argv.length; i++) {
     const a = argv[i];
     if (a === '--gpu') out.gpu = true;
@@ -25,6 +25,9 @@ function parseArgs(argv) {
     else if (a === '--gguf') out.gguf = argv[++i];
     else if (a === '--sha256') out.sha256 = argv[++i];
     else if (a === '--report') out.report = argv[++i];
+    else if (a === '--prompt-template-version') out.promptTemplateVersion = argv[++i];
+    else if (a === '--composition-path') out.compositionPath = argv[++i];
+    else if (a === '--sft-metadata-path') out.sftMetadataPath = argv[++i];
     else throw new Error(`unknown argument ${a}`);
   }
   return out;
@@ -58,6 +61,7 @@ let artifacts = {};
 if (existsSync(artifactsPath)) {
   artifacts = JSON.parse(readFileSync(artifactsPath, 'utf8'));
 }
+
 const ggufPath = resolve(args.gguf || artifacts.ggufPath || '');
 if (!ggufPath || !existsSync(ggufPath)) {
   console.error(`gate: no GGUF at ${ggufPath || '(empty)'}. Train first.`);
@@ -72,6 +76,9 @@ let scoreHeldOutGate;
 let scoreHeldOutGateDual;
 let sha256FileHex;
 let PROMPT_TEMPLATE_V3;
+let PROMPT_TEMPLATE_V4;
+let promptSha256;
+let perPrimitivePromptBundleSha256;
 try {
   ({ Taxonomy } = await import('@airp/core'));
   ({
@@ -82,14 +89,99 @@ try {
     scoreHeldOutGateDual,
     sha256FileHex,
     PROMPT_TEMPLATE_V3,
+    PROMPT_TEMPLATE_V4,
+    promptSha256,
+    perPrimitivePromptBundleSha256,
   } = await import('@airp/evaluator-local'));
 } catch (err) {
   console.error(`cannot import built packages (${err.message}). Run npm run build first.`);
   process.exit(1);
 }
 
-if (PROMPT_TEMPLATE_V3 !== trainRecipe.promptTemplateVersion) {
-  console.error(`PROMPT_TEMPLATE_V3 is ${PROMPT_TEMPLATE_V3}, train-recipe wants v3`);
+// Check for SFT metadata and validate SHAs if present
+const sftMetadataPath = args.sftMetadataPath || trainRecipe.sftMetadataPath;
+if (sftMetadataPath) {
+  const metaPath = resolve(repoRoot, sftMetadataPath);
+  if (!existsSync(metaPath)) {
+    console.error(`SFT metadata file not found: ${metaPath}`);
+    process.exit(1);
+  }
+  const sftMeta = JSON.parse(readFileSync(metaPath, 'utf8'));
+  
+  // For per-primitive-v1, validate promptBundleSha256; otherwise validate promptSha256
+  if (sftMeta.decodeShape === 'per-primitive-v1' || sftMeta.promptTemplateVersion === 'per-primitive-v1') {
+    const { perPrimitivePromptBundleSha256 } = await import('@airp/evaluator-local');
+    const livePromptBundleSha = perPrimitivePromptBundleSha256();
+    if (livePromptBundleSha !== sftMeta.promptBundleSha256) {
+      console.error(`❌ Prompt Bundle SHA mismatch!`);
+      console.error(`  Live perPrimitivePromptBundleSha256(): ${livePromptBundleSha}`);
+      console.error(`  Recorded in ${metaPath}: ${sftMeta.promptBundleSha256}`);
+      console.error(`  The live per-primitive prompt bundle has changed since SFT was built.`);
+      console.error(`  Rebuild SFT or revert prompt changes.`);
+      process.exit(1);
+    }
+  } else {
+    const livePromptSha = promptSha256();
+    if (livePromptSha !== sftMeta.promptSha256) {
+      console.error(`❌ Prompt SHA mismatch!`);
+      console.error(`  Live buildV4System() SHA: ${livePromptSha}`);
+      console.error(`  Recorded in ${metaPath}: ${sftMeta.promptSha256}`);
+      console.error(`  The live prompt template has changed since SFT was built.`);
+      console.error(`  Rebuild SFT or revert prompt changes.`);
+      process.exit(1);
+    }
+  }
+  
+  // Validate labels file SHA if path is present
+  if (sftMeta.paths && sftMeta.paths.labels) {
+    const labelsPath = resolve(repoRoot, sftMeta.paths.labels);
+    if (existsSync(labelsPath)) {
+      const liveLabelsShа = sha256FileHex(labelsPath);
+      if (liveLabelsShа !== sftMeta.labelsSha256) {
+        console.error(`❌ Labels file SHA mismatch!`);
+        console.error(`  Live labels file SHA: ${liveLabelsShа}`);
+        console.error(`  Recorded in ${metaPath}: ${sftMeta.labelsSha256}`);
+        console.error(`  The labels file has changed since SFT was built.`);
+        console.error(`  Rebuild SFT with current labels.`);
+        process.exit(1);
+      }
+    }
+  }
+  
+  console.log(`✅ SFT metadata validated: prompt and labels SHAs match`);
+}
+
+// Resolve promptTemplateVersion from args, recipe, or default
+const promptTemplateVersion = args.promptTemplateVersion || trainRecipe.promptTemplateVersion || PROMPT_TEMPLATE_V3;
+const compositionPath = args.compositionPath || trainRecipe.compositionPath || '';
+
+// Validate template version
+if (promptTemplateVersion === PROMPT_TEMPLATE_V3) {
+  // v3 path: existing control
+} else if (promptTemplateVersion === PROMPT_TEMPLATE_V4 || promptTemplateVersion === 'primitives-v1') {
+  // v4/primitives-v1 path: requires composition
+  if (!compositionPath) {
+    console.error(`primitives-v1 template requires --composition-path or recipe.compositionPath`);
+    process.exit(1);
+  }
+  const compositionFullPath = resolve(repoRoot, compositionPath);
+  if (!existsSync(compositionFullPath)) {
+    console.error(`composition file not found: ${compositionFullPath}`);
+    process.exit(1);
+  }
+} else if (promptTemplateVersion === 'per-primitive-v1') {
+  // per-primitive-v1 path: requires composition
+  if (!compositionPath) {
+    console.error(`per-primitive-v1 template requires --composition-path or recipe.compositionPath`);
+    process.exit(1);
+  }
+  const compositionFullPath = resolve(repoRoot, compositionPath);
+  if (!existsSync(compositionFullPath)) {
+    console.error(`composition file not found: ${compositionFullPath}`);
+    process.exit(1);
+  }
+} else {
+  console.error(`unsupported promptTemplateVersion: ${promptTemplateVersion}`);
   process.exit(1);
 }
 
@@ -112,29 +204,48 @@ if (sha256FileHex(suitePath) !== gate.suiteSha256) {
   console.error('held-out suite digest does not match gate.json');
   process.exit(1);
 }
-if (gate.appliesWhen.promptTemplateVersion !== 'v3') {
-  console.error(`gate appliesWhen is ${gate.appliesWhen.promptTemplateVersion}, not v3`);
-  process.exit(1);
+// Gate config validation: for v3 control, gate must be v3. For primitives-v1, skip gate config check.
+if (promptTemplateVersion === PROMPT_TEMPLATE_V3) {
+  if (gate.appliesWhen.promptTemplateVersion !== 'v3') {
+    console.error(`gate appliesWhen is ${gate.appliesWhen.promptTemplateVersion}, not v3`);
+    process.exit(1);
+  }
 }
 
-const evaluator = new LocalEvaluator({
+const evaluatorOpts = {
   taxonomy,
   modelPath: ggufPath,
   modelSha256: digest,
   gpu: args.gpu,
-  promptTemplateVersion: 'v3',
-});
+  promptTemplateVersion,
+};
+
+// Add composition path for primitives-v1
+if (promptTemplateVersion === PROMPT_TEMPLATE_V4 || promptTemplateVersion === 'primitives-v1') {
+  evaluatorOpts.compositionPath = resolve(repoRoot, compositionPath);
+}
+
+const evaluator = new LocalEvaluator(evaluatorOpts);
 await evaluator.load();
 
-const pin = `local-llm@${digest.slice(0, 12)}+v3`;
+const templateLabel = promptTemplateVersion === PROMPT_TEMPLATE_V4 || promptTemplateVersion === 'primitives-v1' 
+  ? 'primitives-v1' 
+  : 'v3';
+const pin = `local-llm@${digest.slice(0, 12)}+${templateLabel}`;
 const hardware = hardwareStatement();
 console.log(`pin ${pin}`);
 console.log(`hardware: ${hardware}`);
 console.log(`llama.cpp: ${evaluator.systemInfo || '(empty system-info)'}`);
 console.log(`held-out gate: ${suite.items.length} items, extra-class limit ${gate.rules.maxSuiteExtraClassFires.value}`);
-console.log('v3 evidence is empty by construction (the trained task is the compact verdict).');
+if (templateLabel === 'primitives-v1') {
+  console.log(`primitives-v1 template: composition from ${compositionPath}`);
+  console.log('primitives-v1 evidence is empty by construction (verdict is compact 18-token format).');
+} else {
+  console.log('v3 evidence is empty by construction (the trained task is the compact verdict).');
+}
 
 const verdicts = [];
+const perItemData = []; // For per-primitive-v1: full primitives + composed flags per item
 for (const item of suite.items) {
   const flags = await evaluator.evaluate({
     providerId: 'held-out',
@@ -143,6 +254,21 @@ for (const item of suite.items) {
   });
   const got = flags.map((f) => f.type);
   verdicts.push({ id: item.id, got, ms: evaluator.lastEvalMs });
+  
+  // For per-primitive-v1, capture raw primitives verdict
+  if ((promptTemplateVersion === 'per-primitive-v1' || promptTemplateVersion === PROMPT_TEMPLATE_V4) && evaluator.lastPrimitivesVerdict) {
+    perItemData.push({
+      id: item.id,
+      goldExpect: item.expect,
+      primitives: {
+        stance: evaluator.lastPrimitivesVerdict.stance,
+        objects: evaluator.lastPrimitivesVerdict.objects,
+        qualifiers: evaluator.lastPrimitivesVerdict.qualifiers,
+      },
+      composed: got,
+    });
+  }
+  
   const extra = got.filter((type) => !item.expect.includes(type));
   const missing = item.expect.filter((type) => !got.includes(type));
   const mark = missing.length === 0 && extra.length === 0 ? 'pass' : 'FAIL';
@@ -156,6 +282,44 @@ for (const item of suite.items) {
 const dualScore = scoreHeldOutGateDual(suite, gate, verdicts, suitePath);
 const score = dualScore.full;
 const historicalScore = dualScore.historicalSubset;
+
+// Compute subject_is_minor atom analysis for per-primitive-v1
+let subjectIsMinorAnalysis = null;
+if (perItemData.length > 0) {
+  const atomName = 'subject_is_minor';
+  const modelYes = perItemData.filter((item) => item.primitives.qualifiers.includes(atomName));
+  const goldYes = perItemData.filter((item) => item.goldExpect.includes('child_sexual_exploitation'));
+  const truePositive = modelYes.filter((item) => item.goldExpect.includes('child_sexual_exploitation')).length;
+  const falsePositive = modelYes.filter((item) => !item.goldExpect.includes('child_sexual_exploitation')).length;
+  const falseNegative = goldYes.filter((item) => !item.primitives.qualifiers.includes(atomName)).length;
+  const trueNegative = perItemData.length - truePositive - falsePositive - falseNegative;
+  
+  const precision = modelYes.length > 0 ? truePositive / modelYes.length : 0;
+  const recall = goldYes.length > 0 ? truePositive / goldYes.length : 0;
+  const yesRate = modelYes.length / perItemData.length;
+  
+  subjectIsMinorAnalysis = {
+    atomName,
+    goldProxy: 'item.expect includes child_sexual_exploitation',
+    yesRate,
+    precision,
+    recall,
+    truePositive,
+    falsePositive,
+    falseNegative,
+    trueNegative,
+    modelYesCount: modelYes.length,
+    goldYesCount: goldYes.length,
+    n: perItemData.length,
+  };
+  
+  console.log(`\nsubject_is_minor atom analysis (gold proxy: CSE in expect):`);
+  console.log(`  yesRate: ${(yesRate * 100).toFixed(1)}% (${modelYes.length}/${perItemData.length})`);
+  console.log(`  precision: ${(precision * 100).toFixed(1)}% (TP=${truePositive}, FP=${falsePositive})`);
+  console.log(`  recall: ${(recall * 100).toFixed(1)}% (TP=${truePositive}, FN=${falseNegative})`);
+  console.log(`  gold yes count: ${goldYes.length} (items with CSE in expect)`);
+}
+
 const types = taxonomy.flags.map((f) => f.type);
 const perClass = types.map((type) => {
   const scoped = suite.items.filter((item) => item.expect.includes(type));
@@ -177,7 +341,13 @@ const cleanFires = clean.filter((item) => {
 });
 
 console.log('per-class:');
+const cseRow = perClass.find((row) => row.type === 'child_sexual_exploitation');
+if (cseRow) {
+  console.log(`\n  ⭐ child_sexual_exploitation (HEADLINE METRIC):`);
+  console.log(`     n=${String(cseRow.n).padStart(3)}  missed=${cseRow.missed}  extra=${cseRow.extra}  ${cseRow.pass ? '✅ PASS' : '❌ FAIL'}\n`);
+}
 for (const row of perClass) {
+  if (row.type === 'child_sexual_exploitation') continue; // Already printed above
   console.log(
     `  ${row.type.padEnd(28)} n=${String(row.n).padStart(3)}  missed=${row.missed}  extra=${row.extra}  ${row.pass ? 'pass' : 'FAIL'}`,
   );
@@ -205,7 +375,7 @@ const report = {
   pin,
   digest,
   ggufPath,
-  promptTemplateVersion: 'v3',
+  promptTemplateVersion: templateLabel,
   hardware,
   systemInfo: evaluator.systemInfo,
   n: score.n,
@@ -219,7 +389,9 @@ const report = {
   meanFirePathMs: score.meanFirePathMs,
   perClass,
   cleanFires: cleanFires.map((item) => item.id),
-  evidence: 'empty on v3; compact verdict only',
+  evidence: templateLabel === 'primitives-v1' || templateLabel === 'per-primitive-v1' ? 'empty; primitives decode only' : 'empty on v3; compact verdict only',
+  perItemPrimitives: perItemData.length > 0 ? perItemData : undefined,
+  subjectIsMinorAtomAnalysis: subjectIsMinorAnalysis,
   historicalSubset: historicalScore ? {
     name: gate.historicalSubset.name,
     n: historicalScore.n,

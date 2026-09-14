@@ -36,6 +36,7 @@ import {
   SpecialTokensText,
 } from 'node-llama-cpp';
 import { verifyModelSha256 } from './digest.js';
+import { compose as composePrimitives } from './compose-primitives.js';
 import {
   buildClassEvidenceQuestion,
   buildClassVerdictQuestion,
@@ -52,6 +53,19 @@ import {
   PROMPT_TEMPLATE_V3,
   taxonomyTypes,
 } from './prompt-v3.js';
+import {
+  buildV4ChatTurns,
+  compactPrimitivesGbnf,
+  parseCompactPrimitives,
+  PRIMITIVES_CATALOGUE_V1,
+  PROMPT_TEMPLATE_V4,
+  buildStanceSystemPrompt,
+  buildObjectSystemPrompt,
+  buildQualifierSystemPrompt,
+  buildPerPrimitiveUser,
+  type PrimitivesCatalogue,
+} from './prompt-v4.js';
+import fs from 'node:fs';
 
 export { PROMPT_TEMPLATE_VERSION };
 
@@ -71,9 +85,20 @@ export interface LocalEvaluatorOptions {
   seed?: number;
   /**
    * Decode template. Default is the live pin (v2.1). Pass v3 only for a trained
-   * candidate against the held-out gate. This does not change the default evaluator.
+   * candidate against the held-out gate. Pass primitives-v1 for a primitives
+   * evaluator with runtime composition.
    */
   promptTemplateVersion?: string;
+  /**
+   * Composition file path for primitives-v1 template. Maps primitives → taxonomy flags.
+   * Required when promptTemplateVersion is primitives-v1.
+   * Example: tools/evaluator-training/primitives/compositions/airp-v0.5.0.json
+   */
+  compositionPath?: string;
+  /**
+   * Primitives catalogue for primitives-v1 template. Defaults to PRIMITIVES_CATALOGUE_V1.
+   */
+  primitivesCatalogue?: PrimitivesCatalogue;
 }
 
 type LoadedRuntime = {
@@ -83,6 +108,9 @@ type LoadedRuntime = {
   verdictGrammar: LlamaGrammar;
   evidenceGrammar: LlamaGrammar;
   compactGrammar: LlamaGrammar;
+  primitivesGrammar?: LlamaGrammar;
+  stanceGrammar?: LlamaGrammar;
+  yesNoGrammar?: LlamaGrammar;
   systemInfo: string;
 };
 
@@ -103,6 +131,8 @@ export class LocalEvaluator implements Evaluator {
   systemInfo = '';
   /** True when any raw generation in the last evaluate() contained a think tag. */
   lastThoughtDetected = false;
+  /** Last primitives verdict (for per-primitive-v1 or primitives-v1 templates). */
+  lastPrimitivesVerdict: { stance: string; objects: string[]; qualifiers: string[] } | null = null;
   /** True only while load() is running the discarded first generate. */
   #warming = false;
 
@@ -111,8 +141,11 @@ export class LocalEvaluator implements Evaluator {
     this.#opts = opts;
     this.#digest = verifyModelSha256(opts.modelPath, opts.modelSha256);
     const template = opts.promptTemplateVersion ?? PROMPT_TEMPLATE_VERSION;
-    if (template !== PROMPT_TEMPLATE_VERSION && template !== PROMPT_TEMPLATE_V3) {
+    if (template !== PROMPT_TEMPLATE_VERSION && template !== PROMPT_TEMPLATE_V3 && template !== PROMPT_TEMPLATE_V4 && template !== 'per-primitive-v1') {
       throw new Error(`unsupported promptTemplateVersion ${template}`);
+    }
+    if ((template === PROMPT_TEMPLATE_V4 || template === 'per-primitive-v1') && !opts.compositionPath) {
+      throw new Error(`compositionPath required when promptTemplateVersion is ${template}`);
     }
     this.version = `${this.#digest.slice(0, 12)}+${template}`;
   }
@@ -148,6 +181,25 @@ export class LocalEvaluator implements Evaluator {
     const compactGrammar = await llama.createGrammar({
       grammar: compactVerdictGbnf(this.#taxonomy.flags.length),
     });
+    const primitivesGrammar = this.promptTemplateVersion === PROMPT_TEMPLATE_V4
+      ? await llama.createGrammar({
+          grammar: compactPrimitivesGbnf(this.#opts.primitivesCatalogue ?? PRIMITIVES_CATALOGUE_V1),
+        })
+      : undefined;
+    
+    // Per-primitive-v1 grammars: stance enum and yes/no
+    const catalogue = this.#opts.primitivesCatalogue ?? PRIMITIVES_CATALOGUE_V1;
+    const stanceGrammar = this.promptTemplateVersion === 'per-primitive-v1'
+      ? await llama.createGrammar({
+          grammar: `root ::= ${catalogue.stance.map((s) => `"${s.primitive}"`).join(' | ')}`,
+        })
+      : undefined;
+    const yesNoGrammar = this.promptTemplateVersion === 'per-primitive-v1'
+      ? await llama.createGrammar({
+          grammar: 'root ::= "yes" | "no"',
+        })
+      : undefined;
+    
     this.#loaded = {
       model,
       sequence,
@@ -155,6 +207,9 @@ export class LocalEvaluator implements Evaluator {
       verdictGrammar,
       evidenceGrammar,
       compactGrammar,
+      primitivesGrammar,
+      stanceGrammar,
+      yesNoGrammar,
       systemInfo: this.systemInfo,
     };
     console.log(
@@ -203,6 +258,12 @@ export class LocalEvaluator implements Evaluator {
     this.lastThoughtDetected = false;
     if (this.promptTemplateVersion === PROMPT_TEMPLATE_V3) {
       return this.#evaluateV3(req, loaded, started);
+    }
+    if (this.promptTemplateVersion === PROMPT_TEMPLATE_V4) {
+      return this.#evaluateV4(req, loaded, started);
+    }
+    if (this.promptTemplateVersion === 'per-primitive-v1') {
+      return this.#evaluatePerPrimitive(req, loaded, started);
     }
     const perCallMs = this.#opts.timeoutMs ?? 30_000;
     const shared = buildSharedPrefix(req);
@@ -266,6 +327,190 @@ export class LocalEvaluator implements Evaluator {
     this.#evalLog(
       `local-llm@${this.version}: evaluated ${this.#taxonomy.flags.length} classes in ${this.lastEvalMs}ms`,
     );
+    return flags;
+  }
+
+  async #evaluateV4(req: EvaluationRequest, loaded: LoadedRuntime, started: number): Promise<Flag[]> {
+    if (!loaded.primitivesGrammar) {
+      throw new Error('primitivesGrammar not loaded for primitives-v1 template');
+    }
+    if (!this.#opts.compositionPath) {
+      throw new Error('compositionPath required for primitives-v1 template');
+    }
+    const perCallMs = this.#opts.timeoutMs ?? 30_000;
+    const catalogue = this.#opts.primitivesCatalogue ?? PRIMITIVES_CATALOGUE_V1;
+    const { system, user } = buildV4ChatTurns(req, catalogue);
+    const tokens = this.#tokenizeHistory(loaded, [
+      { type: 'system', text: system },
+      { type: 'user', text: user },
+      { type: 'model', response: [] },
+    ]);
+    let raw = '';
+    try {
+      raw = await this.#generate(loaded, tokens, loaded.primitivesGrammar, 20, perCallMs);
+    } catch (err) {
+      this.#evalWarn(
+        `local-llm@${this.version}: primitives generation failed (${(err as Error).message}); treating as no fires`,
+      );
+      this.lastEvalMs = Date.now() - started;
+      return [];
+    }
+    this.lastRawByClass = { compact: raw };
+    if (looksLikeThinking(raw)) {
+      this.lastThoughtDetected = true;
+      this.#evalWarn(`local-llm@${this.version}: think tag in primitives verdict: ${JSON.stringify(raw)}`);
+    }
+    const parsed = parseCompactPrimitives(raw, catalogue);
+    if (parsed.unparseable) {
+      this.#evalWarn(
+        `local-llm@${this.version}: unparseable primitives verdict (${JSON.stringify(raw)}); treating as no fires`,
+      );
+      this.lastEvalMs = Date.now() - started;
+      return [];
+    }
+    // Store primitives verdict
+    this.lastPrimitivesVerdict = { stance: parsed.stance, objects: parsed.objects, qualifiers: parsed.qualifiers };
+    // Compose primitives → taxonomy flags
+    const composition = JSON.parse(fs.readFileSync(this.#opts.compositionPath, 'utf-8'));
+    const firedTypes = composePrimitives({ stance: parsed.stance, objects: parsed.objects, qualifiers: parsed.qualifiers }, composition);
+    const byType = new Map(this.#taxonomy.flags.map((def) => [def.type, def]));
+    const flags: Flag[] = [];
+    for (const type of firedTypes) {
+      const def = byType.get(type);
+      if (!def) continue;
+      this.lastRawByClass[type] = 'yes';
+      flags.push({
+        type: def.type,
+        severity: def.severity,
+        evidence: [],
+        basis: `${this.#taxonomy.version}:local:${def.type}`,
+      });
+    }
+    this.lastEvalMs = Date.now() - started;
+    this.#evalLog(`local-llm@${this.version}: primitives verdict ${raw.trim()} → ${firedTypes.join(',')} in ${this.lastEvalMs}ms`);
+    return flags;
+  }
+
+  async #evaluatePerPrimitive(req: EvaluationRequest, loaded: LoadedRuntime, started: number): Promise<Flag[]> {
+    if (!loaded.stanceGrammar || !loaded.yesNoGrammar) {
+      throw new Error('per-primitive grammars not loaded for per-primitive-v1 template');
+    }
+    if (!this.#opts.compositionPath) {
+      throw new Error('compositionPath required for per-primitive-v1 template');
+    }
+    const perCallMs = this.#opts.timeoutMs ?? 30_000;
+    const catalogue = this.#opts.primitivesCatalogue ?? PRIMITIVES_CATALOGUE_V1;
+    const userPrompt = buildPerPrimitiveUser(req);
+    
+    // Run 18 separate passes: 1 stance + 7 objects + 10 qualifiers
+    const rawAnswers: Record<string, string> = {};
+    
+    // Pass 1: Stance
+    const stanceSystem = buildStanceSystemPrompt(catalogue);
+    const stanceTokens = this.#tokenizeHistory(loaded, [
+      { type: 'system', text: stanceSystem },
+      { type: 'user', text: userPrompt },
+      { type: 'model', response: [] },
+    ]);
+    let stanceRaw = '';
+    try {
+      stanceRaw = await this.#generate(loaded, stanceTokens, loaded.stanceGrammar, 16, perCallMs);
+    } catch (err) {
+      this.#evalWarn(
+        `local-llm@${this.version}: stance generation failed (${(err as Error).message}); defaulting to describes`,
+      );
+      stanceRaw = 'describes';
+    }
+    // Normalize stance (belt-and-suspenders for truncation)
+    let normalizedStance = stanceRaw.trim().toLowerCase();
+    if (normalizedStance.startsWith('encour')) {
+      normalizedStance = 'encourages';
+    } else if (normalizedStance.startsWith('convey')) {
+      normalizedStance = 'conveys_method';
+    }
+    rawAnswers.stance = normalizedStance;
+    
+    // Passes 2-8: Objects (yes/no)
+    for (const obj of catalogue.objects) {
+      const objSystem = buildObjectSystemPrompt(obj.primitive, catalogue);
+      const objTokens = this.#tokenizeHistory(loaded, [
+        { type: 'system', text: objSystem },
+        { type: 'user', text: userPrompt },
+        { type: 'model', response: [] },
+      ]);
+      let objRaw = '';
+      try {
+        objRaw = await this.#generate(loaded, objTokens, loaded.yesNoGrammar, 2, perCallMs);
+      } catch (err) {
+        this.#evalWarn(
+          `local-llm@${this.version}: object ${obj.primitive} generation failed (${(err as Error).message}); defaulting to no`,
+        );
+        objRaw = 'no';
+      }
+      rawAnswers[`object_${obj.primitive}`] = objRaw.trim().toLowerCase();
+    }
+    
+    // Passes 9-18: Qualifiers (yes/no)
+    for (const qual of catalogue.qualifiers) {
+      const qualSystem = buildQualifierSystemPrompt(qual.primitive, catalogue);
+      const qualTokens = this.#tokenizeHistory(loaded, [
+        { type: 'system', text: qualSystem },
+        { type: 'user', text: userPrompt },
+        { type: 'model', response: [] },
+      ]);
+      let qualRaw = '';
+      try {
+        qualRaw = await this.#generate(loaded, qualTokens, loaded.yesNoGrammar, 2, perCallMs);
+      } catch (err) {
+        this.#evalWarn(
+          `local-llm@${this.version}: qualifier ${qual.primitive} generation failed (${(err as Error).message}); defaulting to no`,
+        );
+        qualRaw = 'no';
+      }
+      rawAnswers[`qualifier_${qual.primitive}`] = qualRaw.trim().toLowerCase();
+    }
+    
+    // Assemble primitives verdict from 18 answers
+    const objects: string[] = [];
+    for (const obj of catalogue.objects) {
+      if (rawAnswers[`object_${obj.primitive}`] === 'yes') {
+        objects.push(obj.primitive);
+      }
+    }
+    
+    const qualifiers: string[] = [];
+    for (const qual of catalogue.qualifiers) {
+      if (rawAnswers[`qualifier_${qual.primitive}`] === 'yes') {
+        qualifiers.push(qual.primitive);
+      }
+    }
+    
+    const stance = rawAnswers.stance;
+    
+    // Store raw answers for debugging
+    this.lastRawByClass = rawAnswers;
+    
+    // Store primitives verdict
+    this.lastPrimitivesVerdict = { stance, objects, qualifiers };
+    
+    // Compose primitives → taxonomy flags
+    const composition = JSON.parse(fs.readFileSync(this.#opts.compositionPath, 'utf-8'));
+    const firedTypes = composePrimitives({ stance, objects, qualifiers }, composition);
+    const byType = new Map(this.#taxonomy.flags.map((def) => [def.type, def]));
+    const flags: Flag[] = [];
+    for (const type of firedTypes) {
+      const def = byType.get(type);
+      if (!def) continue;
+      this.lastRawByClass[type] = 'yes';
+      flags.push({
+        type: def.type,
+        severity: def.severity,
+        evidence: [],
+        basis: `${this.#taxonomy.version}:local:${def.type}`,
+      });
+    }
+    this.lastEvalMs = Date.now() - started;
+    this.#evalLog(`local-llm@${this.version}: per-primitive verdict (${stance}, ${objects.length} objects, ${qualifiers.length} qualifiers) → ${firedTypes.join(',')} in ${this.lastEvalMs}ms`);
     return flags;
   }
 

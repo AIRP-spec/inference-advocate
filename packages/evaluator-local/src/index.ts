@@ -35,7 +35,40 @@ export {
   buildV3EvaluationPrompt,
   type ParsedCompactVerdict,
 } from './prompt-v3.js';
+export {
+  PROMPT_TEMPLATE_V4,
+  PRIMITIVES_CATALOGUE_V1,
+  serializeCompactPrimitives,
+  parseCompactPrimitives,
+  compactPrimitivesGbnf,
+  buildV4System,
+  buildV4User,
+  buildV4ChatTurns,
+  buildV4EvaluationPrompt,
+  promptSha256,
+  buildStanceSystemPrompt,
+  buildObjectSystemPrompt,
+  buildQualifierSystemPrompt,
+  buildPerPrimitiveUser,
+  buildAllPerPrimitivePrompts,
+  perPrimitivePromptBundleSha256,
+  type PrimitivesCatalogue,
+  type PrimitivesVerdict,
+  type ParsedCompactPrimitives,
+} from './prompt-v4.js';
 export { verifyModelSha256, sha256FileHex, normalizeDigest } from './digest.js';
+export {
+  type PerPrimitiveStub,
+  PerPrimitiveStubImpl,
+} from './per-primitive-stub.js';
+export {
+  compose,
+  type PrimitivesVerdict as ComposePrimitivesVerdict,
+  type Composition,
+  type CompositionCondition,
+  type NegativeRule,
+  type ClassRule,
+} from './compose-primitives.js';
 export {
   HELD_OUT_GATE_FILE,
   HELD_OUT_SUITE_FILE,
