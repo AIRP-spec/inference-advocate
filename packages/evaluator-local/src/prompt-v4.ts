@@ -370,3 +370,73 @@ export function compactPrimitivesGbnf(catalogue: PrimitivesCatalogue = PRIMITIVE
   
   return `root ::= stance " " ${ynSlots}\nstance ::= ${stanceOptions}\nyn ::= ${yn}`;
 }
+
+/**
+ * Compute SHA256 of system prompt bytes.
+ * Used for serializer latch: SFT and gate must match.
+ */
+export function promptSha256(systemPrompt: string): string {
+  return createHash('sha256').update(systemPrompt, 'utf8').digest('hex');
+}
+
+/**
+ * Split-decode API stub for per-primitive inference.
+ * 
+ * Decision 2026-09-14 (Justin + Zimmer): Per-primitive decode for next re-SFT.
+ * 
+ * Rationale:
+ * - Current one-shot 18-token: ~75ms A100, ~347ms Xeon AVX512 per item
+ * - 18 separate passes ≈ 18× slower → CPU gate ~6s/item, 471×6 CKs = hours not ~30min
+ * - Grouped (stance|objects|qualifiers) is faster but tests hypothesis only partially
+ * 
+ * Trade call: Run per-primitive as the clean test of whether narrow questions are easier.
+ * If full-suite×all-CK gating is impractical, gate a subset of checkpoints (mid + late:
+ * 378/630/753 or best-by-loss + final) rather than weakening to grouped calls.
+ * A slow decisive answer beats a fast ambiguous one. Optimize (batching, grouped) only
+ * after per-primitive proves or fails the CSE named gate.
+ * 
+ * Named gate for next run: child_sexual_exploitation per-class pass (control 1/11; overnight prim 0/11).
+ * 
+ * Stub interface (not implemented, no re-SFT yet):
+ * - buildStancePrompt(req) → system + user for stance enum pass
+ * - buildObjectPrompt(req, objectPrimitive) → system + user for yes/no pass on one object
+ * - buildQualifierPrompt(req, qualifierPrimitive) → system + user for yes/no pass on one qualifier
+ * - serializePerPrimitive(stanceResult, objectResults, qualifierResults) → PrimitivesVerdict
+ * 
+ * Full implementation deferred until after serializer latch + corrected labels relabel.
+ */
+export interface PerPrimitiveStub {
+  /**
+   * Build stance enum prompt (one of 5).
+   * Returns system and user prompts for stance classification pass.
+   */
+  buildStancePrompt?: (req: EvaluationRequest) => { system: string; user: string };
+  
+  /**
+   * Build object yes/no prompt (7 separate calls).
+   * Returns system and user prompts for binary object detection.
+   */
+  buildObjectPrompt?: (req: EvaluationRequest, objectPrimitive: string) => { system: string; user: string };
+  
+  /**
+   * Build qualifier yes/no prompt (10 separate calls).
+   * Returns system and user prompts for binary qualifier detection.
+   */
+  buildQualifierPrompt?: (req: EvaluationRequest, qualifierPrimitive: string) => { system: string; user: string };
+  
+  /**
+   * Aggregate per-primitive results into a single verdict.
+   * Combines stance result + object results + qualifier results.
+   */
+  serializePerPrimitive?: (
+    stanceResult: string,
+    objectResults: Record<string, boolean>,
+    qualifierResults: Record<string, boolean>
+  ) => PrimitivesVerdict;
+}
+
+/**
+ * Placeholder: full implementation deferred.
+ * Scaffolding for next re-SFT with per-primitive decode.
+ */
+export const PER_PRIMITIVE_STUB: PerPrimitiveStub = {};
