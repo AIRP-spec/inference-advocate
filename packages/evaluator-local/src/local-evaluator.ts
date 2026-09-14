@@ -130,6 +130,8 @@ export class LocalEvaluator implements Evaluator {
   systemInfo = '';
   /** True when any raw generation in the last evaluate() contained a think tag. */
   lastThoughtDetected = false;
+  /** Last primitives verdict (for per-primitive-v1 or primitives-v1 templates). */
+  lastPrimitivesVerdict: { stance: string; objects: string[]; qualifiers: string[] } | null = null;
   /** True only while load() is running the discarded first generate. */
   #warming = false;
 
@@ -365,6 +367,8 @@ export class LocalEvaluator implements Evaluator {
       this.lastEvalMs = Date.now() - started;
       return [];
     }
+    // Store primitives verdict
+    this.lastPrimitivesVerdict = { stance: parsed.stance, objects: parsed.objects, qualifiers: parsed.qualifiers };
     // Compose primitives → taxonomy flags
     const composition = JSON.parse(fs.readFileSync(this.#opts.compositionPath, 'utf-8'));
     const firedTypes = this.#compose({ stance: parsed.stance, objects: parsed.objects, qualifiers: parsed.qualifiers }, composition);
@@ -477,6 +481,9 @@ export class LocalEvaluator implements Evaluator {
     
     // Store raw answers for debugging
     this.lastRawByClass = rawAnswers;
+    
+    // Store primitives verdict
+    this.lastPrimitivesVerdict = { stance, objects, qualifiers };
     
     // Compose primitives → taxonomy flags
     const composition = JSON.parse(fs.readFileSync(this.#opts.compositionPath, 'utf-8'));

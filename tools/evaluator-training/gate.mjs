@@ -245,6 +245,7 @@ if (templateLabel === 'primitives-v1') {
 }
 
 const verdicts = [];
+const perItemData = []; // For per-primitive-v1: full primitives + composed flags per item
 for (const item of suite.items) {
   const flags = await evaluator.evaluate({
     providerId: 'held-out',
@@ -253,6 +254,21 @@ for (const item of suite.items) {
   });
   const got = flags.map((f) => f.type);
   verdicts.push({ id: item.id, got, ms: evaluator.lastEvalMs });
+  
+  // For per-primitive-v1, capture raw primitives verdict
+  if ((promptTemplateVersion === 'per-primitive-v1' || promptTemplateVersion === PROMPT_TEMPLATE_V4) && evaluator.lastPrimitivesVerdict) {
+    perItemData.push({
+      id: item.id,
+      goldExpect: item.expect,
+      primitives: {
+        stance: evaluator.lastPrimitivesVerdict.stance,
+        objects: evaluator.lastPrimitivesVerdict.objects,
+        qualifiers: evaluator.lastPrimitivesVerdict.qualifiers,
+      },
+      composed: got,
+    });
+  }
+  
   const extra = got.filter((type) => !item.expect.includes(type));
   const missing = item.expect.filter((type) => !got.includes(type));
   const mark = missing.length === 0 && extra.length === 0 ? 'pass' : 'FAIL';
@@ -266,6 +282,44 @@ for (const item of suite.items) {
 const dualScore = scoreHeldOutGateDual(suite, gate, verdicts, suitePath);
 const score = dualScore.full;
 const historicalScore = dualScore.historicalSubset;
+
+// Compute subject_is_minor atom analysis for per-primitive-v1
+let subjectIsMinorAnalysis = null;
+if (perItemData.length > 0) {
+  const atomName = 'subject_is_minor';
+  const modelYes = perItemData.filter((item) => item.primitives.qualifiers.includes(atomName));
+  const goldYes = perItemData.filter((item) => item.goldExpect.includes('child_sexual_exploitation'));
+  const truePositive = modelYes.filter((item) => item.goldExpect.includes('child_sexual_exploitation')).length;
+  const falsePositive = modelYes.filter((item) => !item.goldExpect.includes('child_sexual_exploitation')).length;
+  const falseNegative = goldYes.filter((item) => !item.primitives.qualifiers.includes(atomName)).length;
+  const trueNegative = perItemData.length - truePositive - falsePositive - falseNegative;
+  
+  const precision = modelYes.length > 0 ? truePositive / modelYes.length : 0;
+  const recall = goldYes.length > 0 ? truePositive / goldYes.length : 0;
+  const yesRate = modelYes.length / perItemData.length;
+  
+  subjectIsMinorAnalysis = {
+    atomName,
+    goldProxy: 'item.expect includes child_sexual_exploitation',
+    yesRate,
+    precision,
+    recall,
+    truePositive,
+    falsePositive,
+    falseNegative,
+    trueNegative,
+    modelYesCount: modelYes.length,
+    goldYesCount: goldYes.length,
+    n: perItemData.length,
+  };
+  
+  console.log(`\nsubject_is_minor atom analysis (gold proxy: CSE in expect):`);
+  console.log(`  yesRate: ${(yesRate * 100).toFixed(1)}% (${modelYes.length}/${perItemData.length})`);
+  console.log(`  precision: ${(precision * 100).toFixed(1)}% (TP=${truePositive}, FP=${falsePositive})`);
+  console.log(`  recall: ${(recall * 100).toFixed(1)}% (TP=${truePositive}, FN=${falseNegative})`);
+  console.log(`  gold yes count: ${goldYes.length} (items with CSE in expect)`);
+}
+
 const types = taxonomy.flags.map((f) => f.type);
 const perClass = types.map((type) => {
   const scoped = suite.items.filter((item) => item.expect.includes(type));
@@ -321,7 +375,7 @@ const report = {
   pin,
   digest,
   ggufPath,
-  promptTemplateVersion: 'v3',
+  promptTemplateVersion: templateLabel,
   hardware,
   systemInfo: evaluator.systemInfo,
   n: score.n,
@@ -335,7 +389,9 @@ const report = {
   meanFirePathMs: score.meanFirePathMs,
   perClass,
   cleanFires: cleanFires.map((item) => item.id),
-  evidence: 'empty on v3; compact verdict only',
+  evidence: templateLabel === 'primitives-v1' || templateLabel === 'per-primitive-v1' ? 'empty; primitives decode only' : 'empty on v3; compact verdict only',
+  perItemPrimitives: perItemData.length > 0 ? perItemData : undefined,
+  subjectIsMinorAtomAnalysis: subjectIsMinorAnalysis,
   historicalSubset: historicalScore ? {
     name: gate.historicalSubset.name,
     n: historicalScore.n,
