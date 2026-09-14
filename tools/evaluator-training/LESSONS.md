@@ -142,3 +142,9 @@ Each incident cost at least one confusing run. Each was invisible until the dive
 **The lesson:** If you have two implementations of the same behavior, you have a latent bug. The bug fires when one changes and the other doesn't, and you won't know which one is right. Merge them or test that they agree. Never assume they'll stay in sync by discipline alone.
 
 Corollary: "We'll just remember to update both" is not a process. Memory is not a control. Add a test or merge the paths.
+
+## Teaching a threshold atom as a constant on every positive of the class it gates is a coverage gap
+
+Every criminal_assistance positive (330 rows) carried exceeds_common_knowledge. The atom never varied within the class it gates, taught as "if CA then eck," a class restatement, not a threshold. The 48 no-fire rows sat in separate groups on different subjects, so nothing held a subject constant and moved depth. Five CA misses had conveys_method present and eck absent because conveys_method was taught contrastively (gore versus method) and eck was not.
+
+The fix: 16 same-subject depth pairs (32 rows) across fraud, theft, intrusion, weapons. Shared contrastGroup ca-depth-{stem}; explain arm (ca-explain-protect, expect []) vs operational (ca-named-help, expect [criminal_assistance]). Subject cannot predict the label. Contrast requires same subject, two depths.

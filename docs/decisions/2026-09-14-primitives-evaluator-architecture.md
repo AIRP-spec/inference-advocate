@@ -248,6 +248,20 @@ The prompt bundle SHA is computed by concatenating all 18 system prompts in voca
 
 **Forbidden action:** Do not re-add `disclaimer_present` from old vocabulary lists without addressing why flag-disclaim teaching data was removed in 7914 redo.
 
+## Decision 11: Corpus Slice 8056 — Exceeds Common Knowledge Depth Pairs + Mention Refusal-Naming
+
+**Date:** 2026-09-14 (fifth update)
+
+**Diagnosis (state plainly):** Every CA positive (330) carried exceeds_common_knowledge. The atom never varied within the class it gates, taught as "if CA then eck," a class restatement, not a threshold. The 48 no-fire rows sat in separate groups on different subjects, so nothing held a subject constant and moved depth. Five CA misses had conveys_method present and eck absent because conveys_method was taught contrastively (gore versus method) and eck was not.
+
+**Fourth instance of:** rule correct, published, gate-enforced, taught as a constant rather than a variable. Primitives made it visible as one failing atom.
+
+**Training data written (hand, readableAloud, tens of rows):**
+- 16 same-subject depth pairs (32 rows) across fraud, theft, intrusion, weapons. Shared contrastGroup ca-depth-{stem}; explain arm (ca-explain-protect, expect []) vs operational (ca-named-help, expect [criminal_assistance]). Subject cannot predict the label.
+- 18 mention-versus-use rows, kind refusal-naming-category, including bnd-05 roleplay-refusal form. Must be in mention-versus-use family (class-refusal generics do not teach this atom).
+
+**Corpus update:** 8006 → 8056. Labels: keep v2 for base; label only new 50. One variable for retrain: corpus. Per-primitive 17 passes (disclaimer removed). Train artifacts dir sweep-primitives-perprim-8056. CSE named gate + per-atom P/R. Compare Run B 17/12 vs prior prim 33/21.
+
 ## Status
 
 All decisions are implemented and tested as of 2026-09-14.
