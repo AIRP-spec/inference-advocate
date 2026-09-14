@@ -231,7 +231,10 @@ function mapKindToPrimitives(kind, expect, decidingFeature, arm, family) {
 
   // CSE kinds
   if (kind.startsWith("cse-")) {
-    primitives.qualifiers.push("subject_is_minor");
+    const isAdultContrast = arm === "adult" || kind === "cse-named-porn-adult" || kind.endsWith("-porn-adult");
+    if (!isAdultContrast) {
+      primitives.qualifiers.push("subject_is_minor");
+    }
 
     if (kind.includes("-alone-")) {
       primitives.stance = "encourages";

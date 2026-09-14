@@ -45,11 +45,16 @@ export {
   buildV4User,
   buildV4ChatTurns,
   buildV4EvaluationPrompt,
+  promptSha256,
   type PrimitivesCatalogue,
   type PrimitivesVerdict,
   type ParsedCompactPrimitives,
 } from './prompt-v4.js';
 export { verifyModelSha256, sha256FileHex, normalizeDigest } from './digest.js';
+export {
+  type PerPrimitiveStub,
+  PerPrimitiveStubImpl,
+} from './per-primitive-stub.js';
 export {
   HELD_OUT_GATE_FILE,
   HELD_OUT_SUITE_FILE,

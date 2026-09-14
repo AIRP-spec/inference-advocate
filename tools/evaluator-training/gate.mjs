@@ -17,7 +17,7 @@ const trainRecipe = JSON.parse(readFileSync(join(here, 'train-recipe.json'), 'ut
 const genRecipe = JSON.parse(readFileSync(join(here, 'recipe.json'), 'utf8'));
 
 function parseArgs(argv) {
-  const out = { gguf: '', sha256: '', gpu: false, report: '', allowFail: false, promptTemplateVersion: '', compositionPath: '' };
+  const out = { gguf: '', sha256: '', gpu: false, report: '', allowFail: false, promptTemplateVersion: '', compositionPath: '', sftMetadataPath: '' };
   for (let i = 2; i < argv.length; i++) {
     const a = argv[i];
     if (a === '--gpu') out.gpu = true;
@@ -27,6 +27,7 @@ function parseArgs(argv) {
     else if (a === '--report') out.report = argv[++i];
     else if (a === '--prompt-template-version') out.promptTemplateVersion = argv[++i];
     else if (a === '--composition-path') out.compositionPath = argv[++i];
+    else if (a === '--sft-metadata-path') out.sftMetadataPath = argv[++i];
     else throw new Error(`unknown argument ${a}`);
   }
   return out;
@@ -60,6 +61,7 @@ let artifacts = {};
 if (existsSync(artifactsPath)) {
   artifacts = JSON.parse(readFileSync(artifactsPath, 'utf8'));
 }
+
 const ggufPath = resolve(args.gguf || artifacts.ggufPath || '');
 if (!ggufPath || !existsSync(ggufPath)) {
   console.error(`gate: no GGUF at ${ggufPath || '(empty)'}. Train first.`);
@@ -75,6 +77,7 @@ let scoreHeldOutGateDual;
 let sha256FileHex;
 let PROMPT_TEMPLATE_V3;
 let PROMPT_TEMPLATE_V4;
+let promptSha256;
 try {
   ({ Taxonomy } = await import('@airp/core'));
   ({
@@ -86,10 +89,50 @@ try {
     sha256FileHex,
     PROMPT_TEMPLATE_V3,
     PROMPT_TEMPLATE_V4,
+    promptSha256,
   } = await import('@airp/evaluator-local'));
 } catch (err) {
   console.error(`cannot import built packages (${err.message}). Run npm run build first.`);
   process.exit(1);
+}
+
+// Check for SFT metadata and validate SHAs if present
+const sftMetadataPath = args.sftMetadataPath || trainRecipe.sftMetadataPath;
+if (sftMetadataPath) {
+  const metaPath = resolve(repoRoot, sftMetadataPath);
+  if (!existsSync(metaPath)) {
+    console.error(`SFT metadata file not found: ${metaPath}`);
+    process.exit(1);
+  }
+  const sftMeta = JSON.parse(readFileSync(metaPath, 'utf8'));
+  
+  const livePromptSha = promptSha256();
+  if (livePromptSha !== sftMeta.promptSha256) {
+    console.error(`❌ Prompt SHA mismatch!`);
+    console.error(`  Live buildV4System() SHA: ${livePromptSha}`);
+    console.error(`  Recorded in ${metaPath}: ${sftMeta.promptSha256}`);
+    console.error(`  The live prompt template has changed since SFT was built.`);
+    console.error(`  Rebuild SFT or revert prompt changes.`);
+    process.exit(1);
+  }
+  
+  // Validate labels file SHA if path is present
+  if (sftMeta.paths && sftMeta.paths.labels) {
+    const labelsPath = resolve(repoRoot, sftMeta.paths.labels);
+    if (existsSync(labelsPath)) {
+      const liveLabelsShа = sha256FileHex(labelsPath);
+      if (liveLabelsShа !== sftMeta.labelsSha256) {
+        console.error(`❌ Labels file SHA mismatch!`);
+        console.error(`  Live labels file SHA: ${liveLabelsShа}`);
+        console.error(`  Recorded in ${metaPath}: ${sftMeta.labelsSha256}`);
+        console.error(`  The labels file has changed since SFT was built.`);
+        console.error(`  Rebuild SFT with current labels.`);
+        process.exit(1);
+      }
+    }
+  }
+  
+  console.log(`✅ SFT metadata validated: prompt and labels SHAs match`);
 }
 
 // Resolve promptTemplateVersion from args, recipe, or default

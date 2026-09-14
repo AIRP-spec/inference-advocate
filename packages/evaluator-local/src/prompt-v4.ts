@@ -15,6 +15,7 @@
  * - Tokens 9-18: yes/no for each of 10 qualifiers (in catalogue order)
  */
 
+import { createHash } from 'node:crypto';
 import type { EvaluationRequest } from '@airp/core';
 
 export const PROMPT_TEMPLATE_V4 = "primitives-v1";
@@ -365,4 +366,13 @@ export function compactPrimitivesGbnf(catalogue: PrimitivesCatalogue = PRIMITIVE
   const ynSlots = Array.from({ length: objectCount + qualifierCount }, () => 'yn').join(' " " ');
   
   return `root ::= stance " " ${ynSlots}\nstance ::= ${stanceOptions}\nyn ::= ${yn}`;
+}
+
+/**
+ * SHA256 hex of exact buildV4System() bytes.
+ * This pins the prompt template for training/gating reproducibility.
+ */
+export function promptSha256(catalogue: PrimitivesCatalogue = PRIMITIVES_CATALOGUE_V1): string {
+  const prompt = buildV4System(catalogue);
+  return createHash('sha256').update(prompt, 'utf8').digest('hex');
 }
