@@ -11,16 +11,15 @@
 
 import assert from "node:assert";
 import { test } from "node:test";
-import { createRequire } from "node:module";
 import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
+import { createHash } from "node:crypto";
 
 const here = path.dirname(fileURLToPath(import.meta.url));
-const require = createRequire(import.meta.url);
 
 // Import from evaluator-local
-const { promptSha256, sha256FileHex, buildV4System, serializeCompactPrimitives, PRIMITIVES_CATALOGUE_V1 } = require("@airp/evaluator-local");
+const { promptSha256, sha256FileHex, buildV4System, serializeCompactPrimitives, PRIMITIVES_CATALOGUE_V1 } = await import("@airp/evaluator-local");
 
 test("promptSha256 is deterministic", () => {
   const sha1 = promptSha256();
@@ -34,7 +33,7 @@ test("promptSha256 is deterministic", () => {
 
 test("promptSha256 matches buildV4System() content", () => {
   const prompt = buildV4System();
-  const expectedSha = require("node:crypto").createHash("sha256").update(prompt, "utf8").digest("hex");
+  const expectedSha = createHash("sha256").update(prompt, "utf8").digest("hex");
   const actualSha = promptSha256();
   
   assert.strictEqual(actualSha, expectedSha, "promptSha256 should match SHA256 of buildV4System() output");
@@ -48,7 +47,7 @@ test("sha256FileHex works correctly", () => {
   
   try {
     const sha = sha256FileHex(tempFile);
-    const expectedSha = require("node:crypto").createHash("sha256").update(testContent, "utf8").digest("hex");
+    const expectedSha = createHash("sha256").update(testContent, "utf8").digest("hex");
     
     assert.strictEqual(sha, expectedSha, "sha256FileHex should compute correct SHA256");
     assert.strictEqual(typeof sha, "string", "sha256FileHex should return a string");

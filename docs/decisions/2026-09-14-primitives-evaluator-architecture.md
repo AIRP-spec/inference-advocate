@@ -11,27 +11,63 @@ The primitives evaluator training pipeline has been established with the overnig
 
 **Decision:** Implement per-primitive prompting (18 separate passes) as the primary architecture, not grouped compact decode.
 
+**Status:** ✅ **Implemented** as of 2026-09-14
+
 **Rationale:**
 - One prompt per primitive provides clearer signal and better model comprehension
 - 18-token grouped decode conflates multiple independent decisions into a single pass
 - Per-primitive architecture aligns with the primitives abstraction layer design
 - Enables fine-grained debugging and error analysis per primitive
 
-**Implementation Path:**
-- Current: Grouped compact 18-token decode (one pass for all primitives)
-- Next: Per-primitive prompting (18 passes: 5 stances, 7 objects, 10 qualifiers)
-- If 471×6 corpus proves too slow: **subset corpus keys (CKs)**, do NOT revert to grouped-first
+**Implementation:**
+- ✅ `buildStanceSystemPrompt()`: Stance classification with 5 options
+- ✅ `buildObjectSystemPrompt(primitive)`: Yes/no for each of 7 objects
+- ✅ `buildQualifierSystemPrompt(primitive)`: Yes/no for each of 10 qualifiers
+- ✅ `buildAllPerPrimitivePrompts()`: Returns all 18 prompts in vocabulary order
+- ✅ `perPrimitivePromptBundleSha256()`: SHA256 of concatenated 18 system prompts
+- ✅ SFT builder: `build-sft-per-primitive.mjs` emits 18 examples per corpus row
+- ✅ Tests: `per-primitive.test.mjs` validates all builders and fixtures
 
-**Interface:** See `packages/evaluator-local/src/per-primitive-stub.ts` for the contract.
+**Prompt Bundle SHA Decision:**
+The prompt bundle SHA is computed by concatenating all 18 system prompts in vocabulary order (separated by `\n---\n`) and hashing the result. This captures the entire prompt family as a single reproducibility pin.
+
+**Decode Shape:** `per-primitive-v1`
+- 18 separate passes per utterance
+- Each pass: minimal system prompt with only that question's definition
+- Assistant output: single token line (stance name or yes/no)
+
+**SFT Output:**
+- Input: N corpus rows × N labels
+- Output: N × 18 SFT examples (one per pass)
+- Each example: `{id: "row-id__primitive", sourceId: "row-id", passType, primitive, messages: [{system}, {user}, {assistant}]}`
+
+**Metadata:**
+- `promptBundleSha256`: SHA256 of all 18 system prompts concatenated
+- `decodeShape`: `per-primitive-v1`
+- `passesPerUtterance`: 18
+
+**Path Forward:**
+- Current: Compact 18-token decode (one pass, deprecated for next run)
+- Next: Per-primitive decode (18 passes: 5 stances, 7 objects, 10 qualifiers)
+- If 471×6 corpus proves too slow: **subset corpus keys (CKs)**, do NOT revert to grouped-first
 
 ## Decision 2: Named Gate for CSE Per-Class Pass
 
 **Decision:** The child sexual exploitation gate is named `child_sexual_exploitation` and runs as a dedicated per-class pass in the held-out gate.
 
+**Headline Metric for Next Run:** The next training run's success will be judged primarily on the **child_sexual_exploitation per-class pass**.
+
+**Context:**
+- Control (v3, CK-630): **1/11 per-class passes** (child_sexual_exploitation passed)
+- Overnight primitives (prim-v1, all CKs): **0/11 per-class passes** (child_sexual_exploitation failed)
+
+**Target:** Restore CSE per-class pass to at least control equivalence (1/11 or better).
+
 **Rationale:**
 - CSE is the most sensitive class and requires dedicated validation
-- Per-class gating ensures recall/precision metrics are explicit
+- Per-class gating ensures recall/precision metrics are explicit for each taxonomy flag
 - Named gate makes it clear which rules apply to CSE specifically
+- The primitives architecture must prove it can handle CSE at least as well as the control
 
 ## Decision 3: Overnight One-Shot Retired
 

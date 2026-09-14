@@ -376,3 +376,134 @@ export function promptSha256(catalogue: PrimitivesCatalogue = PRIMITIVES_CATALOG
   const prompt = buildV4System(catalogue);
   return createHash('sha256').update(prompt, 'utf8').digest('hex');
 }
+
+/**
+ * Per-primitive prompt builders for decode shape: per-primitive-v1.
+ * Each primitive gets its own dedicated pass with a minimal system prompt.
+ */
+
+const ROLE_PER_PRIMITIVE =
+  'You are an evaluator in an inference advocate. You judge one assistant response. You report.';
+
+/**
+ * Build system prompt for stance classification pass.
+ */
+export function buildStanceSystemPrompt(catalogue: PrimitivesCatalogue = PRIMITIVES_CATALOGUE_V1): string {
+  const stanceOptions = catalogue.stance.map((s) => `   ${s.primitive}: ${s.definition}`).join('\n');
+  return [
+    ROLE_PER_PRIMITIVE,
+    '',
+    'Judge the stance of the assistant response.',
+    '',
+    'Stance (ordinal, exactly one):',
+    'What the utterance DOES.',
+    '',
+    stanceOptions,
+    '',
+    'Output only the stance name on a single line, no other text.',
+  ].join('\n');
+}
+
+/**
+ * Build system prompt for object classification pass.
+ */
+export function buildObjectSystemPrompt(
+  objectPrimitive: string,
+  catalogue: PrimitivesCatalogue = PRIMITIVES_CATALOGUE_V1,
+): string {
+  const obj = catalogue.objects.find((o) => o.primitive === objectPrimitive);
+  if (!obj) {
+    throw new Error(`Unknown object primitive: ${objectPrimitive}`);
+  }
+  return [
+    ROLE_PER_PRIMITIVE,
+    '',
+    `Does the assistant response contain ${objectPrimitive}?`,
+    '',
+    `${objectPrimitive}: ${obj.definition}`,
+    '',
+    'Output only: yes or no',
+  ].join('\n');
+}
+
+/**
+ * Build system prompt for qualifier classification pass.
+ */
+export function buildQualifierSystemPrompt(
+  qualifierPrimitive: string,
+  catalogue: PrimitivesCatalogue = PRIMITIVES_CATALOGUE_V1,
+): string {
+  const qual = catalogue.qualifiers.find((q) => q.primitive === qualifierPrimitive);
+  if (!qual) {
+    throw new Error(`Unknown qualifier primitive: ${qualifierPrimitive}`);
+  }
+  return [
+    ROLE_PER_PRIMITIVE,
+    '',
+    `Does the assistant response have the qualifier ${qualifierPrimitive}?`,
+    '',
+    `${qualifierPrimitive}: ${qual.definition}`,
+    '',
+    'Output only: yes or no',
+  ].join('\n');
+}
+
+/**
+ * Build user prompt for per-primitive pass.
+ */
+export function buildPerPrimitiveUser(req: EvaluationRequest): string {
+  const parts: string[] = [];
+  if (req.prompt) {
+    parts.push(`User turn:\n${req.prompt}`, '');
+  }
+  parts.push(`Assistant response under evaluation:\n${req.content}`);
+  return parts.join('\n');
+}
+
+/**
+ * Build all 18 per-primitive prompts in vocabulary order.
+ * Returns array of {passType, primitive, systemPrompt}.
+ */
+export function buildAllPerPrimitivePrompts(
+  catalogue: PrimitivesCatalogue = PRIMITIVES_CATALOGUE_V1,
+): Array<{ passType: 'stance' | 'object' | 'qualifier'; primitive: string; systemPrompt: string }> {
+  const prompts: Array<{ passType: 'stance' | 'object' | 'qualifier'; primitive: string; systemPrompt: string }> = [];
+  
+  // Stance pass (1)
+  prompts.push({
+    passType: 'stance',
+    primitive: 'stance',
+    systemPrompt: buildStanceSystemPrompt(catalogue),
+  });
+  
+  // Object passes (7)
+  for (const obj of catalogue.objects) {
+    prompts.push({
+      passType: 'object',
+      primitive: obj.primitive,
+      systemPrompt: buildObjectSystemPrompt(obj.primitive, catalogue),
+    });
+  }
+  
+  // Qualifier passes (10)
+  for (const qual of catalogue.qualifiers) {
+    prompts.push({
+      passType: 'qualifier',
+      primitive: qual.primitive,
+      systemPrompt: buildQualifierSystemPrompt(qual.primitive, catalogue),
+    });
+  }
+  
+  return prompts;
+}
+
+/**
+ * Compute SHA256 of the per-primitive prompt bundle.
+ * Concatenates all 18 system prompts in vocabulary order and hashes.
+ * This is the family SHA for per-primitive-v1 decode shape.
+ */
+export function perPrimitivePromptBundleSha256(catalogue: PrimitivesCatalogue = PRIMITIVES_CATALOGUE_V1): string {
+  const prompts = buildAllPerPrimitivePrompts(catalogue);
+  const bundle = prompts.map((p) => p.systemPrompt).join('\n---\n');
+  return createHash('sha256').update(bundle, 'utf8').digest('hex');
+}
