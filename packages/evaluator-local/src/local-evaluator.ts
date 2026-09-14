@@ -58,6 +58,10 @@ import {
   parseCompactPrimitives,
   PRIMITIVES_CATALOGUE_V1,
   PROMPT_TEMPLATE_V4,
+  buildStanceSystemPrompt,
+  buildObjectSystemPrompt,
+  buildQualifierSystemPrompt,
+  buildPerPrimitiveUser,
   type PrimitivesCatalogue,
 } from './prompt-v4.js';
 import fs from 'node:fs';
@@ -104,6 +108,8 @@ type LoadedRuntime = {
   evidenceGrammar: LlamaGrammar;
   compactGrammar: LlamaGrammar;
   primitivesGrammar?: LlamaGrammar;
+  stanceGrammar?: LlamaGrammar;
+  yesNoGrammar?: LlamaGrammar;
   systemInfo: string;
 };
 
@@ -132,11 +138,11 @@ export class LocalEvaluator implements Evaluator {
     this.#opts = opts;
     this.#digest = verifyModelSha256(opts.modelPath, opts.modelSha256);
     const template = opts.promptTemplateVersion ?? PROMPT_TEMPLATE_VERSION;
-    if (template !== PROMPT_TEMPLATE_VERSION && template !== PROMPT_TEMPLATE_V3 && template !== PROMPT_TEMPLATE_V4) {
+    if (template !== PROMPT_TEMPLATE_VERSION && template !== PROMPT_TEMPLATE_V3 && template !== PROMPT_TEMPLATE_V4 && template !== 'per-primitive-v1') {
       throw new Error(`unsupported promptTemplateVersion ${template}`);
     }
-    if (template === PROMPT_TEMPLATE_V4 && !opts.compositionPath) {
-      throw new Error(`compositionPath required when promptTemplateVersion is ${PROMPT_TEMPLATE_V4}`);
+    if ((template === PROMPT_TEMPLATE_V4 || template === 'per-primitive-v1') && !opts.compositionPath) {
+      throw new Error(`compositionPath required when promptTemplateVersion is ${template}`);
     }
     this.version = `${this.#digest.slice(0, 12)}+${template}`;
   }
@@ -177,6 +183,20 @@ export class LocalEvaluator implements Evaluator {
           grammar: compactPrimitivesGbnf(this.#opts.primitivesCatalogue ?? PRIMITIVES_CATALOGUE_V1),
         })
       : undefined;
+    
+    // Per-primitive-v1 grammars: stance enum and yes/no
+    const catalogue = this.#opts.primitivesCatalogue ?? PRIMITIVES_CATALOGUE_V1;
+    const stanceGrammar = this.promptTemplateVersion === 'per-primitive-v1'
+      ? await llama.createGrammar({
+          grammar: `root ::= ${catalogue.stance.map((s) => `"${s.primitive}"`).join(' | ')}`,
+        })
+      : undefined;
+    const yesNoGrammar = this.promptTemplateVersion === 'per-primitive-v1'
+      ? await llama.createGrammar({
+          grammar: 'root ::= "yes" | "no"',
+        })
+      : undefined;
+    
     this.#loaded = {
       model,
       sequence,
@@ -185,6 +205,8 @@ export class LocalEvaluator implements Evaluator {
       evidenceGrammar,
       compactGrammar,
       primitivesGrammar,
+      stanceGrammar,
+      yesNoGrammar,
       systemInfo: this.systemInfo,
     };
     console.log(
@@ -236,6 +258,9 @@ export class LocalEvaluator implements Evaluator {
     }
     if (this.promptTemplateVersion === PROMPT_TEMPLATE_V4) {
       return this.#evaluateV4(req, loaded, started);
+    }
+    if (this.promptTemplateVersion === 'per-primitive-v1') {
+      return this.#evaluatePerPrimitive(req, loaded, started);
     }
     const perCallMs = this.#opts.timeoutMs ?? 30_000;
     const shared = buildSharedPrefix(req);
@@ -358,6 +383,119 @@ export class LocalEvaluator implements Evaluator {
     }
     this.lastEvalMs = Date.now() - started;
     this.#evalLog(`local-llm@${this.version}: primitives verdict ${raw.trim()} → ${firedTypes.join(',')} in ${this.lastEvalMs}ms`);
+    return flags;
+  }
+
+  async #evaluatePerPrimitive(req: EvaluationRequest, loaded: LoadedRuntime, started: number): Promise<Flag[]> {
+    if (!loaded.stanceGrammar || !loaded.yesNoGrammar) {
+      throw new Error('per-primitive grammars not loaded for per-primitive-v1 template');
+    }
+    if (!this.#opts.compositionPath) {
+      throw new Error('compositionPath required for per-primitive-v1 template');
+    }
+    const perCallMs = this.#opts.timeoutMs ?? 30_000;
+    const catalogue = this.#opts.primitivesCatalogue ?? PRIMITIVES_CATALOGUE_V1;
+    const userPrompt = buildPerPrimitiveUser(req);
+    
+    // Run 18 separate passes: 1 stance + 7 objects + 10 qualifiers
+    const rawAnswers: Record<string, string> = {};
+    
+    // Pass 1: Stance
+    const stanceSystem = buildStanceSystemPrompt(catalogue);
+    const stanceTokens = this.#tokenizeHistory(loaded, [
+      { type: 'system', text: stanceSystem },
+      { type: 'user', text: userPrompt },
+      { type: 'model', response: [] },
+    ]);
+    let stanceRaw = '';
+    try {
+      stanceRaw = await this.#generate(loaded, stanceTokens, loaded.stanceGrammar, 2, perCallMs);
+    } catch (err) {
+      this.#evalWarn(
+        `local-llm@${this.version}: stance generation failed (${(err as Error).message}); defaulting to describes`,
+      );
+      stanceRaw = 'describes';
+    }
+    rawAnswers.stance = stanceRaw.trim().toLowerCase();
+    
+    // Passes 2-8: Objects (yes/no)
+    for (const obj of catalogue.objects) {
+      const objSystem = buildObjectSystemPrompt(obj.primitive, catalogue);
+      const objTokens = this.#tokenizeHistory(loaded, [
+        { type: 'system', text: objSystem },
+        { type: 'user', text: userPrompt },
+        { type: 'model', response: [] },
+      ]);
+      let objRaw = '';
+      try {
+        objRaw = await this.#generate(loaded, objTokens, loaded.yesNoGrammar, 2, perCallMs);
+      } catch (err) {
+        this.#evalWarn(
+          `local-llm@${this.version}: object ${obj.primitive} generation failed (${(err as Error).message}); defaulting to no`,
+        );
+        objRaw = 'no';
+      }
+      rawAnswers[`object_${obj.primitive}`] = objRaw.trim().toLowerCase();
+    }
+    
+    // Passes 9-18: Qualifiers (yes/no)
+    for (const qual of catalogue.qualifiers) {
+      const qualSystem = buildQualifierSystemPrompt(qual.primitive, catalogue);
+      const qualTokens = this.#tokenizeHistory(loaded, [
+        { type: 'system', text: qualSystem },
+        { type: 'user', text: userPrompt },
+        { type: 'model', response: [] },
+      ]);
+      let qualRaw = '';
+      try {
+        qualRaw = await this.#generate(loaded, qualTokens, loaded.yesNoGrammar, 2, perCallMs);
+      } catch (err) {
+        this.#evalWarn(
+          `local-llm@${this.version}: qualifier ${qual.primitive} generation failed (${(err as Error).message}); defaulting to no`,
+        );
+        qualRaw = 'no';
+      }
+      rawAnswers[`qualifier_${qual.primitive}`] = qualRaw.trim().toLowerCase();
+    }
+    
+    // Assemble primitives verdict from 18 answers
+    const objects: string[] = [];
+    for (const obj of catalogue.objects) {
+      if (rawAnswers[`object_${obj.primitive}`] === 'yes') {
+        objects.push(obj.primitive);
+      }
+    }
+    
+    const qualifiers: string[] = [];
+    for (const qual of catalogue.qualifiers) {
+      if (rawAnswers[`qualifier_${qual.primitive}`] === 'yes') {
+        qualifiers.push(qual.primitive);
+      }
+    }
+    
+    const stance = rawAnswers.stance;
+    
+    // Store raw answers for debugging
+    this.lastRawByClass = rawAnswers;
+    
+    // Compose primitives → taxonomy flags
+    const composition = JSON.parse(fs.readFileSync(this.#opts.compositionPath, 'utf-8'));
+    const firedTypes = this.#compose({ stance, objects, qualifiers }, composition);
+    const byType = new Map(this.#taxonomy.flags.map((def) => [def.type, def]));
+    const flags: Flag[] = [];
+    for (const type of firedTypes) {
+      const def = byType.get(type);
+      if (!def) continue;
+      this.lastRawByClass[type] = 'yes';
+      flags.push({
+        type: def.type,
+        severity: def.severity,
+        evidence: [],
+        basis: `${this.#taxonomy.version}:local:${def.type}`,
+      });
+    }
+    this.lastEvalMs = Date.now() - started;
+    this.#evalLog(`local-llm@${this.version}: per-primitive verdict (${stance}, ${objects.length} objects, ${qualifiers.length} qualifiers) → ${firedTypes.join(',')} in ${this.lastEvalMs}ms`);
     return flags;
   }
 

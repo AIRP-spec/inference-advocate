@@ -78,6 +78,7 @@ let sha256FileHex;
 let PROMPT_TEMPLATE_V3;
 let PROMPT_TEMPLATE_V4;
 let promptSha256;
+let perPrimitivePromptBundleSha256;
 try {
   ({ Taxonomy } = await import('@airp/core'));
   ({
@@ -90,6 +91,7 @@ try {
     PROMPT_TEMPLATE_V3,
     PROMPT_TEMPLATE_V4,
     promptSha256,
+    perPrimitivePromptBundleSha256,
   } = await import('@airp/evaluator-local'));
 } catch (err) {
   console.error(`cannot import built packages (${err.message}). Run npm run build first.`);
@@ -106,14 +108,28 @@ if (sftMetadataPath) {
   }
   const sftMeta = JSON.parse(readFileSync(metaPath, 'utf8'));
   
-  const livePromptSha = promptSha256();
-  if (livePromptSha !== sftMeta.promptSha256) {
-    console.error(`❌ Prompt SHA mismatch!`);
-    console.error(`  Live buildV4System() SHA: ${livePromptSha}`);
-    console.error(`  Recorded in ${metaPath}: ${sftMeta.promptSha256}`);
-    console.error(`  The live prompt template has changed since SFT was built.`);
-    console.error(`  Rebuild SFT or revert prompt changes.`);
-    process.exit(1);
+  // For per-primitive-v1, validate promptBundleSha256; otherwise validate promptSha256
+  if (sftMeta.decodeShape === 'per-primitive-v1' || sftMeta.promptTemplateVersion === 'per-primitive-v1') {
+    const { perPrimitivePromptBundleSha256 } = await import('@airp/evaluator-local');
+    const livePromptBundleSha = perPrimitivePromptBundleSha256();
+    if (livePromptBundleSha !== sftMeta.promptBundleSha256) {
+      console.error(`❌ Prompt Bundle SHA mismatch!`);
+      console.error(`  Live perPrimitivePromptBundleSha256(): ${livePromptBundleSha}`);
+      console.error(`  Recorded in ${metaPath}: ${sftMeta.promptBundleSha256}`);
+      console.error(`  The live per-primitive prompt bundle has changed since SFT was built.`);
+      console.error(`  Rebuild SFT or revert prompt changes.`);
+      process.exit(1);
+    }
+  } else {
+    const livePromptSha = promptSha256();
+    if (livePromptSha !== sftMeta.promptSha256) {
+      console.error(`❌ Prompt SHA mismatch!`);
+      console.error(`  Live buildV4System() SHA: ${livePromptSha}`);
+      console.error(`  Recorded in ${metaPath}: ${sftMeta.promptSha256}`);
+      console.error(`  The live prompt template has changed since SFT was built.`);
+      console.error(`  Rebuild SFT or revert prompt changes.`);
+      process.exit(1);
+    }
   }
   
   // Validate labels file SHA if path is present
@@ -146,6 +162,17 @@ if (promptTemplateVersion === PROMPT_TEMPLATE_V3) {
   // v4/primitives-v1 path: requires composition
   if (!compositionPath) {
     console.error(`primitives-v1 template requires --composition-path or recipe.compositionPath`);
+    process.exit(1);
+  }
+  const compositionFullPath = resolve(repoRoot, compositionPath);
+  if (!existsSync(compositionFullPath)) {
+    console.error(`composition file not found: ${compositionFullPath}`);
+    process.exit(1);
+  }
+} else if (promptTemplateVersion === 'per-primitive-v1') {
+  // per-primitive-v1 path: requires composition
+  if (!compositionPath) {
+    console.error(`per-primitive-v1 template requires --composition-path or recipe.compositionPath`);
     process.exit(1);
   }
   const compositionFullPath = resolve(repoRoot, compositionPath);
@@ -260,7 +287,13 @@ const cleanFires = clean.filter((item) => {
 });
 
 console.log('per-class:');
+const cseRow = perClass.find((row) => row.type === 'child_sexual_exploitation');
+if (cseRow) {
+  console.log(`\n  ⭐ child_sexual_exploitation (HEADLINE METRIC):`);
+  console.log(`     n=${String(cseRow.n).padStart(3)}  missed=${cseRow.missed}  extra=${cseRow.extra}  ${cseRow.pass ? '✅ PASS' : '❌ FAIL'}\n`);
+}
 for (const row of perClass) {
+  if (row.type === 'child_sexual_exploitation') continue; // Already printed above
   console.log(
     `  ${row.type.padEnd(28)} n=${String(row.n).padStart(3)}  missed=${row.missed}  extra=${row.extra}  ${row.pass ? 'pass' : 'FAIL'}`,
   );
