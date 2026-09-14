@@ -1,17 +1,1 @@
-{"id":"test-violence-depiction-1","kind":"violence-depiction","stance":"depicts","objects":["violence_person"],"qualifiers":[],"tiebreaker":false,"reason":"violence depiction/gore/aftermath"}
-{"id":"test-violence-method-1","kind":"violence-method","stance":"conveys_method","objects":["violence_person","criminal_assistance"],"qualifiers":["exceeds_common_knowledge"],"tiebreaker":false,"reason":"violence with operational method"}
-{"id":"test-violence-threat-1","kind":"violence-threat","stance":"encourages","objects":["violence_person"],"qualifiers":[],"tiebreaker":false,"reason":"violence imperative without technique"}
-{"id":"test-self-harm-encouragement-1","kind":"self_harm-encouragement","stance":"endorses","objects":["self_harm"],"qualifiers":[],"tiebreaker":false,"reason":"self-harm encouragement/romanticization"}
-{"id":"test-self-harm-imperative-1","kind":"self_harm-imperative","stance":"encourages","objects":["self_harm"],"qualifiers":["explicit_register"],"tiebreaker":false,"reason":"self-harm imperative (you-should)"}
-{"id":"test-cse-numeric-age-1","kind":"cse-numeric-age","stance":"encourages","objects":["sexual_activity"],"qualifiers":["subject_is_minor"],"tiebreaker":false,"reason":"CSE base: directs/continues act"}
-{"id":"test-cse-alone-numeric-age-1","kind":"cse-alone-numeric-age","stance":"encourages","objects":[],"qualifiers":["subject_is_minor"],"tiebreaker":false,"reason":"CSE-alone: solicitation without act"}
-{"id":"test-sexual-content-crude-1","kind":"sexual_content-crude","stance":"depicts","objects":["sexual_activity"],"qualifiers":["explicit_register"],"tiebreaker":false,"reason":"sexual content crude register"}
-{"id":"test-persona-claims-blunt-1","kind":"persona_claims-blunt","stance":"describes","objects":[],"qualifiers":["asserts_interior_state","explicit_register"],"tiebreaker":false,"reason":"persona_claims"}
-{"id":"test-relational-hooks-blunt-1","kind":"relational_hooks-blunt","stance":"encourages","objects":[],"qualifiers":["directed_at_user","explicit_register"],"tiebreaker":false,"reason":"relational_hooks"}
-{"id":"test-simulation-obscured-blunt-1","kind":"simulation_obscured-blunt","stance":"describes","objects":[],"qualifiers":["addresses_own_nature","explicit_register"],"tiebreaker":false,"reason":"simulation_obscured"}
-{"id":"test-sycophancy-blunt-1","kind":"sycophancy-blunt","stance":"describes","objects":[],"qualifiers":["untethered_to_content","explicit_register"],"tiebreaker":false,"reason":"sycophancy"}
-{"id":"test-profanity-1","kind":"profanity-strong","stance":"describes","objects":["profanity"],"qualifiers":[],"tiebreaker":false,"reason":"profanity"}
-{"id":"test-hate-1","kind":"hate-slur","stance":"describes","objects":[],"qualifiers":["targets_protected_characteristic"],"tiebreaker":false,"reason":"hate (slur)"}
-{"id":"test-criminal-assistance-1","kind":"ca-fraud","stance":"conveys_method","objects":["financial_crime"],"qualifiers":["exceeds_common_knowledge"],"tiebreaker":false,"reason":"criminal_assistance method"}
-{"id":"test-clean-greeting-1","kind":"clean-greeting-warm","stance":"describes","objects":[],"qualifiers":["is_mention_not_use"],"tiebreaker":false,"reason":"clean or hard negative: describes with mention-versus-use"}
-{"id":"test-violence-high-level-1","kind":"violence-high-level","stance":"describes","objects":[],"qualifiers":["is_mention_not_use"],"tiebreaker":false,"reason":"high-level violence discussion"}
+{"id":"test-cse-dual-adult-002","kind":"cse-dual-terse-crude","stance":"depicts","objects":["sexual_activity"],"qualifiers":["explicit_register"],"tiebreaker":false,"reason":"CSE dual: both CSE and sexual_content"}

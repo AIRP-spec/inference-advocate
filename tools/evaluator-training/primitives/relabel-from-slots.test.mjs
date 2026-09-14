@@ -293,3 +293,67 @@ test("dry-run reports tiebreaker rate < 10%", async () => {
     console.log(`✅ Tiebreaker rate: ${rate}% (within 10% threshold)`);
   }
 });
+
+test("adult-contrast CSE: cse-named-porn-adult WITHOUT subject_is_minor", async () => {
+  const adultContrastFixture = [
+    {
+      id: "test-cse-adult-001",
+      kind: "cse-named-porn-adult",
+      arm: "adult",
+      class: "sexual_content",
+      expect: ["sexual_content"],
+      content: "Adults-only porn content",
+    },
+  ];
+
+  const fixtureCorpus = path.join(__dirname, "fixtures", "test-adult-contrast.jsonl");
+  fs.mkdirSync(path.dirname(fixtureCorpus), { recursive: true });
+  fs.writeFileSync(fixtureCorpus, adultContrastFixture.map((f) => JSON.stringify(f)).join("\n"), "utf-8");
+
+  await execAsync(`node ${path.join(__dirname, "relabel-from-slots.mjs")} relabel ${fixtureCorpus}`);
+
+  const outputPath = "tools/evaluator-training/primitives/out/primitives-labels.jsonl";
+  const outputLines = fs
+    .readFileSync(outputPath, "utf-8")
+    .split("\n")
+    .filter((l) => l.trim())
+    .map((l) => JSON.parse(l));
+
+  const output = outputLines[0];
+  assert.strictEqual(output.id, "test-cse-adult-001");
+  assert.ok(output.objects.includes("sexual_activity"), "Should have sexual_activity object");
+  assert.ok(!output.qualifiers.includes("subject_is_minor"), "Should NOT have subject_is_minor for adult-contrast");
+  console.log(`✅ Adult-contrast CSE correctly excludes subject_is_minor`);
+});
+
+test("adult-contrast CSE: arm=adult WITHOUT subject_is_minor", async () => {
+  const adultArmFixture = [
+    {
+      id: "test-cse-dual-adult-002",
+      kind: "cse-dual-terse-crude",
+      arm: "adult",
+      class: "sexual_content",
+      expect: ["sexual_content"],
+      content: "Adult sexual content",
+    },
+  ];
+
+  const fixtureCorpus = path.join(__dirname, "fixtures", "test-adult-arm.jsonl");
+  fs.mkdirSync(path.dirname(fixtureCorpus), { recursive: true });
+  fs.writeFileSync(fixtureCorpus, adultArmFixture.map((f) => JSON.stringify(f)).join("\n"), "utf-8");
+
+  await execAsync(`node ${path.join(__dirname, "relabel-from-slots.mjs")} relabel ${fixtureCorpus}`);
+
+  const outputPath = "tools/evaluator-training/primitives/out/primitives-labels.jsonl";
+  const outputLines = fs
+    .readFileSync(outputPath, "utf-8")
+    .split("\n")
+    .filter((l) => l.trim())
+    .map((l) => JSON.parse(l));
+
+  const output = outputLines[0];
+  assert.strictEqual(output.id, "test-cse-dual-adult-002");
+  assert.ok(output.objects.includes("sexual_activity"), "Should have sexual_activity object");
+  assert.ok(!output.qualifiers.includes("subject_is_minor"), "Should NOT have subject_is_minor for adult arm");
+  console.log(`✅ Adult arm correctly excludes subject_is_minor`);
+});

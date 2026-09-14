@@ -273,6 +273,68 @@ Default behavior remains v3/control. Primitives path is explicit opt-in.
 
 **No publish / no pin flip.** This PR remains scaffolding only. Primitives evaluator is a research artifact proving interchangeability, not a production replacement.
 
+## Post-Overnight Fixes + Serializer Latch
+
+### A. Adult-Contrast CSE Relabel Fix (2026-09-14)
+
+**Problem:** Blanket `kind.startsWith("cse-")` → `subject_is_minor` incorrectly labeled adult-contrast arms.
+
+**Example:** `cse-named-porn-adult` (recipe arm `adult`, expect `[sexual_content]`) is adults-only text for the CSE contrast. It should get `sexual_activity` object WITHOUT `subject_is_minor` qualifier.
+
+**Fix:** `tools/evaluator-training/primitives/relabel-from-slots.mjs`
+- Exclude `subject_is_minor` when `arm === "adult"` OR `kind === "cse-named-porn-adult"`
+- CSE atom is depicted-subject only, not blanket cse-* prefix
+
+**Corrected labels (parent offline relabel):**
+- File: `primitives-labels-8006-v2.jsonl`
+- SHA256: `3f91c2e3a8b4a1b8e3b889ceb22a5980fb075f93b1435342ef22ad4e27c39482`
+- `subject_is_minor` count: 712 rows (down from 736)
+- Adult-contrast rows: 0 false atoms ✅
+
+**Test:** `tools/evaluator-training/primitives/relabel-from-slots.test.mjs` validates adult-contrast exclusion
+
+### B. Serializer Latch (2026-09-14)
+
+**Single source of truth:** `buildV4System()` and `serializeCompactPrimitives()` live ONLY in `packages/evaluator-local/src/prompt-v4.ts`. SFT builder and gate MUST import from there. No forked catalogue prose in tools.
+
+**Latch fields in `sft.meta.json`:**
+```json
+{
+  "promptTemplateVersion": "primitives-v1",
+  "promptSha256": "...",
+  "labelsSha256": "...",
+  "corpusSha256": "...",
+  "vocabularyVersion": "primitives-v1",
+  "decodeShape": "compact-18-token",
+  "corpusPath": "...",
+  "labelsPath": "...",
+  "createdAt": "..."
+}
+```
+
+**Gate refuse on mismatch:**
+1. **Prompt drift:** `gate.mjs` computes `promptSha256(buildV4System())` and aborts if ≠ `sftMetadata.promptSha256`
+2. **Labels drift:** `gate.mjs` computes `fileSha256(labelsPath)` and aborts if ≠ `sftMetadata.labelsSha256`
+
+**Rationale:** Same failure class as 8208-vs-8116 corpus row-count-only matching. Overnight had two labels files (v1 with 24 false adult-contrast atoms, v2 corrected). Prompt latch does not catch training against wrong/superseded labels.
+
+**CI:** `tools/evaluator-training/primitives/serializer-latch.test.mjs` verifies import structure and SHA256 determinism.
+
+### C. Per-Primitive Decode Decision (2026-09-14)
+
+**Decision (Justin + Zimmer):** Next re-SFT uses **per-primitive** decode (18 separate passes: 1 stance enum + 7 object yes/no + 10 qualifier yes/no).
+
+**Latency trade-offs:**
+- Current one-shot 18-token: ~75ms A100, ~347ms Xeon AVX512 per item
+- 18 separate passes ≈ 18× slower → CPU gate ~6s/item, 471×6 CKs = hours not ~30min
+- Grouped (stance|objects|qualifiers) 3 passes: faster but tests hypothesis only partially
+
+**Trade call:** Run per-primitive as the clean test of whether narrow questions are easier. If full-suite×all-CK gating is impractical, **gate a subset of checkpoints** (mid + late: 378/630/753 or best-by-loss + final) rather than weakening to grouped calls for the first experiment. A slow decisive answer beats a fast ambiguous one. Optimize (batching, grouped) only after per-primitive proves or fails the CSE named gate.
+
+**Named gate for next run:** `child_sexual_exploitation` per-class pass (control passed 1/11; overnight prim 0/11).
+
+**Stub:** `packages/evaluator-local/src/prompt-v4.ts` defines `PerPrimitiveStub` interface. Full implementation deferred until after serializer latch + corrected labels relabel.
+
 ## What This Build Does Not Have
 
 - No trained model or pin in this PR

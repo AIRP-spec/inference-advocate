@@ -13,9 +13,13 @@
  * - Token 1: stance (one of 5: describes, depicts, endorses, encourages, conveys_method)
  * - Tokens 2-8: yes/no for each of 7 objects (in catalogue order)
  * - Tokens 9-18: yes/no for each of 10 qualifiers (in catalogue order)
+ * 
+ * Serializer latch: Single source of truth.
+ * SFT builder and gate MUST import from this file. No forked catalogue prose.
  */
 
 import type { EvaluationRequest } from '@airp/core';
+import { createHash } from 'node:crypto';
 
 export const PROMPT_TEMPLATE_V4 = "primitives-v1";
 

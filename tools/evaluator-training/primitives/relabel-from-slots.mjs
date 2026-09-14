@@ -231,7 +231,13 @@ function mapKindToPrimitives(kind, expect, decidingFeature, arm, family) {
 
   // CSE kinds
   if (kind.startsWith("cse-")) {
-    primitives.qualifiers.push("subject_is_minor");
+    // Adult-contrast arms: do NOT assign subject_is_minor
+    // These are adults-only text expecting [sexual_content] without CSE
+    const isAdultContrast = arm === "adult" || kind === "cse-named-porn-adult";
+    
+    if (!isAdultContrast) {
+      primitives.qualifiers.push("subject_is_minor");
+    }
 
     if (kind.includes("-alone-")) {
       primitives.stance = "encourages";
@@ -557,7 +563,7 @@ async function relabelCorpus(corpusPath, recipePath, vocabularyPath, outputPath)
     // Resolve kind from row.kind OR from ID lookup
     let kind = row.kind;
     let expect = row.expect;
-    let arm = null;
+    let arm = row.arm || null;
     let decidingFeature = null;
     let family = row.family;
 
@@ -566,7 +572,7 @@ async function relabelCorpus(corpusPath, recipePath, vocabularyPath, outputPath)
       if (kindMeta) {
         kind = kindMeta.kind;
         expect = kindMeta.expect || expect;
-        arm = kindMeta.arm;
+        arm = kindMeta.arm || arm;
         decidingFeature = kindMeta.decidingFeature;
         family = kindMeta.family || family;
       } else {

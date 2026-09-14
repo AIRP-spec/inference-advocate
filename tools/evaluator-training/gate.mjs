@@ -110,6 +110,62 @@ if (promptTemplateVersion === PROMPT_TEMPLATE_V3) {
     console.error(`composition file not found: ${compositionFullPath}`);
     process.exit(1);
   }
+
+  // Serializer latch: verify prompt SHA256 and labels SHA256 match SFT metadata
+  const sftMetadataPath = artifacts.sftMetadataPath || trainRecipe.sftMetadataPath;
+  if (sftMetadataPath) {
+    const metadataFullPath = resolve(repoRoot, sftMetadataPath);
+    if (!existsSync(metadataFullPath)) {
+      console.error(`SFT metadata file not found: ${metadataFullPath}`);
+      console.error(`Cannot verify serializer latch without metadata`);
+      process.exit(1);
+    }
+
+    const sftMetadata = JSON.parse(readFileSync(metadataFullPath, 'utf8'));
+    
+    // Verify prompt SHA256
+    const liveSystemPrompt = PROMPT_TEMPLATE_V4 ? 
+      (await import('@airp/evaluator-local')).buildV4System?.() : null;
+    
+    if (liveSystemPrompt && sftMetadata.promptSha256) {
+      const { promptSha256: computePromptSha256 } = await import('@airp/evaluator-local');
+      const livePromptSha256 = computePromptSha256(liveSystemPrompt);
+      
+      if (livePromptSha256 !== sftMetadata.promptSha256) {
+        console.error(`\n❌ Serializer latch: prompt SHA256 mismatch`);
+        console.error(`   SFT metadata promptSha256: ${sftMetadata.promptSha256}`);
+        console.error(`   Live buildV4System() SHA256: ${livePromptSha256}`);
+        console.error(`\n   The system prompt has drifted since SFT was built.`);
+        console.error(`   Rebuild SFT with current buildV4System() or revert prompt changes.`);
+        process.exit(1);
+      }
+      console.log(`✓ Prompt SHA256 verified: ${livePromptSha256}`);
+    }
+
+    // Verify labels SHA256
+    const labelsPath = trainRecipe.labelsPath || sftMetadata.labelsPath;
+    if (labelsPath && sftMetadata.labelsSha256) {
+      const labelsFullPath = resolve(repoRoot, labelsPath);
+      if (!existsSync(labelsFullPath)) {
+        console.warn(`⚠️  Labels file not found: ${labelsFullPath}`);
+        console.warn(`   Cannot verify labels SHA256 latch`);
+      } else {
+        const { fileSha256 } = await import(join(repoRoot, 'tools/evaluator-training/primitives/build-sft-v4.mjs'));
+        const liveLabelsSha256 = fileSha256(labelsFullPath);
+        
+        if (liveLabelsSha256 !== sftMetadata.labelsSha256) {
+          console.error(`\n❌ Labels latch: labelsSha256 mismatch`);
+          console.error(`   SFT metadata labelsSha256: ${sftMetadata.labelsSha256}`);
+          console.error(`   Live labels file SHA256:   ${liveLabelsSha256}`);
+          console.error(`\n   The labels file has changed since SFT was built.`);
+          console.error(`   Rebuild SFT with current labels or use correct labels file.`);
+          console.error(`   (This catches training against wrong/superseded labels, e.g. v1 with 24 false adult-contrast atoms)`);
+          process.exit(1);
+        }
+        console.log(`✓ Labels SHA256 verified: ${liveLabelsSha256}`);
+      }
+    }
+  }
 } else {
   console.error(`unsupported promptTemplateVersion: ${promptTemplateVersion}`);
   process.exit(1);
