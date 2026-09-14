@@ -176,6 +176,38 @@ The prompt bundle SHA is computed by concatenating all 18 system prompts in voca
 
 **Note:** Composition rules carry policy decisions. This change reflects that mention-versus-use is a stance-dependent suppression, not a global wipe.
 
+## Decision 9: Single Shared Composition Implementation
+
+**Date:** 2026-09-14 (third update)
+
+**Decision:** Composition logic lives in a single shared module (`packages/evaluator-local/src/compose-primitives.ts`). Both `LocalEvaluator` (runtime) and build tools (SFT generation, testing, CLI) import and use this function. Dual implementations are forbidden.
+
+**Rationale:**
+- **Root cause of CK-6756 re-gate failure:** `LocalEvaluator#compose` and `tools/evaluator-training/primitives/compose.mjs` had separate implementations
+- Both initially implemented blanket `is_mention_not_use` suppression
+- After policy fix to compose.mjs (stance-dependent suppression), LocalEvaluator was not updated → divergence
+- CK-6756 re-gate proved runtime still did global wipe, requiring pod-local mirror
+- Dual implementations create a class of bugs: any policy change must be applied twice, and divergence is silent until gate failure
+
+**Implementation:**
+- **Single source:** `packages/evaluator-local/src/compose-primitives.ts` exports `compose(primitives, composition)`
+- **LocalEvaluator:** Removed private `#compose` and `#matchesCondition` methods, imports `compose` from `compose-primitives.ts`
+- **compose.mjs:** Thin CLI/wrapper that re-exports `compose` from `@airp/evaluator-local`
+- **Test coverage:** `compose.test.mjs` verifies compose.mjs and direct evaluator-local import are the same function reference
+
+**Code locations:**
+- Shared implementation: `packages/evaluator-local/src/compose-primitives.ts`
+- LocalEvaluator import: `packages/evaluator-local/src/local-evaluator.ts` line 39
+- Tools wrapper: `tools/evaluator-training/primitives/compose.mjs` line 14
+- Test: `tools/evaluator-training/primitives/compose.test.mjs` (verifies function identity)
+
+**Policy enforcement:**
+- Composition logic cannot diverge between runtime and tools
+- Any policy change (e.g., negative rule behavior) is guaranteed consistent
+- Tests fail if compose.mjs does not re-export the shared function
+
+**Forbidden pattern:** Private reimplementation of composition logic. All composition must call the shared `compose()` function.
+
 ## Status
 
 All decisions are implemented and tested as of 2026-09-14.

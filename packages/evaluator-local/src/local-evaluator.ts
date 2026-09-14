@@ -36,6 +36,7 @@ import {
   SpecialTokensText,
 } from 'node-llama-cpp';
 import { verifyModelSha256 } from './digest.js';
+import { compose as composePrimitives } from './compose-primitives.js';
 import {
   buildClassEvidenceQuestion,
   buildClassVerdictQuestion,
@@ -371,7 +372,7 @@ export class LocalEvaluator implements Evaluator {
     this.lastPrimitivesVerdict = { stance: parsed.stance, objects: parsed.objects, qualifiers: parsed.qualifiers };
     // Compose primitives → taxonomy flags
     const composition = JSON.parse(fs.readFileSync(this.#opts.compositionPath, 'utf-8'));
-    const firedTypes = this.#compose({ stance: parsed.stance, objects: parsed.objects, qualifiers: parsed.qualifiers }, composition);
+    const firedTypes = composePrimitives({ stance: parsed.stance, objects: parsed.objects, qualifiers: parsed.qualifiers }, composition);
     const byType = new Map(this.#taxonomy.flags.map((def) => [def.type, def]));
     const flags: Flag[] = [];
     for (const type of firedTypes) {
@@ -494,7 +495,7 @@ export class LocalEvaluator implements Evaluator {
     
     // Compose primitives → taxonomy flags
     const composition = JSON.parse(fs.readFileSync(this.#opts.compositionPath, 'utf-8'));
-    const firedTypes = this.#compose({ stance, objects, qualifiers }, composition);
+    const firedTypes = composePrimitives({ stance, objects, qualifiers }, composition);
     const byType = new Map(this.#taxonomy.flags.map((def) => [def.type, def]));
     const flags: Flag[] = [];
     for (const type of firedTypes) {
@@ -562,62 +563,6 @@ export class LocalEvaluator implements Evaluator {
     this.lastEvalMs = Date.now() - started;
     this.#evalLog(`local-llm@${this.version}: compact verdict ${raw.trim()} in ${this.lastEvalMs}ms`);
     return flags;
-  }
-
-  #compose(primitives: { stance: string; objects: string[]; qualifiers: string[] }, composition: any): string[] {
-    const verdicts: string[] = [];
-    
-    // Check negative rules first (with stance-dependent policy)
-    if (composition.negativeRules) {
-      for (const rule of composition.negativeRules) {
-        if (this.#matchesCondition(primitives, rule.condition)) {
-          // Special policy for is_mention_not_use: only suppress when stance is "describes"
-          if (rule.condition.qualifiers && rule.condition.qualifiers.includes('is_mention_not_use')) {
-            if (primitives.stance === 'describes') {
-              return verdicts; // Empty, suppress all flags (true mention)
-            }
-            // Production stance (depicts/encourages/endorses/conveys_method): do not suppress
-            continue;
-          }
-          
-          // All other negative rules: full wipe
-          return verdicts; // Empty, suppress all flags
-        }
-      }
-    }
-    
-    // Check each class rule
-    for (const classRule of composition.classes) {
-      if (classRule.unsupported || !classRule.rule) continue;
-      if (classRule.rule.none) continue;
-      
-      if (this.#matchesCondition(primitives, classRule.rule)) {
-        verdicts.push(classRule.class);
-      }
-    }
-    
-    return verdicts;
-  }
-  
-  #matchesCondition(primitives: { stance: string; objects: string[]; qualifiers: string[] }, condition: any): boolean {
-    if (condition.allOf) {
-      return condition.allOf.every((sub: any) => this.#matchesCondition(primitives, sub));
-    }
-    if (condition.anyOf) {
-      return condition.anyOf.some((sub: any) => this.#matchesCondition(primitives, sub));
-    }
-    if (condition.stance && primitives.stance !== condition.stance) {
-      return false;
-    }
-    if (condition.objects) {
-      const hasAll = condition.objects.every((obj: string) => primitives.objects.includes(obj));
-      if (!hasAll) return false;
-    }
-    if (condition.qualifiers) {
-      const hasAll = condition.qualifiers.every((qual: string) => primitives.qualifiers.includes(qual));
-      if (!hasAll) return false;
-    }
-    return true;
   }
 
   async #evidenceFor(

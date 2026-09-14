@@ -62,6 +62,14 @@ export {
   PerPrimitiveStubImpl,
 } from './per-primitive-stub.js';
 export {
+  compose,
+  type PrimitivesVerdict as ComposePrimitivesVerdict,
+  type Composition,
+  type CompositionCondition,
+  type NegativeRule,
+  type ClassRule,
+} from './compose-primitives.js';
+export {
   HELD_OUT_GATE_FILE,
   HELD_OUT_SUITE_FILE,
   loadGateConfigFromFile,

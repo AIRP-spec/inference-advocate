@@ -370,4 +370,32 @@ test("the 89 violence+CA duals dissolve", () => {
   console.log("✅ Violence+CA duals correctly decomposed");
 });
 
+test("compose.mjs and @airp/evaluator-local use the same core implementation", async () => {
+  const { compose: directCompose } = await import("@airp/evaluator-local");
+  const { compose: wrapperCompose, loadComposition } = await import("./compose.mjs");
+  
+  // Both should produce identical results on the same test case
+  const testPrimitives = {
+    stance: "depicts",
+    objects: ["sexual_activity"],
+    qualifiers: ["subject_is_minor", "is_mention_not_use"],
+  };
+  
+  const composition = loadComposition(AIRP_COMPOSITION);
+  
+  const directResult = directCompose(testPrimitives, composition);
+  const wrapperResult = wrapperCompose(testPrimitives, composition);
+  
+  assert.deepStrictEqual(directResult, wrapperResult, "Both paths must produce identical results");
+  assert.deepStrictEqual(
+    [...directResult].sort(),
+    ["child_sexual_exploitation", "sexual_content"],
+    "Production stance (depicts) should override is_mention_not_use"
+  );
+  
+  // Test with file path (wrapper feature)
+  const wrapperWithPath = wrapperCompose(testPrimitives, AIRP_COMPOSITION);
+  assert.deepStrictEqual(wrapperWithPath, directResult, "Wrapper with file path should match direct call");
+});
+
 console.log(`\nRunning ${TEST_CASES.length} composition test cases...`);
