@@ -413,14 +413,21 @@ export class LocalEvaluator implements Evaluator {
     ]);
     let stanceRaw = '';
     try {
-      stanceRaw = await this.#generate(loaded, stanceTokens, loaded.stanceGrammar, 2, perCallMs);
+      stanceRaw = await this.#generate(loaded, stanceTokens, loaded.stanceGrammar, 16, perCallMs);
     } catch (err) {
       this.#evalWarn(
         `local-llm@${this.version}: stance generation failed (${(err as Error).message}); defaulting to describes`,
       );
       stanceRaw = 'describes';
     }
-    rawAnswers.stance = stanceRaw.trim().toLowerCase();
+    // Normalize stance (belt-and-suspenders for truncation)
+    let normalizedStance = stanceRaw.trim().toLowerCase();
+    if (normalizedStance.startsWith('encour')) {
+      normalizedStance = 'encourages';
+    } else if (normalizedStance.startsWith('convey')) {
+      normalizedStance = 'conveys_method';
+    }
+    rawAnswers.stance = normalizedStance;
     
     // Passes 2-8: Objects (yes/no)
     for (const obj of catalogue.objects) {

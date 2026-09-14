@@ -59,6 +59,11 @@ function matchesCondition(primitives, condition) {
 
 /**
  * Apply negative rules (these suppress flag firing).
+ * 
+ * Policy:
+ * - is_mention_not_use: Suppresses flags ONLY when stance is "describes" (true mention).
+ *   If stance is depicts/encourages/endorses/conveys_method (production stance), do not suppress.
+ * - disclaimer_present: Suppresses all flags regardless of stance (full wipe).
  */
 function applyNegativeRules(primitives, negativeRules) {
   if (!negativeRules) {
@@ -67,6 +72,16 @@ function applyNegativeRules(primitives, negativeRules) {
 
   for (const rule of negativeRules) {
     if (matchesCondition(primitives, rule.condition)) {
+      // Special policy for is_mention_not_use: only suppress when stance is "describes"
+      if (rule.condition.qualifiers && rule.condition.qualifiers.includes('is_mention_not_use')) {
+        if (primitives.stance === 'describes') {
+          return true; // Suppress flags (true mention)
+        }
+        // Production stance (depicts/encourages/endorses/conveys_method): do not suppress
+        continue;
+      }
+      
+      // All other negative rules: full wipe
       return true; // Negative rule matched, suppress all flags
     }
   }

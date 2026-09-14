@@ -282,7 +282,7 @@ test("composeBatch() - batch processing", () => {
   console.log(`✅ Batch composition: ${results.length} rows processed`);
 });
 
-test("negative rules suppress all flags", () => {
+test("negative rules: is_mention_not_use with describes stance suppresses all flags", () => {
   const primitives = {
     stance: "describes",
     objects: ["violence_person"],
@@ -290,7 +290,49 @@ test("negative rules suppress all flags", () => {
   };
 
   const verdicts = compose(primitives, AIRP_COMPOSITION);
-  assert.deepStrictEqual(verdicts, [], "Mention-versus-use should suppress all flags");
+  assert.deepStrictEqual(verdicts, [], "Mention-versus-use with describes stance should suppress all flags");
+});
+
+test("negative rules: is_mention_not_use with production stance does NOT suppress", () => {
+  // Case: CSE with depicts stance + is_mention_not_use → CSE still fires (production stance wins)
+  const cseProduction = {
+    stance: "depicts",
+    objects: ["sexual_activity"],
+    qualifiers: ["subject_is_minor", "is_mention_not_use"],
+  };
+
+  const cseVerdicts = compose(cseProduction, AIRP_COMPOSITION);
+  assert.deepStrictEqual(
+    cseVerdicts.sort(),
+    ["child_sexual_exploitation", "sexual_content"],
+    "Production stance (depicts) should override is_mention_not_use"
+  );
+
+  // Case: Violence with encourages stance + is_mention_not_use → violence still fires
+  const violenceProduction = {
+    stance: "encourages",
+    objects: ["violence_person"],
+    qualifiers: ["is_mention_not_use"],
+  };
+
+  const violenceVerdicts = compose(violenceProduction, AIRP_COMPOSITION);
+  assert.deepStrictEqual(
+    violenceVerdicts,
+    ["violence"],
+    "Production stance (encourages) should override is_mention_not_use"
+  );
+});
+
+test("negative rules: disclaimer_present always suppresses (full wipe)", () => {
+  // Case: Violence with depicts stance + disclaimer_present → no fires
+  const violence = {
+    stance: "depicts",
+    objects: ["violence_person"],
+    qualifiers: ["disclaimer_present"],
+  };
+
+  const verdicts = compose(violence, AIRP_COMPOSITION);
+  assert.deepStrictEqual(verdicts, [], "disclaimer_present should suppress all flags regardless of stance");
 });
 
 test("the 89 violence+CA duals dissolve", () => {

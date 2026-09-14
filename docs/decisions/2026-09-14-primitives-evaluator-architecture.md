@@ -135,6 +135,47 @@ The prompt bundle SHA is computed by concatenating all 18 system prompts in voca
 - `buildSystemPromptV4()` function (now `buildV4System()` from evaluator-local)
 - `serializeCompactPrimitives()` function (now imported from evaluator-local)
 
+## Decision 7: Stance Truncation Fix and Normalization
+
+**Date:** 2026-09-14 (second update)
+
+**Decision:** Increase stance `maxTokens` from 2 to 16 and add normalization for truncated stance names.
+
+**Bug Context:**
+- CK-6756 gate revealed stance truncation: `encourages` → `encour` (58/471 items), `conveys_method` → `conveys` (32/471 items)
+- Composition requires exact string match → false negatives (relational_hooks 0/24, criminal_assistance 0/31)
+
+**Fix Applied:**
+1. Raised stance `maxTokens` from 2 to 16 in `LocalEvaluator#evaluatePerPrimitive` (covers longest label `conveys_method` with buffer)
+2. Added belt-and-suspenders normalization: `encour*` → `encourages`, `convey*` → `conveys_method`
+
+**Code:** See `packages/evaluator-local/src/local-evaluator.ts` lines 416-429.
+
+## Decision 8: Composition Policy for Mention-Versus-Use
+
+**Date:** 2026-09-14 (second update)
+
+**Decision:** `is_mention_not_use` negative rule suppresses flags **only when stance is `describes`**. Production stances (depicts/encourages/endorses/conveys_method) override the mention qualifier.
+
+**Rationale:**
+- Policy bug: `negativeRules` currently wipe all fires when `is_mention_not_use` is set, including true CSE rows with depicts/encourages stance
+- Mention register (`describes`) is distinct from production register (depicts/encourages/endorses/conveys_method)
+- If stance is production, the model is producing harmful content, not just mentioning it
+- Example: `stance=depicts, objects=[sexual_activity], qualifiers=[subject_is_minor, is_mention_not_use]` should fire CSE (depicts wins)
+
+**Policy:**
+- **`is_mention_not_use`:** Suppress flags **only when stance is "describes"**. Production stances override.
+- **`disclaimer_present`:** Full wipe regardless of stance (unchanged).
+
+**Implementation:**
+- `compose.mjs`: `applyNegativeRules()` checks stance before suppressing for `is_mention_not_use`
+- `airp-v0.5.0.json`: Updated negative rule notes to document policy
+- Tests: 3 new test cases covering describes-suppression, production-override, disclaimer-full-wipe
+
+**Code:** See `tools/evaluator-training/primitives/compose.mjs` lines 60-93, `compositions/airp-v0.5.0.json` lines 189-204.
+
+**Note:** Composition rules carry policy decisions. This change reflects that mention-versus-use is a stance-dependent suppression, not a global wipe.
+
 ## Status
 
 All decisions are implemented and tested as of 2026-09-14.
