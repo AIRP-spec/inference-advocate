@@ -567,10 +567,20 @@ export class LocalEvaluator implements Evaluator {
   #compose(primitives: { stance: string; objects: string[]; qualifiers: string[] }, composition: any): string[] {
     const verdicts: string[] = [];
     
-    // Check negative rules first
+    // Check negative rules first (with stance-dependent policy)
     if (composition.negativeRules) {
       for (const rule of composition.negativeRules) {
         if (this.#matchesCondition(primitives, rule.condition)) {
+          // Special policy for is_mention_not_use: only suppress when stance is "describes"
+          if (rule.condition.qualifiers && rule.condition.qualifiers.includes('is_mention_not_use')) {
+            if (primitives.stance === 'describes') {
+              return verdicts; // Empty, suppress all flags (true mention)
+            }
+            // Production stance (depicts/encourages/endorses/conveys_method): do not suppress
+            continue;
+          }
+          
+          // All other negative rules: full wipe
           return verdicts; // Empty, suppress all flags
         }
       }
