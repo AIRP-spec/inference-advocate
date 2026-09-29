@@ -1,0 +1,254 @@
+{
+  "phase": "4-5-compose-held-out",
+  "finished_local": "2026-09-29T05:50:05.617Z",
+  "archive": {
+    "path": "/workspace/airp-laya-artifacts/airp-laya-20260929-bf16-complete.tgz",
+    "himalogic": "/root/primitives-evaluator/laya/airp-laya-20260929-bf16-complete.tgz",
+    "sha256": "5d775b06a98a94835cb135d159a8ef2fd79947cfecac2618cd5a8469c05321c8",
+    "amp": "bf16",
+    "cost_usd_approx": 1.85,
+    "pod_id": "p6bw3n8iza22sk",
+    "pod_terminated": true,
+    "outcome": "complete"
+  },
+  "pins": {
+    "base_model": "convaiinnovations/laya",
+    "revision": "55cf4c4ebb4ebe31b2550e8bdf3bd21b99753851",
+    "weight_sha256": "891102d372688fc2a094dac56a384bc537b87c63f21f9f3dac0be2b7cbc8d86c",
+    "labels_sha256": "5bdae44cd2bc520c56b09b1478c64724cb6fa3b7be0c93a63bc7262a9b9cd282",
+    "questions_canonical_sha256": "a2e7b5b36615e3b720258c1363819e7c976fac64d998e7d19a0899a5d41ef7a7",
+    "train_sha256": "474c8a6029ce6ecab6e0fbf94bdd19ef1c6a8b343578f21bca09172195dda8a1",
+    "val_sha256": "dcb44431d878ad2298a551ebcbb8e753e982bf8cd92e83e2df28c6892f497d17",
+    "held_out_suite_v2_sha256": "6c7b30e16b8ab53544f590bcbbdcd381f32e3e4cf324e225e2e8c489cebb28e4",
+    "max_len": 1024,
+    "head_max_len": 256,
+    "n_questions": 17,
+    "train_rows": 7250,
+    "val_rows": 805,
+    "expected_train_sequences_formula": "train_rows * n_questions (= 7250 * 17 = 123250) minus any build_sequence failures",
+    "corpus_sha256": "712fd64d8829b4482858ef99666356de1e304c38f3a14ce85a3f6e5235aaab74",
+    "composition_sha256": "4def0b8fd339713bd261106cb10235949f4bd1bc4e3631a88dd7cc511b0087e0",
+    "suite_sha256": "6c7b30e16b8ab53544f590bcbbdcd381f32e3e4cf324e225e2e8c489cebb28e4",
+    "archive_sha256": "5d775b06a98a94835cb135d159a8ef2fd79947cfecac2618cd5a8469c05321c8"
+  },
+  "compose": {
+    "path": "packages/evaluator-local/src/compose-primitives.ts via @airp/evaluator-local",
+    "composition": "tools/evaluator-training/primitives/compositions/airp-v0.5.0.json",
+    "note": "Same shared compose as Qwen gate.mjs; offline from gate-primitives JSONL (no GPU)"
+  },
+  "checkpoints": [
+    {
+      "ckpt": "ckpt-epoch-0.5-step-1926",
+      "extras": 50,
+      "recallMisses": 11,
+      "cleanFires": 25,
+      "cse": {
+        "type": "child_sexual_exploitation",
+        "n": 29,
+        "missed": 0,
+        "extra": 0,
+        "pass": true
+      },
+      "meetsReplacementBar": false,
+      "gateReport": "gate-report-ckpt-epoch-0.5-step-1926.json",
+      "eck": {
+        "precision": 0.6976744186046512,
+        "recall": 0.967741935483871,
+        "yesRate": 0.09129511677282377
+      },
+      "subject_is_minor": {
+        "precision": 1,
+        "recall": 1,
+        "yesRate": 0.06157112526539278
+      }
+    },
+    {
+      "ckpt": "ckpt-epoch-1.0-step-3852",
+      "extras": 66,
+      "recallMisses": 12,
+      "cleanFires": 28,
+      "cse": {
+        "type": "child_sexual_exploitation",
+        "n": 29,
+        "missed": 0,
+        "extra": 3,
+        "pass": false
+      },
+      "meetsReplacementBar": false,
+      "gateReport": "gate-report-ckpt-epoch-1.0-step-3852.json",
+      "eck": {
+        "precision": 0.6326530612244898,
+        "recall": 1,
+        "yesRate": 0.1040339702760085
+      },
+      "subject_is_minor": {
+        "precision": 0.8055555555555556,
+        "recall": 1,
+        "yesRate": 0.07643312101910828
+      }
+    },
+    {
+      "ckpt": "ckpt-epoch-1.5-step-5778",
+      "extras": 45,
+      "recallMisses": 21,
+      "cleanFires": 27,
+      "cse": {
+        "type": "child_sexual_exploitation",
+        "n": 29,
+        "missed": 0,
+        "extra": 3,
+        "pass": false
+      },
+      "meetsReplacementBar": false,
+      "gateReport": "gate-report-ckpt-epoch-1.5-step-5778.json",
+      "eck": {
+        "precision": 0.7692307692307693,
+        "recall": 0.967741935483871,
+        "yesRate": 0.08280254777070063
+      },
+      "subject_is_minor": {
+        "precision": 0.90625,
+        "recall": 1,
+        "yesRate": 0.06794055201698514
+      }
+    },
+    {
+      "ckpt": "ckpt-epoch-2.0-step-7704",
+      "extras": 45,
+      "recallMisses": 18,
+      "cleanFires": 31,
+      "cse": {
+        "type": "child_sexual_exploitation",
+        "n": 29,
+        "missed": 0,
+        "extra": 1,
+        "pass": false
+      },
+      "meetsReplacementBar": false,
+      "gateReport": "gate-report-ckpt-epoch-2.0-step-7704.json",
+      "eck": {
+        "precision": 0.6122448979591837,
+        "recall": 0.967741935483871,
+        "yesRate": 0.1040339702760085
+      },
+      "subject_is_minor": {
+        "precision": 0.9666666666666667,
+        "recall": 1,
+        "yesRate": 0.06369426751592357
+      }
+    },
+    {
+      "ckpt": "ckpt-epoch-2.5-step-9630",
+      "extras": 39,
+      "recallMisses": 16,
+      "cleanFires": 24,
+      "cse": {
+        "type": "child_sexual_exploitation",
+        "n": 29,
+        "missed": 0,
+        "extra": 0,
+        "pass": true
+      },
+      "meetsReplacementBar": false,
+      "gateReport": "gate-report-ckpt-epoch-2.5-step-9630.json",
+      "eck": {
+        "precision": 0.7142857142857143,
+        "recall": 0.967741935483871,
+        "yesRate": 0.08917197452229299
+      },
+      "subject_is_minor": {
+        "precision": 0.9354838709677419,
+        "recall": 1,
+        "yesRate": 0.06581740976645435
+      }
+    },
+    {
+      "ckpt": "ckpt-epoch-2.6-step-10160",
+      "extras": 38,
+      "recallMisses": 14,
+      "cleanFires": 23,
+      "cse": {
+        "type": "child_sexual_exploitation",
+        "n": 29,
+        "missed": 0,
+        "extra": 0,
+        "pass": true
+      },
+      "meetsReplacementBar": false,
+      "gateReport": "gate-report-ckpt-epoch-2.6-step-10160.json",
+      "eck": {
+        "precision": 0.6818181818181818,
+        "recall": 0.967741935483871,
+        "yesRate": 0.09341825902335456
+      },
+      "subject_is_minor": {
+        "precision": 0.9354838709677419,
+        "recall": 1,
+        "yesRate": 0.06581740976645435
+      }
+    }
+  ],
+  "baselines": {
+    "runB": {
+      "extras": 17,
+      "recallMisses": 12
+    },
+    "qwen_ck6420": {
+      "extras": 36,
+      "recallMisses": 12,
+      "cse": {
+        "type": "child_sexual_exploitation",
+        "n": 29,
+        "missed": 0,
+        "extra": 2,
+        "pass": false
+      }
+    },
+    "qwen_ck8560": {
+      "extras": 27,
+      "recallMisses": 23,
+      "cse": {
+        "type": "child_sexual_exploitation",
+        "n": 29,
+        "missed": 0,
+        "extra": 0,
+        "pass": true
+      }
+    }
+  },
+  "winner": {
+    "ckpt": "ckpt-epoch-2.6-step-10160",
+    "extras": 38,
+    "recallMisses": 14,
+    "csePass": true,
+    "meetsReplacementBar": false,
+    "vs_runB": "above Run B extras/recall-misses bar",
+    "vs_qwen6420": "38e/14r vs 36e/12r",
+    "vs_qwen8560": "38e/14r vs 27e/23r"
+  },
+  "training_meta_summary": {
+    "wall_time_sec": 6224.764483213425,
+    "global_steps": 10160,
+    "epochs": 3,
+    "n_train_sequences": 123250,
+    "loss_curve_summary": {
+      "n_points": 40636,
+      "first": 0.4342809319496155,
+      "last": 0,
+      "min": -0.9231932163238525,
+      "mean": 0.17531754437956634
+    }
+  },
+  "artifacts": {
+    "side_by_side": "/workspace/airp-primitives-overnight/laya-8056/SIDE-BY-SIDE.md",
+    "summary": "/workspace/airp-primitives-overnight/laya-8056/SUMMARY.json",
+    "gate_reports": [
+      "/workspace/airp-primitives-overnight/laya-8056/gate-report-ckpt-epoch-0.5-step-1926.json",
+      "/workspace/airp-primitives-overnight/laya-8056/gate-report-ckpt-epoch-1.0-step-3852.json",
+      "/workspace/airp-primitives-overnight/laya-8056/gate-report-ckpt-epoch-1.5-step-5778.json",
+      "/workspace/airp-primitives-overnight/laya-8056/gate-report-ckpt-epoch-2.0-step-7704.json",
+      "/workspace/airp-primitives-overnight/laya-8056/gate-report-ckpt-epoch-2.5-step-9630.json",
+      "/workspace/airp-primitives-overnight/laya-8056/gate-report-ckpt-epoch-2.6-step-10160.json"
+    ]
+  }
+}
