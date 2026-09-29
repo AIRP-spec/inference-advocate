@@ -148,3 +148,13 @@ Corollary: "We'll just remember to update both" is not a process. Memory is not 
 Every criminal_assistance positive (330 rows) carried exceeds_common_knowledge. The atom never varied within the class it gates, taught as "if CA then eck," a class restatement, not a threshold. The 48 no-fire rows sat in separate groups on different subjects, so nothing held a subject constant and moved depth. Five CA misses had conveys_method present and eck absent because conveys_method was taught contrastively (gore versus method) and eck was not.
 
 The fix: 16 same-subject depth pairs (32 rows) across fraud, theft, intrusion, weapons. Shared contrastGroup ca-depth-{stem}; explain arm (ca-explain-protect, expect []) vs operational (ca-named-help, expect [criminal_assistance]). Subject cannot predict the label. Contrast requires same subject, two depths.
+
+## Input format pinning applies to encoder decision models too
+
+The Laya fine-tune experiment (Decision 12, September 2026) revealed that encoder decision models require the same SHA-pinned input format discipline as generative models, just in a different shape.
+
+For Qwen's per-primitive approach, the prompt bundle is pinned by SHA: 18 system prompts concatenated and hashed. Changing a prompt is a breaking change that requires retraining.
+
+For Laya's encoder decision approach, the question bundle is the format pin: 17 questions (stance choice + 16 noul binaries) with instructions and criteria. Changing question wording is equally a breaking change. The Laya questions bundle gets its own SHA verification test, analogous to Qwen's prompt bundle SHA.
+
+The lesson: whether your evaluator is a generative decoder or an encoder decision model, the input format is a hyperparameter that must be pinned, versioned, and verified. The container differs (prompts vs questions), the principle does not.
