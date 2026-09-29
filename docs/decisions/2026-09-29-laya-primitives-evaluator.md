@@ -78,19 +78,25 @@ Raising `max_len` to 1024 at fine-tune time: the 471-item held-out suite fits co
 
 **Decision:** Deterministic stratified split: ~90% train, ~10% val, stratified by stance and key rare positives.
 
-**Seed:** Fixed, recorded in split metadata  
+**Phase 2 Split (Completed 2026-09-29):**
+- **Seed:** `20260929`
+- **Archive:** `airp-laya-8056-split.tgz` (himalogic / Nepal VPS)
+- **Archive SHA256:** `186e9fd5675733a8c51d828bbf3799099d10942474af6601cc80e5383d808942`
+
+**Artifacts:**
+- `train.jsonl`: 7250 rows, SHA256 `474c8a6029ce6ecab6e0fbf94bdd19ef1c6a8b343578f21bca09172195dda8a1`
+- `val.jsonl`: 805 rows, SHA256 `dcb44431d878ad2298a551ebcbb8e753e982bf8cd92e83e2df28c6892f497d17`
+- Questions (canonical): SHA256 `a2e7b5b36615e3b720258c1363819e7c976fac64d998e7d19a0899a5d41ef7a7`
+- Labels SHA: `5bdae44cd2bc520c56b09b1478c64724cb6fa3b7be0c93a63bc7262a9b9cd282` (8056 merged)
+- Corpus SHA: `712fd64d9c0c27e40a92aaa6cf86f8bb84a0385d8df0cbb2d2b473f04aaaaab74`
+
 **Stratification targets:**
 - Stance distribution (5 levels)
 - Rare positives: `subject_is_minor`, `exceeds_common_knowledge`, `is_mention_not_use` (minority classes with high composition weight)
 
-**Val split purpose:** Threshold tuning and ECE calibration only — **never** for early stopping or hyperparameter search, and **never** mixed with held-out suite ids.
+**Suite leak prevention:** 1 content-hash collision with suite `bnd-05` excluded (documented in `split-meta.json`). No held-out suite ids in train or val.
 
-**Suite leak prevention:** Assert no held-out suite item ids appear in train or val. Test fails if leak detected.
-
-**Artifacts:**
-- `train.jsonl` (labels + primitives, ~7250 rows)
-- `val.jsonl` (labels + primitives, ~800 rows)
-- SHAs for both files recorded in split metadata
+**Val split purpose:** Threshold tuning and ECE calibration only — **never** for early stopping or hyperparameter search.
 
 ### Laya Sample Construction
 

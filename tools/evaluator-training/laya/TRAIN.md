@@ -32,36 +32,45 @@
 }
 ```
 
-## Training Command (Scaffold)
+## Upstream Training Recipe
 
-**Note:** This is a scaffold. Adapt to actual Laya fine-tune API once upstream documentation is consulted.
+**Source:** Laya research branch fine-tune notebook  
+**URL:** https://raw.githubusercontent.com/NandhaKishorM/laya/research/notebooks/laya_finetune_typed_decisions_2xT4_kaggle.ipynb
+
+**Note:** `pip install laya` 0.3.21 has no train module. Training implementation lives in the research branch notebook. Adapt that notebook for AIRP primitives task:
+
+1. Load base model `convaiinnovations/laya` @ revision `55cf4c4e`
+2. Load training data from Phase 2 split (7250 train, 805 val)
+3. Configure RLCD training:
+   - encoder+heads (not heads-only)
+   - max_len=1024 (raised from base 512)
+   - batch_size=16 (adjust for 24GB VRAM)
+   - learning_rate=2e-5
+   - epochs=3
+   - checkpoint_every=0.5 epoch
+4. Train and save checkpoints
+
+## Training Command (Adapted from Upstream Notebook)
+
+Adapt the typed-decisions notebook for AIRP:
 
 ```bash
-python train_laya.py \
-  --base_model convaiinnovations/laya \
-  --revision 55cf4c4ebb4ebe31b2550e8bdf3bd21b99753851 \
-  --train_file train.jsonl \
-  --val_file val.jsonl \
-  --questions_file questions.json \
-  --output_dir ./checkpoints \
-  --recipe RLCD \
-  --max_len 1024 \
-  --batch_size 16 \
-  --learning_rate 2e-5 \
-  --num_epochs 3 \
-  --checkpoint_every 0.5 \
-  --warmup_steps 100 \
-  --save_strategy epoch \
-  --evaluation_strategy epoch
+# Extract and adapt from research notebook
+jupyter nbconvert --to script laya_finetune_typed_decisions_2xT4_kaggle.ipynb
+# Edit generated script:
+# - Change data paths to airp-laya-8056 split
+# - Change questions to AIRP 17-question bundle
+# - Set max_len=1024
+# - Keep RLCD recipe
+# Run:
+python laya_finetune_airp_primitives.py
 ```
 
-If the Laya package does not expose a CLI or simple API for fine-tuning, create a thin wrapper script `train_laya.py` that:
-1. Loads the base model from HuggingFace Hub (with revision pin)
-2. Verifies weight SHA256 (optional but recommended)
-3. Loads training data (samples must be in Laya's expected format: `{state, questions, answers}`)
-4. Configures RLCD training
-5. Trains encoder+heads at max_len=1024
-6. Saves checkpoints every 0.5 epoch
+Key adaptations from typed-decisions notebook:
+- **Questions:** Replace typed-decisions 4-question bundle with AIRP 17-question bundle
+- **Max length:** Change from 512 to 1024
+- **Data format:** Ensure `{state, questions, answers}` matches AIRP primitives shape
+- **Checkpointing:** Save every 0.5 epoch (6 checkpoints expected)
 
 ## Checkpoint Archiving
 
