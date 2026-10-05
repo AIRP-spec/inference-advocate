@@ -137,3 +137,23 @@ stance has no per-item gold on held-out and is not reported there). Nothing is f
   epochs 3, batch 8, accum 4, lr 2e-5 / 1e-4, max_len 1024, head_max_len 256, seed 42).
   Thresholds fitted per checkpoint on the clean val (A1 procedure with the zero-positive fix).
   Checkpoint selected by A2. Every checkpoint gated under both conditions.
+
+## Amendment B (2026-10-05, before the retrain and before any held-out scoring)
+
+The A4 search (5000 random greedy draws) found **no** feasible split: `is_mention_not_use`
+positives sit mostly in four large kind units (1560/950/630/280 rows) and
+`targets_protected_characteristic` positives in three units (80/40/20). Constraints, unit
+definition, size bounds and objective are unchanged. Only the search changes: 200 seeded greedy
+starts (`random.Random(f"20261005:{i}")`), each followed by best-improvement hill-climbing over
+single-unit toggles and one-in/one-out swaps, constraint violations penalised ×10. Lowest
+objective among feasible results wins (ties → lowest start index). Implemented in
+`build_group_split.py`; result recorded in `split-group-meta.json` (committed with this
+amendment, before the retrain starts).
+
+Result: start 99, objective 0.2249, 191/200 starts feasible. Train 7236 rows
+(`0c39e5f4…`), val 819 rows (`3d223a33…`), 40 val units, 0 contrast groups on both sides.
+Disclosed residuals: 128 val rows share a `kind` with train rows (kinds `ca-named-help`,
+`clean-redirect`, `clean-refusal-reasoned`, `hate-eliminationist`, `profanity-directed-alone`,
+reached through contrast groups that reuse those kinds); 685/819 val rows come from contrast
+groups, so val over-represents contrast-pair text; all 16 `ca-depth-*` groups (32 rows) landed in
+val, so the retrain does not see the CA depth pairs added in the 8056 corpus.
