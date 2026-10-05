@@ -270,4 +270,6 @@ Net, from the Laya side: Laya is much faster and calibratable after temperature 
   - `task1-retrain-checkpoints.tar` (SHA `385ef23d…` on pod) — six retrain checkpoint dirs
   - `bench/bench-cpu-orig-ckpt-epoch-2.6-step-10160.json` — VPS CPU latency
   - `ckpt-orig/ckpt-epoch-2.6-step-10160/` — orig selected checkpoint for CPU bench
-- Ledger: `/workspace/airp/spend-ledger.txt`. Pod terminated only after archive SHAs verified via API.
+- Terminated at ~12:36 NPT after archive SHAs verified. Uptime 7,472 s (2.076 h) × $0.74 = **$1.54**. Confirmed absent from RunPod `myself.pods` (only Task 2 pod remains).
+- Ledger: `/workspace/airp/spend-ledger.txt`.
+- Commits on branch `cursor/task1-laya-regate-methodology-fixed-eb65` (PR #27): tip `35aaf6f5d135412628e824c23b1ce77425362c10` (report); prior `72207b9` (gate/analyze/RUN.md).
