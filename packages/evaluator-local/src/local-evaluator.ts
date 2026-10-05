@@ -709,6 +709,8 @@ export async function warmAtLoad(opts: {
   warn: (line: string) => void;
   version: string;
   template: string;
+  /** Evaluator id for the log line. Defaults to the GGUF evaluator's. */
+  id?: string;
 }): Promise<void> {
   const snapshot: LocalEvaluatorObservables = {
     lastRawByClass: { ...opts.observables.lastRawByClass },
@@ -719,11 +721,11 @@ export async function warmAtLoad(opts: {
   try {
     await opts.evaluate(LOAD_WARMUP_REQUEST);
     opts.log(
-      `local-llm@${opts.version}: warm-up ran (template ${opts.template}) in ${Date.now() - started}ms`,
+      `${opts.id ?? 'local-llm'}@${opts.version}: warm-up ran (template ${opts.template}) in ${Date.now() - started}ms`,
     );
   } catch (err) {
     opts.warn(
-      `local-llm@${opts.version}: warm-up failed (${(err as Error).message}, template ${opts.template}); continuing`,
+      `${opts.id ?? 'local-llm'}@${opts.version}: warm-up failed (${(err as Error).message}, template ${opts.template}); continuing`,
     );
   } finally {
     opts.observables.lastRawByClass = snapshot.lastRawByClass;
@@ -736,6 +738,10 @@ export async function createLocalEvaluator(
   cfg: LocalEvaluatorConfig,
   taxonomy: Taxonomy,
 ): Promise<LocalEvaluator> {
+  if (cfg.engine !== undefined && cfg.engine !== 'gguf') {
+    // A Laya config reaching the GGUF constructor would otherwise try to load laya.onnx as a GGUF.
+    throw new Error(`createLocalEvaluator builds the GGUF engine; engine ${cfg.engine} is built by createOnDeviceEvaluator`);
+  }
   const evaluator = new LocalEvaluator({
     taxonomy,
     modelPath: cfg.modelPath,
@@ -748,6 +754,19 @@ export async function createLocalEvaluator(
   });
   await evaluator.load();
   return evaluator;
+}
+
+/**
+ * Host entry for kind 'local'. Dispatches on cfg.engine: omitted or 'gguf' is the GGUF live pin
+ * (LocalEvaluator), 'laya-onnx' is the Laya primitives evaluator. The Laya module, and with it
+ * ONNX Runtime, is imported only when a config names it.
+ */
+export async function createOnDeviceEvaluator(cfg: LocalEvaluatorConfig, taxonomy: Taxonomy): Promise<Evaluator> {
+  if (cfg.engine === 'laya-onnx') {
+    const { createLayaLocalEvaluator } = await import('./laya-evaluator.js');
+    return createLayaLocalEvaluator(cfg, taxonomy);
+  }
+  return createLocalEvaluator(cfg, taxonomy);
 }
 
 /** Hosts print this so a reader can tell which file the pin refers to. */

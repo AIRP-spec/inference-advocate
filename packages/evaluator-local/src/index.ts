@@ -6,6 +6,7 @@
 export {
   LocalEvaluator,
   createLocalEvaluator,
+  createOnDeviceEvaluator,
   localGgufLoadOptions,
   LOAD_WARMUP_REQUEST,
   warmAtLoad,
@@ -58,6 +59,20 @@ export {
   type PrimitivesVerdict,
   type ParsedCompactPrimitives,
 } from './prompt-v4.js';
+export {
+  LayaLocalEvaluator,
+  createLayaLocalEvaluator,
+  layaPrimitivesFromLogits,
+  loadLayaPins,
+  validateLayaPins,
+  LAYA_PINS_SCHEMA,
+  LAYA_ONNX_FILE,
+  type LayaPins,
+  type LayaQuestion,
+  type LayaLogits,
+  type LayaLastPass,
+  type LayaLocalEvaluatorOptions,
+} from './laya-evaluator.js';
 export { verifyModelSha256, sha256FileHex, normalizeDigest } from './digest.js';
 export {
   type PerPrimitiveStub,
