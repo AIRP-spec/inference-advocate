@@ -23,7 +23,7 @@ import { fileURLToPath } from 'node:url';
 const here = dirname(fileURLToPath(import.meta.url));
 const repo = resolve(here, '../..');
 const L = join(here, 'laya-node');
-const { compose, layaPrimitivesFromLogits, validateLayaPins, LayaLocalEvaluator } = await import(
+const { compose, layaPrimitivesFromLogits, validateLayaPins, LayaLocalEvaluator, createOnDeviceEvaluator, createLocalEvaluator } = await import(
   join(repo, 'packages/evaluator-local/dist/index.js')
 );
 const { Taxonomy } = await import(join(repo, 'packages/core/dist/index.js'));
@@ -100,6 +100,15 @@ test('laya evaluator refuses to start on a model, pins or composition mismatch',
   // Thresholds missing a primitive.
   const t = fakeBundle({ onnxClaim: PINNED.onnx, pinsPatch: { thresholds: { ...pins.thresholds, noul: { profanity: 0.5 } } } });
   assert.throws(() => new LayaLocalEvaluator({ ...base, modelPath: t.modelPath, modelSha256: PINNED.onnx, pinsPath: t.pinsPath, pinsSha256: t.pinsSha256 }), /threshold/);
+});
+
+test('engine dispatch: laya-onnx reaches the Laya evaluator (and its pin checks); the GGUF constructor refuses it', async () => {
+  const taxonomy = Taxonomy.loadFromFile(join(repo, 'data/taxonomy/flags.v0.json'));
+  const b = fakeBundle({ onnxClaim: PINNED.onnx });
+  const cfg = { kind: 'local', engine: 'laya-onnx', modelPath: b.modelPath, modelSha256: PINNED.onnx,
+    laya: { pinsPath: b.pinsPath, pinsSha256: b.pinsSha256, compositionPath: COMPOSITION, compositionSha256: PINNED.composition } };
+  await assert.rejects(() => createOnDeviceEvaluator(cfg, taxonomy), /local evaluator model digest mismatch for laya\.onnx/);
+  await assert.rejects(() => createLocalEvaluator(cfg, taxonomy), /builds the GGUF engine/);
 });
 
 const bundleDir = process.env.AIRP_LAYA_BUNDLE_DIR;
