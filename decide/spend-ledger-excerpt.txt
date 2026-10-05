@@ -1,0 +1,8 @@
+2026-10-05 10:31 NPT TASK1 START pod jbosjzujr94hu3 (airp-task1-laya, RTX 4090 SECURE, $0.74/hr) purpose: Laya val/held-out raw inference for 6 orig ckpts + 1d retrain + 4090 latency. Est ~3h ≈ $2.20
+2026-10-05 10:35 NPT TASK2 START pod rdp49ajz11iujc (airp-task2-qwen-scoring, RTX 4090 SECURE, $0.74/hr) purpose: Qwen per-primitive GGUF regen + scored/greedy runs x4 CKs + GPU latency. Est ~3h ≈ $2.22
+2026-10-05 12:36 NPT TASK1 STOP pod jbosjzujr94hu3 terminated (API confirm: not in myself.pods). uptime 7472s (2.076h) @ $0.74/hr = $1.54. Only Task2 pod rdp49ajz11iujc remains.
+2026-10-05 13:07 NPT TASK2 STOP pod rdp49ajz11iujc TERMINATED (confirmed via API: pod query null, myself.pods empty). Uptime 9019 s (2.51 h) x $0.74/hr = $1.85. Task 2 total spend $1.85.
+2026-10-05 15:22 NPT STEP4 LAYA START pod iauzudzp6gtcys (airp-decide-step4-laya, NVIDIA GeForce RTX 4090, $0.74/hr) purpose: Laya group-split retrain on v4 labels + val/held-out infer. Est ~3h.
+2026-10-05 15:22 NPT STEP4 QWEN START pod 6x6rfws1x4i15e (airp-decide-step4-qwen, NVIDIA A100-SXM4-80GB, $1.59/hr) purpose: Qwen per-primitive LoRA on train7236 v4 + GGUF/infer. Est ~5h.
+2026-10-05 17:53 NPT STEP4 LAYA STOP pod iauzudzp6gtcys TERMINATED (API confirm). Uptime 9032s (2.51h) x $0.74/hr = $1.86. Archive: VPS /root/primitives-evaluator/decide-2026-10-05/step4/laya-pod MANIFEST verified (tarball OK; fixed self-hash).
+2026-10-05 19:36 NPT STEP4 QWEN STOP pod 6x6rfws1x4i15e TERMINATED (API confirm pods=[]). Uptime 15092s (4.19h) x $1.59/hr = $6.67. Archive VPS step4/qwen-pod MANIFEST verified.
