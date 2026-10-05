@@ -69,6 +69,26 @@ import fs from 'node:fs';
 
 export { PROMPT_TEMPLATE_VERSION };
 
+/**
+ * Chat wrapper used for every LocalEvaluator decode. Exported so offline tools (the
+ * per-primitive probability scorer) build byte-identical prompt tokens from one source.
+ */
+export function createEvaluatorChatWrapper(): QwenChatWrapper {
+  return new QwenChatWrapper({ thoughts: 'discourage', variation: '3' });
+}
+
+/**
+ * Chat history for one per-primitive-v1 pass: the pass's system prompt, the shared user
+ * turn, and an empty model turn. Single source for LocalEvaluator and offline scoring.
+ */
+export function perPrimitiveChatHistory(systemPrompt: string, req: EvaluationRequest): ChatHistoryItem[] {
+  return [
+    { type: 'system', text: systemPrompt },
+    { type: 'user', text: buildPerPrimitiveUser(req) },
+    { type: 'model', response: [] },
+  ];
+}
+
 const VERDICT_GBNF = 'root ::= "yes" | "no"';
 const EVIDENCE_GBNF = 'root ::= [^<>\\n]+';
 const VERDICT_MAX_TOKENS = 4;
@@ -175,7 +195,7 @@ export class LocalEvaluator implements Evaluator {
       swaFullCache: true,
     });
     const sequence = context.getSequence();
-    const wrapper = new QwenChatWrapper({ thoughts: 'discourage', variation: '3' });
+    const wrapper = createEvaluatorChatWrapper();
     const verdictGrammar = await llama.createGrammar({ grammar: VERDICT_GBNF });
     const evidenceGrammar = await llama.createGrammar({ grammar: EVIDENCE_GBNF });
     const compactGrammar = await llama.createGrammar({
@@ -400,18 +420,13 @@ export class LocalEvaluator implements Evaluator {
     }
     const perCallMs = this.#opts.timeoutMs ?? 30_000;
     const catalogue = this.#opts.primitivesCatalogue ?? PRIMITIVES_CATALOGUE_V1;
-    const userPrompt = buildPerPrimitiveUser(req);
     
     // Run 18 separate passes: 1 stance + 7 objects + 10 qualifiers
     const rawAnswers: Record<string, string> = {};
     
     // Pass 1: Stance
     const stanceSystem = buildStanceSystemPrompt(catalogue);
-    const stanceTokens = this.#tokenizeHistory(loaded, [
-      { type: 'system', text: stanceSystem },
-      { type: 'user', text: userPrompt },
-      { type: 'model', response: [] },
-    ]);
+    const stanceTokens = this.#tokenizeHistory(loaded, perPrimitiveChatHistory(stanceSystem, req));
     let stanceRaw = '';
     try {
       stanceRaw = await this.#generate(loaded, stanceTokens, loaded.stanceGrammar, 16, perCallMs);
@@ -433,11 +448,7 @@ export class LocalEvaluator implements Evaluator {
     // Passes 2-8: Objects (yes/no)
     for (const obj of catalogue.objects) {
       const objSystem = buildObjectSystemPrompt(obj.primitive, catalogue);
-      const objTokens = this.#tokenizeHistory(loaded, [
-        { type: 'system', text: objSystem },
-        { type: 'user', text: userPrompt },
-        { type: 'model', response: [] },
-      ]);
+      const objTokens = this.#tokenizeHistory(loaded, perPrimitiveChatHistory(objSystem, req));
       let objRaw = '';
       try {
         objRaw = await this.#generate(loaded, objTokens, loaded.yesNoGrammar, 2, perCallMs);
@@ -453,11 +464,7 @@ export class LocalEvaluator implements Evaluator {
     // Passes 9-18: Qualifiers (yes/no)
     for (const qual of catalogue.qualifiers) {
       const qualSystem = buildQualifierSystemPrompt(qual.primitive, catalogue);
-      const qualTokens = this.#tokenizeHistory(loaded, [
-        { type: 'system', text: qualSystem },
-        { type: 'user', text: userPrompt },
-        { type: 'model', response: [] },
-      ]);
+      const qualTokens = this.#tokenizeHistory(loaded, perPrimitiveChatHistory(qualSystem, req));
       let qualRaw = '';
       try {
         qualRaw = await this.#generate(loaded, qualTokens, loaded.yesNoGrammar, 2, perCallMs);
