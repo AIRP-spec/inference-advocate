@@ -1,0 +1,14 @@
+{
+  "kind": "local",
+  "engine": "laya-onnx",
+  "modelPath": "/path/to/laya-5766-fp32-bundle/laya.onnx",
+  "modelSha256": "0b5694036a20f3093f2cac7c8f6d8569400756e9982a28ccd4070997a522aa8e",
+  "laya": {
+    "pinsPath": "tools/evaluator-training/laya-node/pins/laya-5766-fp32.pins.json",
+    "pinsSha256": "b0c9dd23bb71233db4026d6531fa1484c0f8b64b307ac1bd3b7330a911f1edbd",
+    "compositionPath": "tools/evaluator-training/primitives/compositions/airp-v0.5.0.json",
+    "compositionSha256": "4def0b8fd339713bd261106cb10235949f4bd1bc4e3631a88dd7cc511b0087e0",
+    "intraOpNumThreads": 8
+  },
+  "note": "Laya ckpt-epoch-1.5-step-5766 fp32. Non-default development path; omit this file for the rule evaluator."
+}
