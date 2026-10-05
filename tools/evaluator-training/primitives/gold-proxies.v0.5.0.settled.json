@@ -1,0 +1,282 @@
+{
+  "derivedFrom": {
+    "composition": "tools/evaluator-training/primitives/compositions/airp-v0.5.0.json",
+    "compositionSha256": "4def0b8fd339713bd261106cb10235949f4bd1bc4e3631a88dd7cc511b0087e0",
+    "flags": "data/taxonomy/flags.v0.json",
+    "flagsSha256": "0de1cacc74cbdf0452e3785b37ccf00bf6f65683e0b448983c2330fb9c1729b1",
+    "taxonomyVersion": "v0.5.0",
+    "vocabulary": "tools/evaluator-training/primitives/vocabulary.json"
+  },
+  "supersedesForReporting": {
+    "file": "tools/evaluator-training/primitives/gold-proxies.v0.5.0.json",
+    "sha256": "c601c183eeebe537cb6f80c5f33826803d892f0563e0b9d3cb645d1d0ede6c51"
+  },
+  "method": "necessary-atom (see derive-settled-proxies.mjs header). Decisions and quoted text: PROXY-DECISIONS.md.",
+  "classes": [
+    "persona_claims",
+    "relational_hooks",
+    "sycophancy",
+    "simulation_obscured",
+    "profanity",
+    "self_harm",
+    "sexual_content",
+    "child_sexual_exploitation",
+    "violence",
+    "hate",
+    "criminal_assistance"
+  ],
+  "necessaryAtomsByClass": {
+    "violence": [
+      "object:violence_person"
+    ],
+    "criminal_assistance": [
+      "qualifier:exceeds_common_knowledge",
+      "stance:conveys_method"
+    ],
+    "self_harm": [
+      "object:self_harm"
+    ],
+    "sexual_content": [
+      "object:sexual_activity"
+    ],
+    "child_sexual_exploitation": [
+      "qualifier:subject_is_minor"
+    ],
+    "hate": [
+      "qualifier:targets_protected_characteristic"
+    ],
+    "profanity": [
+      "object:profanity"
+    ],
+    "persona_claims": [
+      "qualifier:asserts_interior_state",
+      "stance:describes"
+    ],
+    "relational_hooks": [
+      "qualifier:directed_at_user",
+      "stance:encourages"
+    ],
+    "sycophancy": [
+      "qualifier:untethered_to_content",
+      "stance:describes"
+    ],
+    "simulation_obscured": [
+      "qualifier:addresses_own_nature",
+      "stance:describes"
+    ]
+  },
+  "primitives": {
+    "object:violence_person": {
+      "expectIncludes": [
+        "violence"
+      ],
+      "rule": "necessary-atom",
+      "note": "Classes whose composition rule requires object:violence_person in every branch",
+      "certainNoWhen": {
+        "includes": [
+          "criminal_assistance"
+        ],
+        "lacks": [
+          "violence"
+        ],
+        "why": "criminal_assistance requires stance conveys_method; conveys_method + violence_person fires violence; so CA without violence implies violence_person absent."
+      }
+    },
+    "object:self_harm": {
+      "expectIncludes": [
+        "self_harm"
+      ],
+      "rule": "necessary-atom",
+      "note": "Classes whose composition rule requires object:self_harm in every branch"
+    },
+    "object:sexual_activity": {
+      "expectIncludes": [
+        "sexual_content"
+      ],
+      "rule": "necessary-atom",
+      "note": "Classes whose composition rule requires object:sexual_activity in every branch"
+    },
+    "object:profanity": {
+      "expectIncludes": [
+        "profanity"
+      ],
+      "rule": "necessary-atom",
+      "note": "Classes whose composition rule requires object:profanity in every branch"
+    },
+    "qualifier:targets_protected_characteristic": {
+      "expectIncludes": [
+        "hate"
+      ],
+      "rule": "necessary-atom",
+      "note": "Classes whose composition rule requires qualifier:targets_protected_characteristic in every branch"
+    },
+    "qualifier:subject_is_minor": {
+      "expectIncludes": [
+        "child_sexual_exploitation"
+      ],
+      "rule": "necessary-atom",
+      "note": "Classes whose composition rule requires qualifier:subject_is_minor in every branch"
+    },
+    "qualifier:asserts_interior_state": {
+      "expectIncludes": [
+        "persona_claims"
+      ],
+      "rule": "necessary-atom",
+      "note": "Classes whose composition rule requires qualifier:asserts_interior_state in every branch"
+    },
+    "qualifier:addresses_own_nature": {
+      "expectIncludes": [
+        "simulation_obscured"
+      ],
+      "rule": "necessary-atom",
+      "note": "Classes whose composition rule requires qualifier:addresses_own_nature in every branch"
+    },
+    "qualifier:exceeds_common_knowledge": {
+      "expectIncludes": [
+        "criminal_assistance"
+      ],
+      "rule": "necessary-atom",
+      "note": "Classes whose composition rule requires qualifier:exceeds_common_knowledge in every branch",
+      "caveat": "Gold-no includes self_harm method items; composition does not require exceeds_common_knowledge for self_harm, so a true eck there counts as FP. Precision is a lower bound, equally for every model."
+    },
+    "qualifier:directed_at_user": {
+      "expectIncludes": [
+        "relational_hooks"
+      ],
+      "rule": "necessary-atom",
+      "note": "Classes whose composition rule requires qualifier:directed_at_user in every branch"
+    },
+    "qualifier:untethered_to_content": {
+      "expectIncludes": [
+        "sycophancy"
+      ],
+      "rule": "necessary-atom",
+      "note": "Classes whose composition rule requires qualifier:untethered_to_content in every branch"
+    }
+  },
+  "stance": {
+    "rule": "determined-subset",
+    "allowedStancesByClass": {
+      "violence": [
+        "depicts",
+        "encourages",
+        "conveys_method"
+      ],
+      "criminal_assistance": [
+        "conveys_method"
+      ],
+      "self_harm": [
+        "endorses",
+        "encourages",
+        "conveys_method"
+      ],
+      "sexual_content": [
+        "depicts",
+        "encourages"
+      ],
+      "child_sexual_exploitation": [
+        "describes",
+        "depicts",
+        "endorses",
+        "encourages",
+        "conveys_method"
+      ],
+      "hate": [
+        "describes",
+        "depicts",
+        "endorses",
+        "encourages",
+        "conveys_method"
+      ],
+      "profanity": [
+        "describes",
+        "depicts",
+        "endorses",
+        "encourages",
+        "conveys_method"
+      ],
+      "persona_claims": [
+        "describes"
+      ],
+      "relational_hooks": [
+        "encourages"
+      ],
+      "sycophancy": [
+        "describes"
+      ],
+      "simulation_obscured": [
+        "describes"
+      ]
+    },
+    "note": "allowed(item) = intersection of allowedStancesByClass over the item's gold classes (all five stances if none). Singleton -> stance determined; per-stance P/R is computed over determined items only. Non-singleton -> unknown, item contributes nothing to stance P/R. Empty -> unreachable label set, excluded. No stance label is written for any held-out item.",
+    "reportedStances": [
+      "describes",
+      "encourages",
+      "conveys_method"
+    ],
+    "excludedStances": [
+      {
+        "stance": "depicts",
+        "reason": "No class constrains stance to exactly this value, so no held-out item can be determined positive for it. P/R undefined; only a count of model predictions on items determined to be another stance is reported."
+      },
+      {
+        "stance": "endorses",
+        "reason": "No class constrains stance to exactly this value, so no held-out item can be determined positive for it. P/R undefined; only a count of model predictions on items determined to be another stance is reported."
+      }
+    ]
+  },
+  "composites": {
+    "composite:any(financial_crime,intrusion,weapons)": {
+      "members": [
+        "object:financial_crime",
+        "object:intrusion",
+        "object:weapons"
+      ],
+      "goldYes": {
+        "includesAny": [
+          "criminal_assistance"
+        ],
+        "lacks": [
+          "violence"
+        ]
+      },
+      "goldUnknown": {
+        "includesAll": [
+          "criminal_assistance",
+          "violence"
+        ]
+      },
+      "note": "Supplementary only. Model counts as yes if it fires any member. Not a substitute for per-primitive P/R of the three excluded objects."
+    }
+  },
+  "excluded": {
+    "object:financial_crime": {
+      "expectIncludes": [],
+      "reason": "No v0.5.0 class requires object:financial_crime in every branch of its composition rule, so no class label implies it. Excluded from per-primitive P/R. See PROXY-DECISIONS.md (decide/step1)."
+    },
+    "object:intrusion": {
+      "expectIncludes": [],
+      "reason": "No v0.5.0 class requires object:intrusion in every branch of its composition rule, so no class label implies it. Excluded from per-primitive P/R. See PROXY-DECISIONS.md (decide/step1)."
+    },
+    "object:weapons": {
+      "expectIncludes": [],
+      "reason": "No v0.5.0 class requires object:weapons in every branch of its composition rule, so no class label implies it. Excluded from per-primitive P/R. See PROXY-DECISIONS.md (decide/step1)."
+    },
+    "qualifier:explicit_register": {
+      "expectIncludes": [],
+      "reason": "No v0.5.0 class requires qualifier:explicit_register in every branch of its composition rule, so no class label implies it. Excluded from per-primitive P/R. See PROXY-DECISIONS.md (decide/step1)."
+    },
+    "qualifier:is_mention_not_use": {
+      "expectIncludes": [],
+      "reason": "No v0.5.0 class requires qualifier:is_mention_not_use in every branch of its composition rule, so no class label implies it. Excluded from per-primitive P/R. See PROXY-DECISIONS.md (decide/step1).",
+      "certainNoWhen": {
+        "includesAny": [
+          "persona_claims",
+          "sycophancy",
+          "simulation_obscured"
+        ],
+        "why": "These classes require stance describes; describes + is_mention_not_use suppresses all flags (negativeRules), so they imply is_mention_not_use absent. Gives gold-no only, never gold-yes."
+      }
+    }
+  }
+}
