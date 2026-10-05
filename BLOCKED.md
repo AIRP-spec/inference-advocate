@@ -1,8 +1,44 @@
-# Task 1 Blocked: Cannot Access Required Artifacts
+# Task 1 Partial Progress + Remaining Blocker
 
 **Date:** 2026-10-05  
 **Task:** Task 1 (Laya re-gate with methodology fixed)  
-**Blocker:** Network access to Nepal VPS (himalogic.com) where required artifacts are stored
+**Status:** Analysis and derivation complete, re-scoring blocked on artifact access
+
+## Progress Completed
+
+### ✅ Gold Proxies Derived (Task requirement: Shared fix)
+- Created `tools/evaluator-training/primitives/gold-proxies.v0.5.0.json`
+- **SHA-256:** `1a47b3f36a80f89fd466040125a4f27307884876da523afe2347e464b56395c5`
+- Derived deterministically from composition file + flags.v0.json validation
+- Fixed `directed_at_user` proxy: `relational_hooks` (was incorrectly `harassment`)
+- Documented limitation: cannot verify against per-atom-precision-converged.json (VPS inaccessible)
+
+### ✅ Validation Split Analysis (Task 1b)
+- Analyzed `split-train-val.mjs` source code
+- **Finding:** Split was by **RANDOM ROW** within strata, NOT by contrast group/kind
+- Stratification used: stance + three qualifiers (subject_is_minor, exceeds_common_knowledge, is_mention_not_use)
+- **Implication per brief 1d:** Retraining with group-based split required
+
+### ✅ Training Metadata Analysis (Task 1g partial)
+- Training config: 3 epochs, checkpoint every 0.5 epoch
+- **Step 10,160** = checkpoint at **2.6 epochs** (not early stopping, planned checkpoint)
+- 3 full epochs would be ~11,556 steps (train_rows * n_questions / batch_size * 3)
+- Final checkpoint was epoch-2.6-step-10160, which was a planned 0.5-epoch checkpoint
+
+### ✅ CSE Gate Flips Documented (Task 1g partial)
+From PHASE4-5-RESULTS.json across 6 checkpoints:
+- step-1926 (epoch 0.5): CSE **PASS** (29/0/0)
+- step-3852 (epoch 1.0): CSE **FAIL** (29/0/3)
+- step-5778 (epoch 1.5): CSE **FAIL** (29/0/3)
+- step-7704 (epoch 2.0): CSE **FAIL** (29/0/1)
+- step-9630 (epoch 2.5): CSE **PASS** (29/0/0)
+- step-10160 (epoch 2.6): CSE **PASS** (29/0/0)
+
+**Analysis:** CSE gate flipped 3 times across converged checkpoints (pass → fail → pass). Per brief: "A result that flips across checkpoints is one draw, not a pass."
+
+---
+
+## Primary Blocker: Cannot Access Artifacts for Re-scoring
 
 ## Problem
 
