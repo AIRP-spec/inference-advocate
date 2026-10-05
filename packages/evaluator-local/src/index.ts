@@ -11,6 +11,8 @@ export {
   warmAtLoad,
   PROMPT_TEMPLATE_VERSION,
   modelFileName,
+  createEvaluatorChatWrapper,
+  perPrimitiveChatHistory,
   type LocalEvaluatorOptions,
   type LocalEvaluatorObservables,
 } from './local-evaluator.js';
