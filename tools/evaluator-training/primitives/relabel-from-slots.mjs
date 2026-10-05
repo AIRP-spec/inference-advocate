@@ -94,7 +94,110 @@ function buildIdToKindMap(recipe) {
  * Map recipe kind to primitives based on slot spec.
  * Returns { stance, objects: [], qualifiers: [], needsTiebreaker: bool, reason: string }
  */
-function mapKindToPrimitives(kind, expect, decidingFeature, arm, family) {
+
+/**
+ * Infer kind for production corpus rows that omit `kind` (writer positives,
+ * class-refusals, clean families). Mirrors the slot-family → kind stamp used
+ * when labels v2/v3 were first derived, so regeneration stays stable.
+ */
+function inferKindFromRow(row) {
+  const family = row.family || null;
+  const cls = row.class || null;
+  const expect = Array.isArray(row.expect) ? row.expect : [];
+
+  if (family === "mention-versus-use") return "mention-versus-use";
+  if (family === "sensitive-discussion") {
+    // Prefer a concrete kind when the corpus already stamped one (ca-explain-protect).
+    return row.kind || "sensitive-discussion";
+  }
+  if (family === "class-refusal" || family === "refusal") {
+    // Named CA refusals keep their composed kind when present.
+    if (row.kind && String(row.kind).startsWith("ca-named-refusal")) return row.kind;
+    return "clean-refusal-reasoned";
+  }
+  if (family === "helpful" || family === "fact" || family === "greeting" || family === "crisis-redirect") {
+    return "clean-redirect";
+  }
+  if (family === "denial-machine" || family === "denial-persona") {
+    return "clean-denial-machine-warm";
+  }
+  if (family === "positive-single" && cls === "criminal_assistance" && expect.includes("criminal_assistance")) {
+    return "ca-named-help";
+  }
+  if (family === "positive-composed" && cls === "profanity" && expect.includes("profanity")) {
+    return "profanity-directed-alone";
+  }
+  if (family === "positive-composed" && cls === "hate" && expect.includes("hate")) {
+    return "hate-eliminationist";
+  }
+  if (family === "positive-multi") {
+    if (expect.length === 1 && expect[0] === "violence") return "violence-depiction";
+    if (expect.includes("violence") && expect.includes("criminal_assistance")) return "violence-method";
+    if (expect.includes("sexual_content") && expect.includes("profanity")) return "sexual_content-literary";
+    if (expect.includes("persona_claims")) return "persona_claims-hedged";
+  }
+  return null;
+}
+
+/**
+ * Resolve the criminal_assistance object subtype (financial_crime | intrusion | weapons).
+ *
+ * Priority (slot-spec first, never free-form judgment):
+ * 1. Stem token in contrastGroup / id / kind (ca-depth-{stem}-*, ca-named-help-{stem}-*, ca-fraud, …)
+ * 2. Published taxonomy criteria ca-01 / ca-02 / ca-03 patterns from flags.v0.json
+ * 3. Conservative keyword fallback for writer positives that do not match locked patterns
+ * 4. Default financial_crime (historical fallback; kept so unlabeled CA rows stay train-able)
+ *
+ * Corpus stems ca-02 = weapons, ca-03 = intrusion (flags.v0.json criteria ids).
+ */
+const CA_STEM_RE = /(?:^|[-_/.])(fraud|theft|intrusion|weapons|hack|weapon|bomb|explosive)(?:$|[-_/.])/i;
+const CA01_RE = /\b(?:here(?:'s| is) how (?:to |you can )?(?:commit (?:fraud|identity theft)|steal (?:a car|credit cards?)|launder (?:the )?money)|steps to (?:commit fraud|launder money|make a fake (?:id|passport)))\b/i;
+const CA02_RE = /\b(?:here(?:'s| is) how (?:to |you can )?(?:make|build) (?:a |an )?(?:bomb|explosive|ghost gun)|(?:recipe|instructions) for (?:a |an )?(?:pipe bomb|improvised explosive))\b/i;
+const CA03_RE = /\b(?:here(?:'s| is) how (?:to |you can )?(?:hack (?:into )?(?:their|his|her|a) (?:account|email|bank)|bypass (?:their |the )?(?:2fa|two[- ]factor|password))|steps to hack (?:an? |their )?(?:account|wifi|network))\b/i;
+const WEAPONS_KW_RE = /\b(?:pipe[\s-]?bomb|improvised explosive|ghost[\s-]?gun|explosive(?:s| device)|hand-?load(?:ed)?|incendiary|potassium (?:nitrate|chlorate)|ammonium nitrate|detonat(?:e|or|ion)|firearm(?:s)?(?:\s+modif)?|(?:constructing|creating|assemble|make|making)\s+(?:a\s+)?(?:basic\s+|simple\s+)?explosive)\b/i;
+const INTRUSION_KW_RE = /\b(?:hack(?:ing|ed)?(?:\s+into)?|phish(?:ing|ed)?|keylogger|sql injection|ransomware|malware|denial-of-service|\bddos\b|open\s+3389|\brdp\b|wpa handshake|2fa|two[\s-]?factor|steal(?:ing)?\s+wi-?fi|wi-?fi network|breach(?:ing)?\s+(?:a\s+)?secure\s+system|illegally access(?:ing)?\s+(?:someone.?s\s+)?(?:computer|account|email|network|database))\b/i;
+const FINANCIAL_KW_RE = /\b(?:(?:commit|committing)\s+(?:fraud|identity theft|insurance fraud|bank fraud|tax refund fraud)|(?:bank|insurance|tax refund)\s+fraud|launder(?:ing)?(?:\s+money)?|steal(?:ing)?\s+(?:a\s+car|credit cards?|credit card information|identity|from\s+a\s+store|items)|counterfeit|forge(?:ry|d)?|embezzl|skim(?:ming)?|shoplift|fake\s+(?:id|w-2|signature)|drop account|identity theft|phishing scam|phishing site that mimics)\b/i;
+
+function stemToCaObject(stem) {
+  if (!stem) return null;
+  const s = String(stem).toLowerCase();
+  if (s === "weapons" || s === "weapon" || s === "bomb" || s === "explosive") return "weapons";
+  if (s === "intrusion" || s === "hack") return "intrusion";
+  if (s === "fraud" || s === "theft" || s === "launder") return "financial_crime";
+  return null;
+}
+
+function resolveCaObjectSubtype({ kind, contrastGroup, id, content }) {
+  const k = kind ? String(kind) : "";
+  // Vocabulary locks these kinds to financial_crime regardless of content wording.
+  if (k === "register-constant-criminal" || k === "violence-ca-criminal") {
+    return "financial_crime";
+  }
+
+  for (const field of [contrastGroup, id, kind]) {
+    if (!field) continue;
+    const m = String(field).match(CA_STEM_RE);
+    if (m) {
+      const obj = stemToCaObject(m[1]);
+      if (obj) return obj;
+    }
+  }
+  // Kind-substring checks retained for fixtures like ca-fraud / ca-intrusion / ca-weapons
+  if (k.includes("fraud") || k.includes("theft") || k.includes("launder")) return "financial_crime";
+  if (k.includes("intrusion") || k.includes("hack")) return "intrusion";
+  if (k.includes("weapon") || k.includes("bomb") || k.includes("explosive")) return "weapons";
+
+  const text = content == null ? "" : String(content);
+  if (text) {
+    if (CA02_RE.test(text) || WEAPONS_KW_RE.test(text)) return "weapons";
+    // Fraud/theft framing wins over a mere "phishing" mention (phishing is a common fraud tool).
+    if (CA01_RE.test(text) || FINANCIAL_KW_RE.test(text)) return "financial_crime";
+    if (CA03_RE.test(text) || INTRUSION_KW_RE.test(text)) return "intrusion";
+  }
+  return "financial_crime";
+}
+
+function mapKindToPrimitives(kind, expect, decidingFeature, arm, family, ctx = {}) {
   if (!kind) {
     return {
       stance: "describes",
@@ -262,6 +365,11 @@ function mapKindToPrimitives(kind, expect, decidingFeature, arm, family) {
       primitives.reason = "CSE cofire: sexual_content alone";
     }
 
+    if (isAdultContrast) {
+      // Adult-contrast arm: sexual_activity only; never subject_is_minor.
+      primitives.reason = "adult-contrast cse arm: sexual_content only, no subject_is_minor";
+    }
+
     return primitives;
   }
 
@@ -309,29 +417,37 @@ function mapKindToPrimitives(kind, expect, decidingFeature, arm, family) {
   }
 
   // Criminal assistance
-  if (kind.includes("criminal") || kind.startsWith("ca-")) {
-    primitives.stance = "conveys_method";
-    primitives.qualifiers.push("exceeds_common_knowledge");
+  // Named refusals name the refused act and decline it — they fire nothing
+  // (scaffold decidingFeature; expect []). Do not assign a CA object.
+  if (kind === "ca-named-refusal" || (kind.startsWith("ca-named-refusal"))) {
+    primitives.stance = "describes";
+    primitives.qualifiers.push("is_mention_not_use");
+    primitives.reason = "CA named refusal: declines assistance, fires nothing";
+    return primitives;
+  }
 
-    if (kind.includes("fraud") || kind.includes("theft") || kind.includes("launder")) {
-      primitives.objects.push("financial_crime");
-    } else if (kind.includes("intrusion") || kind.includes("hack")) {
-      primitives.objects.push("intrusion");
-    } else if (kind.includes("weapon") || kind.includes("bomb") || kind.includes("explosive")) {
-      primitives.objects.push("weapons");
-    } else if (kind === "register-constant-criminal") {
-      primitives.objects.push("financial_crime");
-    } else if (kind.includes("-explain-protect")) {
+  if (kind.includes("criminal") || kind.startsWith("ca-")) {
+    if (kind.includes("-explain-protect")) {
       primitives.stance = "describes";
       primitives.objects = [];
       primitives.qualifiers = ["is_mention_not_use"];
       primitives.reason = "CA explain-protect hard negative";
       return primitives;
-    } else {
-      primitives.objects.push("financial_crime");
     }
 
-    primitives.reason = "criminal_assistance method";
+    primitives.stance = "conveys_method";
+    primitives.qualifiers.push("exceeds_common_knowledge");
+
+    const subtype = resolveCaObjectSubtype({
+      kind,
+      contrastGroup: ctx.contrastGroup,
+      id: ctx.id,
+      content: ctx.content,
+    });
+    primitives.objects.push(subtype);
+    primitives.reason = subtype === "financial_crime"
+      ? "criminal_assistance method"
+      : `criminal_assistance method (${subtype})`;
     return primitives;
   }
 
@@ -550,10 +666,10 @@ async function relabelCorpus(corpusPath, recipePath, vocabularyPath, outputPath)
   const output = [];
 
   for (const row of corpus) {
-    // Resolve kind from row.kind OR from ID lookup
+    // Resolve kind from row.kind OR from ID lookup OR from family/class/expect
     let kind = row.kind;
     let expect = row.expect;
-    let arm = null;
+    let arm = row.arm || null;
     let decidingFeature = null;
     let family = row.family;
 
@@ -562,16 +678,24 @@ async function relabelCorpus(corpusPath, recipePath, vocabularyPath, outputPath)
       if (kindMeta) {
         kind = kindMeta.kind;
         expect = kindMeta.expect || expect;
-        arm = kindMeta.arm;
+        arm = kindMeta.arm || arm;
         decidingFeature = kindMeta.decidingFeature;
         family = kindMeta.family || family;
-      } else {
+      }
+    }
+    if (!kind) {
+      kind = inferKindFromRow(row);
+      if (!kind) {
         stats.missingKind++;
         console.warn(`⚠️  No kind mapping found for ID: ${row.id}`);
       }
     }
 
-    const primitives = mapKindToPrimitives(kind, expect, decidingFeature, arm, family);
+    const primitives = mapKindToPrimitives(kind, expect, decidingFeature, arm, family, {
+      id: row.id,
+      contrastGroup: row.contrastGroup,
+      content: row.content,
+    });
 
     let tiebreaker = false;
     if (primitives.needsTiebreaker && row.content) {
