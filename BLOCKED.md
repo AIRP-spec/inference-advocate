@@ -86,9 +86,28 @@ Options:
 
 **Budget:** Task 2 has $12 budget (shared $25 cap with Task 1). No pods started yet, $0 spent.
 
+## Additional Investigation
+
+Checked for VPS access or checkpoints in this environment:
+- ✅ Searched for checkpoint files locally: none found
+- ✅ Checked `/root/.ssh/`: empty directory
+- ✅ Checked for SSH keys or configs: none
+- ✅ Searched for prior cloud agents with VPS info: 28 agents listed, none have VPS documentation
+- ✅ Searched RUNBOOK.md, LESSONS.md for VPS procedures: mentions `/root/` on gate pods but not Nepal VPS access
+- ✅ Checked environment variables and secrets: none related to VPS
+
+## Parallel Task Status
+
+Task 1 agent (bc-0f3d7d7b-cff2-54ff-a8d1-59602078eb65) is also RUNNING and likely facing the same blocker, as it needs the same checkpoints and inputs.
+
 ## Remote Verification
 
 ```bash
 $ git ls-remote origin cursor/task2-probability-scoring-qwen-30a1
-# (output below)
+9da790bffcba8c7ad2ee936e67aed357440e07e5
+
+$ git log --format="%H %s" -1
+9da790bffcba8c7ad2ee936e67aed357440e07e5 Shared fix: derive gold proxies v0.5.0 for per-primitive precision
 ```
+
+Push verified: remote SHA matches local commit.
