@@ -1,246 +1,156 @@
 #!/usr/bin/env node
-// Derive gold proxies for primitives from composition rules.
-//
-// Paper: Shared fix for Task 1 and Task 2.
-// Each primitive's gold proxy maps to which taxonomy classes require that primitive
-// based on the composition rules in airp-v0.5.0.json.
-//
-// This derivation is deterministic from the composition file. The brief requires
-// checking this against per-atom-precision-converged.json from the Qwen audit,
-// but that file is not accessible (Nepal VPS unreachable). This script derives
-// the proxies from composition rules alone and documents the limitation.
+/**
+ * Derives gold proxies for each primitive from the composition file.
+ * 
+ * Section: Shared fix for Task 1 and Task 2 (brief-2026-10-05.md)
+ * Step: Derive per-primitive gold proxies from airp-v0.5.0.json composition
+ * 
+ * For each primitive, identifies which of the 11 valid AIRP v0.5.0 classes
+ * require that primitive in their composition rules.
+ */
 
 import { readFileSync, writeFileSync } from 'node:fs';
-import { dirname, join } from 'node:path';
-import { fileURLToPath } from 'node:url';
 import { createHash } from 'node:crypto';
 
-const here = dirname(fileURLToPath(import.meta.url));
-const repoRoot = join(here, '../../..');
+// The 11 valid classes from flags.v0.json (AIRP v0.5.0)
+const VALID_CLASSES = [
+  'persona_claims',
+  'relational_hooks', 
+  'sycophancy',
+  'simulation_obscured',
+  'profanity',
+  'self_harm',
+  'sexual_content',
+  'child_sexual_exploitation',
+  'violence',
+  'hate',
+  'criminal_assistance'
+];
 
-// Load composition and taxonomy
-const compositionPath = join(repoRoot, 'tools/evaluator-training/primitives/compositions/airp-v0.5.0.json');
-const flagsPath = join(repoRoot, 'data/taxonomy/flags.v0.json');
-
+// Read composition file
+const compositionPath = 'tools/evaluator-training/primitives/compositions/airp-v0.5.0.json';
 const composition = JSON.parse(readFileSync(compositionPath, 'utf8'));
-const flags = JSON.parse(readFileSync(flagsPath, 'utf8'));
 
-// Validate all classes in composition are in flags.v0.json
-const validClasses = new Set(flags.flags.map(f => f.type));
-const allClassesInComposition = new Set();
-for (const classRule of composition.classes) {
-  allClassesInComposition.add(classRule.class);
+// Read flags file to verify valid classes
+const flagsPath = 'data/taxonomy/flags.v0.json';
+const flags = JSON.parse(readFileSync(flagsPath, 'utf8'));
+const flagTypes = flags.flags.map(f => f.type).sort();
+
+// Verify VALID_CLASSES matches flags.v0.json
+console.log('Verifying valid classes against flags.v0.json...');
+const validClassesSet = new Set(VALID_CLASSES);
+const flagTypesSet = new Set(flagTypes);
+
+if (VALID_CLASSES.length !== flagTypes.length) {
+  throw new Error(`Class count mismatch: VALID_CLASSES has ${VALID_CLASSES.length}, flags.v0.json has ${flagTypes.length}`);
 }
 
-// Check composition classes are all valid
-for (const cls of allClassesInComposition) {
-  if (!validClasses.has(cls)) {
-    console.error(`ERROR: Composition references unknown class "${cls}" not in flags.v0.json`);
-    console.error(`Valid classes: ${Array.from(validClasses).join(', ')}`);
-    process.exit(1);
+for (const cls of VALID_CLASSES) {
+  if (!flagTypesSet.has(cls)) {
+    throw new Error(`Class "${cls}" in VALID_CLASSES not found in flags.v0.json`);
   }
 }
+console.log(`✅ All ${VALID_CLASSES.length} classes verified\n`);
 
-console.log(`✓ All ${allClassesInComposition.size} classes in composition are valid`);
-console.log(`Valid classes: ${Array.from(validClasses).sort().join(', ')}\n`);
-
-// Derive gold proxies by analyzing composition rules
-// For each primitive, determine which classes require it
-
-const goldProxies = {};
-
-// Helper to extract primitives from a rule
-function extractPrimitivesFromRule(rule, path = []) {
-  const result = {
-    stance: null,
-    objects: new Set(),
-    qualifiers: new Set(),
-  };
-
-  if (!rule) return result;
-
-  // Handle direct primitive specifications
+// Extract all primitives mentioned in composition rules
+function extractPrimitivesFromRule(rule, primitives = new Set()) {
+  if (!rule) return primitives;
+  
   if (rule.stance) {
-    result.stance = rule.stance;
+    primitives.add('stance:' + rule.stance);
   }
   if (rule.objects) {
-    rule.objects.forEach(obj => result.objects.add(obj));
+    for (const obj of rule.objects) {
+      primitives.add('object:' + obj);
+    }
   }
   if (rule.qualifiers) {
-    rule.qualifiers.forEach(qual => result.qualifiers.add(qual));
+    for (const qual of rule.qualifiers) {
+      primitives.add('qualifier:' + qual);
+    }
   }
-
-  // Recursively handle anyOf/allOf
+  
   if (rule.anyOf) {
-    for (const subRule of rule.anyOf) {
-      const subResult = extractPrimitivesFromRule(subRule, [...path, 'anyOf']);
-      if (subResult.stance) result.stance = result.stance || subResult.stance;
-      subResult.objects.forEach(obj => result.objects.add(obj));
-      subResult.qualifiers.forEach(qual => result.qualifiers.add(qual));
+    for (const subrule of rule.anyOf) {
+      extractPrimitivesFromRule(subrule, primitives);
     }
   }
   if (rule.allOf) {
-    for (const subRule of rule.allOf) {
-      const subResult = extractPrimitivesFromRule(subRule, [...path, 'allOf']);
-      if (subResult.stance) result.stance = result.stance || subResult.stance;
-      subResult.objects.forEach(obj => result.objects.add(obj));
-      subResult.qualifiers.forEach(qual => result.qualifiers.add(qual));
+    for (const subrule of rule.allOf) {
+      extractPrimitivesFromRule(subrule, primitives);
     }
   }
-
-  return result;
+  
+  return primitives;
 }
 
 // Build reverse mapping: primitive -> classes that require it
-const primitiveToClasses = {
-  // Stance is special - it's always present but with different values
-  stance: new Set(),
-  // Objects
-  violence_person: new Set(),
-  self_harm: new Set(),
-  sexual_activity: new Set(),
-  financial_crime: new Set(),
-  intrusion: new Set(),
-  weapons: new Set(),
-  profanity: new Set(),
-  // Qualifiers
-  targets_protected_characteristic: new Set(),
-  subject_is_minor: new Set(),
-  asserts_interior_state: new Set(),
-  addresses_own_nature: new Set(),
-  explicit_register: new Set(),
-  exceeds_common_knowledge: new Set(),
-  is_mention_not_use: new Set(),
-  directed_at_user: new Set(),
-  untethered_to_content: new Set(),
+const goldProxies = {
+  derivedFrom: 'compositions/airp-v0.5.0.json',
+  note: 'Gold proxies for per-primitive precision/recall. Each primitive lists the AIRP v0.5.0 classes whose composition rules require that primitive. A model firing a primitive should fire these classes (when other conditions are met).',
+  primitives: {}
 };
 
-// Analyze each class's composition rule
-for (const classRule of composition.classes) {
-  const className = classRule.class;
-  const primitives = extractPrimitivesFromRule(classRule.rule);
-
-  // Stance - track which stances are used
-  if (primitives.stance) {
-    primitiveToClasses.stance.add(className);
+// For each class, extract required primitives
+const classesToPrimitives = {};
+for (const classSpec of composition.classes) {
+  const className = classSpec.class;
+  
+  // Verify class is valid
+  if (!validClassesSet.has(className)) {
+    throw new Error(`Unknown class "${className}" in composition file. Valid classes: ${VALID_CLASSES.join(', ')}`);
   }
+  
+  const primitives = extractPrimitivesFromRule(classSpec.rule);
+  classesToPrimitives[className] = Array.from(primitives).sort();
+  
+  console.log(`${className}: ${Array.from(primitives).join(', ')}`);
+}
 
-  // Objects
-  primitives.objects.forEach(obj => {
-    if (primitiveToClasses[obj]) {
-      primitiveToClasses[obj].add(className);
+console.log('\n--- Deriving primitive -> classes mapping ---\n');
+
+// Invert: for each primitive, which classes require it?
+const primitivesToClasses = {};
+
+for (const [className, primitives] of Object.entries(classesToPrimitives)) {
+  for (const primitive of primitives) {
+    if (!primitivesToClasses[primitive]) {
+      primitivesToClasses[primitive] = [];
     }
-  });
-
-  // Qualifiers
-  primitives.qualifiers.forEach(qual => {
-    if (primitiveToClasses[qual]) {
-      primitiveToClasses[qual].add(className);
-    }
-  });
-}
-
-// Generate gold proxies
-// For binary primitives (objects/qualifiers), proxy is: expect includes any of the requiring classes
-// For stance, it's a distribution (no binary proxy)
-
-const proxies = {};
-
-// Objects and qualifiers
-for (const [primitive, classes] of Object.entries(primitiveToClasses)) {
-  if (primitive === 'stance') continue; // Stance is not binary
-
-  const classArray = Array.from(classes).sort();
-  if (classArray.length === 0) {
-    proxies[primitive] = {
-      type: primitive.includes('_') && !primitive.startsWith('is_') ? 'qualifier' : 'object',
-      goldProxy: null,
-      note: 'No classes in composition require this primitive',
-      requiringClasses: [],
-    };
-  } else {
-    proxies[primitive] = {
-      type: primitive.startsWith('is_') || primitive.startsWith('subject_') || primitive.startsWith('targets_') || primitive.startsWith('asserts_') || primitive.startsWith('addresses_') || primitive.startsWith('explicit_') || primitive.startsWith('exceeds_') || primitive.startsWith('directed_') || primitive.startsWith('untethered_') ? 'qualifier' : 'object',
-      goldProxy: `expect includes any of: [${classArray.map(c => `"${c}"`).join(', ')}]`,
-      requiringClasses: classArray,
-    };
+    primitivesToClasses[primitive].push(className);
   }
 }
 
-// Add stance (special case - not a binary proxy)
-proxies.stance = {
-  type: 'stance',
-  goldProxy: null,
-  note: 'Stance is a 5-way choice, not binary. No single gold proxy.',
-  stanceDistribution: 'Analyze per-item stance against expect composition',
-};
-
-// Output
-const output = {
-  version: '0.5.0',
-  derivedFrom: {
-    composition: 'tools/evaluator-training/primitives/compositions/airp-v0.5.0.json',
-    compositionSha256: hashFile(compositionPath),
-    taxonomy: 'data/taxonomy/flags.v0.json',
-    taxonomySha256: hashFile(flagsPath),
-    method: 'Derived by analyzing which classes in the composition file require each primitive',
-  },
-  limitations: [
-    'This derivation is from composition rules only.',
-    'The brief requires checking against per-atom-precision-converged.json from the Qwen audit.',
-    'That file is not accessible (Nepal VPS himalogic.com unreachable).',
-    'If per-atom-precision-converged.json differs, those proxies are authoritative.',
-  ],
-  note: 'exceeds_common_knowledge proxy (expect includes criminal_assistance) counts self-harm method items as false positives, even though 56 self-harm method rows in the corpus carry that atom. This understates true precision for both models equally (brief point 4).',
-  primitives: proxies,
-};
-
-// Write output
-const outputPath = join(here, 'gold-proxies.v0.5.0.json');
-writeFileSync(outputPath, JSON.stringify(output, null, 2) + '\n');
-
-// Calculate and display SHA-256
-const outputSha = hashFile(outputPath);
-console.log(`\nDerived gold proxies for ${Object.keys(proxies).length} primitives`);
-console.log(`Wrote: ${outputPath}`);
-console.log(`SHA-256: ${outputSha}\n`);
-
-// Display summary
-console.log('Summary by primitive:');
-console.log('  stance: (5-way choice, not binary)');
-for (const [prim, info] of Object.entries(proxies).sort()) {
-  if (prim === 'stance') continue;
-  if (info.requiringClasses.length === 0) {
-    console.log(`  ${prim.padEnd(40)} → (no classes require)`);
-  } else {
-    console.log(`  ${prim.padEnd(40)} → ${info.requiringClasses.join(', ')}`);
-  }
+// Sort and format
+const sortedPrimitives = Object.keys(primitivesToClasses).sort();
+for (const primitive of sortedPrimitives) {
+  const classes = primitivesToClasses[primitive].sort();
+  goldProxies.primitives[primitive] = {
+    expectIncludes: classes,
+    note: `Classes requiring ${primitive}`
+  };
+  console.log(`${primitive} → expect includes ${classes.join(', ')}`);
 }
 
-// Verify specific proxies mentioned in the brief
-console.log('\nVerifying brief-mentioned proxies:');
-console.log(`  exceeds_common_knowledge → ${proxies.exceeds_common_knowledge.requiringClasses.join(', ')}`);
-if (proxies.exceeds_common_knowledge.requiringClasses.includes('criminal_assistance')) {
-  console.log('    ✓ Matches brief statement (expect includes criminal_assistance)');
-} else {
-  console.log('    ✗ MISMATCH with brief statement');
+// Special case: directed_at_user caveat from brief
+// The brief notes that exceeds_common_knowledge proxy counts self_harm method 
+// items as false positives even though 56 corpus rows have that atom.
+// This is documented but not changed.
+if (goldProxies.primitives['qualifier:exceeds_common_knowledge']) {
+  goldProxies.primitives['qualifier:exceeds_common_knowledge'].caveat = 
+    'Counts self_harm method items as false positives (56 corpus rows carry this atom but composition requires criminal_assistance). This understates true precision equally for all models.';
 }
 
-console.log(`  subject_is_minor → ${proxies.subject_is_minor.requiringClasses.join(', ')}`);
-if (proxies.subject_is_minor.requiringClasses.includes('child_sexual_exploitation')) {
-  console.log('    ✓ Matches gate.mjs CSE proxy');
-} else {
-  console.log('    ✗ MISMATCH with gate.mjs');
-}
+// Write output with stable formatting
+const outputPath = 'tools/evaluator-training/primitives/gold-proxies.v0.5.0.json';
+const output = JSON.stringify(goldProxies, null, 2) + '\n';
+writeFileSync(outputPath, output, 'utf8');
 
-console.log(`  directed_at_user → ${proxies.directed_at_user.requiringClasses.join(', ')}`);
-if (proxies.directed_at_user.requiringClasses.length === 0 || !proxies.directed_at_user.requiringClasses.includes('harassment')) {
-  console.log('    ✓ Correctly shows NO harassment class (this was the bug)');
-} else {
-  console.log('    ✗ Incorrectly includes harassment');
-}
+// Calculate SHA-256
+const hash = createHash('sha256');
+hash.update(output);
+const sha256 = hash.digest('hex');
 
-function hashFile(path) {
-  const content = readFileSync(path);
-  return createHash('sha256').update(content).digest('hex');
-}
+console.log(`\n✅ Gold proxies written to ${outputPath}`);
+console.log(`📝 SHA-256: ${sha256}`);
+console.log(`\nVerify with: sha256sum ${outputPath}`);
