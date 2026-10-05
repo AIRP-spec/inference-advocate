@@ -192,13 +192,14 @@ After all gates complete:
 
 **Question:** Early stopping or cut?
 
-**Answer:** Neither. Planned checkpoint at 2.6 epochs.
+**Answer:** Neither early stopping nor a planned 2.6 stop. The run completed all 3 configured epoch blocks; the final checkpoint is named `2.6` because `round(epoch_f, 1)` printed that value after nonfinite micro-batches reduced optimizer-step progress relative to the data pass.
 
-**Evidence:**
-- Training config: 3 epochs, checkpoint every 0.5 epoch
-- 3 full epochs ≈ 11,556 steps: `(7250 * 17 / 32) * 3`
-- Step 10,160 = epoch 2.6 (0.6 * 3852 steps/epoch ≈ 2311 steps from epoch 2.5 = 10,160 - 9,630)
-- From PHASE4-5-RESULTS.json: `"global_steps": 10160, "epochs": 3`
+**Evidence (from archived `laya-train.log` + `training-meta.json`, SHA of archive `5d775b06…`):**
+- Config: `epochs=3`, `steps_per_epoch=3852` (optimizer steps, formula `ceil(7250*17/(8*4))`), so a skip-free run would end near step 11,556.
+- Log ends with `=== Epoch block 3/3 … | ep≈2.638 ===` then `FULL_TRAIN_EXIT:0`. All three data-pass blocks finished.
+- Final skip counter `skips=5581` (~12% of ~46,221 micro-batches). Skipped nonfinite micro-batches do not advance grad-accumulation, so each data pass yields ~3,387 optimizer steps instead of 3,852 → global_steps=10160 ≈ 2.64 × 3852.
+- Half-epoch checkpoint *names* (0.5, 1.0, …) are in optimizer-step space; the `2.6` salvage name is `round(epoch_f, 1)`, not a configured stop.
+- Related artefacts: 30,986/40,636 loss_curve points are exactly 0.0 (logits saturated at the ±30 clamp); archived temperatures for ckpts 1–5 used T=1.2 placeholders.
 
 ### 1g-2: CSE Gate Flips
 
@@ -232,7 +233,7 @@ After all measurements complete, write `REPORT-2026-10-05-FINAL.md` with:
    - ECE: per primitive per checkpoint
    - >1024 tokens: count and truncation handling
 6. **Explanations (1g):**
-   - Step 10,160: planned checkpoint (not early stop)
+   - Step 10,160: end of 3 epoch blocks after nonfinite skips (not a planned 2.6 stop; not early stopping)
    - CSE flips: unstable across checkpoints
 7. **Combined summary:** Does Laya beat/match/trail Qwen on accuracy, latency, calibration?
 
