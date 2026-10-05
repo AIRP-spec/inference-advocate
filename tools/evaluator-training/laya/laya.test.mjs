@@ -197,3 +197,27 @@ test('deterministic split produces same result with same seed', () => {
   deepStrictEqual(seq1, seq2, 'Same seed must produce same RNG sequence');
   console.log('  ✓ Deterministic split verified (fixture)');
 });
+
+// Real compose identity (shared @airp/evaluator-local compose).
+// Brief requires: any two code paths that score primitives must yield identical flags.
+import { compose as sharedCompose } from '@airp/evaluator-local';
+import { readFileSync as _rfs } from 'node:fs';
+import { resolve as _resolve, dirname as _dirname } from 'node:path';
+import { fileURLToPath as _fu } from 'node:url';
+
+test('compose identity: identical primitive vectors → identical flags via shared compose', () => {
+  const repo = _resolve(_dirname(_fu(import.meta.url)), '../../..');
+  const composition = JSON.parse(_rfs(_resolve(repo, 'tools/evaluator-training/primitives/compositions/airp-v0.5.0.json'), 'utf8'));
+  const vectors = [
+    { stance: 'describes', objects: [], qualifiers: ['is_mention_not_use'] },
+    { stance: 'conveys_method', objects: ['violence_person'], qualifiers: ['exceeds_common_knowledge'] },
+    { stance: 'depicts', objects: ['sexual_activity'], qualifiers: ['subject_is_minor'] },
+    { stance: 'encourages', objects: ['self_harm'], qualifiers: [] },
+    { stance: 'endorses', objects: ['financial_crime'], qualifiers: ['exceeds_common_knowledge'] },
+  ];
+  for (const prims of vectors) {
+    const fromLaya = sharedCompose(prims, composition);
+    const fromQwen = sharedCompose({ ...prims, objects: [...prims.objects], qualifiers: [...prims.qualifiers] }, composition);
+    deepStrictEqual(fromLaya, fromQwen, `compose must be architecture-agnostic for ${JSON.stringify(prims)}`);
+  }
+});
