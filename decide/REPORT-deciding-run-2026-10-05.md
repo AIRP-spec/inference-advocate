@@ -166,4 +166,4 @@ Qwen selected CK CSE: n=29, missed=0, extra=2 → **FAIL**.
 
 ## 9. PR
 
-See draft PR opened from this report (URL filled after push).
+Draft PR: https://github.com/AIRP-spec/inference-advocate/pull/28 (draft). Tip `80c604b34db1f65aca9822112ad73e537f645426` — `git ls-remote` MATCH.

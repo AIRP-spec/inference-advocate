@@ -41,3 +41,4 @@
 - 2026-10-05 19:34 NPT: PRIORITY terminate. ALL_INFER_DONE+PULL_OK (279M local). finish_qwen3 stuck on VPS scp; pod idle ~$6.64. Terminating NOW then finish archive off-pod.
 - 2026-10-05 19:36 NPT: Qwen pod TERMINATED (API confirm empty). up=15092s cost=$6.67. Local tarball 279M; VPS scp still in flight (finish_qwen3).
 - 2026-10-05 19:41 NPT: Qwen MANIFEST verified on VPS step4/qwen-pod (279M tgz OK). Pod already TERMINATED. Cost $6.67. Next: finalize report + draft PR.
+- 2026-10-05 19:43 NPT: COMPLETE. Pod terminated $6.67. MANIFEST OK. Draft PR #28. ls-remote tip 80c604b MATCH. Recommend stay Qwen (Δ=-19 PASS, CSE PASS, CPU 2379ms FAIL).
