@@ -13,3 +13,4 @@ Spend ledger (follow-up total cap $30): prior follow-up GPU ~$0.30 (Task 3a pod)
 - 19:43Z B done (10854 steps). All 12 ckpts on box. raw infer on pod in progress; VPS push of archive/pod running.
 - 19:51Z OFFLINE done: primary selected A-ckpt-epoch-2.5-step-570 (val F1 .8092). v2 E/M/C 17/19/13 (E+M=36 = 5766's 36). converged A 2.0/2.5/3.0 CSE all PASS. Launched pod_post.sh (ONNX export, parity, GPU bench).
 - 20:17Z ARCHIVE verified on VPS (MANIFEST 275 files, remote sha -c exit 0 after re-sending 1 partial ckpt). POD m1y9qwkkh4kt6p TERMINATED 20:17Z, uptime 4687s x $0.89 = $1.16 (+$0.03 broken pod). 3b GPU spend ≈ $1.19. GPU latency 7.6/8.3/12.3/27.3 ms median at 50/200/500/1000 (ONNX CUDA). ONNX parity: 471 items 0 flips, max delta 1.8e-4 (CPU). Next: CPU bench on VPS (flock), report, PR.
+- 20:25Z CPU bench done (645 ms @500; suite 46 ms). REPORT-3b.md written; archive post manifest verified; PR #30 draft, branch tip 0ef6864. Pod terminated 20:17Z. DONE.
