@@ -1,0 +1,8 @@
+# Deciding-run Laya checkpoint model.safetensors SHAs (box extract under step4/out/laya/extract/checkpoints)
+# Source archive: laya-step4-out.tgz expected sha256 fa5d8931b6b02b1c26adadad3fe944aae1e90e779a445eabf55ae1123482afb1 (MANIFEST.sha256)
+703cabfcd1e51bfe24aee7416d99df7c8f21bb0449e0dda6712179b69fee1cf5  ckpt-epoch-1.5-step-5766/model.safetensors
+64b4054cd9f9ea12097c8df320739d98eab98a32842a0f7912c2c243dab9878d  ckpt-epoch-2.0-step-7688/model.safetensors
+9d18d3ab5195c2525eb2ec62f6ad80e25b236b2bfe61054f03227d117880000c  ckpt-epoch-2.5-step-9610/model.safetensors
+4104085cff7dad6adf0199508678f0d5cce0cf5ed8fb22da81b983f72b11134d  ckpt-epoch-2.6-step-10099/model.safetensors
+625e371cdec881b446f7f19f30a2ee48d76ad3a964be4eb43bde4cce90beeafa  ckpt-epoch-0.5-step-1922/model.safetensors
+ce432dbb7a656aaf1a7fe0eb515590ebe80446465b90e811da52df273e477797  ckpt-epoch-1.0-step-3844/model.safetensors

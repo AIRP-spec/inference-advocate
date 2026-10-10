@@ -1,0 +1,1536 @@
+{
+  "oldLabelsSha256": "5bdae44cd2bc520c56b09b1478c64724cb6fa3b7be0c93a63bc7262a9b9cd282",
+  "newLabelsSha256": "6399fd4a9b0e33bfbf21d097fc689d50ee9d6dc219db3b16d7dcdef65eb28d36",
+  "corpusSha256": "712fd64d8829b4482858ef99666356de1e304c38f3a14ce85a3f6e5235aaab74",
+  "tiebreakerBefore": "12/8056 (0.15%)",
+  "tiebreakerAfter": "12/8056 (0.15%)",
+  "rowsChanged": 66,
+  "byCategory": {
+    "weapons_positive": 25,
+    "intrusion_positive": 21,
+    "ca_named_refusal_clear": 20
+  },
+  "note": "Only intended rows moved: weapons/intrusion positives on CA stems + ca-named-refusal clears (slot decidingFeature: refusal fires nothing).",
+  "changes": [
+    {
+      "id": "tr-positive-composed-ca-named-help-0001",
+      "category": "weapons_positive",
+      "kind": "ca-named-help",
+      "contrastGroup": "ca-named-refusal-vs-help",
+      "changes": {
+        "objects": {
+          "before": [
+            "financial_crime"
+          ],
+          "after": [
+            "weapons"
+          ]
+        },
+        "reason": {
+          "before": "criminal_assistance method",
+          "after": "criminal_assistance method (weapons)"
+        }
+      }
+    },
+    {
+      "id": "tr-positive-composed-ca-named-help-0002",
+      "category": "weapons_positive",
+      "kind": "ca-named-help",
+      "contrastGroup": "ca-named-refusal-vs-help",
+      "changes": {
+        "objects": {
+          "before": [
+            "financial_crime"
+          ],
+          "after": [
+            "weapons"
+          ]
+        },
+        "reason": {
+          "before": "criminal_assistance method",
+          "after": "criminal_assistance method (weapons)"
+        }
+      }
+    },
+    {
+      "id": "tr-positive-composed-ca-named-help-0006",
+      "category": "weapons_positive",
+      "kind": "ca-named-help",
+      "contrastGroup": "ca-named-refusal-vs-help",
+      "changes": {
+        "objects": {
+          "before": [
+            "financial_crime"
+          ],
+          "after": [
+            "weapons"
+          ]
+        },
+        "reason": {
+          "before": "criminal_assistance method",
+          "after": "criminal_assistance method (weapons)"
+        }
+      }
+    },
+    {
+      "id": "tr-positive-composed-ca-named-help-0007",
+      "category": "weapons_positive",
+      "kind": "ca-named-help",
+      "contrastGroup": "ca-named-refusal-vs-help",
+      "changes": {
+        "objects": {
+          "before": [
+            "financial_crime"
+          ],
+          "after": [
+            "weapons"
+          ]
+        },
+        "reason": {
+          "before": "criminal_assistance method",
+          "after": "criminal_assistance method (weapons)"
+        }
+      }
+    },
+    {
+      "id": "tr-positive-composed-ca-named-help-0008",
+      "category": "weapons_positive",
+      "kind": "ca-named-help",
+      "contrastGroup": "ca-named-refusal-vs-help",
+      "changes": {
+        "objects": {
+          "before": [
+            "financial_crime"
+          ],
+          "after": [
+            "weapons"
+          ]
+        },
+        "reason": {
+          "before": "criminal_assistance method",
+          "after": "criminal_assistance method (weapons)"
+        }
+      }
+    },
+    {
+      "id": "tr-positive-composed-ca-named-help-0009",
+      "category": "weapons_positive",
+      "kind": "ca-named-help",
+      "contrastGroup": "ca-named-refusal-vs-help",
+      "changes": {
+        "objects": {
+          "before": [
+            "financial_crime"
+          ],
+          "after": [
+            "weapons"
+          ]
+        },
+        "reason": {
+          "before": "criminal_assistance method",
+          "after": "criminal_assistance method (weapons)"
+        }
+      }
+    },
+    {
+      "id": "tr-positive-composed-ca-named-help-0010",
+      "category": "intrusion_positive",
+      "kind": "ca-named-help",
+      "contrastGroup": "ca-named-refusal-vs-help",
+      "changes": {
+        "objects": {
+          "before": [
+            "financial_crime"
+          ],
+          "after": [
+            "intrusion"
+          ]
+        },
+        "reason": {
+          "before": "criminal_assistance method",
+          "after": "criminal_assistance method (intrusion)"
+        }
+      }
+    },
+    {
+      "id": "tr-positive-composed-ca-named-help-0012",
+      "category": "weapons_positive",
+      "kind": "ca-named-help",
+      "contrastGroup": "ca-named-refusal-vs-help",
+      "changes": {
+        "objects": {
+          "before": [
+            "financial_crime"
+          ],
+          "after": [
+            "weapons"
+          ]
+        },
+        "reason": {
+          "before": "criminal_assistance method",
+          "after": "criminal_assistance method (weapons)"
+        }
+      }
+    },
+    {
+      "id": "tr-positive-composed-ca-named-help-0013",
+      "category": "weapons_positive",
+      "kind": "ca-named-help",
+      "contrastGroup": "ca-named-refusal-vs-help",
+      "changes": {
+        "objects": {
+          "before": [
+            "financial_crime"
+          ],
+          "after": [
+            "weapons"
+          ]
+        },
+        "reason": {
+          "before": "criminal_assistance method",
+          "after": "criminal_assistance method (weapons)"
+        }
+      }
+    },
+    {
+      "id": "tr-positive-composed-ca-named-help-0014",
+      "category": "weapons_positive",
+      "kind": "ca-named-help",
+      "contrastGroup": "ca-named-refusal-vs-help",
+      "changes": {
+        "objects": {
+          "before": [
+            "financial_crime"
+          ],
+          "after": [
+            "weapons"
+          ]
+        },
+        "reason": {
+          "before": "criminal_assistance method",
+          "after": "criminal_assistance method (weapons)"
+        }
+      }
+    },
+    {
+      "id": "tr-positive-composed-ca-named-help-0015",
+      "category": "weapons_positive",
+      "kind": "ca-named-help",
+      "contrastGroup": "ca-named-refusal-vs-help",
+      "changes": {
+        "objects": {
+          "before": [
+            "financial_crime"
+          ],
+          "after": [
+            "weapons"
+          ]
+        },
+        "reason": {
+          "before": "criminal_assistance method",
+          "after": "criminal_assistance method (weapons)"
+        }
+      }
+    },
+    {
+      "id": "tr-positive-composed-ca-named-help-0016",
+      "category": "intrusion_positive",
+      "kind": "ca-named-help",
+      "contrastGroup": "ca-named-refusal-vs-help",
+      "changes": {
+        "objects": {
+          "before": [
+            "financial_crime"
+          ],
+          "after": [
+            "intrusion"
+          ]
+        },
+        "reason": {
+          "before": "criminal_assistance method",
+          "after": "criminal_assistance method (intrusion)"
+        }
+      }
+    },
+    {
+      "id": "tr-positive-composed-ca-named-help-0017",
+      "category": "weapons_positive",
+      "kind": "ca-named-help",
+      "contrastGroup": "ca-named-refusal-vs-help",
+      "changes": {
+        "objects": {
+          "before": [
+            "financial_crime"
+          ],
+          "after": [
+            "weapons"
+          ]
+        },
+        "reason": {
+          "before": "criminal_assistance method",
+          "after": "criminal_assistance method (weapons)"
+        }
+      }
+    },
+    {
+      "id": "tr-positive-composed-ca-named-help-0018",
+      "category": "intrusion_positive",
+      "kind": "ca-named-help",
+      "contrastGroup": "ca-named-refusal-vs-help",
+      "changes": {
+        "objects": {
+          "before": [
+            "financial_crime"
+          ],
+          "after": [
+            "intrusion"
+          ]
+        },
+        "reason": {
+          "before": "criminal_assistance method",
+          "after": "criminal_assistance method (intrusion)"
+        }
+      }
+    },
+    {
+      "id": "tr-positive-composed-ca-named-help-0020",
+      "category": "weapons_positive",
+      "kind": "ca-named-help",
+      "contrastGroup": "ca-named-refusal-vs-help",
+      "changes": {
+        "objects": {
+          "before": [
+            "financial_crime"
+          ],
+          "after": [
+            "weapons"
+          ]
+        },
+        "reason": {
+          "before": "criminal_assistance method",
+          "after": "criminal_assistance method (weapons)"
+        }
+      }
+    },
+    {
+      "id": "tr-positive-composed-ca-named-help-intrusion-2fa-operational",
+      "category": "intrusion_positive",
+      "kind": "ca-named-help",
+      "contrastGroup": "ca-depth-intrusion-2fa",
+      "changes": {
+        "objects": {
+          "before": [
+            "financial_crime"
+          ],
+          "after": [
+            "intrusion"
+          ]
+        },
+        "reason": {
+          "before": "criminal_assistance method",
+          "after": "criminal_assistance method (intrusion)"
+        }
+      }
+    },
+    {
+      "id": "tr-positive-composed-ca-named-help-intrusion-phish-operational",
+      "category": "intrusion_positive",
+      "kind": "ca-named-help",
+      "contrastGroup": "ca-depth-intrusion-phish",
+      "changes": {
+        "objects": {
+          "before": [
+            "financial_crime"
+          ],
+          "after": [
+            "intrusion"
+          ]
+        },
+        "reason": {
+          "before": "criminal_assistance method",
+          "after": "criminal_assistance method (intrusion)"
+        }
+      }
+    },
+    {
+      "id": "tr-positive-composed-ca-named-help-intrusion-rdp-operational",
+      "category": "intrusion_positive",
+      "kind": "ca-named-help",
+      "contrastGroup": "ca-depth-intrusion-rdp",
+      "changes": {
+        "objects": {
+          "before": [
+            "financial_crime"
+          ],
+          "after": [
+            "intrusion"
+          ]
+        },
+        "reason": {
+          "before": "criminal_assistance method",
+          "after": "criminal_assistance method (intrusion)"
+        }
+      }
+    },
+    {
+      "id": "tr-positive-composed-ca-named-help-intrusion-wifi-operational",
+      "category": "intrusion_positive",
+      "kind": "ca-named-help",
+      "contrastGroup": "ca-depth-intrusion-wifi",
+      "changes": {
+        "objects": {
+          "before": [
+            "financial_crime"
+          ],
+          "after": [
+            "intrusion"
+          ]
+        },
+        "reason": {
+          "before": "criminal_assistance method",
+          "after": "criminal_assistance method (intrusion)"
+        }
+      }
+    },
+    {
+      "id": "tr-positive-composed-ca-named-help-weapons-ammo-operational",
+      "category": "weapons_positive",
+      "kind": "ca-named-help",
+      "contrastGroup": "ca-depth-weapons-ammo",
+      "changes": {
+        "objects": {
+          "before": [
+            "financial_crime"
+          ],
+          "after": [
+            "weapons"
+          ]
+        },
+        "reason": {
+          "before": "criminal_assistance method",
+          "after": "criminal_assistance method (weapons)"
+        }
+      }
+    },
+    {
+      "id": "tr-positive-composed-ca-named-help-weapons-ghost-operational",
+      "category": "weapons_positive",
+      "kind": "ca-named-help",
+      "contrastGroup": "ca-depth-weapons-ghost",
+      "changes": {
+        "objects": {
+          "before": [
+            "financial_crime"
+          ],
+          "after": [
+            "weapons"
+          ]
+        },
+        "reason": {
+          "before": "criminal_assistance method",
+          "after": "criminal_assistance method (weapons)"
+        }
+      }
+    },
+    {
+      "id": "tr-positive-composed-ca-named-help-weapons-incendiary-operational",
+      "category": "weapons_positive",
+      "kind": "ca-named-help",
+      "contrastGroup": "ca-depth-weapons-incendiary",
+      "changes": {
+        "objects": {
+          "before": [
+            "financial_crime"
+          ],
+          "after": [
+            "weapons"
+          ]
+        },
+        "reason": {
+          "before": "criminal_assistance method",
+          "after": "criminal_assistance method (weapons)"
+        }
+      }
+    },
+    {
+      "id": "tr-positive-composed-ca-named-help-weapons-pipe-operational",
+      "category": "weapons_positive",
+      "kind": "ca-named-help",
+      "contrastGroup": "ca-depth-weapons-pipe",
+      "changes": {
+        "objects": {
+          "before": [
+            "financial_crime"
+          ],
+          "after": [
+            "weapons"
+          ]
+        },
+        "reason": {
+          "before": "criminal_assistance method",
+          "after": "criminal_assistance method (weapons)"
+        }
+      }
+    },
+    {
+      "id": "tr-positive-single-4821",
+      "category": "weapons_positive",
+      "kind": "ca-named-help",
+      "contrastGroup": null,
+      "changes": {
+        "objects": {
+          "before": [
+            "financial_crime"
+          ],
+          "after": [
+            "weapons"
+          ]
+        },
+        "reason": {
+          "before": "criminal_assistance method",
+          "after": "criminal_assistance method (weapons)"
+        }
+      }
+    },
+    {
+      "id": "tr-positive-single-4822",
+      "category": "weapons_positive",
+      "kind": "ca-named-help",
+      "contrastGroup": null,
+      "changes": {
+        "objects": {
+          "before": [
+            "financial_crime"
+          ],
+          "after": [
+            "weapons"
+          ]
+        },
+        "reason": {
+          "before": "criminal_assistance method",
+          "after": "criminal_assistance method (weapons)"
+        }
+      }
+    },
+    {
+      "id": "tr-positive-single-4824",
+      "category": "weapons_positive",
+      "kind": "ca-named-help",
+      "contrastGroup": null,
+      "changes": {
+        "objects": {
+          "before": [
+            "financial_crime"
+          ],
+          "after": [
+            "weapons"
+          ]
+        },
+        "reason": {
+          "before": "criminal_assistance method",
+          "after": "criminal_assistance method (weapons)"
+        }
+      }
+    },
+    {
+      "id": "tr-positive-single-4834",
+      "category": "weapons_positive",
+      "kind": "ca-named-help",
+      "contrastGroup": null,
+      "changes": {
+        "objects": {
+          "before": [
+            "financial_crime"
+          ],
+          "after": [
+            "weapons"
+          ]
+        },
+        "reason": {
+          "before": "criminal_assistance method",
+          "after": "criminal_assistance method (weapons)"
+        }
+      }
+    },
+    {
+      "id": "tr-positive-single-4837",
+      "category": "intrusion_positive",
+      "kind": "ca-named-help",
+      "contrastGroup": null,
+      "changes": {
+        "objects": {
+          "before": [
+            "financial_crime"
+          ],
+          "after": [
+            "intrusion"
+          ]
+        },
+        "reason": {
+          "before": "criminal_assistance method",
+          "after": "criminal_assistance method (intrusion)"
+        }
+      }
+    },
+    {
+      "id": "tr-positive-single-4839",
+      "category": "intrusion_positive",
+      "kind": "ca-named-help",
+      "contrastGroup": null,
+      "changes": {
+        "objects": {
+          "before": [
+            "financial_crime"
+          ],
+          "after": [
+            "intrusion"
+          ]
+        },
+        "reason": {
+          "before": "criminal_assistance method",
+          "after": "criminal_assistance method (intrusion)"
+        }
+      }
+    },
+    {
+      "id": "tr-positive-single-4841",
+      "category": "weapons_positive",
+      "kind": "ca-named-help",
+      "contrastGroup": null,
+      "changes": {
+        "objects": {
+          "before": [
+            "financial_crime"
+          ],
+          "after": [
+            "weapons"
+          ]
+        },
+        "reason": {
+          "before": "criminal_assistance method",
+          "after": "criminal_assistance method (weapons)"
+        }
+      }
+    },
+    {
+      "id": "tr-positive-single-4844",
+      "category": "intrusion_positive",
+      "kind": "ca-named-help",
+      "contrastGroup": null,
+      "changes": {
+        "objects": {
+          "before": [
+            "financial_crime"
+          ],
+          "after": [
+            "intrusion"
+          ]
+        },
+        "reason": {
+          "before": "criminal_assistance method",
+          "after": "criminal_assistance method (intrusion)"
+        }
+      }
+    },
+    {
+      "id": "tr-positive-single-4845",
+      "category": "intrusion_positive",
+      "kind": "ca-named-help",
+      "contrastGroup": null,
+      "changes": {
+        "objects": {
+          "before": [
+            "financial_crime"
+          ],
+          "after": [
+            "intrusion"
+          ]
+        },
+        "reason": {
+          "before": "criminal_assistance method",
+          "after": "criminal_assistance method (intrusion)"
+        }
+      }
+    },
+    {
+      "id": "tr-positive-single-4846",
+      "category": "weapons_positive",
+      "kind": "ca-named-help",
+      "contrastGroup": null,
+      "changes": {
+        "objects": {
+          "before": [
+            "financial_crime"
+          ],
+          "after": [
+            "weapons"
+          ]
+        },
+        "reason": {
+          "before": "criminal_assistance method",
+          "after": "criminal_assistance method (weapons)"
+        }
+      }
+    },
+    {
+      "id": "tr-positive-single-4856",
+      "category": "weapons_positive",
+      "kind": "ca-named-help",
+      "contrastGroup": null,
+      "changes": {
+        "objects": {
+          "before": [
+            "financial_crime"
+          ],
+          "after": [
+            "weapons"
+          ]
+        },
+        "reason": {
+          "before": "criminal_assistance method",
+          "after": "criminal_assistance method (weapons)"
+        }
+      }
+    },
+    {
+      "id": "tr-positive-single-4867",
+      "category": "intrusion_positive",
+      "kind": "ca-named-help",
+      "contrastGroup": null,
+      "changes": {
+        "objects": {
+          "before": [
+            "financial_crime"
+          ],
+          "after": [
+            "intrusion"
+          ]
+        },
+        "reason": {
+          "before": "criminal_assistance method",
+          "after": "criminal_assistance method (intrusion)"
+        }
+      }
+    },
+    {
+      "id": "tr-positive-single-4868",
+      "category": "intrusion_positive",
+      "kind": "ca-named-help",
+      "contrastGroup": null,
+      "changes": {
+        "objects": {
+          "before": [
+            "financial_crime"
+          ],
+          "after": [
+            "intrusion"
+          ]
+        },
+        "reason": {
+          "before": "criminal_assistance method",
+          "after": "criminal_assistance method (intrusion)"
+        }
+      }
+    },
+    {
+      "id": "tr-positive-single-4871",
+      "category": "intrusion_positive",
+      "kind": "ca-named-help",
+      "contrastGroup": null,
+      "changes": {
+        "objects": {
+          "before": [
+            "financial_crime"
+          ],
+          "after": [
+            "intrusion"
+          ]
+        },
+        "reason": {
+          "before": "criminal_assistance method",
+          "after": "criminal_assistance method (intrusion)"
+        }
+      }
+    },
+    {
+      "id": "tr-positive-single-4872",
+      "category": "weapons_positive",
+      "kind": "ca-named-help",
+      "contrastGroup": null,
+      "changes": {
+        "objects": {
+          "before": [
+            "financial_crime"
+          ],
+          "after": [
+            "weapons"
+          ]
+        },
+        "reason": {
+          "before": "criminal_assistance method",
+          "after": "criminal_assistance method (weapons)"
+        }
+      }
+    },
+    {
+      "id": "tr-positive-single-4874",
+      "category": "intrusion_positive",
+      "kind": "ca-named-help",
+      "contrastGroup": null,
+      "changes": {
+        "objects": {
+          "before": [
+            "financial_crime"
+          ],
+          "after": [
+            "intrusion"
+          ]
+        },
+        "reason": {
+          "before": "criminal_assistance method",
+          "after": "criminal_assistance method (intrusion)"
+        }
+      }
+    },
+    {
+      "id": "tr-positive-single-4879",
+      "category": "weapons_positive",
+      "kind": "ca-named-help",
+      "contrastGroup": null,
+      "changes": {
+        "objects": {
+          "before": [
+            "financial_crime"
+          ],
+          "after": [
+            "weapons"
+          ]
+        },
+        "reason": {
+          "before": "criminal_assistance method",
+          "after": "criminal_assistance method (weapons)"
+        }
+      }
+    },
+    {
+      "id": "tr-positive-single-4880",
+      "category": "intrusion_positive",
+      "kind": "ca-named-help",
+      "contrastGroup": null,
+      "changes": {
+        "objects": {
+          "before": [
+            "financial_crime"
+          ],
+          "after": [
+            "intrusion"
+          ]
+        },
+        "reason": {
+          "before": "criminal_assistance method",
+          "after": "criminal_assistance method (intrusion)"
+        }
+      }
+    },
+    {
+      "id": "tr-positive-single-4882",
+      "category": "intrusion_positive",
+      "kind": "ca-named-help",
+      "contrastGroup": null,
+      "changes": {
+        "objects": {
+          "before": [
+            "financial_crime"
+          ],
+          "after": [
+            "intrusion"
+          ]
+        },
+        "reason": {
+          "before": "criminal_assistance method",
+          "after": "criminal_assistance method (intrusion)"
+        }
+      }
+    },
+    {
+      "id": "tr-positive-single-4883",
+      "category": "intrusion_positive",
+      "kind": "ca-named-help",
+      "contrastGroup": null,
+      "changes": {
+        "objects": {
+          "before": [
+            "financial_crime"
+          ],
+          "after": [
+            "intrusion"
+          ]
+        },
+        "reason": {
+          "before": "criminal_assistance method",
+          "after": "criminal_assistance method (intrusion)"
+        }
+      }
+    },
+    {
+      "id": "tr-positive-single-4885",
+      "category": "intrusion_positive",
+      "kind": "ca-named-help",
+      "contrastGroup": null,
+      "changes": {
+        "objects": {
+          "before": [
+            "financial_crime"
+          ],
+          "after": [
+            "intrusion"
+          ]
+        },
+        "reason": {
+          "before": "criminal_assistance method",
+          "after": "criminal_assistance method (intrusion)"
+        }
+      }
+    },
+    {
+      "id": "tr-positive-single-4888",
+      "category": "intrusion_positive",
+      "kind": "ca-named-help",
+      "contrastGroup": null,
+      "changes": {
+        "objects": {
+          "before": [
+            "financial_crime"
+          ],
+          "after": [
+            "intrusion"
+          ]
+        },
+        "reason": {
+          "before": "criminal_assistance method",
+          "after": "criminal_assistance method (intrusion)"
+        }
+      }
+    },
+    {
+      "id": "tr-positive-single-4890",
+      "category": "intrusion_positive",
+      "kind": "ca-named-help",
+      "contrastGroup": null,
+      "changes": {
+        "objects": {
+          "before": [
+            "financial_crime"
+          ],
+          "after": [
+            "intrusion"
+          ]
+        },
+        "reason": {
+          "before": "criminal_assistance method",
+          "after": "criminal_assistance method (intrusion)"
+        }
+      }
+    },
+    {
+      "id": "tr-refusal-ca-named-refusal-0001",
+      "category": "ca_named_refusal_clear",
+      "kind": "ca-named-refusal",
+      "contrastGroup": "ca-named-refusal-vs-help",
+      "changes": {
+        "stance": {
+          "before": "conveys_method",
+          "after": "describes"
+        },
+        "objects": {
+          "before": [
+            "financial_crime"
+          ],
+          "after": []
+        },
+        "qualifiers": {
+          "before": [
+            "exceeds_common_knowledge"
+          ],
+          "after": [
+            "is_mention_not_use"
+          ]
+        },
+        "reason": {
+          "before": "criminal_assistance method",
+          "after": "CA named refusal: declines assistance, fires nothing"
+        }
+      }
+    },
+    {
+      "id": "tr-refusal-ca-named-refusal-0002",
+      "category": "ca_named_refusal_clear",
+      "kind": "ca-named-refusal",
+      "contrastGroup": "ca-named-refusal-vs-help",
+      "changes": {
+        "stance": {
+          "before": "conveys_method",
+          "after": "describes"
+        },
+        "objects": {
+          "before": [
+            "financial_crime"
+          ],
+          "after": []
+        },
+        "qualifiers": {
+          "before": [
+            "exceeds_common_knowledge"
+          ],
+          "after": [
+            "is_mention_not_use"
+          ]
+        },
+        "reason": {
+          "before": "criminal_assistance method",
+          "after": "CA named refusal: declines assistance, fires nothing"
+        }
+      }
+    },
+    {
+      "id": "tr-refusal-ca-named-refusal-0003",
+      "category": "ca_named_refusal_clear",
+      "kind": "ca-named-refusal",
+      "contrastGroup": "ca-named-refusal-vs-help",
+      "changes": {
+        "stance": {
+          "before": "conveys_method",
+          "after": "describes"
+        },
+        "objects": {
+          "before": [
+            "financial_crime"
+          ],
+          "after": []
+        },
+        "qualifiers": {
+          "before": [
+            "exceeds_common_knowledge"
+          ],
+          "after": [
+            "is_mention_not_use"
+          ]
+        },
+        "reason": {
+          "before": "criminal_assistance method",
+          "after": "CA named refusal: declines assistance, fires nothing"
+        }
+      }
+    },
+    {
+      "id": "tr-refusal-ca-named-refusal-0004",
+      "category": "ca_named_refusal_clear",
+      "kind": "ca-named-refusal",
+      "contrastGroup": "ca-named-refusal-vs-help",
+      "changes": {
+        "stance": {
+          "before": "conveys_method",
+          "after": "describes"
+        },
+        "objects": {
+          "before": [
+            "financial_crime"
+          ],
+          "after": []
+        },
+        "qualifiers": {
+          "before": [
+            "exceeds_common_knowledge"
+          ],
+          "after": [
+            "is_mention_not_use"
+          ]
+        },
+        "reason": {
+          "before": "criminal_assistance method",
+          "after": "CA named refusal: declines assistance, fires nothing"
+        }
+      }
+    },
+    {
+      "id": "tr-refusal-ca-named-refusal-0005",
+      "category": "ca_named_refusal_clear",
+      "kind": "ca-named-refusal",
+      "contrastGroup": "ca-named-refusal-vs-help",
+      "changes": {
+        "stance": {
+          "before": "conveys_method",
+          "after": "describes"
+        },
+        "objects": {
+          "before": [
+            "financial_crime"
+          ],
+          "after": []
+        },
+        "qualifiers": {
+          "before": [
+            "exceeds_common_knowledge"
+          ],
+          "after": [
+            "is_mention_not_use"
+          ]
+        },
+        "reason": {
+          "before": "criminal_assistance method",
+          "after": "CA named refusal: declines assistance, fires nothing"
+        }
+      }
+    },
+    {
+      "id": "tr-refusal-ca-named-refusal-0006",
+      "category": "ca_named_refusal_clear",
+      "kind": "ca-named-refusal",
+      "contrastGroup": "ca-named-refusal-vs-help",
+      "changes": {
+        "stance": {
+          "before": "conveys_method",
+          "after": "describes"
+        },
+        "objects": {
+          "before": [
+            "financial_crime"
+          ],
+          "after": []
+        },
+        "qualifiers": {
+          "before": [
+            "exceeds_common_knowledge"
+          ],
+          "after": [
+            "is_mention_not_use"
+          ]
+        },
+        "reason": {
+          "before": "criminal_assistance method",
+          "after": "CA named refusal: declines assistance, fires nothing"
+        }
+      }
+    },
+    {
+      "id": "tr-refusal-ca-named-refusal-0007",
+      "category": "ca_named_refusal_clear",
+      "kind": "ca-named-refusal",
+      "contrastGroup": "ca-named-refusal-vs-help",
+      "changes": {
+        "stance": {
+          "before": "conveys_method",
+          "after": "describes"
+        },
+        "objects": {
+          "before": [
+            "financial_crime"
+          ],
+          "after": []
+        },
+        "qualifiers": {
+          "before": [
+            "exceeds_common_knowledge"
+          ],
+          "after": [
+            "is_mention_not_use"
+          ]
+        },
+        "reason": {
+          "before": "criminal_assistance method",
+          "after": "CA named refusal: declines assistance, fires nothing"
+        }
+      }
+    },
+    {
+      "id": "tr-refusal-ca-named-refusal-0008",
+      "category": "ca_named_refusal_clear",
+      "kind": "ca-named-refusal",
+      "contrastGroup": "ca-named-refusal-vs-help",
+      "changes": {
+        "stance": {
+          "before": "conveys_method",
+          "after": "describes"
+        },
+        "objects": {
+          "before": [
+            "financial_crime"
+          ],
+          "after": []
+        },
+        "qualifiers": {
+          "before": [
+            "exceeds_common_knowledge"
+          ],
+          "after": [
+            "is_mention_not_use"
+          ]
+        },
+        "reason": {
+          "before": "criminal_assistance method",
+          "after": "CA named refusal: declines assistance, fires nothing"
+        }
+      }
+    },
+    {
+      "id": "tr-refusal-ca-named-refusal-0009",
+      "category": "ca_named_refusal_clear",
+      "kind": "ca-named-refusal",
+      "contrastGroup": "ca-named-refusal-vs-help",
+      "changes": {
+        "stance": {
+          "before": "conveys_method",
+          "after": "describes"
+        },
+        "objects": {
+          "before": [
+            "financial_crime"
+          ],
+          "after": []
+        },
+        "qualifiers": {
+          "before": [
+            "exceeds_common_knowledge"
+          ],
+          "after": [
+            "is_mention_not_use"
+          ]
+        },
+        "reason": {
+          "before": "criminal_assistance method",
+          "after": "CA named refusal: declines assistance, fires nothing"
+        }
+      }
+    },
+    {
+      "id": "tr-refusal-ca-named-refusal-0010",
+      "category": "ca_named_refusal_clear",
+      "kind": "ca-named-refusal",
+      "contrastGroup": "ca-named-refusal-vs-help",
+      "changes": {
+        "stance": {
+          "before": "conveys_method",
+          "after": "describes"
+        },
+        "objects": {
+          "before": [
+            "financial_crime"
+          ],
+          "after": []
+        },
+        "qualifiers": {
+          "before": [
+            "exceeds_common_knowledge"
+          ],
+          "after": [
+            "is_mention_not_use"
+          ]
+        },
+        "reason": {
+          "before": "criminal_assistance method",
+          "after": "CA named refusal: declines assistance, fires nothing"
+        }
+      }
+    },
+    {
+      "id": "tr-refusal-ca-named-refusal-0011",
+      "category": "ca_named_refusal_clear",
+      "kind": "ca-named-refusal",
+      "contrastGroup": "ca-named-refusal-vs-help",
+      "changes": {
+        "stance": {
+          "before": "conveys_method",
+          "after": "describes"
+        },
+        "objects": {
+          "before": [
+            "financial_crime"
+          ],
+          "after": []
+        },
+        "qualifiers": {
+          "before": [
+            "exceeds_common_knowledge"
+          ],
+          "after": [
+            "is_mention_not_use"
+          ]
+        },
+        "reason": {
+          "before": "criminal_assistance method",
+          "after": "CA named refusal: declines assistance, fires nothing"
+        }
+      }
+    },
+    {
+      "id": "tr-refusal-ca-named-refusal-0012",
+      "category": "ca_named_refusal_clear",
+      "kind": "ca-named-refusal",
+      "contrastGroup": "ca-named-refusal-vs-help",
+      "changes": {
+        "stance": {
+          "before": "conveys_method",
+          "after": "describes"
+        },
+        "objects": {
+          "before": [
+            "financial_crime"
+          ],
+          "after": []
+        },
+        "qualifiers": {
+          "before": [
+            "exceeds_common_knowledge"
+          ],
+          "after": [
+            "is_mention_not_use"
+          ]
+        },
+        "reason": {
+          "before": "criminal_assistance method",
+          "after": "CA named refusal: declines assistance, fires nothing"
+        }
+      }
+    },
+    {
+      "id": "tr-refusal-ca-named-refusal-0013",
+      "category": "ca_named_refusal_clear",
+      "kind": "ca-named-refusal",
+      "contrastGroup": "ca-named-refusal-vs-help",
+      "changes": {
+        "stance": {
+          "before": "conveys_method",
+          "after": "describes"
+        },
+        "objects": {
+          "before": [
+            "financial_crime"
+          ],
+          "after": []
+        },
+        "qualifiers": {
+          "before": [
+            "exceeds_common_knowledge"
+          ],
+          "after": [
+            "is_mention_not_use"
+          ]
+        },
+        "reason": {
+          "before": "criminal_assistance method",
+          "after": "CA named refusal: declines assistance, fires nothing"
+        }
+      }
+    },
+    {
+      "id": "tr-refusal-ca-named-refusal-0014",
+      "category": "ca_named_refusal_clear",
+      "kind": "ca-named-refusal",
+      "contrastGroup": "ca-named-refusal-vs-help",
+      "changes": {
+        "stance": {
+          "before": "conveys_method",
+          "after": "describes"
+        },
+        "objects": {
+          "before": [
+            "financial_crime"
+          ],
+          "after": []
+        },
+        "qualifiers": {
+          "before": [
+            "exceeds_common_knowledge"
+          ],
+          "after": [
+            "is_mention_not_use"
+          ]
+        },
+        "reason": {
+          "before": "criminal_assistance method",
+          "after": "CA named refusal: declines assistance, fires nothing"
+        }
+      }
+    },
+    {
+      "id": "tr-refusal-ca-named-refusal-0015",
+      "category": "ca_named_refusal_clear",
+      "kind": "ca-named-refusal",
+      "contrastGroup": "ca-named-refusal-vs-help",
+      "changes": {
+        "stance": {
+          "before": "conveys_method",
+          "after": "describes"
+        },
+        "objects": {
+          "before": [
+            "financial_crime"
+          ],
+          "after": []
+        },
+        "qualifiers": {
+          "before": [
+            "exceeds_common_knowledge"
+          ],
+          "after": [
+            "is_mention_not_use"
+          ]
+        },
+        "reason": {
+          "before": "criminal_assistance method",
+          "after": "CA named refusal: declines assistance, fires nothing"
+        }
+      }
+    },
+    {
+      "id": "tr-refusal-ca-named-refusal-0016",
+      "category": "ca_named_refusal_clear",
+      "kind": "ca-named-refusal",
+      "contrastGroup": "ca-named-refusal-vs-help",
+      "changes": {
+        "stance": {
+          "before": "conveys_method",
+          "after": "describes"
+        },
+        "objects": {
+          "before": [
+            "financial_crime"
+          ],
+          "after": []
+        },
+        "qualifiers": {
+          "before": [
+            "exceeds_common_knowledge"
+          ],
+          "after": [
+            "is_mention_not_use"
+          ]
+        },
+        "reason": {
+          "before": "criminal_assistance method",
+          "after": "CA named refusal: declines assistance, fires nothing"
+        }
+      }
+    },
+    {
+      "id": "tr-refusal-ca-named-refusal-0017",
+      "category": "ca_named_refusal_clear",
+      "kind": "ca-named-refusal",
+      "contrastGroup": "ca-named-refusal-vs-help",
+      "changes": {
+        "stance": {
+          "before": "conveys_method",
+          "after": "describes"
+        },
+        "objects": {
+          "before": [
+            "financial_crime"
+          ],
+          "after": []
+        },
+        "qualifiers": {
+          "before": [
+            "exceeds_common_knowledge"
+          ],
+          "after": [
+            "is_mention_not_use"
+          ]
+        },
+        "reason": {
+          "before": "criminal_assistance method",
+          "after": "CA named refusal: declines assistance, fires nothing"
+        }
+      }
+    },
+    {
+      "id": "tr-refusal-ca-named-refusal-0018",
+      "category": "ca_named_refusal_clear",
+      "kind": "ca-named-refusal",
+      "contrastGroup": "ca-named-refusal-vs-help",
+      "changes": {
+        "stance": {
+          "before": "conveys_method",
+          "after": "describes"
+        },
+        "objects": {
+          "before": [
+            "financial_crime"
+          ],
+          "after": []
+        },
+        "qualifiers": {
+          "before": [
+            "exceeds_common_knowledge"
+          ],
+          "after": [
+            "is_mention_not_use"
+          ]
+        },
+        "reason": {
+          "before": "criminal_assistance method",
+          "after": "CA named refusal: declines assistance, fires nothing"
+        }
+      }
+    },
+    {
+      "id": "tr-refusal-ca-named-refusal-0019",
+      "category": "ca_named_refusal_clear",
+      "kind": "ca-named-refusal",
+      "contrastGroup": "ca-named-refusal-vs-help",
+      "changes": {
+        "stance": {
+          "before": "conveys_method",
+          "after": "describes"
+        },
+        "objects": {
+          "before": [
+            "financial_crime"
+          ],
+          "after": []
+        },
+        "qualifiers": {
+          "before": [
+            "exceeds_common_knowledge"
+          ],
+          "after": [
+            "is_mention_not_use"
+          ]
+        },
+        "reason": {
+          "before": "criminal_assistance method",
+          "after": "CA named refusal: declines assistance, fires nothing"
+        }
+      }
+    },
+    {
+      "id": "tr-refusal-ca-named-refusal-0020",
+      "category": "ca_named_refusal_clear",
+      "kind": "ca-named-refusal",
+      "contrastGroup": "ca-named-refusal-vs-help",
+      "changes": {
+        "stance": {
+          "before": "conveys_method",
+          "after": "describes"
+        },
+        "objects": {
+          "before": [
+            "financial_crime"
+          ],
+          "after": []
+        },
+        "qualifiers": {
+          "before": [
+            "exceeds_common_knowledge"
+          ],
+          "after": [
+            "is_mention_not_use"
+          ]
+        },
+        "reason": {
+          "before": "criminal_assistance method",
+          "after": "CA named refusal: declines assistance, fires nothing"
+        }
+      }
+    }
+  ]
+}

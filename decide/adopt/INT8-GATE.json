@@ -1,0 +1,528 @@
+{
+  "task": "2a",
+  "brief": "BRIEF-laya-adoption-2026-10-06.md",
+  "brief_sha256": "59e142801dac5b4312826162af2e28af092f8250e81a536f442812d5e7f1a6f1",
+  "generated_npt": "2026-10-06T02:53:37.709038+05:45",
+  "architecture": "one ORT session.run with 17 padded question-conditioned rows per response (batched)",
+  "quantization": {
+    "method": "onnxruntime.quantization.quantize_dynamic",
+    "weight_type": "QInt8",
+    "activations": "dynamic uint8 per-tensor at runtime",
+    "per_channel": false,
+    "op_types_to_quantize": [
+      "MatMul",
+      "Gemm"
+    ]
+  },
+  "suite_sha256": "6c7b30e16b8ab53544f590bcbbdcd381f32e3e4cf324e225e2e8c489cebb28e4",
+  "questions_sha256": "f519fa8e4763cc95acef3d134f984941c263043bad4abfd2a827c69e560650ee",
+  "compose": "@airp/evaluator-local compose + scoreHeldOutGateDual via gate-laya-task1.mjs (default thresholds)",
+  "archive_tgz_sha256": "fa5d8931b6b02b1c26adadad3fe944aae1e90e779a445eabf55ae1123482afb1",
+  "note_prior_step3": "Step3 int8 gate was on task1 retrain ckpt-9610 (weight sha 3a88d65f\u2026), NOT deciding-run 5766/9610. Those numbers are not reused.",
+  "checkpoints": [
+    {
+      "checkpoint": "ckpt-epoch-1.5-step-5766",
+      "role": "selected",
+      "weight_sha256": "703cabfcd1e51bfe24aee7416d99df7c8f21bb0449e0dda6712179b69fee1cf5",
+      "onnx": {
+        "fp32": {
+          "path": "/workspace/airp/decide/adopt/int8/onnx/ckpt-epoch-1.5-step-5766/laya-fp32.onnx",
+          "sha256": "0b5694036a20f3093f2cac7c8f6d8569400756e9982a28ccd4070997a522aa8e",
+          "bytes": 1686047325
+        },
+        "int8": {
+          "path": "/workspace/airp/decide/adopt/int8/onnx/ckpt-epoch-1.5-step-5766/laya-int8-dynamic.onnx",
+          "sha256": "4e58214ec923680f3f54efac5ccbac4601bb4b4c4ceb94af8c16682d1b6296c7",
+          "bytes": 596478862
+        }
+      },
+      "gate_fp32": {
+        "v2": {
+          "n": 471,
+          "extras": 16,
+          "recallMisses": 20,
+          "recallMissedClassInstances": 20,
+          "cleanFires": 13,
+          "cleanN": 212,
+          "pass": false
+        },
+        "v1_207": {
+          "n": 207,
+          "extras": 5,
+          "recallMisses": 10,
+          "recallMissedClassInstances": 10,
+          "cleanFires": 4,
+          "cleanN": 100,
+          "pass": false
+        },
+        "cse": {
+          "n": 29,
+          "missed": 0,
+          "extra": 0,
+          "pass": true,
+          "type": "child_sexual_exploitation"
+        }
+      },
+      "gate_int8": {
+        "v2": {
+          "n": 471,
+          "extras": 234,
+          "recallMisses": 105,
+          "recallMissedClassInstances": 111,
+          "cleanFires": 49,
+          "cleanN": 212,
+          "pass": false
+        },
+        "v1_207": {
+          "n": 207,
+          "extras": 108,
+          "recallMisses": 41,
+          "recallMissedClassInstances": 44,
+          "cleanFires": 22,
+          "cleanN": 100,
+          "pass": false
+        },
+        "cse": {
+          "n": 29,
+          "missed": 5,
+          "extra": 41,
+          "pass": false,
+          "type": "child_sexual_exploitation"
+        }
+      },
+      "composed_disagree_n": 220,
+      "composed_disagree_rate": 0.46709129511677283,
+      "primitive_flip_items": 426,
+      "primitive_flips_total": 1166,
+      "primitive_flip_rates": {
+        "stance": 0.1910828025477707,
+        "violence_person": 0.20169851380042464,
+        "self_harm": 0.1337579617834395,
+        "sexual_activity": 0.10828025477707007,
+        "financial_crime": 0.09978768577494693,
+        "intrusion": 0.11464968152866242,
+        "weapons": 0.10615711252653928,
+        "profanity": 0.10191082802547771,
+        "is_mention_not_use": 0.16560509554140126,
+        "subject_is_minor": 0.14861995753715498,
+        "exceeds_common_knowledge": 0.12526539278131635,
+        "addresses_own_nature": 0.2526539278131635,
+        "asserts_interior_state": 0.1040339702760085,
+        "directed_at_user": 0.17197452229299362,
+        "explicit_register": 0.14861995753715498,
+        "targets_protected_characteristic": 0.16348195329087048,
+        "untethered_to_content": 0.13800424628450106
+      },
+      "primitive_flips_by_primitive": {
+        "untethered_to_content": 65,
+        "weapons": 50,
+        "directed_at_user": 81,
+        "explicit_register": 70,
+        "stance": 90,
+        "asserts_interior_state": 49,
+        "self_harm": 63,
+        "intrusion": 54,
+        "violence_person": 95,
+        "targets_protected_characteristic": 77,
+        "profanity": 48,
+        "addresses_own_nature": 119,
+        "is_mention_not_use": 78,
+        "subject_is_minor": 70,
+        "financial_crime": 47,
+        "exceeds_common_knowledge": 59,
+        "sexual_activity": 51
+      },
+      "max_abs_prob_diff": 0.9999999902031226,
+      "latency_box_batched": {
+        "fp32": {
+          "median_ms": 2212.4708439951064,
+          "p95_ms": 2951.0672769974917
+        },
+        "int8": {
+          "median_ms": 957.3361430084333,
+          "p95_ms": 1234.1341439896496
+        }
+      },
+      "disagree_path": "/workspace/airp/decide/adopt/int8/gate/ckpt-epoch-1.5-step-5766/disagree-ckpt-epoch-1.5-step-5766.json"
+    },
+    {
+      "checkpoint": "ckpt-epoch-2.0-step-7688",
+      "role": "converged",
+      "weight_sha256": "64b4054cd9f9ea12097c8df320739d98eab98a32842a0f7912c2c243dab9878d",
+      "onnx": {
+        "fp32": {
+          "path": "/workspace/airp/decide/adopt/int8/onnx/ckpt-epoch-2.0-step-7688/laya-fp32.onnx",
+          "sha256": "f9383ea793ca652aa6eb4bbcf0f8dab7943ddbe92e1066b28e5b36ca3b13cc2e",
+          "bytes": 1686047325
+        },
+        "int8": {
+          "path": "/workspace/airp/decide/adopt/int8/onnx/ckpt-epoch-2.0-step-7688/laya-int8-dynamic.onnx",
+          "sha256": "69ad13fd6bbe2a71cde2efbea6b825dd9f7a180cd423c70a638b0917d33a3a3c",
+          "bytes": 596478862
+        }
+      },
+      "gate_fp32": {
+        "v2": {
+          "n": 471,
+          "extras": 41,
+          "recallMisses": 25,
+          "recallMissedClassInstances": 25,
+          "cleanFires": 34,
+          "cleanN": 212,
+          "pass": false
+        },
+        "v1_207": {
+          "n": 207,
+          "extras": 18,
+          "recallMisses": 12,
+          "recallMissedClassInstances": 12,
+          "cleanFires": 16,
+          "cleanN": 100,
+          "pass": false
+        },
+        "cse": {
+          "n": 29,
+          "missed": 0,
+          "extra": 0,
+          "pass": true,
+          "type": "child_sexual_exploitation"
+        }
+      },
+      "gate_int8": {
+        "v2": {
+          "n": 471,
+          "extras": 229,
+          "recallMisses": 98,
+          "recallMissedClassInstances": 103,
+          "cleanFires": 72,
+          "cleanN": 212,
+          "pass": false
+        },
+        "v1_207": {
+          "n": 207,
+          "extras": 93,
+          "recallMisses": 39,
+          "recallMissedClassInstances": 40,
+          "cleanFires": 30,
+          "cleanN": 100,
+          "pass": false
+        },
+        "cse": {
+          "n": 29,
+          "missed": 2,
+          "extra": 32,
+          "pass": false,
+          "type": "child_sexual_exploitation"
+        }
+      },
+      "composed_disagree_n": 223,
+      "composed_disagree_rate": 0.4734607218683652,
+      "primitive_flip_items": 425,
+      "primitive_flips_total": 1120,
+      "primitive_flip_rates": {
+        "stance": 0.1740976645435244,
+        "violence_person": 0.18259023354564755,
+        "self_harm": 0.10615711252653928,
+        "sexual_activity": 0.0870488322717622,
+        "financial_crime": 0.11889596602972399,
+        "intrusion": 0.09554140127388536,
+        "weapons": 0.10191082802547771,
+        "profanity": 0.09341825902335456,
+        "is_mention_not_use": 0.1932059447983015,
+        "subject_is_minor": 0.10191082802547771,
+        "exceeds_common_knowledge": 0.1316348195329087,
+        "addresses_own_nature": 0.24416135881104034,
+        "asserts_interior_state": 0.11040339702760085,
+        "directed_at_user": 0.20382165605095542,
+        "explicit_register": 0.19532908704883228,
+        "targets_protected_characteristic": 0.12738853503184713,
+        "untethered_to_content": 0.11040339702760085
+      },
+      "primitive_flips_by_primitive": {
+        "explicit_register": 92,
+        "violence_person": 86,
+        "exceeds_common_knowledge": 62,
+        "directed_at_user": 96,
+        "is_mention_not_use": 91,
+        "financial_crime": 56,
+        "untethered_to_content": 52,
+        "subject_is_minor": 48,
+        "addresses_own_nature": 115,
+        "sexual_activity": 41,
+        "targets_protected_characteristic": 60,
+        "profanity": 44,
+        "asserts_interior_state": 52,
+        "weapons": 48,
+        "self_harm": 50,
+        "stance": 82,
+        "intrusion": 45
+      },
+      "max_abs_prob_diff": 0.9999999862840955,
+      "latency_box_batched": {
+        "fp32": {
+          "median_ms": 2254.0388210036326,
+          "p95_ms": 4709.294831001898
+        },
+        "int8": {
+          "median_ms": 884.1881529951934,
+          "p95_ms": 1156.8689499981701
+        }
+      },
+      "disagree_path": "/workspace/airp/decide/adopt/int8/gate/ckpt-epoch-2.0-step-7688/disagree-ckpt-epoch-2.0-step-7688.json"
+    },
+    {
+      "checkpoint": "ckpt-epoch-2.5-step-9610",
+      "role": "converged",
+      "weight_sha256": "9d18d3ab5195c2525eb2ec62f6ad80e25b236b2bfe61054f03227d117880000c",
+      "onnx": {
+        "fp32": {
+          "path": "/workspace/airp/decide/adopt/int8/onnx/ckpt-epoch-2.5-step-9610/laya-fp32.onnx",
+          "sha256": "26bfc57cbae62d125a93bce6dcd8c236ee25b8f00a53635bf3ea92a38088a1ad",
+          "bytes": 1686047325
+        },
+        "int8": {
+          "path": "/workspace/airp/decide/adopt/int8/onnx/ckpt-epoch-2.5-step-9610/laya-int8-dynamic.onnx",
+          "sha256": "6e2c955702f37bc717c52f15b5690311c754dd1a1f13926fe9846c3e4248050b",
+          "bytes": 596478862
+        }
+      },
+      "gate_fp32": {
+        "v2": {
+          "n": 471,
+          "extras": 35,
+          "recallMisses": 20,
+          "recallMissedClassInstances": 20,
+          "cleanFires": 24,
+          "cleanN": 212,
+          "pass": false
+        },
+        "v1_207": {
+          "n": 207,
+          "extras": 11,
+          "recallMisses": 12,
+          "recallMissedClassInstances": 12,
+          "cleanFires": 9,
+          "cleanN": 100,
+          "pass": false
+        },
+        "cse": {
+          "n": 29,
+          "missed": 0,
+          "extra": 0,
+          "pass": true,
+          "type": "child_sexual_exploitation"
+        }
+      },
+      "gate_int8": {
+        "v2": {
+          "n": 471,
+          "extras": 258,
+          "recallMisses": 97,
+          "recallMissedClassInstances": 101,
+          "cleanFires": 56,
+          "cleanN": 212,
+          "pass": false
+        },
+        "v1_207": {
+          "n": 207,
+          "extras": 112,
+          "recallMisses": 48,
+          "recallMissedClassInstances": 50,
+          "cleanFires": 25,
+          "cleanN": 100,
+          "pass": false
+        },
+        "cse": {
+          "n": 29,
+          "missed": 2,
+          "extra": 40,
+          "pass": false,
+          "type": "child_sexual_exploitation"
+        }
+      },
+      "composed_disagree_n": 226,
+      "composed_disagree_rate": 0.47983014861995754,
+      "primitive_flip_items": 430,
+      "primitive_flips_total": 1109,
+      "primitive_flip_rates": {
+        "stance": 0.1613588110403397,
+        "violence_person": 0.21443736730360935,
+        "self_harm": 0.09978768577494693,
+        "sexual_activity": 0.10615711252653928,
+        "financial_crime": 0.10191082802547771,
+        "intrusion": 0.12314225053078556,
+        "weapons": 0.12314225053078556,
+        "profanity": 0.12101910828025478,
+        "is_mention_not_use": 0.14861995753715498,
+        "subject_is_minor": 0.10828025477707007,
+        "exceeds_common_knowledge": 0.09766454352441614,
+        "addresses_own_nature": 0.2823779193205945,
+        "asserts_interior_state": 0.11464968152866242,
+        "directed_at_user": 0.15074309978768577,
+        "explicit_register": 0.1464968152866242,
+        "targets_protected_characteristic": 0.12101910828025478,
+        "untethered_to_content": 0.1337579617834395
+      },
+      "primitive_flips_by_primitive": {
+        "violence_person": 101,
+        "addresses_own_nature": 133,
+        "asserts_interior_state": 54,
+        "exceeds_common_knowledge": 46,
+        "financial_crime": 48,
+        "untethered_to_content": 63,
+        "sexual_activity": 50,
+        "intrusion": 58,
+        "self_harm": 47,
+        "is_mention_not_use": 70,
+        "profanity": 57,
+        "subject_is_minor": 51,
+        "weapons": 58,
+        "targets_protected_characteristic": 57,
+        "directed_at_user": 71,
+        "explicit_register": 69,
+        "stance": 76
+      },
+      "max_abs_prob_diff": 0.9999999833623496,
+      "latency_box_batched": {
+        "fp32": {
+          "median_ms": 2150.6260850001127,
+          "p95_ms": 2905.0295380002353
+        },
+        "int8": {
+          "median_ms": 867.277084995294,
+          "p95_ms": 1105.2521810051985
+        }
+      },
+      "disagree_path": "/workspace/airp/decide/adopt/int8/gate/ckpt-epoch-2.5-step-9610/disagree-ckpt-epoch-2.5-step-9610.json"
+    },
+    {
+      "checkpoint": "ckpt-epoch-2.6-step-10099",
+      "role": "converged",
+      "weight_sha256": "4104085cff7dad6adf0199508678f0d5cce0cf5ed8fb22da81b983f72b11134d",
+      "onnx": {
+        "fp32": {
+          "path": "/workspace/airp/decide/adopt/int8/onnx/ckpt-epoch-2.6-step-10099/laya-fp32.onnx",
+          "sha256": "616f9273d37cce8e4dfd6b1ce8badff96822f434c5adb5f5808ba7cecdee9866",
+          "bytes": 1686047325
+        },
+        "int8": {
+          "path": "/workspace/airp/decide/adopt/int8/onnx/ckpt-epoch-2.6-step-10099/laya-int8-dynamic.onnx",
+          "sha256": "27ca6766ebc60a372ce68db565fe061ff24fa015a259e18967b05fe6cf5c7a15",
+          "bytes": 596478862
+        }
+      },
+      "gate_fp32": {
+        "v2": {
+          "n": 471,
+          "extras": 37,
+          "recallMisses": 23,
+          "recallMissedClassInstances": 23,
+          "cleanFires": 25,
+          "cleanN": 212,
+          "pass": false
+        },
+        "v1_207": {
+          "n": 207,
+          "extras": 11,
+          "recallMisses": 12,
+          "recallMissedClassInstances": 12,
+          "cleanFires": 9,
+          "cleanN": 100,
+          "pass": false
+        },
+        "cse": {
+          "n": 29,
+          "missed": 0,
+          "extra": 0,
+          "pass": true,
+          "type": "child_sexual_exploitation"
+        }
+      },
+      "gate_int8": {
+        "v2": {
+          "n": 471,
+          "extras": 272,
+          "recallMisses": 85,
+          "recallMissedClassInstances": 89,
+          "cleanFires": 65,
+          "cleanN": 212,
+          "pass": false
+        },
+        "v1_207": {
+          "n": 207,
+          "extras": 117,
+          "recallMisses": 33,
+          "recallMissedClassInstances": 35,
+          "cleanFires": 28,
+          "cleanN": 100,
+          "pass": false
+        },
+        "cse": {
+          "n": 29,
+          "missed": 4,
+          "extra": 36,
+          "pass": false,
+          "type": "child_sexual_exploitation"
+        }
+      },
+      "composed_disagree_n": 234,
+      "composed_disagree_rate": 0.4968152866242038,
+      "primitive_flip_items": 429,
+      "primitive_flips_total": 1093,
+      "primitive_flip_rates": {
+        "stance": 0.13800424628450106,
+        "violence_person": 0.19745222929936307,
+        "self_harm": 0.08917197452229299,
+        "sexual_activity": 0.11252653927813164,
+        "financial_crime": 0.12526539278131635,
+        "intrusion": 0.09341825902335456,
+        "weapons": 0.10615711252653928,
+        "profanity": 0.11464968152866242,
+        "is_mention_not_use": 0.16560509554140126,
+        "subject_is_minor": 0.09341825902335456,
+        "exceeds_common_knowledge": 0.12101910828025478,
+        "addresses_own_nature": 0.2653927813163482,
+        "asserts_interior_state": 0.12526539278131635,
+        "directed_at_user": 0.16560509554140126,
+        "explicit_register": 0.1464968152866242,
+        "targets_protected_characteristic": 0.15074309978768577,
+        "untethered_to_content": 0.11040339702760085
+      },
+      "primitive_flips_by_primitive": {
+        "directed_at_user": 78,
+        "self_harm": 42,
+        "financial_crime": 59,
+        "untethered_to_content": 52,
+        "explicit_register": 69,
+        "addresses_own_nature": 125,
+        "exceeds_common_knowledge": 57,
+        "intrusion": 44,
+        "is_mention_not_use": 78,
+        "profanity": 54,
+        "violence_person": 93,
+        "subject_is_minor": 44,
+        "weapons": 50,
+        "asserts_interior_state": 59,
+        "stance": 65,
+        "sexual_activity": 53,
+        "targets_protected_characteristic": 71
+      },
+      "max_abs_prob_diff": 0.99999998289402,
+      "latency_box_batched": {
+        "fp32": {
+          "median_ms": 2098.478290994535,
+          "p95_ms": 2931.7523159988923
+        },
+        "int8": {
+          "median_ms": 741.9315570004983,
+          "p95_ms": 949.381792001077
+        }
+      },
+      "disagree_path": "/workspace/airp/decide/adopt/int8/gate/ckpt-epoch-2.6-step-10099/disagree-ckpt-epoch-2.6-step-10099.json"
+    }
+  ],
+  "deployment_verdict": {
+    "int8_is_deployment_build": false,
+    "text": "int8 is NOT the deployment build. composed item-level disagreement is far above a couple of items: 5766=220, 7688=223, 9610=226, 10099=234 CSE named gate fails on int8 for: 5766, 7688, 9610, 10099 Keep fp32 ONNX (or torch) for accuracy; the ~1.2 s int8 CPU figure is not a measured number for a model that answers like fp32 on these deciding-run checkpoints."
+  }
+}

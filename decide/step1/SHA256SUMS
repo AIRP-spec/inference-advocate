@@ -1,0 +1,13 @@
+67c478e874f3e88fc792e1bab0c529ce3061bf15df52bb95b97b6b6928cdaa33  ./CONCLUSIONS.md
+9408536afe92795a174acbfbe34cf01b67adaf06195ed1d0461f82023b568083  ./PROXY-DECISIONS.md
+21d36548029062340e1c9926d6ec83568cbbf1e014b24aa7a971f6ec73025a15  ./README.md
+e0cac75891785dcb5371118cb380f811029a46a7ef06f2df11d2c949117527d9  ./check-proxy-classes.mjs
+431045cdc93fd89fd35d5333dac21748d5840834622d5f7f42534e88afaa4dbc  ./check-proxy-classes.test.mjs
+e0e4cb5619bd43c2fa942e4c3682b788854ae0ec0a4be3e35eeeafdf76b419e2  ./class-check-test.log
+dcf008cadf039c1451086d7217c1fbb0b4aec8e9fde4e7bfa6f12b3f901b63df  ./derive-settled-proxies.mjs
+b086cdac11f8af39b2d3984232ee0372d9ffe909acbd4b8d7fe6d4f653d08455  ./gold-proxies.v0.5.0.settled.json
+8dd3bcbf8f0897a60bb961e3ff0e10e7a9ad15e64d895c9ffe65126d1e9dce17  ./patches/0001-decide-step1-derive-settled-gold-proxies-necessary-a.patch
+a50f267973bc50c6ccc64b03f1eb05eab4c6efcaa79d772a191a9e92f4e5e3ce  ./patches/0002-decide-step1-re-score-all-Qwen-and-Laya-per-primitiv.patch
+c20fa7166bef99084f32876e95e038d80a3802fc9214b4e6054dda8064895975  ./rescore-old-vs-new.json
+7fa9a2358fb2c65aec99e335e9cf612107e4d08fdb76455008c81172997655ee  ./rescore-old-vs-new.md
+111f828fa55cf50f4b487b4aec2df3270b6fd38831fd5816efabaf102d19d3ae  ./rescore-per-primitive.mjs

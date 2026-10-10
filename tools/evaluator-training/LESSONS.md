@@ -117,3 +117,34 @@ The discarded 8208 generation attempt (September 2026) taught four lessons that 
 ## The meta-lesson
 
 Almost every real problem in this process was found by a human reading a sample, and almost every problem was invisible to the automated checks that passed right alongside it. The format-identity tests passed while the labels contradicted the gate. The verdict-consistency check passed while the greeting fired ten classes. The pipeline was green at every step where the corpus was wrong. Read it.
+
+## Dual-path implementations are a bug class, not a mistake
+
+Four incidents in one week, September 2026, all had the same shape: two code paths implementing one behavior with nothing enforcing agreement. The failure modes were different but the root was identical.
+
+1. **Writer prompt vs corpus:** The recipe called for a specific prompt format, but the corpus was generated with a different format. No test compared the recipe prompt to the actual generation call. Result: 8208 corpus did not match 8116 or 7914, corresponded to no committed recipe.
+
+2. **SFT builder vs buildV4System:** `build-sft-v4.mjs` initially duplicated the prompt template and primitive catalogue formatting instead of importing from `@airp/evaluator-local`. When `buildV4System` changed, the SFT builder did not. Result: Training data used a different prompt than runtime evaluation, and nothing detected it until the SHA latch was added.
+
+3. **compose.mjs vs LocalEvaluator.#compose:** Composition logic existed in two places. After updating `compose.mjs` to implement stance-dependent `is_mention_not_use` policy, `LocalEvaluator` private method was not updated. Result: CK-6756 re-gate revealed runtime still did global wipe, required confusing pod-local mirror.
+
+4. **Match-all regex where absent pattern matched everything:** In conformance checking, an absent pattern field defaulted to matching all text instead of explicitly requiring a pattern when needed. Result: Silent false passes where no check should have run.
+
+Each incident cost at least one confusing run. Each was invisible until the divergence caused an observable failure. Each would have been prevented by the same fix: a cross-path identity test enforcing agreement.
+
+**General rule:** Any behavior with two implementations needs a cross-path identity test in CI. Any absent value needs an explicit default rather than a language default.
+
+**Applied fixes:**
+- SFT builder: Import `buildV4System` and `serializeCompactPrimitives` from `@airp/evaluator-local` (single source). SHA latch enforces agreement.
+- Composition: Single shared `compose()` function in `@airp/evaluator-local`, both runtime and tools import it. Test verifies they produce identical results on same inputs.
+- Absent patterns: Explicit validation that required fields are present, not a permissive default.
+
+**The lesson:** If you have two implementations of the same behavior, you have a latent bug. The bug fires when one changes and the other doesn't, and you won't know which one is right. Merge them or test that they agree. Never assume they'll stay in sync by discipline alone.
+
+Corollary: "We'll just remember to update both" is not a process. Memory is not a control. Add a test or merge the paths.
+
+## Teaching a threshold atom as a constant on every positive of the class it gates is a coverage gap
+
+Every criminal_assistance positive (330 rows) carried exceeds_common_knowledge. The atom never varied within the class it gates, taught as "if CA then eck," a class restatement, not a threshold. The 48 no-fire rows sat in separate groups on different subjects, so nothing held a subject constant and moved depth. Five CA misses had conveys_method present and eck absent because conveys_method was taught contrastively (gore versus method) and eck was not.
+
+The fix: 16 same-subject depth pairs (32 rows) across fraud, theft, intrusion, weapons. Shared contrastGroup ca-depth-{stem}; explain arm (ca-explain-protect, expect []) vs operational (ca-named-help, expect [criminal_assistance]). Subject cannot predict the label. Contrast requires same subject, two depths.

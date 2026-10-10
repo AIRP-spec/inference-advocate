@@ -1,0 +1,27 @@
+# Task 3 CPU speed — progress (times NPT, UTC+5:45)
+
+- 03:31 baseline s0 (5766 fp32 padded, intra 8, full 471, VPS): median 2313 ms, p95 3431 ms. Gate vs box fp32: 0 composed disagree, max|Δlogit| 0 (v2 16/20/13, CSE PASS). p95 inflated by int8-archive rsync running concurrently; a clean control is re-measured in S1.
+- Token lengths (5766 tokenizer): state median 12 / max 34; row median 51 / max 124; padded seq median 102 (stance row = 90-token header); padding 48% of batch.
+- S3 length choice made from distribution before any gate: max_len 128 (smallest multiple of 32 ≥ 124) → 0 rows changed (results/maxlen-identity.json).
+- Packed (padding-free, block-diagonal) export built + verified: torch packed vs padded max|Δlogit| 5.3e-5 (41 items), ORT packed vs torch padded 4.1e-5. sha 910eec05…
+- ORT transformers optimizer on packed: 0 Attention/MHA/RotaryEmbedding fusions (ModernBERT RoPE pattern not matched); only Gelu 29 / LayerNorm 62 (already done by ORT_ENABLE_ALL). ortopt sha cc7a9b4c…
+- Base pack + orchestrate.sh prepared. NOT launched (only if best fp32 ≥ 1 s after steps 1–3 are gated). Pods: none.
+- 04:18 VPS queue: Task 4 node/python bench running (yielded to it) → S1 sweep (80-item screens, control first+last) → phase2: S2 packed full 471, ortopt screen, base speed probes, S3 max_len 128 full 471.
+- Spend this phase: $0.
+- 05:08 S1 screens (items 0–79, warm-up 10, VPS): t8 ctrlA 2275/2711, ctrlB 2236/2621, **t8 spin0 1906/2082**, t6 2234/2381, t4 3190/3432, t8 affinity 2267/2603 (median/p95 ms). All bit-identical to baseline logits on those 80 items (max|Δlogit| 0). Winner: intra 8 + allow_spinning 0.
+- 05:08 phase2 running (PID 2025482): s1-t8-spin0-full (started 05:04:55) → s2 packed full → ortopt/packed screens → base speed probes → s3 max_len 128 full.
+- 05:22 **S1 full 471 (t8 spin0, padded): median 1890 ms, p95 2233 ms.** Gate vs s0: 0 composed disagree, 0 primitive flips, max|Δlogit| 0; v2 16/20/13, v1 5/10/4, CSE PASS. Current best = S1.
+- 05:22 s2 packed (on top of S1) full 471 running (started 05:22:23).
+- 05:34 **S2 packed full 471 (t8 spin0): median 1130 ms, p95 1875 ms** (feed tokens median 1020 vs 1734 padded). Gate vs S1: 0 composed disagree, 0 primitive flips, max|Δlogit| 4.1e-4, max|Δp| 2.4e-6; v2 16/20/13, v1 5/10/4, CSE PASS. Current best = S2. Still ≥ 1 s.
+- 05:34 phase2 continuing: ortopt/packed screens, base speed probes, S3 max_len 128 full.
+- 05:58 S3 max_len 128 (packed+spin0) full 471: 1133/1883; gate vs S2: 0 disagree, max|Δlogit| 0 (inputs byte-identical). ortopt screen 1209/1933 vs packed screen 1173/1874 (no gain; 0 flips). Base speed probes (untrained, n=80): padded 761/824, packed 486/776.
+- 05:58 Best accuracy-matched large build 1130 ms ≥ 1 s → step 4 launched: pod 0osdj9z2pumvx2 RTX 4090 $0.74/hr (05:58:25 NPT), pack sha 20f1d7c7…
+- 06:11 S2c (extra change, layout-only): packed with cost-minimising bin cap (cap ∈ [longest, 2×longest], cost model fit on S2 timings) full 471: **1069 / 1305 ms**; gate vs S2 and vs s0: 0 composed disagree, 0 flips, max|Δp| 2.4e-6, CSE PASS. Best large = S2c, still ≥ 1 s.
+- 06:11 base pod training: ep≈0.24 at 06:08 (≈0.06 ep / 2 min → ~100 min train).
+- 06:50 Reattached: orchestrate.sh PID 871692 still alive and monitoring pod 0osdj9z2pumvx2 (ep≈1.44 at 06:48). It will pull → archive to VPS cpu-speed/base-pod (MANIFEST + remote verify) → terminate. No second pod.
+- 07:29 base training FULL_TRAIN_EXIT:0 (6 ckpts 1922…10099); 07:33 POST_INFER_DONE; 07:35 pulled base-out.tgz (b5a442d2…, sha matches pod).
+- 07:36 orchestrate archive step FAILED (box python lacked paramiko) → pod left running per rule, BLOCKED-archive.md written.
+- 07:37–07:45 manual archive: rsync base-out.tgz + trainpack + pod meta to VPS cpu-speed/base-pod → sha256sum -c OK; moved to cpu-speed/base/, extracted remotely, full MANIFEST.sha256 (73 entries incl. every ckpt model.safetensors, raw, training-meta, loss_curve, pins) → remote sha256sum -c OK (manifest sha bf6bf679…).
+- 07:46:04 pod 0osdj9z2pumvx2 TERMINATED (podTerminate OK; myself.pods = []). Wall 6459 s = 1.794 h × $0.74 = $1.33. BLOCKED-archive.md removed. Phase spend $1.33.
+- 07:45 offline selection (val composed macro-F1): base ckpt-epoch-2.6-step-10099 0.7921 (stance 0.857); all base ckpts CSE FAIL on held-out v2 (10099: 26/19/15 pod raw).
+- 07:50 VPS bench base 10099 S2c+spin0: r1 439/531 (overlapped archive upload) ; r2 clean **433 / 505 ms** (r1≡r2 outputs). Gate vs large S2c: base 25/19/15 CSE FAIL vs large 16/20/13 PASS; 45/471 composed disagree, 215 prim flips / 154 items. 1 s hit by base, but base fails accuracy gate → not drop-in. CPU-SPEED.md §5 + SHA table filled.

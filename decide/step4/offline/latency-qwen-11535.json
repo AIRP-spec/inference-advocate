@@ -1,0 +1,26 @@
+{
+  "source": "/workspace/airp/decide/step4/out/qwen/extract/out/latency/gpu-step-11535.json",
+  "gguf": "step-11535.gguf",
+  "ggufSha256": "af8a27a81e7d39acee1eed349d0d04775e9fc7040668c65d1286a049d8c5ce64",
+  "finishedAt": "2026-10-05T13:34:35.490Z",
+  "summary": {
+    "greedyLocalEvaluator": {
+      "n": 471,
+      "medianMs": 240.54653499999404,
+      "p95Ms": 258.2337179999995,
+      "meanMs": 242.5257731719742
+    },
+    "scoredNoReuse": {
+      "n": 471,
+      "medianMs": 2036.5530850000214,
+      "p95Ms": 2117.4495960000204,
+      "meanMs": 2042.6608850339676
+    },
+    "scoredReuse": {
+      "n": 471,
+      "medianMs": 2019.7687719999813,
+      "p95Ms": 2117.7386920000426,
+      "meanMs": 2028.7347378195273
+    }
+  }
+}

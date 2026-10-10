@@ -32,6 +32,8 @@ def parse_args():
     p.add_argument("--recipe", default=str(HERE / "sweep-recipe.json"))
     p.add_argument("--lora-dir", default="")
     p.add_argument("--gpu", action="store_true", help="Pass --gpu to gate.mjs")
+    p.add_argument("--prompt-template-version", default="", help="Pass to gate.mjs (e.g., primitives-v1)")
+    p.add_argument("--composition-path", default="", help="Pass to gate.mjs for primitives-v1")
     return p.parse_args()
 
 
@@ -134,7 +136,7 @@ def rm_if_exists(path: Path):
     print(f"deleted {path}")
 
 
-def gate_one(gguf_path: Path, report_path: Path, gpu: bool) -> int:
+def gate_one(gguf_path: Path, report_path: Path, gpu: bool, prompt_template_version: str = "", composition_path: str = "") -> int:
     node = shutil.which("node") or "node"
     cmd = [
         node,
@@ -239,7 +241,7 @@ def main():
             print(f"GGUF sha256 {sha} llama.cpp {llama_commit}")
             rm_if_exists(merged_dir)
             rm_if_exists(leftover_f16)
-            status = gate_one(gguf_path, report_path, args.gpu)
+            status = gate_one(gguf_path, report_path, args.gpu, args.prompt_template_version, args.composition_path)
             if status not in (0, 2):
                 raise SystemExit(f"gate.mjs exited {status} for {adapter_dir.name}")
             if not report_path.exists():

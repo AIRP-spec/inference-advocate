@@ -1,0 +1,48 @@
+# Task 2a INT8-GATE 2026-10-05T21:09:27+00:00
+89dca269cf2676bfea64bb5c55e6e1f9626a06348cbeff56a1f3456d5319a450  INT8-GATE.md
+b234ad3b614e5f6396d7a6345445c5d9d6fa7ea95caf19d92ca7e2813beea209  INT8-GATE.json
+a924bb21e402f5ee496ee165b4b8732caef8684dd422ee464d46144daa5db2c0  PROGRESS.md
+59e142801dac5b4312826162af2e28af092f8250e81a536f442812d5e7f1a6f1  BRIEF-laya-adoption-2026-10-06.md
+# worktree
+2ee7286699b14c65d5aa9a1c68f5cdfc34c1040856e4c7513ca4018e807341dc  int8/WEIGHT-SHAS.txt
+# from int8/onnx/ckpt-epoch-0.5-step-1922/SHA256SUMS
+de5db722535fcd2c00e94452a32e833fd165baf6e4714687e937e652a3e9e530  /workspace/airp/decide/adopt/int8/onnx/ckpt-epoch-0.5-step-1922/laya-fp32.onnx
+05602c405a3f614f9c5baf5746c2c7cf0a41fcadae4521eb337e288c251f9e3a  /workspace/airp/decide/adopt/int8/onnx/ckpt-epoch-0.5-step-1922/laya-int8-dynamic.onnx
+# from int8/onnx/ckpt-epoch-1.0-step-3844/SHA256SUMS
+c8c0139726af81c0701786ac04ea9b87add5762bf39c613bde5e6584972ffe0a  /workspace/airp/decide/adopt/int8/onnx/ckpt-epoch-1.0-step-3844/laya-fp32.onnx
+a139b4ab7155b90f8d17e21163ad74821ce4f33b54bccbacf0a5263e3c54065a  /workspace/airp/decide/adopt/int8/onnx/ckpt-epoch-1.0-step-3844/laya-int8-dynamic.onnx
+# from int8/onnx/ckpt-epoch-1.5-step-5766/SHA256SUMS
+0b5694036a20f3093f2cac7c8f6d8569400756e9982a28ccd4070997a522aa8e  /workspace/airp/decide/adopt/int8/onnx/ckpt-epoch-1.5-step-5766/laya-fp32.onnx
+4e58214ec923680f3f54efac5ccbac4601bb4b4c4ceb94af8c16682d1b6296c7  /workspace/airp/decide/adopt/int8/onnx/ckpt-epoch-1.5-step-5766/laya-int8-dynamic.onnx
+# from int8/onnx/ckpt-epoch-2.0-step-7688/SHA256SUMS
+f9383ea793ca652aa6eb4bbcf0f8dab7943ddbe92e1066b28e5b36ca3b13cc2e  /workspace/airp/decide/adopt/int8/onnx/ckpt-epoch-2.0-step-7688/laya-fp32.onnx
+69ad13fd6bbe2a71cde2efbea6b825dd9f7a180cd423c70a638b0917d33a3a3c  /workspace/airp/decide/adopt/int8/onnx/ckpt-epoch-2.0-step-7688/laya-int8-dynamic.onnx
+# from int8/onnx/ckpt-epoch-2.5-step-9610/SHA256SUMS
+26bfc57cbae62d125a93bce6dcd8c236ee25b8f00a53635bf3ea92a38088a1ad  /workspace/airp/decide/adopt/int8/onnx/ckpt-epoch-2.5-step-9610/laya-fp32.onnx
+6e2c955702f37bc717c52f15b5690311c754dd1a1f13926fe9846c3e4248050b  /workspace/airp/decide/adopt/int8/onnx/ckpt-epoch-2.5-step-9610/laya-int8-dynamic.onnx
+# from int8/onnx/ckpt-epoch-2.6-step-10099/SHA256SUMS
+616f9273d37cce8e4dfd6b1ce8badff96822f434c5adb5f5808ba7cecdee9866  /workspace/airp/decide/adopt/int8/onnx/ckpt-epoch-2.6-step-10099/laya-fp32.onnx
+27ca6766ebc60a372ce68db565fe061ff24fa015a259e18967b05fe6cf5c7a15  /workspace/airp/decide/adopt/int8/onnx/ckpt-epoch-2.6-step-10099/laya-int8-dynamic.onnx
+123bcadb1fbbac6061df4e50c5d08f0ad2a26e9799ab481908ff270ee07dbd9b  int8/gate/ckpt-epoch-1.5-step-5766/disagree-ckpt-epoch-1.5-step-5766.json
+e670c832c064ac66603a80bc96631a4fcf13fb59c4e029fb05cc77564c330d97  int8/gate/ckpt-epoch-2.0-step-7688/disagree-ckpt-epoch-2.0-step-7688.json
+6c40b5767031d555b37023feae0d78a650c04800d3aff6c30f994fed229a23b1  int8/gate/ckpt-epoch-2.5-step-9610/disagree-ckpt-epoch-2.5-step-9610.json
+de359bd92ca2cfbcea344f440cb6bf3f19b402f8b8e7fd0a69e52cb0585e1daa  int8/gate/ckpt-epoch-2.6-step-10099/disagree-ckpt-epoch-2.6-step-10099.json
+12f131a3c4465d37d80997b40e6f8b200de4e30ad3c4e26a1f3cf0e273dfc5ae  int8/results/bench-ckpt-epoch-1.5-step-5766-fp32-batched.json
+303c4a1197523b3a6ce7e7c7e828245b2b99e90532ac221298718575c4f39ded  int8/results/bench-ckpt-epoch-1.5-step-5766-int8-batched.json
+8e58f7a91577424e4ee115df9ba0b60e36600137cf2105c6db20bbabe16d0788  int8/results/bench-ckpt-epoch-2.0-step-7688-fp32-batched.json
+65a36c0f2bd6d3696b730c26006605c81daec9eb0f98529969fff854732e4ccb  int8/results/bench-ckpt-epoch-2.0-step-7688-int8-batched.json
+20ab4bd8cccfca0c74d0ca889ed8d370eae5887ed9ca68306f97e6076a344e2f  int8/results/bench-ckpt-epoch-2.5-step-9610-fp32-batched.json
+a0b27ce7cd941dd1d86cae5141725881aebe0483c22a528e9b49cda9a00a01f2  int8/results/bench-ckpt-epoch-2.5-step-9610-int8-batched.json
+64e2b9319e2cd602d0ea2556c3abf54670dff252d9949300315da590eb3eb31f  int8/results/bench-ckpt-epoch-2.6-step-10099-fp32-batched.json
+49c11fc9c3c9cc04ae572346a4862bb935dca98fa27fc05e3c83f349769cf6ff  int8/results/bench-ckpt-epoch-2.6-step-10099-int8-batched.json
+bd5580d8b44e9f28ca909e532ed3944213cea7f157bf66e025855c7cb546f811  int8/scripts/assemble_report.py
+9c05104441504590ff48ad12a0a01b588859696db10b04e03b6b9e3586a38b7c  int8/scripts/bench_ort.py
+ff1127ab8380f01ba44b9bc390181c0c8f68930676ae9117288ad4604c6edbdd  int8/scripts/compare_and_gate.py
+b559f26f0124521753268792df6180dbbfaa254e9dec7761459834047c9a52ef  int8/scripts/continue_pipeline.sh
+014b8f3458ecb19ef797ed0493e7e800f8e0002b6f915c58cc62a771a43b3fcf  int8/scripts/export_onnx.py
+f8f122a7dde9fa638923160fd2232c36eb36abdc1c13b5509a0250069ff340f7  int8/scripts/finalize.sh
+cc0fab2132222e8e9ff859e9097854f8fcc2d4d6853ff1a56ee44b10cf7e2b58  int8/scripts/focus_finish2.sh
+340b6b7741408f20636367e9a586ca63bf757dd14903af2c647e795aafb98b5b  int8/scripts/gate_and_disagree.py
+52ca0a687bf5aef712f6a505dca64d58882c500f776d3c90801ddc7235a16f0e  int8/scripts/laya_onnx_common.py
+380dad1840ebaf6a1155811a9d97d8bd80843c131ab87eb459ce9b12639a28bf  int8/scripts/run_one_bench.sh
+4ac871f24327b2eaab47c9343587d58ce97f6e38ce345d7a7e75097777772b67  int8/scripts/verify_weights.py
