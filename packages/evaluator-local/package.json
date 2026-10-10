@@ -16,7 +16,9 @@
   },
   "dependencies": {
     "@airp/core": "*",
-    "node-llama-cpp": "^3.14.0"
+    "@receptron/laya": "0.1.2",
+    "node-llama-cpp": "^3.14.0",
+    "onnxruntime-node": "1.30.0"
   },
   "devDependencies": {
     "@types/node": "^22.9.0",

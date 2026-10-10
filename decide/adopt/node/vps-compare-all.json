@@ -1,0 +1,10 @@
+{
+ "n": 471,
+ "primsIdentical": 471,
+ "composedIdentical": 471,
+ "decodeIdentical": 471,
+ "maxAbsLogitDiff": 0.0008279085159301758,
+ "minPythonMargin": 0.11175036430358887,
+ "pass": true,
+ "problems": []
+}

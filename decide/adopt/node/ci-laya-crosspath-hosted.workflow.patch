@@ -1,0 +1,89 @@
+diff --git a/.github/workflows/ci.yml b/.github/workflows/ci.yml
+index f6354cb..79365fd 100644
+--- a/.github/workflows/ci.yml
++++ b/.github/workflows/ci.yml
+@@ -41,3 +41,84 @@ jobs:
+ 
+       - name: build the interface
+         run: npm run build:ui
++
++  # Laya cross-path identity: Python gate path vs Node shipped path, item by item on the fixed held-out
++  # items, for the shipped build (packed S2c graph), packed feed included.
++  #
++  # Runs on a GitHub-hosted runner. There is deliberately no self-hosted runner: this repository is
++  # public, and a self-hosted runner would run fork code on our hardware.
++  #
++  # The 1.7 GB model bundle is downloaded from a pinned URL, and its SHA-256 is checked before it is
++  # extracted or used (the job fails on mismatch, on a cache hit too). The archive is cached between runs.
++  #
++  # Triggers: push to main and workflow_dispatch only, never pull_request. The job is skipped on
++  # pull requests. It also fails, by design, until the bundle is published at the URL below.
++  # To build the archive: tools/evaluator-training/laya-node/make-bundle-archive.sh
++  laya-crosspath:
++    if: ${{ github.event_name != 'pull_request' }}
++    runs-on: ubuntu-latest
++    timeout-minutes: 90
++    permissions:
++      contents: read
++    env:
++      AIRP_LAYA_CROSSPATH_REQUIRED: '1'
++      # Where the bundle is published. Override with the repository variable AIRP_LAYA_BUNDLE_URL.
++      LAYA_BUNDLE_URL: ${{ vars.AIRP_LAYA_BUNDLE_URL || 'https://github.com/AIRP-spec/inference-advocate/releases/download/laya-5766-fp32-packed/laya-5766-fp32-packed-bundle.tar.gz' }}
++      # What the bytes must be. Changing the model means changing this line in a reviewed commit.
++      LAYA_BUNDLE_SHA256: 30ecd3b5cb52fcc471c6f4ea73d659e4533f5e0a4aa3db6871b91d13b57d2c77
++      LAYA_BUNDLE_FILE: ${{ github.workspace }}/.laya-cache/laya-5766-fp32-packed-bundle.tar.gz
++    steps:
++      - uses: actions/checkout@v4
++
++      - uses: actions/setup-node@v4
++        with:
++          node-version: '22.x'
++          cache: npm
++
++      - uses: actions/setup-python@v5
++        with:
++          python-version: '3.12'
++
++      - name: restore the model bundle archive
++        id: bundle-cache
++        uses: actions/cache@v4
++        with:
++          path: .laya-cache
++          key: laya-bundle-${{ env.LAYA_BUNDLE_SHA256 }}
++
++      - name: download the model bundle (cache miss only)
++        if: steps.bundle-cache.outputs.cache-hit != 'true'
++        run: |
++          mkdir -p "$(dirname "$LAYA_BUNDLE_FILE")"
++          curl --fail --location --retry 3 --retry-delay 10 --output "$LAYA_BUNDLE_FILE" "$LAYA_BUNDLE_URL" || {
++            echo "::error::could not download the Laya bundle from $LAYA_BUNDLE_URL. It has to be published there first (or set the repository variable AIRP_LAYA_BUNDLE_URL)."
++            exit 1
++          }
++
++      - name: verify the bundle SHA-256 (always, before use)
++        run: |
++          echo "${LAYA_BUNDLE_SHA256}  ${LAYA_BUNDLE_FILE}" | sha256sum --check - || {
++            echo "::error::Laya bundle SHA-256 mismatch: refusing to use it"
++            rm -f "$LAYA_BUNDLE_FILE"
++            exit 1
++          }
++
++      - name: extract the bundle
++        run: |
++          mkdir -p "$RUNNER_TEMP/laya"
++          tar -xzf "$LAYA_BUNDLE_FILE" -C "$RUNNER_TEMP/laya"
++          echo "AIRP_LAYA_BUNDLE_DIR_PACKED=$RUNNER_TEMP/laya/laya-5766-fp32-packed" >> "$GITHUB_ENV"
++
++      - name: python reference environment (pinned, CPU only)
++        run: |
++          python -m venv "$RUNNER_TEMP/laya-venv"
++          "$RUNNER_TEMP/laya-venv/bin/pip" install --quiet --index-url https://download.pytorch.org/whl/cpu torch==2.14.0
++          "$RUNNER_TEMP/laya-venv/bin/pip" install --quiet laya==0.3.21 onnxruntime==1.22.1 transformers==4.48.3 numpy==2.2.6
++          echo "AIRP_LAYA_PYTHON=$RUNNER_TEMP/laya-venv/bin/python" >> "$GITHUB_ENV"
++
++      - run: npm ci
++
++      - run: npm run build
++
++      - name: laya cross-path identity (packed feed, primitives, composed verdicts)
++        run: node --test tools/evaluator-training/laya-crosspath.test.mjs
