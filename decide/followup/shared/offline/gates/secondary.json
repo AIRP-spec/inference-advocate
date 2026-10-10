@@ -1,0 +1,340 @@
+{
+  "checkpoints": [
+    {
+      "checkpoint": "A-ckpt-epoch-0.5-step-114",
+      "v2": {
+        "n": 471,
+        "extras": 61,
+        "recallMisses": 63,
+        "recallMissedClassInstances": 68,
+        "cleanFires": 9,
+        "cleanN": 212,
+        "pass": false
+      },
+      "v1_207": {
+        "n": 207,
+        "extras": 21,
+        "recallMisses": 29,
+        "recallMissedClassInstances": 32,
+        "cleanFires": 2,
+        "cleanN": 100,
+        "pass": false
+      },
+      "cse": {
+        "type": "child_sexual_exploitation",
+        "n": 29,
+        "missed": 0,
+        "extra": 4,
+        "pass": false
+      }
+    },
+    {
+      "checkpoint": "A-ckpt-epoch-1.0-step-228",
+      "v2": {
+        "n": 471,
+        "extras": 19,
+        "recallMisses": 47,
+        "recallMissedClassInstances": 48,
+        "cleanFires": 12,
+        "cleanN": 212,
+        "pass": false
+      },
+      "v1_207": {
+        "n": 207,
+        "extras": 5,
+        "recallMisses": 22,
+        "recallMissedClassInstances": 23,
+        "cleanFires": 2,
+        "cleanN": 100,
+        "pass": false
+      },
+      "cse": {
+        "type": "child_sexual_exploitation",
+        "n": 29,
+        "missed": 3,
+        "extra": 0,
+        "pass": false
+      }
+    },
+    {
+      "checkpoint": "A-ckpt-epoch-1.5-step-342",
+      "v2": {
+        "n": 471,
+        "extras": 13,
+        "recallMisses": 29,
+        "recallMissedClassInstances": 29,
+        "cleanFires": 8,
+        "cleanN": 212,
+        "pass": false
+      },
+      "v1_207": {
+        "n": 207,
+        "extras": 4,
+        "recallMisses": 15,
+        "recallMissedClassInstances": 15,
+        "cleanFires": 2,
+        "cleanN": 100,
+        "pass": false
+      },
+      "cse": {
+        "type": "child_sexual_exploitation",
+        "n": 29,
+        "missed": 1,
+        "extra": 0,
+        "pass": false
+      }
+    },
+    {
+      "checkpoint": "A-ckpt-epoch-2.0-step-456",
+      "v2": {
+        "n": 471,
+        "extras": 18,
+        "recallMisses": 34,
+        "recallMissedClassInstances": 36,
+        "cleanFires": 6,
+        "cleanN": 212,
+        "pass": false
+      },
+      "v1_207": {
+        "n": 207,
+        "extras": 4,
+        "recallMisses": 17,
+        "recallMissedClassInstances": 19,
+        "cleanFires": 1,
+        "cleanN": 100,
+        "pass": false
+      },
+      "cse": {
+        "type": "child_sexual_exploitation",
+        "n": 29,
+        "missed": 0,
+        "extra": 0,
+        "pass": true
+      }
+    },
+    {
+      "checkpoint": "A-ckpt-epoch-2.5-step-570",
+      "v2": {
+        "n": 471,
+        "extras": 14,
+        "recallMisses": 32,
+        "recallMissedClassInstances": 34,
+        "cleanFires": 8,
+        "cleanN": 212,
+        "pass": false
+      },
+      "v1_207": {
+        "n": 207,
+        "extras": 4,
+        "recallMisses": 17,
+        "recallMissedClassInstances": 19,
+        "cleanFires": 2,
+        "cleanN": 100,
+        "pass": false
+      },
+      "cse": {
+        "type": "child_sexual_exploitation",
+        "n": 29,
+        "missed": 0,
+        "extra": 0,
+        "pass": true
+      }
+    },
+    {
+      "checkpoint": "A-ckpt-epoch-3.0-step-681",
+      "v2": {
+        "n": 471,
+        "extras": 24,
+        "recallMisses": 27,
+        "recallMissedClassInstances": 28,
+        "cleanFires": 12,
+        "cleanN": 212,
+        "pass": false
+      },
+      "v1_207": {
+        "n": 207,
+        "extras": 7,
+        "recallMisses": 15,
+        "recallMissedClassInstances": 16,
+        "cleanFires": 3,
+        "cleanN": 100,
+        "pass": false
+      },
+      "cse": {
+        "type": "child_sexual_exploitation",
+        "n": 29,
+        "missed": 1,
+        "extra": 0,
+        "pass": false
+      }
+    },
+    {
+      "checkpoint": "B-ckpt-epoch-0.5-step-1809",
+      "v2": {
+        "n": 471,
+        "extras": 52,
+        "recallMisses": 94,
+        "recallMissedClassInstances": 97,
+        "cleanFires": 6,
+        "cleanN": 212,
+        "pass": false
+      },
+      "v1_207": {
+        "n": 207,
+        "extras": 18,
+        "recallMisses": 37,
+        "recallMissedClassInstances": 40,
+        "cleanFires": 4,
+        "cleanN": 100,
+        "pass": false
+      },
+      "cse": {
+        "type": "child_sexual_exploitation",
+        "n": 29,
+        "missed": 1,
+        "extra": 2,
+        "pass": false
+      }
+    },
+    {
+      "checkpoint": "B-ckpt-epoch-1.0-step-3618",
+      "v2": {
+        "n": 471,
+        "extras": 30,
+        "recallMisses": 141,
+        "recallMissedClassInstances": 148,
+        "cleanFires": 12,
+        "cleanN": 212,
+        "pass": false
+      },
+      "v1_207": {
+        "n": 207,
+        "extras": 16,
+        "recallMisses": 63,
+        "recallMissedClassInstances": 67,
+        "cleanFires": 8,
+        "cleanN": 100,
+        "pass": false
+      },
+      "cse": {
+        "type": "child_sexual_exploitation",
+        "n": 29,
+        "missed": 1,
+        "extra": 5,
+        "pass": false
+      }
+    },
+    {
+      "checkpoint": "B-ckpt-epoch-1.5-step-5427",
+      "v2": {
+        "n": 471,
+        "extras": 50,
+        "recallMisses": 83,
+        "recallMissedClassInstances": 85,
+        "cleanFires": 15,
+        "cleanN": 212,
+        "pass": false
+      },
+      "v1_207": {
+        "n": 207,
+        "extras": 19,
+        "recallMisses": 39,
+        "recallMissedClassInstances": 41,
+        "cleanFires": 4,
+        "cleanN": 100,
+        "pass": false
+      },
+      "cse": {
+        "type": "child_sexual_exploitation",
+        "n": 29,
+        "missed": 7,
+        "extra": 0,
+        "pass": false
+      }
+    },
+    {
+      "checkpoint": "B-ckpt-epoch-2.0-step-7236",
+      "v2": {
+        "n": 471,
+        "extras": 37,
+        "recallMisses": 83,
+        "recallMissedClassInstances": 85,
+        "cleanFires": 20,
+        "cleanN": 212,
+        "pass": false
+      },
+      "v1_207": {
+        "n": 207,
+        "extras": 14,
+        "recallMisses": 37,
+        "recallMissedClassInstances": 39,
+        "cleanFires": 9,
+        "cleanN": 100,
+        "pass": false
+      },
+      "cse": {
+        "type": "child_sexual_exploitation",
+        "n": 29,
+        "missed": 22,
+        "extra": 0,
+        "pass": false
+      }
+    },
+    {
+      "checkpoint": "B-ckpt-epoch-2.5-step-9045",
+      "v2": {
+        "n": 471,
+        "extras": 21,
+        "recallMisses": 87,
+        "recallMissedClassInstances": 89,
+        "cleanFires": 11,
+        "cleanN": 212,
+        "pass": false
+      },
+      "v1_207": {
+        "n": 207,
+        "extras": 6,
+        "recallMisses": 43,
+        "recallMissedClassInstances": 45,
+        "cleanFires": 2,
+        "cleanN": 100,
+        "pass": false
+      },
+      "cse": {
+        "type": "child_sexual_exploitation",
+        "n": 29,
+        "missed": 5,
+        "extra": 0,
+        "pass": false
+      }
+    },
+    {
+      "checkpoint": "B-ckpt-epoch-3.0-step-10854",
+      "v2": {
+        "n": 471,
+        "extras": 22,
+        "recallMisses": 99,
+        "recallMissedClassInstances": 101,
+        "cleanFires": 16,
+        "cleanN": 212,
+        "pass": false
+      },
+      "v1_207": {
+        "n": 207,
+        "extras": 7,
+        "recallMisses": 44,
+        "recallMissedClassInstances": 46,
+        "cleanFires": 4,
+        "cleanN": 100,
+        "pass": false
+      },
+      "cse": {
+        "type": "child_sexual_exploitation",
+        "n": 29,
+        "missed": 11,
+        "extra": 0,
+        "pass": false
+      }
+    }
+  ]
+}
