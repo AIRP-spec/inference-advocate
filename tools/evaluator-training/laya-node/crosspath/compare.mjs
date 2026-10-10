@@ -28,7 +28,7 @@ export function comparePaths(pyRows, nodeRows, pins, composition) {
   let minPyMargin = Infinity;
   const ids = [...py.keys()];
   if (ids.length !== nd.size || !ids.every((i) => nd.has(i))) problems.push({ kind: 'item-set', py: ids.length, node: nd.size });
-  let primsIdentical = 0, composedIdentical = 0, decodeIdentical = 0;
+  let primsIdentical = 0, composedIdentical = 0, decodeIdentical = 0, feedIdentical = 0, feedChecked = 0;
   for (const id of ids) {
     const a = py.get(id), b = nd.get(id);
     if (!b) continue;
@@ -45,10 +45,16 @@ export function comparePaths(pyRows, nodeRows, pins, composition) {
     const primsOk = key(a.prims) === key(b.prims);
     const compOk = JSON.stringify([...pyComposed].sort()) === JSON.stringify([...nodeComposed].sort())
       && JSON.stringify([...nodeComposed].sort()) === JSON.stringify([...(b.composed ?? nodeComposed)].sort());
+    // Packed layout (python row carries feed_sha256): both paths must have fed the model byte-identical tensors (SHA over all seven feed arrays).
+    if (a.feed_sha256 !== undefined) {
+      feedChecked++;
+      if (a.feed_sha256 === b.feedSha256) feedIdentical++;
+      else problems.push({ id, kind: 'packed-feed', python: a.feed_sha256, node: b.feedSha256 });
+    }
     primsIdentical += primsOk; composedIdentical += compOk; decodeIdentical += decOk;
     if (!primsOk || !compOk || !decOk) problems.push({ id, python: a.prims, node: b.prims, pythonComposed: pyComposed, nodeComposed, decodeOnPythonLogits: decOk });
   }
-  return { n: ids.length, primsIdentical, composedIdentical, decodeIdentical, maxAbsLogitDiff, minPythonMargin: minPyMargin,
+  return { n: ids.length, primsIdentical, composedIdentical, decodeIdentical, feedChecked, feedIdentical, maxAbsLogitDiff, minPythonMargin: minPyMargin,
     pass: problems.length === 0, problems };
 }
 

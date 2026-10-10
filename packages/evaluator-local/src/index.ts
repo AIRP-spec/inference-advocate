@@ -72,7 +72,22 @@ export {
   type LayaLogits,
   type LayaLastPass,
   type LayaLocalEvaluatorOptions,
+  type LayaLayoutPin,
 } from './laya-evaluator.js';
+export {
+  packRows,
+  chooseCap,
+  packedFeedSha256,
+  packedFeedArrays,
+  buildQuestionPrefix,
+  completeSequence,
+  toInternal as layaToInternal,
+  renderOptions as layaRenderOptions,
+  COST_A as LAYA_PACK_COST_A,
+  COST_B as LAYA_PACK_COST_B,
+  type PackRow,
+  type PackedFeed,
+} from './laya-packed.js';
 export { verifyModelSha256, sha256FileHex, normalizeDigest } from './digest.js';
 export {
   type PerPrimitiveStub,

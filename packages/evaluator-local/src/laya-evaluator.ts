@@ -11,8 +11,12 @@
 //     wording, max_len / head_max_len, and the SHAs of laya_config.json and the tokenizer files;
 //   - the composition (laya.compositionSha256), which must also equal the pins file's.
 //
-// One forward pass per response: @receptron/laya's systemOne builds the 17 question-conditioned
-// rows (laya build_sequence layout), pads them into one batch, and runs the session once.
+// Two feed layouts, chosen by the pins file (`layout`), both one forward pass per response:
+//   padded (default, the original pins): @receptron/laya's systemOne builds the 17 question-conditioned
+//     rows (laya build_sequence layout), pads them into one batch, and runs the session once.
+//   packed (laya-5766-fp32-packed pins): the same 17 rows, bin-packed without padding (laya-packed.ts,
+//     a port of decide/adopt/cpu-speed pack_common.py) and run once through the packed graph, with
+//     ORT intra-op spinning off. Same verdicts as padded (0 disagreements on 471 items, Python side).
 // Decisions are taken from that pass's raw logits, not from systemOne's answers, because
 // systemOne rounds probabilities to four decimals and a rounded P(true) of 0.49996 would read
 // as 0.5 and fire where the Python gate path did not. The decode is layaPrimitivesFromLogits,
@@ -24,6 +28,19 @@ import type { EvaluationRequest, Evaluator, Flag, LocalEvaluatorConfig, Taxonomy
 import { sha256FileHex, verifyModelSha256, normalizeDigest } from './digest.js';
 import { compose as composePrimitives, type Composition, type PrimitivesVerdict } from './compose-primitives.js';
 import { LOAD_WARMUP_REQUEST, warmAtLoad } from './local-evaluator.js';
+import {
+  QTYPES,
+  buildQuestionPrefix,
+  completeSequence,
+  packRows,
+  packedFeedArrays,
+  packedFeedSha256,
+  renderOptions,
+  toInternal,
+  type InternalQuestion,
+  type LayaTokenIds,
+  type PackRow,
+} from './laya-packed.js';
 
 export const LAYA_PINS_SCHEMA = 'airp-laya-pins/1';
 /** @receptron/laya expects this file name inside its bundle directory. */
@@ -51,6 +68,20 @@ export interface LayaPins {
   thresholds: { mode: string; stance: 'argmax'; noul: Record<string, number> };
   composition: { file: string; sha256: string };
   primitiveKinds: { objects: string[]; qualifiers: string[] };
+  /** Absent = padded (receptron systemOne). */
+  layout?: LayaLayoutPin;
+  /** ORT session settings pinned with the model: they change speed, never verdicts. */
+  ort?: { allowSpinning?: boolean };
+}
+
+export interface LayaLayoutPin {
+  kind: 'padded' | 'packed';
+  /** packed only: how the bin capacity is chosen. */
+  packCap?: 'max' | 'costmin';
+  costA?: number;
+  costB?: number;
+  /** SHA-256 of the Python pack_common.py this layout is a port of (provenance, checked in CI). */
+  packCommonSha256?: string;
 }
 
 export interface LayaLocalEvaluatorOptions {
@@ -140,6 +171,16 @@ export function validateLayaPins(pins: LayaPins): void {
     if (typeof t !== 'number' || !(t > 0)) throw new Error('laya pins: temperatures must be positive');
   }
   if (pins.thresholds.stance !== 'argmax') throw new Error('laya pins: stance decision must be argmax');
+  const lay = pins.layout;
+  if (lay !== undefined) {
+    if (lay.kind !== 'padded' && lay.kind !== 'packed') throw new Error(`laya pins: unknown layout ${String(lay.kind)}`);
+    if (lay.kind === 'packed') {
+      if (lay.packCap !== 'max' && lay.packCap !== 'costmin') throw new Error('laya pins: packed layout needs packCap max|costmin');
+      if (lay.packCap === 'costmin' && !(typeof lay.costA === 'number' && typeof lay.costB === 'number' && lay.costA > 0 && lay.costB >= 0)) {
+        throw new Error('laya pins: costmin packing needs positive costA and costB');
+      }
+    }
+  }
 }
 
 function verifyPinnedFile(path: string, expected: string, what: string): void {
@@ -182,6 +223,7 @@ export function loadLayaPins(opts: Pick<LayaLocalEvaluatorOptions, 'modelPath' |
 }
 
 type OrtTensor = { data: unknown; dims: readonly number[] };
+type RawRun = (feeds: Record<string, OrtTensor>, fetches?: unknown) => Promise<Record<string, OrtTensor>>;
 type LayaInstance = {
   session: { run: (feeds: Record<string, OrtTensor>, fetches?: unknown, opts?: unknown) => Promise<Record<string, OrtTensor>> };
   systemOne: (state: string, questions: Record<string, LayaQuestion>) => Promise<{ answers: Record<string, { choice?: string }>; usage: { input_tokens: number } }>;
@@ -194,7 +236,20 @@ export interface LayaLastPass {
   composed: string[];
   inputTokens: number;
   batchRows: number;
+  /** padded: the padded sequence length; packed: the bin capacity. */
   paddedLength: number;
+  layout: 'padded' | 'packed';
+  /** packed only: number of bins fed. */
+  bins?: number;
+  /** packed only: SHA-256 of the feed tensors (see packedFeedSha256). Computed on demand, not on the hot path. */
+  feedSha256?: () => string;
+}
+
+interface PackedPrep {
+  encode: (text: string) => number[];
+  ids: LayaTokenIds;
+  prefixes: Array<{ prefix: number[]; markers: number[] }>;
+  qtypes: number[];
 }
 
 export class LayaLocalEvaluator implements Evaluator {
@@ -208,6 +263,9 @@ export class LayaLocalEvaluator implements Evaluator {
   #lastRun: { logits: Float32Array; dims: readonly number[]; paddedLength: number } | undefined;
   #queue: Promise<void> = Promise.resolve();
   #warming = false;
+  #rawRun: RawRun | undefined;
+  #ort: { Tensor: new (type: string, data: Float32Array | BigInt64Array | Uint8Array, dims: number[]) => OrtTensor } | undefined;
+  #packed: PackedPrep | undefined;
 
   /** Same observables as LocalEvaluator, so warmAtLoad can restore them. */
   lastRawByClass: Record<string, string> = {};
@@ -235,17 +293,21 @@ export class LayaLocalEvaluator implements Evaluator {
       Laya: { load: (o: Record<string, unknown>) => Promise<LayaInstance> };
     };
     const ort = (await import('onnxruntime-node')) as unknown as {
-      Tensor: new (type: string, data: Float32Array, dims: number[]) => OrtTensor;
+      Tensor: new (type: string, data: Float32Array | BigInt64Array | Uint8Array, dims: number[]) => OrtTensor;
       env?: { versions?: Record<string, string> };
     };
     const sessionOptions: Record<string, unknown> = { interOpNumThreads: 1, executionMode: 'sequential' };
     if (this.#opts.intraOpNumThreads !== undefined) sessionOptions['intraOpNumThreads'] = this.#opts.intraOpNumThreads;
+    // Pinned with the model: ORT intra-op spinning off (session.intra_op.allow_spinning = "0"). Speed only.
+    if (this.pins.ort?.allowSpinning === false) sessionOptions['extra'] = { session: { intra_op: { allow_spinning: '0' } } };
     const laya = await Laya.load({ modelDir: dirname(this.#opts.modelPath), executionProviders: ['cpu'], sessionOptions });
     // The pinned graph names its second output act_logits; @receptron/laya reads act_probs. Adapt
     // that one name, and keep this pass's raw logits for the pinned decode. Nothing else changes:
     // feeds, the batch, and the logits tensor reach the caller as the session produced them.
     const session = laya.session;
     const run = session.run.bind(session);
+    this.#rawRun = run as unknown as RawRun;
+    this.#ort = ort;
     session.run = async (feeds) => {
       const out = await run(feeds, ['logits', 'act_logits']);
       const logits = out['logits'];
@@ -264,6 +326,7 @@ export class LayaLocalEvaluator implements Evaluator {
       return { logits, act_probs: new ort.Tensor('float32', probs, [n, c]) };
     };
     this.#laya = laya;
+    if (this.pins.layout?.kind === 'packed') this.#packed = this.#preparePacked(laya);
     this.systemInfo = `onnxruntime-node ${ort.env?.versions?.['node'] ?? ''}`.trim();
     console.log(`local-laya@${this.version}: session open (${this.pins.name}) in ${Date.now() - started}ms`);
     if (this.#opts.skipWarmup) return;
@@ -307,9 +370,18 @@ export class LayaLocalEvaluator implements Evaluator {
     if (!laya) throw new Error('laya evaluator failed to load');
     const defs = this.pins.questions.definitions;
     this.#lastRun = undefined;
-    const res = await laya.systemOne(content, defs);
+    let inputTokens: number;
+    let packedInfo: { bins: number; feedSha256: () => string } | undefined;
+    if (this.#packed) {
+      const r = await this.#runPacked(content, this.#packed);
+      inputTokens = r.inputTokens;
+      packedInfo = { bins: r.bins, feedSha256: r.feedSha256 };
+    } else {
+      const res = await laya.systemOne(content, defs);
+      inputTokens = res.usage.input_tokens;
+    }
     const run = this.#lastRun as { logits: Float32Array; dims: readonly number[]; paddedLength: number } | undefined;
-    if (!run) throw new Error('laya: systemOne did not run the session');
+    if (!run) throw new Error('laya: the session did not run');
     const order = this.pins.questions.order;
     const [rows = 0, k = 0] = run.dims;
     if (rows !== order.length) throw new Error(`laya: ${rows} rows for ${order.length} questions`);
@@ -324,10 +396,52 @@ export class LayaLocalEvaluator implements Evaluator {
       logits,
       primitives,
       composed: composePrimitives(primitives, this.#composition),
-      inputTokens: res.usage.input_tokens,
+      inputTokens,
       batchRows: rows,
       paddedLength: run.paddedLength,
+      layout: packedInfo ? 'packed' : 'padded',
+      ...(packedInfo ? { bins: packedInfo.bins, feedSha256: packedInfo.feedSha256 } : {}),
     };
+  }
+
+  /**
+   * Packed layout: tokenizer, special ids and the fixed per-question prefixes. The tokenizer is
+   * @receptron/laya's own (the instance's `encode` and `ids`, the objects its systemOne uses), so
+   * token ids are the same function as on the padded path.
+   */
+  #preparePacked(laya: LayaInstance): PackedPrep {
+    const inner = laya as unknown as { encode?: (t: string) => number[]; ids?: LayaTokenIds; config?: { max_len: number; head_max_len: number } };
+    if (typeof inner.encode !== 'function' || !inner.ids) {
+      throw new Error('laya: @receptron/laya no longer exposes encode/ids; the packed layout needs them (pinned to 0.1.2)');
+    }
+    const defs = this.pins.questions.definitions;
+    const iq = this.pins.questions.order.map((q) => toInternal(defs[q] as LayaQuestion));
+    const prefixes = iq.map((q: InternalQuestion) => {
+      const p = buildQuestionPrefix(inner.encode as (t: string) => number[], inner.ids as LayaTokenIds, q, this.pins.headMaxLen);
+      if (p.markers.length !== renderOptions(q).length) throw new Error('laya: question options do not fit in head_max_len');
+      return p;
+    });
+    return { encode: inner.encode, ids: inner.ids, prefixes, qtypes: iq.map((q) => QTYPES[q.t] as number) };
+  }
+
+  async #runPacked(content: string, prep: PackedPrep): Promise<{ inputTokens: number; bins: number; feedSha256: () => string }> {
+    const lay = this.pins.layout as LayaLayoutPin;
+    const ort = this.#ort;
+    const run = this.#rawRun;
+    if (!ort || !run) throw new Error('laya: session not open');
+    const state = prep.encode(content.split(prep.ids.maskTok).join(' '));
+    const rows: PackRow[] = prep.prefixes.map((p, i) => {
+      const seq = completeSequence(p, state, prep.ids.sep, this.pins.maxLen);
+      return { ids: seq.ids, markers: seq.markers, qtype: prep.qtypes[i] as number };
+    });
+    const feed = packRows(rows, prep.ids.pad, lay.packCap ?? 'costmin', lay.costA, lay.costB);
+    const feeds: Record<string, OrtTensor> = {};
+    for (const a of packedFeedArrays(feed)) feeds[a.name] = new ort.Tensor(a.type, a.data, a.dims) as unknown as OrtTensor;
+    const out = await run(feeds, ['logits']);
+    const logits = out['logits'];
+    if (!logits || !(logits.data instanceof Float32Array)) throw new Error('laya: packed graph did not return float32 logits');
+    this.#lastRun = { logits: logits.data, dims: logits.dims, paddedLength: feed.cap };
+    return { inputTokens: rows.reduce((s, r) => s + r.ids.length, 0), bins: feed.bins, feedSha256: () => packedFeedSha256(feed) };
   }
 
   async #evaluateLocked(req: EvaluationRequest): Promise<Flag[]> {

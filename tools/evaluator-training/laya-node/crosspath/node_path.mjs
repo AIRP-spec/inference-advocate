@@ -10,7 +10,11 @@
  *
  * Usage: node node_path.mjs --bundle DIR --pins PINS.json --pins-sha HEX --composition C.json
  *          --composition-sha HEX --suite SUITE.json --ids IDS.json|all --out OUT.jsonl
- *          [--threads N] [--summary SUMMARY.json]
+ *          [--threads N] [--warmup N] [--summary SUMMARY.json]
+ *
+ * --warmup N: N untimed evaluate() calls on the first N suite items before the timed pass, the same
+ * protocol as the Python bench (bench2.py --warmup). The timed pass still covers every id in --ids.
+ * With a packed pins file the per-item record also carries the feed SHA-256 (computed after the timer).
  */
 import { readFileSync, writeFileSync } from 'node:fs';
 import { join, resolve, dirname } from 'node:path';
@@ -47,6 +51,8 @@ const t1 = performance.now();
 await ev.load();
 const loadMs = performance.now() - t1;
 
+const warmup = Number(arg('--warmup', 0));
+for (const it of suite.slice(0, warmup)) await ev.evaluate({ providerId: 'crosspath', prompt: '', content: it.content });
 const lines = [];
 const ms = [];
 for (const [n, id] of ids.entries()) {
@@ -58,7 +64,8 @@ for (const [n, id] of ids.entries()) {
   ms.push(dt);
   const p = ev.lastPass;
   lines.push(JSON.stringify({ id, path: 'node', logits: p.logits, prims: p.primitives, composed: p.composed,
-    flags: flags.map((f) => f.type), inputTokens: p.inputTokens, paddedLength: p.paddedLength, ms: dt }));
+    flags: flags.map((f) => f.type), inputTokens: p.inputTokens, paddedLength: p.paddedLength, ms: dt,
+    layout: p.layout, ...(p.layout === 'packed' ? { bins: p.bins, feedSha256: p.feedSha256() } : {}) }));
   if ((n + 1) % 50 === 0) console.log(`node path ${n + 1}/${ids.length}`);
 }
 writeFileSync(arg('--out'), lines.join('\n') + '\n');
@@ -71,6 +78,7 @@ const summary = {
   n: ms.length, median_ms: median, p95_ms: q(0.95), mean_ms: ms.reduce((a, b) => a + b, 0) / ms.length,
   min_ms: sorted[0], max_ms: sorted[sorted.length - 1], verify_ms: verifyMs, load_ms: loadMs, warmup_ms: ev.warmupMs,
   evaluator: `${ev.id}@${ev.version}`, node: process.version, onnxruntime_node: ortPkg, receptron_laya: layaPkg,
+  layout: ev.pins.layout?.kind ?? 'padded', allowSpinning: ev.pins.ort?.allowSpinning === false ? 0 : 'ORT default', warmupItems: warmup,
   intraOpNumThreads: threads ?? 'ORT default', host: os.hostname(), cpu: os.cpus()[0]?.model, nproc: os.cpus().length,
   loadavg: os.loadavg(), finished: new Date().toISOString(),
 };

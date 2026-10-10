@@ -1,14 +1,14 @@
 {
   "kind": "local",
   "engine": "laya-onnx",
-  "modelPath": "/path/to/laya-5766-fp32-bundle/laya.onnx",
-  "modelSha256": "0b5694036a20f3093f2cac7c8f6d8569400756e9982a28ccd4070997a522aa8e",
+  "modelPath": "/path/to/laya-5766-fp32-packed/laya.onnx",
+  "modelSha256": "910eec0576e3e8ecd61064c1856f8d34c3d29ba07f90044fcfcc7c385a992696",
   "laya": {
-    "pinsPath": "tools/evaluator-training/laya-node/pins/laya-5766-fp32.pins.json",
-    "pinsSha256": "b0c9dd23bb71233db4026d6531fa1484c0f8b64b307ac1bd3b7330a911f1edbd",
+    "pinsPath": "tools/evaluator-training/laya-node/pins/laya-5766-fp32-packed.pins.json",
+    "pinsSha256": "6cca52cf615f4a7988d8310d1d4bf3810937cf988f242f43bf14d446033a0b73",
     "compositionPath": "tools/evaluator-training/primitives/compositions/airp-v0.5.0.json",
     "compositionSha256": "4def0b8fd339713bd261106cb10235949f4bd1bc4e3631a88dd7cc511b0087e0",
     "intraOpNumThreads": 8
   },
-  "note": "Laya ckpt-epoch-1.5-step-5766 fp32. Non-default development path; omit this file for the rule evaluator."
+  "note": "Laya ckpt-epoch-1.5-step-5766 fp32, packed S2c graph (the padded fallback: laya-5766-fp32.pins.json, model 0b569403…). Non-default development path; omit this file for the rule evaluator."
 }
