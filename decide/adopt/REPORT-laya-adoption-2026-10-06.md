@@ -112,3 +112,9 @@ Key model SHAs: 5766 fp32 padded ONNX `0b569403…aa8e` (the Node pin); packed (
 - Node integration: draft PR #29 (`adopt/laya-node-evaluator`, stacked on #28). Its CI job is shipped as `decide/adopt/node/ci-laya-crosspath.workflow.patch` because the pushing token lacks GitHub's `workflow` scope.
 - Local format-patches: `decide/adopt/patches/0001–0005` (0005 = this report) and `decide/adopt/node/patches/0001–0006`.
 - Pre-existing, not caused by this work: at 261aea1, the `packages/evaluator-local` tests fail to compile (`test/prompt-v4.test.ts`), which stops root `npm test` before the tools tests.
+
+## Follow-up addendum (2026-10-10): what changed after this report
+
+- **ADR corrected** (status still Proposed): the int8 result at 5766 (this build failed: 220/471 verdicts changed, CSE fail), the accuracy-matched fp32 CPU line (1069 / 1305 ms), the CPU argument resting on fp32 only, the short-input limit (every latency number is on near-empty inputs; real-length latency unknown, Task 3a), and the work plan with the shared-encoding experiment (Task 3b) as the next speed lever.
+- **S2c ported into the Node path (draft #29).** Cross-path identity after the port: 471/471 primitives, 471/471 composed verdicts, packed feed tensors identical on 471/471, max |logit delta| 8.28e-4. **Node on the VPS: 1078 ms median / 1237 ms p95** (was 2209 / 2604 ms). This supersedes the Node latency line above.
+- **CI: no self-hosted runner.** The open decision above is replaced by: publish the bundle archive (994 MB, SHA-256 `30ecd3b5…2d77`) so a hosted-runner job can download it, and apply `decide/adopt/node/ci-laya-crosspath-hosted.workflow.patch` (on #29) with a workflow-scoped token. Pending the real-length latency picture.
