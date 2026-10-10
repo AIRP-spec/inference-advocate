@@ -26,7 +26,7 @@ Declared rule (commit `9127136`, 2026-10-05 15:21 NPT, before any pod started): 
 |---|---|---|---|
 | 1. Quality | Laya's v2 extras + recall misses no more than 5 worse than Qwen's | Laya 36 (16 + 20) vs Qwen 55 (31 + 24): Laya is **19 better** | **Pass** |
 | 2. CSE | Laya passes the CSE named gate on all converged checkpoints (7688, 9610, 10099) | n=29, missed 0, extra 0 on each | **Pass** |
-| 3. CPU latency | Laya's CPU median under 1000 ms per response on the Nepal VPS | 2379 ms fp32, 1209 ms int8 | **Fail** |
+| 3. CPU latency | Laya's CPU median under 1000 ms per response on the Nepal VPS | 2379 ms fp32, 1209 ms int8 (as measured in the run; superseded below by the gated build) | **Fail** |
 
 As written, the rule therefore said: **stay with per-primitive Qwen.**
 
@@ -37,13 +37,13 @@ Head-to-head on the measures the run produced:
 | v2 extras / misses / clean fires | **16 / 20 / 13** | 31 / 24 / 21 |
 | Item-level, right where the other is wrong (v2, n=471) | **35** | 17 |
 | CSE named gate across converged checkpoints | **clean** | selected checkpoint fails |
-| CPU median, Nepal VPS | **2379 ms fp32, 1209 ms int8** | ~3900 ms |
+| CPU median, Nepal VPS (fp32) | **1069 ms** (p95 1305 ms), accuracy-matched build (S2c) | ~3900 ms |
 
 Notes on the numbers (provenance, not qualifications of the decision):
 - **Item level.** Both models are right on 401 items and both are wrong on 18. "Right" means the composed class set exactly equals the gold `expect`.
 - **CSE.** Qwen's selected checkpoint gives missed 0, extra 2. Every Qwen checkpoint gated in the run failed CSE (report §4).
-- **Laya CPU.** Measured in Step 3 on `ckpt-epoch-2.5-step-9610`, which has the same architecture as 5766 (identical `rl_agent_config.json` and tokenizer, same ModernBERT config). Runtime was ONNX Runtime 1.22.1 with 8 threads over all 471 items. The measurement is **one forward pass per response**: one `session.run` over 17 question-conditioned rows. `decide/adopt/ONE-PASS.md` confirms this from the code that ran. Suite responses are short (median 12 tokens), so these medians are a lower bound for real chat responses (`decide/step3/CPU-LATENCY.md` §3.2).
-- **int8.** The 1209 ms build has not yet been gated at 5766 (brief Task 2a). In Step 3, on the earlier checkpoint, int8 changed 87–101 decisions. So 1209 ms is a candidate number, not yet the number for the model as gated.
+- **Laya CPU.** The deciding-run figure (2379 ms fp32) was measured in Step 3 on `ckpt-epoch-2.5-step-9610`, which has the same architecture as 5766 (identical `rl_agent_config.json` and tokenizer, same ModernBERT config), with ONNX Runtime 1.22.1 and 8 threads over all 471 items. The number this ADR relies on is the accuracy-matched fp32 build of the selected checkpoint 5766, measured afterwards (`decide/adopt/CPU-SPEED.md`): **1069 ms median / 1305 ms p95** on the same VPS, all 471 items, down from 2313 / 3431 ms. Three changes got there (S2c): ORT `session.intra_op.allow_spinning=0`, a padding-free packed export (block-diagonal attention, still one `session.run`), and a cost-minimizing bin cap for the packing. Against fp32 baseline, that build has **0 composed-verdict disagreements and 0 primitive flips out of 471**, max |Δlogit| 4.1e-4, and the CSE named gate passes. The measurement is **one forward pass per response**: one `session.run` over 17 question-conditioned rows (`decide/adopt/ONE-PASS.md`, confirmed from the code that ran). The 1000 ms bar of clause 3 is not met by this build either (median 1069 ms). See section 6 for the limits of every latency number here.
+- **int8.** The 1209 ms int8 figure is not a number for a model that answers like fp32. At 5766, **this int8 build failed the gate** (brief Task 2a, `decide/adopt/INT8-GATE.md`): it changed **220 of 471** composed verdicts against fp32 and failed the CSE named gate. On the converged checkpoints (7688, 9610, 10099) it changed 223 to 234 verdicts, and also failed CSE. In Step 3, the earlier checkpoint changed 87 to 101 decisions under int8, so the jump to 220 suggests a defect in the quantized build rather than an inherent int8 limit. That has not been investigated, and this ADR makes no claim about int8 in general. The deployment build is fp32.
 - **What does not favor Laya.** Two numbers outside the decision measures, disclosed so the "leads everywhere" argument is not overstated:
   - Validation composed-class macro-F1 is 0.8259 for Laya and 0.8351 for Qwen. This was the checkpoint-*selection* metric, on the validation split, and not a decision clause. Stance accuracy on validation is 0.9109 for Laya and 0.8926 for Qwen.
   - On the v1-207 subset of v2, Laya is 5 / 10 / 4 and Qwen is 11 / 10 / 7, so misses tie at 10.
@@ -55,7 +55,7 @@ Notes on the numbers (provenance, not qualifications of the decision):
 
 **The defect.** Clause 3 required Laya's CPU median to be under 1000 ms before switching. It never applied the same bar to the alternative. Per-primitive Qwen runs at about 3.9 s on the same CPU, so it fails clause 3 by a wider margin than Laya does. When clause 3 fails, the rule falls back to Qwen, which fails the same clause. "Stay with Qwen because Laya is too slow" picks the slower model. The defect is in how the rule is built, not in the measurement. A latency bar that only the challenger has to meet is not a latency requirement; it is a thumb on the scale for the incumbent.
 
-**Why the override does not carry the risk pre-registration guards against.** Pre-declared rules exist so that nobody can pick, after the fact, whichever measure or threshold favors the model they prefer. That risk exists only when the options trade off: one wins on some axes and loses on others, so the choice of measure decides the winner. Here there is no trade-off to exploit. On every axis the decision measured, Laya leads: composed extras, misses, clean fires, item-level wins, CSE on converged checkpoints, and CPU latency at both precisions. No choice among these measures, and no threshold on any of them, makes Qwen the better option. Applying clause 3 to both models fails both, and Laya fails it by less. The override changes the outcome only by fixing the defect. It does not pick a new measure.
+**Why the override does not carry the risk pre-registration guards against.** Pre-declared rules exist so that nobody can pick, after the fact, whichever measure or threshold favors the model they prefer. That risk exists only when the options trade off: one wins on some axes and loses on others, so the choice of measure decides the winner. Here there is no trade-off to exploit. On every axis the decision measured, Laya leads: composed extras, misses, clean fires, item-level wins, CSE on converged checkpoints, and CPU latency on fp32 (1069 ms against about 3900 ms for Qwen). The argument rests on fp32 only: the int8 build failed its gate and is not part of it. No choice among these measures, and no threshold on any of them, makes Qwen the better option. Applying clause 3 to both models fails both, and Laya fails it by less. The override changes the outcome only by fixing the defect. It does not pick a new measure.
 
 The original rule, its outcome, and this override all stay on record. The deciding-run report is unchanged.
 
@@ -77,13 +77,17 @@ Every write-up of this decision, including PR text, release notes, and roadmap e
 
 **The 1-second CPU median is a deployment target, not a switching criterion.** It does not decide which model we use. It is what the chosen model has to reach before it ships as a default on CPU.
 
-Work toward it follows the adoption brief: Task 2a (gate int8) first, then Task 3. Task 3 makes one change at a time, cheapest first:
-1. ORT threads and settings
-2. graph optimization
-3. maximum input length, chosen from the token distribution before gating
-4. only then a smaller encoder, as a separate experiment
+**Stated limit: every latency number so far, for both models, was measured on near-empty inputs.** The held-out responses have a median of 12 tokens (maximum 34). Real chat responses are longer and cost proportionally more, so these medians are lower bounds. Latency at real response lengths is unknown. It is being measured on a real-length set (follow-up Task 3a). Until that exists, "1069 ms" must not be read as the latency users will see.
 
-Every change is gated on v2 with item-level disagreement against the current build. A speedup that changes verdicts is a different model and must be measured as one. Latency is reported as median and p95 per item on the full 471-item suite, and finally in the Node runtime that ships, on the Nepal VPS.
+Work toward the target follows the adoption brief. Every change is gated on v2 with item-level disagreement against the current build. A speedup that changes verdicts is a different model and must be measured as one. Latency is reported as median and p95 per item on the full 471-item suite, and finally in the Node runtime that ships, on the Nepal VPS.
+
+Status (2026-10-06 and follow-up):
+- **Task 2a, int8 gate: done.** This int8 build failed: 220 of 471 verdicts changed at 5766, 223 to 234 on the converged checkpoints, CSE failed on all four. Keep fp32.
+- **Task 3 step 1, ORT threads and settings: done.** `allow_spinning=0` took the median from 2313 to 1890 ms with 0 disagreements.
+- **Task 3 step 2, graph optimization: done.** The ORT transformer optimizer fused no attention nodes (no gain, not adopted). The padding-free packed export (1130 ms) plus the cost-minimizing bin cap (S2c) reached **1069 ms median / 1305 ms p95** with 0 disagreements and 0 primitive flips.
+- **Task 3 step 3, maximum input length: done.** The token distribution was measured first (longest row 124 tokens). `max_len` 128 changes 0 rows on this suite and has no effect on latency here.
+- **Task 3 step 4, smaller encoder: done as a separate experiment, rejected.** ModernBERT-base retrained on the same labels, split, and rules reaches 433 / 505 ms, but fails the CSE named gate and disagrees with the large model on 45 of 471 composed verdicts. It is a different, weaker model.
+- **Next speed lever, Task 3b: shared encoding.** Test whether the response can be encoded once and shared across the 17 primitive rows, instead of 17 question-conditioned rows. This is an architecture change: it must be measured and gated as a new model (retrain, then v2 gate and item-level disagreement against the current build), not as a tuning step.
 
 ## Consequences
 
@@ -105,5 +109,7 @@ Every change is gated on v2 with item-level disagreement against the current bui
 - `tools/evaluator-training/primitives/decide-step4/DECLARATION.md` (commit `9127136`)
 - `decide/step3/CPU-LATENCY.md`
 - `decide/adopt/ONE-PASS.md`
+- `decide/adopt/INT8-GATE.md`
+- `decide/adopt/CPU-SPEED.md`
 - `decide/adopt/PER-PRIMITIVE.md`
 - Settled proxies `gold-proxies.v0.5.0.settled.json` (sha256 `b086cdac11f8af39b2d3984232ee0372d9ffe909acbd4b8d7fe6d4f653d08455`)
