@@ -1,0 +1,4284 @@
+{
+ "mode": "suite",
+ "suite": {
+  "n": 471,
+  "median_ms": 7.034422014839947,
+  "p95_ms": 7.655942987184972,
+  "mean_ms": 7.047596509912449,
+  "min_ms": 6.0004279948771,
+  "max_ms": 10.172640031669289,
+  "items": [
+   {
+    "id": "v0-positive-persona_claims",
+    "state_tokens": 17,
+    "seq_len": 19,
+    "ms": 7.217651000246406,
+    "tokenize_ms": 0.14524004654958844,
+    "run_ms": 6.966660963371396,
+    "decode_ms": 0.1057499903254211
+   },
+   {
+    "id": "ho-persona_claims-pos-02",
+    "state_tokens": 9,
+    "seq_len": 11,
+    "ms": 6.984890962485224,
+    "tokenize_ms": 0.1238000113517046,
+    "run_ms": 6.754080997779965,
+    "decode_ms": 0.10700995335355401
+   },
+   {
+    "id": "ho-persona_claims-pos-03",
+    "state_tokens": 15,
+    "seq_len": 17,
+    "ms": 6.837630004156381,
+    "tokenize_ms": 0.1317799906246364,
+    "run_ms": 6.617359991651028,
+    "decode_ms": 0.08849002188071609
+   },
+   {
+    "id": "ho-persona_claims-pos-04",
+    "state_tokens": 16,
+    "seq_len": 18,
+    "ms": 6.074598990380764,
+    "tokenize_ms": 0.11440098751336336,
+    "run_ms": 5.871497036423534,
+    "decode_ms": 0.08870096644386649
+   },
+   {
+    "id": "ho-persona_claims-pos-05",
+    "state_tokens": 15,
+    "seq_len": 17,
+    "ms": 6.385119049809873,
+    "tokenize_ms": 0.11098000686615705,
+    "run_ms": 6.168377993162721,
+    "decode_ms": 0.10576104978099465
+   },
+   {
+    "id": "v0-counter-persona_claims",
+    "state_tokens": 19,
+    "seq_len": 21,
+    "ms": 7.027770974673331,
+    "tokenize_ms": 0.15670998254790902,
+    "run_ms": 6.757330032996833,
+    "decode_ms": 0.11373095912858844
+   },
+   {
+    "id": "tax1-counter-persona_claims",
+    "state_tokens": 16,
+    "seq_len": 18,
+    "ms": 6.934350007213652,
+    "tokenize_ms": 0.1570599852129817,
+    "run_ms": 6.671409995760769,
+    "decode_ms": 0.10588002623990178
+   },
+   {
+    "id": "ho-persona_claims-ctr-03",
+    "state_tokens": 24,
+    "seq_len": 26,
+    "ms": 7.07022100687027,
+    "tokenize_ms": 0.14920101966708899,
+    "run_ms": 6.8162999814376235,
+    "decode_ms": 0.10472000576555729
+   },
+   {
+    "id": "ho-persona_claims-ctr-04",
+    "state_tokens": 19,
+    "seq_len": 21,
+    "ms": 6.957961013540626,
+    "tokenize_ms": 0.14042097609490156,
+    "run_ms": 6.705770036205649,
+    "decode_ms": 0.11177000124007463
+   },
+   {
+    "id": "ho-persona_claims-ctr-05",
+    "state_tokens": 17,
+    "seq_len": 19,
+    "ms": 7.11299100657925,
+    "tokenize_ms": 0.1359210000373423,
+    "run_ms": 6.871849996969104,
+    "decode_ms": 0.10522000957280397
+   },
+   {
+    "id": "ho-persona_claims-bnd-01",
+    "state_tokens": 12,
+    "seq_len": 14,
+    "ms": 7.077600981574506,
+    "tokenize_ms": 0.12723100371658802,
+    "run_ms": 6.845499970950186,
+    "decode_ms": 0.1048700069077313
+   },
+   {
+    "id": "ho-persona_claims-bnd-02",
+    "state_tokens": 8,
+    "seq_len": 10,
+    "ms": 6.989080982748419,
+    "tokenize_ms": 0.11732097482308745,
+    "run_ms": 6.78440002957359,
+    "decode_ms": 0.08735997835174203
+   },
+   {
+    "id": "ho-persona_claims-bnd-03",
+    "state_tokens": 10,
+    "seq_len": 12,
+    "ms": 6.786020006984472,
+    "tokenize_ms": 0.10192097397521138,
+    "run_ms": 6.593069003429264,
+    "decode_ms": 0.09103002957999706
+   },
+   {
+    "id": "ho-persona_claims-bnd-04",
+    "state_tokens": 13,
+    "seq_len": 15,
+    "ms": 6.817999994382262,
+    "tokenize_ms": 0.1073600142262876,
+    "run_ms": 6.606179988011718,
+    "decode_ms": 0.10445999214425683
+   },
+   {
+    "id": "ho-persona_claims-bnd-05",
+    "state_tokens": 18,
+    "seq_len": 20,
+    "ms": 6.717939977534115,
+    "tokenize_ms": 0.13609998859465122,
+    "run_ms": 6.477538961917162,
+    "decode_ms": 0.10430102702230215
+   },
+   {
+    "id": "ho-persona_claims-pos-06",
+    "state_tokens": 6,
+    "seq_len": 8,
+    "ms": 6.688630033750087,
+    "tokenize_ms": 0.11119002010673285,
+    "run_ms": 6.489839986898005,
+    "decode_ms": 0.08760002674534917
+   },
+   {
+    "id": "ho-persona_claims-pos-07",
+    "state_tokens": 14,
+    "seq_len": 16,
+    "ms": 6.753190013114363,
+    "tokenize_ms": 0.10754005052149296,
+    "run_ms": 6.54044997645542,
+    "decode_ms": 0.10519998613744974
+   },
+   {
+    "id": "ho-persona_claims-pos-08",
+    "state_tokens": 14,
+    "seq_len": 16,
+    "ms": 6.862130016088486,
+    "tokenize_ms": 0.12989999959245324,
+    "run_ms": 6.6442699753679335,
+    "decode_ms": 0.08796004112809896
+   },
+   {
+    "id": "ho-persona_claims-pos-09",
+    "state_tokens": 16,
+    "seq_len": 18,
+    "ms": 6.6529400064609945,
+    "tokenize_ms": 0.11907098814845085,
+    "run_ms": 6.421959027647972,
+    "decode_ms": 0.11190999066457152
+   },
+   {
+    "id": "v0-positive-relational_hooks",
+    "state_tokens": 23,
+    "seq_len": 25,
+    "ms": 7.084241020493209,
+    "tokenize_ms": 0.14743098290637136,
+    "run_ms": 6.831740029156208,
+    "decode_ms": 0.10507000843062997
+   },
+   {
+    "id": "ho-relational_hooks-pos-02",
+    "state_tokens": 13,
+    "seq_len": 15,
+    "ms": 7.047010993119329,
+    "tokenize_ms": 0.13159099034965038,
+    "run_ms": 6.8108499981462955,
+    "decode_ms": 0.10457000462338328
+   },
+   {
+    "id": "ho-relational_hooks-pos-03",
+    "state_tokens": 18,
+    "seq_len": 20,
+    "ms": 7.036641996819526,
+    "tokenize_ms": 0.156151014380157,
+    "run_ms": 6.7731500021182,
+    "decode_ms": 0.1073409803211689
+   },
+   {
+    "id": "ho-relational_hooks-pos-04",
+    "state_tokens": 12,
+    "seq_len": 14,
+    "ms": 7.126940996386111,
+    "tokenize_ms": 0.1334599801339209,
+    "run_ms": 6.889600015711039,
+    "decode_ms": 0.10388100054115057
+   },
+   {
+    "id": "ho-relational_hooks-pos-05",
+    "state_tokens": 12,
+    "seq_len": 14,
+    "ms": 7.0997209986671805,
+    "tokenize_ms": 0.1312699750997126,
+    "run_ms": 6.863901042379439,
+    "decode_ms": 0.10454998118802905
+   },
+   {
+    "id": "v0-counter-relational_hooks",
+    "state_tokens": 22,
+    "seq_len": 24,
+    "ms": 8.569834986701608,
+    "tokenize_ms": 0.1757799764163792,
+    "run_ms": 8.281924994662404,
+    "decode_ms": 0.11213001562282443
+   },
+   {
+    "id": "tax1-counter-relational_hooks",
+    "state_tokens": 13,
+    "seq_len": 15,
+    "ms": 6.994371011387557,
+    "tokenize_ms": 0.1386309741064906,
+    "run_ms": 6.743020028807223,
+    "decode_ms": 0.11272000847384334
+   },
+   {
+    "id": "ho-relational_hooks-ctr-03",
+    "state_tokens": 22,
+    "seq_len": 24,
+    "ms": 7.004161016084254,
+    "tokenize_ms": 0.16526097897440195,
+    "run_ms": 6.728070031385869,
+    "decode_ms": 0.11083000572398305
+   },
+   {
+    "id": "ho-relational_hooks-ctr-04",
+    "state_tokens": 19,
+    "seq_len": 21,
+    "ms": 6.979340978432447,
+    "tokenize_ms": 0.15400099800899625,
+    "run_ms": 6.709229957778007,
+    "decode_ms": 0.11611002264544368
+   },
+   {
+    "id": "ho-relational_hooks-ctr-05",
+    "state_tokens": 19,
+    "seq_len": 21,
+    "ms": 7.031181012280285,
+    "tokenize_ms": 0.15555100981146097,
+    "run_ms": 6.740820012055337,
+    "decode_ms": 0.13480999041348696
+   },
+   {
+    "id": "ho-relational_hooks-bnd-01",
+    "state_tokens": 8,
+    "seq_len": 10,
+    "ms": 6.474519032053649,
+    "tokenize_ms": 0.1198599929921329,
+    "run_ms": 6.249689031392336,
+    "decode_ms": 0.10497000766918063
+   },
+   {
+    "id": "ho-relational_hooks-bnd-02",
+    "state_tokens": 6,
+    "seq_len": 8,
+    "ms": 7.077700982335955,
+    "tokenize_ms": 0.11696101864799857,
+    "run_ms": 6.856489984784275,
+    "decode_ms": 0.10424997890368104
+   },
+   {
+    "id": "ho-relational_hooks-bnd-03",
+    "state_tokens": 12,
+    "seq_len": 14,
+    "ms": 7.181691995356232,
+    "tokenize_ms": 0.14192098751664162,
+    "run_ms": 6.93444098578766,
+    "decode_ms": 0.10533002205193043
+   },
+   {
+    "id": "ho-relational_hooks-bnd-04",
+    "state_tokens": 13,
+    "seq_len": 15,
+    "ms": 7.019051001407206,
+    "tokenize_ms": 0.15689997235313058,
+    "run_ms": 6.757520022802055,
+    "decode_ms": 0.1046310062520206
+   },
+   {
+    "id": "ho-relational_hooks-bnd-05",
+    "state_tokens": 10,
+    "seq_len": 12,
+    "ms": 7.226811023429036,
+    "tokenize_ms": 0.14086003648117185,
+    "run_ms": 6.981870974414051,
+    "decode_ms": 0.10408001253381371
+   },
+   {
+    "id": "ho-relational_hooks-pos-06",
+    "state_tokens": 16,
+    "seq_len": 18,
+    "ms": 7.068091013934463,
+    "tokenize_ms": 0.14262099284678698,
+    "run_ms": 6.82104000588879,
+    "decode_ms": 0.1044300151988864
+   },
+   {
+    "id": "ho-relational_hooks-pos-07",
+    "state_tokens": 15,
+    "seq_len": 17,
+    "ms": 7.11927202064544,
+    "tokenize_ms": 0.1405910006724298,
+    "run_ms": 6.874920043628663,
+    "decode_ms": 0.103760976344347
+   },
+   {
+    "id": "ho-relational_hooks-pos-08",
+    "state_tokens": 17,
+    "seq_len": 19,
+    "ms": 7.08815100369975,
+    "tokenize_ms": 0.14692998956888914,
+    "run_ms": 6.836700020357966,
+    "decode_ms": 0.10452099377289414
+   },
+   {
+    "id": "v0-positive-sycophancy",
+    "state_tokens": 14,
+    "seq_len": 16,
+    "ms": 7.0002509746700525,
+    "tokenize_ms": 0.15804002759978175,
+    "run_ms": 6.73666998045519,
+    "decode_ms": 0.10554096661508083
+   },
+   {
+    "id": "ho-sycophancy-pos-02",
+    "state_tokens": 11,
+    "seq_len": 13,
+    "ms": 8.650635019876063,
+    "tokenize_ms": 0.1369600067846477,
+    "run_ms": 8.38883500546217,
+    "decode_ms": 0.12484000762924552
+   },
+   {
+    "id": "ho-sycophancy-pos-03",
+    "state_tokens": 8,
+    "seq_len": 10,
+    "ms": 6.772981025278568,
+    "tokenize_ms": 0.13785099145025015,
+    "run_ms": 6.547129014506936,
+    "decode_ms": 0.08800101932138205
+   },
+   {
+    "id": "ho-sycophancy-pos-04",
+    "state_tokens": 9,
+    "seq_len": 11,
+    "ms": 6.932150048669428,
+    "tokenize_ms": 0.11158001143485308,
+    "run_ms": 6.715250026900321,
+    "decode_ms": 0.10532001033425331
+   },
+   {
+    "id": "ho-sycophancy-pos-05",
+    "state_tokens": 7,
+    "seq_len": 9,
+    "ms": 8.136863994877785,
+    "tokenize_ms": 0.12293999316170812,
+    "run_ms": 7.907973020337522,
+    "decode_ms": 0.1059509813785553
+   },
+   {
+    "id": "v0-counter-sycophancy",
+    "state_tokens": 16,
+    "seq_len": 18,
+    "ms": 7.212701020762324,
+    "tokenize_ms": 0.1529600122012198,
+    "run_ms": 6.954241020139307,
+    "decode_ms": 0.10549998842179775
+   },
+   {
+    "id": "tax1-counter-sycophancy",
+    "state_tokens": 7,
+    "seq_len": 9,
+    "ms": 7.1404819609597325,
+    "tokenize_ms": 0.12505101040005684,
+    "run_ms": 6.910059950314462,
+    "decode_ms": 0.10537100024521351
+   },
+   {
+    "id": "ho-sycophancy-ctr-03",
+    "state_tokens": 20,
+    "seq_len": 22,
+    "ms": 8.581544971093535,
+    "tokenize_ms": 0.16055000014603138,
+    "run_ms": 8.309394994284958,
+    "decode_ms": 0.1115999766625464
+   },
+   {
+    "id": "ho-sycophancy-ctr-04",
+    "state_tokens": 18,
+    "seq_len": 20,
+    "ms": 6.720750010572374,
+    "tokenize_ms": 0.17639098223298788,
+    "run_ms": 6.439119053538889,
+    "decode_ms": 0.1052399748004973
+   },
+   {
+    "id": "ho-sycophancy-ctr-05",
+    "state_tokens": 12,
+    "seq_len": 14,
+    "ms": 6.946541019715369,
+    "tokenize_ms": 0.1391210244037211,
+    "run_ms": 6.702189974021167,
+    "decode_ms": 0.10523002129048109
+   },
+   {
+    "id": "ho-sycophancy-bnd-01",
+    "state_tokens": 5,
+    "seq_len": 7,
+    "ms": 8.868345990777016,
+    "tokenize_ms": 0.30185101786628366,
+    "run_ms": 8.457694959361106,
+    "decode_ms": 0.10880001354962587
+   },
+   {
+    "id": "ho-sycophancy-bnd-02",
+    "state_tokens": 5,
+    "seq_len": 7,
+    "ms": 7.160531997215003,
+    "tokenize_ms": 0.11696101864799857,
+    "run_ms": 6.935819983482361,
+    "decode_ms": 0.10775099508464336
+   },
+   {
+    "id": "ho-sycophancy-bnd-03",
+    "state_tokens": 15,
+    "seq_len": 17,
+    "ms": 7.187121023889631,
+    "tokenize_ms": 0.14635000843554735,
+    "run_ms": 6.933390977792442,
+    "decode_ms": 0.10738003766164184
+   },
+   {
+    "id": "ho-sycophancy-bnd-04",
+    "state_tokens": 13,
+    "seq_len": 15,
+    "ms": 7.062391028739512,
+    "tokenize_ms": 0.1416710438206792,
+    "run_ms": 6.813569983933121,
+    "decode_ms": 0.10715000098571181
+   },
+   {
+    "id": "ho-sycophancy-bnd-05",
+    "state_tokens": 4,
+    "seq_len": 6,
+    "ms": 8.734236005693674,
+    "tokenize_ms": 0.11253997217863798,
+    "run_ms": 8.513856038916856,
+    "decode_ms": 0.10783999459818006
+   },
+   {
+    "id": "ho-sycophancy-pos-06",
+    "state_tokens": 20,
+    "seq_len": 22,
+    "ms": 6.983401020988822,
+    "tokenize_ms": 0.16408099327236414,
+    "run_ms": 6.712610018439591,
+    "decode_ms": 0.10671000927686691
+   },
+   {
+    "id": "ho-sycophancy-pos-07",
+    "state_tokens": 12,
+    "seq_len": 14,
+    "ms": 7.103101001121104,
+    "tokenize_ms": 0.1314099645242095,
+    "run_ms": 6.8657410447485745,
+    "decode_ms": 0.10594999184831977
+   },
+   {
+    "id": "ho-sycophancy-pos-08",
+    "state_tokens": 16,
+    "seq_len": 18,
+    "ms": 6.9655709667131305,
+    "tokenize_ms": 0.14997099060565233,
+    "run_ms": 6.726389983668923,
+    "decode_ms": 0.08920999243855476
+   },
+   {
+    "id": "v0-positive-simulation_obscured",
+    "state_tokens": 17,
+    "seq_len": 19,
+    "ms": 6.370548973791301,
+    "tokenize_ms": 0.11391000589355826,
+    "run_ms": 6.160538992844522,
+    "decode_ms": 0.09609997505322099
+   },
+   {
+    "id": "ho-simulation_obscured-pos-02",
+    "state_tokens": 16,
+    "seq_len": 18,
+    "ms": 7.049760955851525,
+    "tokenize_ms": 0.12230995343998075,
+    "run_ms": 6.813491054344922,
+    "decode_ms": 0.11395994806662202
+   },
+   {
+    "id": "ho-simulation_obscured-pos-03",
+    "state_tokens": 17,
+    "seq_len": 19,
+    "ms": 6.630710035096854,
+    "tokenize_ms": 0.1473810407333076,
+    "run_ms": 6.377089011948556,
+    "decode_ms": 0.10623998241499066
+   },
+   {
+    "id": "ho-simulation_obscured-pos-04",
+    "state_tokens": 17,
+    "seq_len": 19,
+    "ms": 6.884930015075952,
+    "tokenize_ms": 0.15118002193048596,
+    "run_ms": 6.627319962717593,
+    "decode_ms": 0.10643003042787313
+   },
+   {
+    "id": "ho-simulation_obscured-pos-05",
+    "state_tokens": 8,
+    "seq_len": 10,
+    "ms": 6.64440996479243,
+    "tokenize_ms": 0.11340097989886999,
+    "run_ms": 6.441659003030509,
+    "decode_ms": 0.08934998186305165
+   },
+   {
+    "id": "v0-counter-simulation_obscured",
+    "state_tokens": 23,
+    "seq_len": 25,
+    "ms": 6.276178988628089,
+    "tokenize_ms": 0.13250095071271062,
+    "run_ms": 6.054678000509739,
+    "decode_ms": 0.08900003740563989
+   },
+   {
+    "id": "tax1-counter-simulation_obscured",
+    "state_tokens": 10,
+    "seq_len": 12,
+    "ms": 7.202011009212583,
+    "tokenize_ms": 0.10146002750843763,
+    "run_ms": 6.995330972131342,
+    "decode_ms": 0.10522000957280397
+   },
+   {
+    "id": "ho-simulation_obscured-ctr-03",
+    "state_tokens": 18,
+    "seq_len": 20,
+    "ms": 6.1905389884486794,
+    "tokenize_ms": 0.14875101624056697,
+    "run_ms": 5.935307999607176,
+    "decode_ms": 0.10647997260093689
+   },
+   {
+    "id": "ho-simulation_obscured-ctr-04",
+    "state_tokens": 16,
+    "seq_len": 18,
+    "ms": 6.7894699750468135,
+    "tokenize_ms": 0.14815002214163542,
+    "run_ms": 6.535029970109463,
+    "decode_ms": 0.10628998279571533
+   },
+   {
+    "id": "ho-simulation_obscured-ctr-05",
+    "state_tokens": 17,
+    "seq_len": 19,
+    "ms": 6.631099968217313,
+    "tokenize_ms": 0.1437310129404068,
+    "run_ms": 6.398338999133557,
+    "decode_ms": 0.08902995614334941
+   },
+   {
+    "id": "ho-simulation_obscured-bnd-01",
+    "state_tokens": 6,
+    "seq_len": 8,
+    "ms": 6.578889966476709,
+    "tokenize_ms": 0.09775999933481216,
+    "run_ms": 6.392408977262676,
+    "decode_ms": 0.08872098987922072
+   },
+   {
+    "id": "ho-simulation_obscured-bnd-02",
+    "state_tokens": 6,
+    "seq_len": 8,
+    "ms": 6.981740007176995,
+    "tokenize_ms": 0.11571001959964633,
+    "run_ms": 6.75946002593264,
+    "decode_ms": 0.10656996164470911
+   },
+   {
+    "id": "ho-simulation_obscured-bnd-03",
+    "state_tokens": 11,
+    "seq_len": 13,
+    "ms": 6.64950005011633,
+    "tokenize_ms": 0.13522105291485786,
+    "run_ms": 6.408428947906941,
+    "decode_ms": 0.10585004929453135
+   },
+   {
+    "id": "ho-simulation_obscured-bnd-04",
+    "state_tokens": 12,
+    "seq_len": 14,
+    "ms": 7.02011096291244,
+    "tokenize_ms": 0.12285099364817142,
+    "run_ms": 6.791049963794649,
+    "decode_ms": 0.10621000546962023
+   },
+   {
+    "id": "ho-simulation_obscured-bnd-05",
+    "state_tokens": 8,
+    "seq_len": 10,
+    "ms": 6.87322102021426,
+    "tokenize_ms": 0.11577102122828364,
+    "run_ms": 6.651118979789317,
+    "decode_ms": 0.10633101919665933
+   },
+   {
+    "id": "ho-simulation_obscured-pos-06",
+    "state_tokens": 18,
+    "seq_len": 20,
+    "ms": 6.868149968795478,
+    "tokenize_ms": 0.1482799998484552,
+    "run_ms": 6.613879988435656,
+    "decode_ms": 0.10598998051136732
+   },
+   {
+    "id": "ho-simulation_obscured-pos-07",
+    "state_tokens": 15,
+    "seq_len": 17,
+    "ms": 6.924200977664441,
+    "tokenize_ms": 0.13148097787052393,
+    "run_ms": 6.686320004519075,
+    "decode_ms": 0.10639999527484179
+   },
+   {
+    "id": "ho-simulation_obscured-pos-08",
+    "state_tokens": 22,
+    "seq_len": 24,
+    "ms": 6.793080014176667,
+    "tokenize_ms": 0.14859001385048032,
+    "run_ms": 6.538099958561361,
+    "decode_ms": 0.10639004176482558
+   },
+   {
+    "id": "v0-positive-profanity",
+    "state_tokens": 10,
+    "seq_len": 12,
+    "ms": 7.026450999546796,
+    "tokenize_ms": 0.12918002903461456,
+    "run_ms": 6.789090984966606,
+    "decode_ms": 0.10817998554557562
+   },
+   {
+    "id": "ho-profanity-pos-02",
+    "state_tokens": 16,
+    "seq_len": 18,
+    "ms": 6.945501023437828,
+    "tokenize_ms": 0.1416300074197352,
+    "run_ms": 6.688870023936033,
+    "decode_ms": 0.11500099208205938
+   },
+   {
+    "id": "ho-profanity-pos-03",
+    "state_tokens": 9,
+    "seq_len": 11,
+    "ms": 7.0592109696008265,
+    "tokenize_ms": 0.12281996896490455,
+    "run_ms": 6.831601029261947,
+    "decode_ms": 0.10478997137397528
+   },
+   {
+    "id": "ho-profanity-pos-04",
+    "state_tokens": 8,
+    "seq_len": 10,
+    "ms": 7.197810977231711,
+    "tokenize_ms": 0.13048999244347215,
+    "run_ms": 6.961620994843543,
+    "decode_ms": 0.10569998994469643
+   },
+   {
+    "id": "ho-profanity-pos-05",
+    "state_tokens": 8,
+    "seq_len": 10,
+    "ms": 7.117222005035728,
+    "tokenize_ms": 0.12148095993325114,
+    "run_ms": 6.889000011142343,
+    "decode_ms": 0.10674103396013379
+   },
+   {
+    "id": "v0-counter-profanity",
+    "state_tokens": 20,
+    "seq_len": 22,
+    "ms": 7.042921031825244,
+    "tokenize_ms": 0.16716000391170382,
+    "run_ms": 6.769209983758628,
+    "decode_ms": 0.10655104415491223
+   },
+   {
+    "id": "tax1-counter-profanity",
+    "state_tokens": 13,
+    "seq_len": 15,
+    "ms": 7.006301020737737,
+    "tokenize_ms": 0.13786001363769174,
+    "run_ms": 6.762699980754405,
+    "decode_ms": 0.10574102634564042
+   },
+   {
+    "id": "ho-profanity-ctr-03",
+    "state_tokens": 27,
+    "seq_len": 29,
+    "ms": 8.593814971391112,
+    "tokenize_ms": 0.1737200072966516,
+    "run_ms": 8.311564975883812,
+    "decode_ms": 0.1085299882106483
+   },
+   {
+    "id": "ho-profanity-ctr-04",
+    "state_tokens": 18,
+    "seq_len": 20,
+    "ms": 6.990941008552909,
+    "tokenize_ms": 0.1538210199214518,
+    "run_ms": 6.729509972501546,
+    "decode_ms": 0.10761001612991095
+   },
+   {
+    "id": "ho-profanity-ctr-05",
+    "state_tokens": 11,
+    "seq_len": 13,
+    "ms": 7.215371995698661,
+    "tokenize_ms": 0.13167998986318707,
+    "run_ms": 6.975910975597799,
+    "decode_ms": 0.10778103023767471
+   },
+   {
+    "id": "ho-profanity-bnd-01",
+    "state_tokens": 9,
+    "seq_len": 11,
+    "ms": 7.103620970156044,
+    "tokenize_ms": 0.1259999698959291,
+    "run_ms": 6.870749988593161,
+    "decode_ms": 0.10687101166695356
+   },
+   {
+    "id": "ho-profanity-bnd-02",
+    "state_tokens": 8,
+    "seq_len": 10,
+    "ms": 7.1961210342124104,
+    "tokenize_ms": 0.12749002780765295,
+    "run_ms": 6.959600956179202,
+    "decode_ms": 0.1090300502255559
+   },
+   {
+    "id": "ho-profanity-bnd-03",
+    "state_tokens": 7,
+    "seq_len": 9,
+    "ms": 7.145281997509301,
+    "tokenize_ms": 0.13209099415689707,
+    "run_ms": 6.906599970534444,
+    "decode_ms": 0.10659103281795979
+   },
+   {
+    "id": "ho-profanity-bnd-04",
+    "state_tokens": 13,
+    "seq_len": 15,
+    "ms": 7.052189961541444,
+    "tokenize_ms": 0.1446999958716333,
+    "run_ms": 6.801599985919893,
+    "decode_ms": 0.10588997974991798
+   },
+   {
+    "id": "ho-profanity-bnd-05",
+    "state_tokens": 16,
+    "seq_len": 18,
+    "ms": 7.129061967134476,
+    "tokenize_ms": 0.1512609887868166,
+    "run_ms": 6.864310009405017,
+    "decode_ms": 0.11349096894264221
+   },
+   {
+    "id": "v0-positive-self_harm",
+    "state_tokens": 14,
+    "seq_len": 16,
+    "ms": 7.073651009704918,
+    "tokenize_ms": 0.13825995847582817,
+    "run_ms": 6.819250003900379,
+    "decode_ms": 0.11614104732871056
+   },
+   {
+    "id": "ho-self_harm-pos-02",
+    "state_tokens": 16,
+    "seq_len": 18,
+    "ms": 6.985521002206951,
+    "tokenize_ms": 0.155890011228621,
+    "run_ms": 6.715780007652938,
+    "decode_ms": 0.11385098332539201
+   },
+   {
+    "id": "ho-self_harm-pos-03",
+    "state_tokens": 10,
+    "seq_len": 12,
+    "ms": 6.737750023603439,
+    "tokenize_ms": 0.13058999320492148,
+    "run_ms": 6.502048985566944,
+    "decode_ms": 0.10511104483157396
+   },
+   {
+    "id": "ho-self_harm-pos-04",
+    "state_tokens": 10,
+    "seq_len": 12,
+    "ms": 6.988061009906232,
+    "tokenize_ms": 0.13080000644549727,
+    "run_ms": 6.7330499878153205,
+    "decode_ms": 0.12421101564541459
+   },
+   {
+    "id": "ho-self_harm-pos-05",
+    "state_tokens": 14,
+    "seq_len": 16,
+    "ms": 7.108940975740552,
+    "tokenize_ms": 0.13851001858711243,
+    "run_ms": 6.879450986161828,
+    "decode_ms": 0.09097997099161148
+   },
+   {
+    "id": "v0-counter-self_harm",
+    "state_tokens": 34,
+    "seq_len": 36,
+    "ms": 8.231893996708095,
+    "tokenize_ms": 0.17114996444433928,
+    "run_ms": 7.970544043928385,
+    "decode_ms": 0.09019998833537102
+   },
+   {
+    "id": "tax1-counter-self_harm",
+    "state_tokens": 17,
+    "seq_len": 19,
+    "ms": 7.041111006401479,
+    "tokenize_ms": 0.12712099123746157,
+    "run_ms": 6.807700032368302,
+    "decode_ms": 0.10628998279571533
+   },
+   {
+    "id": "ho-self_harm-ctr-03",
+    "state_tokens": 21,
+    "seq_len": 23,
+    "ms": 8.532815962098539,
+    "tokenize_ms": 0.1601009862497449,
+    "run_ms": 8.264864969532937,
+    "decode_ms": 0.10785000631585717
+   },
+   {
+    "id": "ho-self_harm-ctr-04",
+    "state_tokens": 24,
+    "seq_len": 26,
+    "ms": 7.069290964864194,
+    "tokenize_ms": 0.17876096535474062,
+    "run_ms": 6.7835699883289635,
+    "decode_ms": 0.10696001118049026
+   },
+   {
+    "id": "ho-self_harm-ctr-05",
+    "state_tokens": 17,
+    "seq_len": 19,
+    "ms": 7.1046510129235685,
+    "tokenize_ms": 0.16146997222676873,
+    "run_ms": 6.836111017037183,
+    "decode_ms": 0.10707002365961671
+   },
+   {
+    "id": "ho-self_harm-bnd-01",
+    "state_tokens": 8,
+    "seq_len": 10,
+    "ms": 7.19327200204134,
+    "tokenize_ms": 0.12871099170297384,
+    "run_ms": 6.958330050110817,
+    "decode_ms": 0.10623096022754908
+   },
+   {
+    "id": "ho-self_harm-bnd-02",
+    "state_tokens": 6,
+    "seq_len": 8,
+    "ms": 7.0909010246396065,
+    "tokenize_ms": 0.11563004227355123,
+    "run_ms": 6.863850983791053,
+    "decode_ms": 0.11141999857500196
+   },
+   {
+    "id": "ho-self_harm-bnd-03",
+    "state_tokens": 20,
+    "seq_len": 22,
+    "ms": 6.943971035070717,
+    "tokenize_ms": 0.1372499973513186,
+    "run_ms": 6.699079996906221,
+    "decode_ms": 0.10764104081317782
+   },
+   {
+    "id": "ho-self_harm-bnd-04",
+    "state_tokens": 19,
+    "seq_len": 21,
+    "ms": 7.071661006193608,
+    "tokenize_ms": 0.152819964569062,
+    "run_ms": 6.812279985751957,
+    "decode_ms": 0.10656105587258935
+   },
+   {
+    "id": "ho-self_harm-bnd-05",
+    "state_tokens": 4,
+    "seq_len": 6,
+    "ms": 6.8494799779728055,
+    "tokenize_ms": 0.10915001621469855,
+    "run_ms": 6.633829965721816,
+    "decode_ms": 0.10649999603629112
+   },
+   {
+    "id": "ho-self_harm-pos-06",
+    "state_tokens": 15,
+    "seq_len": 17,
+    "ms": 7.24305200856179,
+    "tokenize_ms": 0.1402499619871378,
+    "run_ms": 6.986610998865217,
+    "decode_ms": 0.11619104770943522
+   },
+   {
+    "id": "v0-positive-sexual_content",
+    "state_tokens": 14,
+    "seq_len": 16,
+    "ms": 7.018661010079086,
+    "tokenize_ms": 0.14001998351886868,
+    "run_ms": 6.772299995645881,
+    "decode_ms": 0.10634103091433644
+   },
+   {
+    "id": "ho-sexual_content-pos-02",
+    "state_tokens": 14,
+    "seq_len": 16,
+    "ms": 7.071470958180726,
+    "tokenize_ms": 0.13036001473665237,
+    "run_ms": 6.834409956354648,
+    "decode_ms": 0.10670098708942533
+   },
+   {
+    "id": "ho-sexual_content-pos-03",
+    "state_tokens": 15,
+    "seq_len": 17,
+    "ms": 7.0272309822030365,
+    "tokenize_ms": 0.13911002315580845,
+    "run_ms": 6.798729998990893,
+    "decode_ms": 0.08939096005633473
+   },
+   {
+    "id": "ho-sexual_content-pos-04",
+    "state_tokens": 11,
+    "seq_len": 13,
+    "ms": 6.512569030746818,
+    "tokenize_ms": 0.11512002674862742,
+    "run_ms": 6.302058987785131,
+    "decode_ms": 0.09539001621305943
+   },
+   {
+    "id": "ho-sexual_content-pos-05",
+    "state_tokens": 13,
+    "seq_len": 15,
+    "ms": 6.743339996319264,
+    "tokenize_ms": 0.11034001363441348,
+    "run_ms": 6.526729965116829,
+    "decode_ms": 0.10627001756802201
+   },
+   {
+    "id": "v0-counter-sexual_content",
+    "state_tokens": 13,
+    "seq_len": 15,
+    "ms": 6.138938013464212,
+    "tokenize_ms": 0.15882099978625774,
+    "run_ms": 5.8907269849441946,
+    "decode_ms": 0.08939002873376012
+   },
+   {
+    "id": "tax1-counter-sexual_content",
+    "state_tokens": 11,
+    "seq_len": 13,
+    "ms": 6.386519991792738,
+    "tokenize_ms": 0.12404099106788635,
+    "run_ms": 6.156668008770794,
+    "decode_ms": 0.10581099195405841
+   },
+   {
+    "id": "ho-sexual_content-ctr-03",
+    "state_tokens": 14,
+    "seq_len": 16,
+    "ms": 7.134740997571498,
+    "tokenize_ms": 0.15292002353817225,
+    "run_ms": 6.875101011246443,
+    "decode_ms": 0.10671996278688312
+   },
+   {
+    "id": "ho-sexual_content-ctr-04",
+    "state_tokens": 14,
+    "seq_len": 16,
+    "ms": 6.923609995283186,
+    "tokenize_ms": 0.15032000374048948,
+    "run_ms": 6.667470035608858,
+    "decode_ms": 0.10581995593383908
+   },
+   {
+    "id": "ho-sexual_content-ctr-05",
+    "state_tokens": 16,
+    "seq_len": 18,
+    "ms": 7.213001954369247,
+    "tokenize_ms": 0.15539099695160985,
+    "run_ms": 6.951810966711491,
+    "decode_ms": 0.10579999070614576
+   },
+   {
+    "id": "ho-sexual_content-bnd-01",
+    "state_tokens": 9,
+    "seq_len": 11,
+    "ms": 6.447268999181688,
+    "tokenize_ms": 0.13421999756246805,
+    "run_ms": 6.199678988195956,
+    "decode_ms": 0.11337001342326403
+   },
+   {
+    "id": "ho-sexual_content-bnd-02",
+    "state_tokens": 10,
+    "seq_len": 12,
+    "ms": 6.772499997168779,
+    "tokenize_ms": 0.13351102825254202,
+    "run_ms": 6.53374899411574,
+    "decode_ms": 0.1052399748004973
+   },
+   {
+    "id": "ho-sexual_content-bnd-03",
+    "state_tokens": 15,
+    "seq_len": 17,
+    "ms": 6.652179989032447,
+    "tokenize_ms": 0.14811096480116248,
+    "run_ms": 6.414709030650556,
+    "decode_ms": 0.08935999358072877
+   },
+   {
+    "id": "ho-sexual_content-bnd-04",
+    "state_tokens": 10,
+    "seq_len": 12,
+    "ms": 6.410580012015998,
+    "tokenize_ms": 0.11139101115986705,
+    "run_ms": 6.211258005350828,
+    "decode_ms": 0.08793099550530314
+   },
+   {
+    "id": "ho-sexual_content-bnd-05",
+    "state_tokens": 12,
+    "seq_len": 14,
+    "ms": 6.808470003306866,
+    "tokenize_ms": 0.11804001405835152,
+    "run_ms": 6.601369008421898,
+    "decode_ms": 0.08906098082661629
+   },
+   {
+    "id": "ho-sexual_content-pos-06",
+    "state_tokens": 20,
+    "seq_len": 22,
+    "ms": 6.086988025344908,
+    "tokenize_ms": 0.1246799947693944,
+    "run_ms": 5.855998024344444,
+    "decode_ms": 0.10631000623106956
+   },
+   {
+    "id": "ho-sexual_content-pos-07",
+    "state_tokens": 16,
+    "seq_len": 18,
+    "ms": 7.085510995239019,
+    "tokenize_ms": 0.14203996397554874,
+    "run_ms": 6.837691005785018,
+    "decode_ms": 0.10578002547845244
+   },
+   {
+    "id": "v0-positive-child_sexual_exploitation",
+    "state_tokens": 22,
+    "seq_len": 24,
+    "ms": 6.988761015236378,
+    "tokenize_ms": 0.17663103062659502,
+    "run_ms": 6.704710016492754,
+    "decode_ms": 0.10741996811702847
+   },
+   {
+    "id": "ho-child_sexual_exploitation-pos-02",
+    "state_tokens": 12,
+    "seq_len": 14,
+    "ms": 7.113030995242298,
+    "tokenize_ms": 0.13232999481260777,
+    "run_ms": 6.868261029012501,
+    "decode_ms": 0.11243997141718864
+   },
+   {
+    "id": "ho-child_sexual_exploitation-pos-03",
+    "state_tokens": 17,
+    "seq_len": 19,
+    "ms": 7.147311000153422,
+    "tokenize_ms": 0.13660098193213344,
+    "run_ms": 6.903310015331954,
+    "decode_ms": 0.10740000288933516
+   },
+   {
+    "id": "ho-child_sexual_exploitation-pos-04",
+    "state_tokens": 10,
+    "seq_len": 12,
+    "ms": 6.790340994484723,
+    "tokenize_ms": 0.1331410021521151,
+    "run_ms": 6.551238999236375,
+    "decode_ms": 0.10596099309623241
+   },
+   {
+    "id": "ho-child_sexual_exploitation-pos-05",
+    "state_tokens": 17,
+    "seq_len": 19,
+    "ms": 6.80900999577716,
+    "tokenize_ms": 0.16828998923301697,
+    "run_ms": 6.532900035381317,
+    "decode_ms": 0.10781997116282582
+   },
+   {
+    "id": "v0-counter-child_sexual_exploitation",
+    "state_tokens": 15,
+    "seq_len": 17,
+    "ms": 7.086730969604105,
+    "tokenize_ms": 0.1493199961259961,
+    "run_ms": 6.83087098877877,
+    "decode_ms": 0.10653998469933867
+   },
+   {
+    "id": "tax1-counter-child_sexual_exploitation",
+    "state_tokens": 15,
+    "seq_len": 17,
+    "ms": 7.153290964197367,
+    "tokenize_ms": 0.16430096002295613,
+    "run_ms": 6.862459995318204,
+    "decode_ms": 0.12653000885620713
+   },
+   {
+    "id": "ho-child_sexual_exploitation-ctr-03",
+    "state_tokens": 28,
+    "seq_len": 30,
+    "ms": 8.31450498662889,
+    "tokenize_ms": 0.1881009666249156,
+    "run_ms": 8.035083999857306,
+    "decode_ms": 0.09132002014666796
+   },
+   {
+    "id": "ho-child_sexual_exploitation-ctr-04",
+    "state_tokens": 17,
+    "seq_len": 19,
+    "ms": 6.646119989454746,
+    "tokenize_ms": 0.120131007861346,
+    "run_ms": 6.435899005737156,
+    "decode_ms": 0.09008997585624456
+   },
+   {
+    "id": "ho-child_sexual_exploitation-ctr-05",
+    "state_tokens": 16,
+    "seq_len": 18,
+    "ms": 6.775129993911833,
+    "tokenize_ms": 0.12570101534947753,
+    "run_ms": 6.559149012900889,
+    "decode_ms": 0.09027996566146612
+   },
+   {
+    "id": "ho-child_sexual_exploitation-bnd-01",
+    "state_tokens": 16,
+    "seq_len": 18,
+    "ms": 6.335978978313506,
+    "tokenize_ms": 0.10981096420437098,
+    "run_ms": 6.111918017268181,
+    "decode_ms": 0.11424999684095383
+   },
+   {
+    "id": "ho-child_sexual_exploitation-bnd-02",
+    "state_tokens": 9,
+    "seq_len": 11,
+    "ms": 7.205342000816017,
+    "tokenize_ms": 0.12024102034047246,
+    "run_ms": 6.978629971854389,
+    "decode_ms": 0.10647100862115622
+   },
+   {
+    "id": "ho-child_sexual_exploitation-bnd-03",
+    "state_tokens": 12,
+    "seq_len": 14,
+    "ms": 7.139191031455994,
+    "tokenize_ms": 0.136310001835227,
+    "run_ms": 6.895800994243473,
+    "decode_ms": 0.10708003537729383
+   },
+   {
+    "id": "ho-child_sexual_exploitation-bnd-04",
+    "state_tokens": 18,
+    "seq_len": 20,
+    "ms": 6.958740996196866,
+    "tokenize_ms": 0.14815997565165162,
+    "run_ms": 6.703921011649072,
+    "decode_ms": 0.10666000889614224
+   },
+   {
+    "id": "ho-child_sexual_exploitation-bnd-05",
+    "state_tokens": 12,
+    "seq_len": 14,
+    "ms": 7.160221051890403,
+    "tokenize_ms": 0.14359003398567438,
+    "run_ms": 6.909650983288884,
+    "decode_ms": 0.10698003461584449
+   },
+   {
+    "id": "ho-child_sexual_exploitation-pos-06",
+    "state_tokens": 15,
+    "seq_len": 17,
+    "ms": 7.061630953103304,
+    "tokenize_ms": 0.13260095147415996,
+    "run_ms": 6.820900016464293,
+    "decode_ms": 0.10812998516485095
+   },
+   {
+    "id": "v0-positive-violence",
+    "state_tokens": 20,
+    "seq_len": 22,
+    "ms": 7.042970973998308,
+    "tokenize_ms": 0.16290100757032633,
+    "run_ms": 6.773869972676039,
+    "decode_ms": 0.10619999375194311
+   },
+   {
+    "id": "ho-violence-pos-02",
+    "state_tokens": 20,
+    "seq_len": 22,
+    "ms": 6.979511003009975,
+    "tokenize_ms": 0.172591011505574,
+    "run_ms": 6.701140024233609,
+    "decode_ms": 0.10577996727079153
+   },
+   {
+    "id": "ho-violence-pos-03",
+    "state_tokens": 19,
+    "seq_len": 21,
+    "ms": 7.042211014777422,
+    "tokenize_ms": 0.15809101751074195,
+    "run_ms": 6.778249982744455,
+    "decode_ms": 0.10587001452222466
+   },
+   {
+    "id": "ho-violence-pos-04",
+    "state_tokens": 12,
+    "seq_len": 14,
+    "ms": 7.090941013302654,
+    "tokenize_ms": 0.13960996875539422,
+    "run_ms": 6.845321040600538,
+    "decode_ms": 0.10601000394672155
+   },
+   {
+    "id": "ho-violence-pos-05",
+    "state_tokens": 16,
+    "seq_len": 18,
+    "ms": 7.081520976498723,
+    "tokenize_ms": 0.16650097677484155,
+    "run_ms": 6.808790029026568,
+    "decode_ms": 0.10622997069731355
+   },
+   {
+    "id": "v0-counter-violence",
+    "state_tokens": 22,
+    "seq_len": 24,
+    "ms": 6.984560983255506,
+    "tokenize_ms": 0.18869101768359542,
+    "run_ms": 6.7064399481751025,
+    "decode_ms": 0.08943001739680767
+   },
+   {
+    "id": "tax1-counter-violence",
+    "state_tokens": 14,
+    "seq_len": 16,
+    "ms": 6.452839006669819,
+    "tokenize_ms": 0.13337098062038422,
+    "run_ms": 6.212658016011119,
+    "decode_ms": 0.10681001003831625
+   },
+   {
+    "id": "ho-violence-ctr-03",
+    "state_tokens": 19,
+    "seq_len": 21,
+    "ms": 6.803901051171124,
+    "tokenize_ms": 0.15128101222217083,
+    "run_ms": 6.528188998345286,
+    "decode_ms": 0.1244310406036675
+   },
+   {
+    "id": "ho-violence-ctr-04",
+    "state_tokens": 11,
+    "seq_len": 13,
+    "ms": 6.146878004074097,
+    "tokenize_ms": 0.13595999917015433,
+    "run_ms": 5.9219179674983025,
+    "decode_ms": 0.08900003740563989
+   },
+   {
+    "id": "ho-violence-ctr-05",
+    "state_tokens": 10,
+    "seq_len": 12,
+    "ms": 6.880440982058644,
+    "tokenize_ms": 0.122779980301857,
+    "run_ms": 6.65165000827983,
+    "decode_ms": 0.10601099347695708
+   },
+   {
+    "id": "ho-violence-bnd-01",
+    "state_tokens": 14,
+    "seq_len": 16,
+    "ms": 7.084060984198004,
+    "tokenize_ms": 0.15812000492587686,
+    "run_ms": 6.819379981607199,
+    "decode_ms": 0.10656099766492844
+   },
+   {
+    "id": "ho-violence-bnd-02",
+    "state_tokens": 10,
+    "seq_len": 12,
+    "ms": 7.132280967198312,
+    "tokenize_ms": 0.13611000031232834,
+    "run_ms": 6.891600962262601,
+    "decode_ms": 0.10457000462338328
+   },
+   {
+    "id": "ho-violence-bnd-03",
+    "state_tokens": 14,
+    "seq_len": 16,
+    "ms": 7.046211045235395,
+    "tokenize_ms": 0.13361003948375583,
+    "run_ms": 6.806580990087241,
+    "decode_ms": 0.10602001566439867
+   },
+   {
+    "id": "ho-violence-bnd-04",
+    "state_tokens": 15,
+    "seq_len": 17,
+    "ms": 7.078811002429575,
+    "tokenize_ms": 0.15913101378828287,
+    "run_ms": 6.812990002799779,
+    "decode_ms": 0.10668998584151268
+   },
+   {
+    "id": "ho-violence-bnd-05",
+    "state_tokens": 10,
+    "seq_len": 12,
+    "ms": 7.195272017270327,
+    "tokenize_ms": 0.14062097761780024,
+    "run_ms": 6.950360024347901,
+    "decode_ms": 0.10429101530462503
+   },
+   {
+    "id": "v0-positive-hate",
+    "state_tokens": 15,
+    "seq_len": 17,
+    "ms": 7.074180990457535,
+    "tokenize_ms": 0.15474000247195363,
+    "run_ms": 6.8128599668852985,
+    "decode_ms": 0.10658102110028267
+   },
+   {
+    "id": "ho-hate-pos-02",
+    "state_tokens": 10,
+    "seq_len": 12,
+    "ms": 6.904399953782558,
+    "tokenize_ms": 0.15792000340297818,
+    "run_ms": 6.658409954980016,
+    "decode_ms": 0.0880699953995645
+   },
+   {
+    "id": "ho-violence-pos-06",
+    "state_tokens": 17,
+    "seq_len": 19,
+    "ms": 7.081752002704889,
+    "tokenize_ms": 0.1460710191167891,
+    "run_ms": 6.846770003903657,
+    "decode_ms": 0.08891097968444228
+   },
+   {
+    "id": "ho-hate-pos-03",
+    "state_tokens": 10,
+    "seq_len": 12,
+    "ms": 6.7653299774974585,
+    "tokenize_ms": 0.12420001439750195,
+    "run_ms": 6.536148954182863,
+    "decode_ms": 0.10498100891709328
+   },
+   {
+    "id": "ho-hate-pos-04",
+    "state_tokens": 13,
+    "seq_len": 15,
+    "ms": 7.168431009631604,
+    "tokenize_ms": 0.1412099809385836,
+    "run_ms": 6.921241001691669,
+    "decode_ms": 0.10598002700135112
+   },
+   {
+    "id": "ho-hate-pos-05",
+    "state_tokens": 5,
+    "seq_len": 7,
+    "ms": 6.814319989643991,
+    "tokenize_ms": 0.12625998351722956,
+    "run_ms": 6.5992100280709565,
+    "decode_ms": 0.08884997805580497
+   },
+   {
+    "id": "v0-counter-hate",
+    "state_tokens": 13,
+    "seq_len": 15,
+    "ms": 6.976370990741998,
+    "tokenize_ms": 0.1322609605267644,
+    "run_ms": 6.737460033036768,
+    "decode_ms": 0.10664999717846513
+   },
+   {
+    "id": "tax1-counter-hate",
+    "state_tokens": 12,
+    "seq_len": 14,
+    "ms": 7.2213420062325895,
+    "tokenize_ms": 0.15970098320394754,
+    "run_ms": 6.955270015168935,
+    "decode_ms": 0.10637100785970688
+   },
+   {
+    "id": "ho-hate-ctr-03",
+    "state_tokens": 27,
+    "seq_len": 29,
+    "ms": 6.567649019416422,
+    "tokenize_ms": 0.18436001846566796,
+    "run_ms": 6.293858983553946,
+    "decode_ms": 0.08943001739680767
+   },
+   {
+    "id": "ho-hate-ctr-04",
+    "state_tokens": 25,
+    "seq_len": 27,
+    "ms": 8.05404398124665,
+    "tokenize_ms": 0.13966095866635442,
+    "run_ms": 7.824033033102751,
+    "decode_ms": 0.09034998947754502
+   },
+   {
+    "id": "ho-hate-ctr-05",
+    "state_tokens": 23,
+    "seq_len": 25,
+    "ms": 6.593790021724999,
+    "tokenize_ms": 0.16364100156351924,
+    "run_ms": 6.314309022855014,
+    "decode_ms": 0.1158399973064661
+   },
+   {
+    "id": "ho-hate-bnd-01",
+    "state_tokens": 9,
+    "seq_len": 11,
+    "ms": 7.198851031716913,
+    "tokenize_ms": 0.129360007122159,
+    "run_ms": 6.963571009691805,
+    "decode_ms": 0.10592001490294933
+   },
+   {
+    "id": "ho-hate-bnd-02",
+    "state_tokens": 8,
+    "seq_len": 10,
+    "ms": 7.1236720541492105,
+    "tokenize_ms": 0.13133103493601084,
+    "run_ms": 6.8854999844916165,
+    "decode_ms": 0.10684103472158313
+   },
+   {
+    "id": "ho-hate-bnd-03",
+    "state_tokens": 15,
+    "seq_len": 17,
+    "ms": 7.100621005520225,
+    "tokenize_ms": 0.15400996198877692,
+    "run_ms": 6.839670997578651,
+    "decode_ms": 0.10694004595279694
+   },
+   {
+    "id": "ho-hate-bnd-04",
+    "state_tokens": 14,
+    "seq_len": 16,
+    "ms": 7.127201010007411,
+    "tokenize_ms": 0.16725005116313696,
+    "run_ms": 6.8527309922501445,
+    "decode_ms": 0.1072199665941298
+   },
+   {
+    "id": "ho-hate-bnd-05",
+    "state_tokens": 6,
+    "seq_len": 8,
+    "ms": 7.111271028406918,
+    "tokenize_ms": 0.1246000174432993,
+    "run_ms": 6.880480970721692,
+    "decode_ms": 0.10619004024192691
+   },
+   {
+    "id": "v0-positive-criminal_assistance",
+    "state_tokens": 21,
+    "seq_len": 23,
+    "ms": 7.001131016295403,
+    "tokenize_ms": 0.1639809925109148,
+    "run_ms": 6.7311099846847355,
+    "decode_ms": 0.1060400390997529
+   },
+   {
+    "id": "ho-criminal_assistance-pos-02",
+    "state_tokens": 16,
+    "seq_len": 18,
+    "ms": 7.095851004123688,
+    "tokenize_ms": 0.15673099551349878,
+    "run_ms": 6.832860002759844,
+    "decode_ms": 0.1062600058503449
+   },
+   {
+    "id": "ho-criminal_assistance-pos-03",
+    "state_tokens": 13,
+    "seq_len": 15,
+    "ms": 7.167492003645748,
+    "tokenize_ms": 0.15876098768785596,
+    "run_ms": 6.893630023114383,
+    "decode_ms": 0.11510099284350872
+   },
+   {
+    "id": "ho-criminal_assistance-pos-04",
+    "state_tokens": 19,
+    "seq_len": 21,
+    "ms": 6.998470984399319,
+    "tokenize_ms": 0.16942003276199102,
+    "run_ms": 6.714619987178594,
+    "decode_ms": 0.1144309644587338
+   },
+   {
+    "id": "ho-criminal_assistance-pos-05",
+    "state_tokens": 16,
+    "seq_len": 18,
+    "ms": 7.144810981117189,
+    "tokenize_ms": 0.14998001279309392,
+    "run_ms": 6.877950974740088,
+    "decode_ms": 0.11687999358400702
+   },
+   {
+    "id": "v0-counter-criminal_assistance",
+    "state_tokens": 15,
+    "seq_len": 17,
+    "ms": 7.114151027053595,
+    "tokenize_ms": 0.1484010135754943,
+    "run_ms": 6.858679989818484,
+    "decode_ms": 0.10707002365961671
+   },
+   {
+    "id": "tax1-counter-criminal_assistance",
+    "state_tokens": 11,
+    "seq_len": 13,
+    "ms": 7.144461967982352,
+    "tokenize_ms": 0.15702098608016968,
+    "run_ms": 6.881139997858554,
+    "decode_ms": 0.10630098404362798
+   },
+   {
+    "id": "ho-criminal_assistance-ctr-03",
+    "state_tokens": 19,
+    "seq_len": 21,
+    "ms": 7.099081005435437,
+    "tokenize_ms": 0.178760034032166,
+    "run_ms": 6.8131599691696465,
+    "decode_ms": 0.10716100223362446
+   },
+   {
+    "id": "ho-criminal_assistance-ctr-04",
+    "state_tokens": 28,
+    "seq_len": 30,
+    "ms": 7.017070951405913,
+    "tokenize_ms": 0.18257996998727322,
+    "run_ms": 6.728150008711964,
+    "decode_ms": 0.10634097270667553
+   },
+   {
+    "id": "ho-criminal_assistance-ctr-05",
+    "state_tokens": 14,
+    "seq_len": 16,
+    "ms": 7.038740965072066,
+    "tokenize_ms": 0.15210994752123952,
+    "run_ms": 6.7803600104525685,
+    "decode_ms": 0.10627100709825754
+   },
+   {
+    "id": "ho-criminal_assistance-bnd-01",
+    "state_tokens": 15,
+    "seq_len": 17,
+    "ms": 6.766250007785857,
+    "tokenize_ms": 0.1469099661335349,
+    "run_ms": 6.529920035973191,
+    "decode_ms": 0.08942000567913055
+   },
+   {
+    "id": "ho-criminal_assistance-bnd-02",
+    "state_tokens": 10,
+    "seq_len": 12,
+    "ms": 6.541309005115181,
+    "tokenize_ms": 0.11381000513210893,
+    "run_ms": 6.3112390344031155,
+    "decode_ms": 0.11625996557995677
+   },
+   {
+    "id": "ho-criminal_assistance-bnd-03",
+    "state_tokens": 17,
+    "seq_len": 19,
+    "ms": 7.157852000091225,
+    "tokenize_ms": 0.1648510224185884,
+    "run_ms": 6.8795999977737665,
+    "decode_ms": 0.11340097989886999
+   },
+   {
+    "id": "ho-criminal_assistance-bnd-04",
+    "state_tokens": 16,
+    "seq_len": 18,
+    "ms": 7.10875098593533,
+    "tokenize_ms": 0.15556998550891876,
+    "run_ms": 6.836991000454873,
+    "decode_ms": 0.11618999997153878
+   },
+   {
+    "id": "ho-criminal_assistance-bnd-05",
+    "state_tokens": 12,
+    "seq_len": 14,
+    "ms": 7.171870965976268,
+    "tokenize_ms": 0.12361997505649924,
+    "run_ms": 6.942281033843756,
+    "decode_ms": 0.10596995707601309
+   },
+   {
+    "id": "ho-criminal_assistance-ctr-06",
+    "state_tokens": 16,
+    "seq_len": 18,
+    "ms": 6.997671036515385,
+    "tokenize_ms": 0.14984101289883256,
+    "run_ms": 6.741449993569404,
+    "decode_ms": 0.10638003004714847
+   },
+   {
+    "id": "ho-criminal_assistance-bnd-06",
+    "state_tokens": 15,
+    "seq_len": 17,
+    "ms": 7.199492014478892,
+    "tokenize_ms": 0.14977098908275366,
+    "run_ms": 6.942760024685413,
+    "decode_ms": 0.10696100071072578
+   },
+   {
+    "id": "ho-clean-greeting-01",
+    "state_tokens": 9,
+    "seq_len": 11,
+    "ms": 7.127061020582914,
+    "tokenize_ms": 0.13843999477103353,
+    "run_ms": 6.8830010131932795,
+    "decode_ms": 0.10562001261860132
+   },
+   {
+    "id": "ho-clean-greeting-02",
+    "state_tokens": 10,
+    "seq_len": 12,
+    "ms": 7.155071012675762,
+    "tokenize_ms": 0.14446000568568707,
+    "run_ms": 6.9037709617987275,
+    "decode_ms": 0.1068400451913476
+   },
+   {
+    "id": "ho-clean-greeting-03",
+    "state_tokens": 10,
+    "seq_len": 12,
+    "ms": 7.190212025307119,
+    "tokenize_ms": 0.14895101776346564,
+    "run_ms": 6.927239999640733,
+    "decode_ms": 0.11402100790292025
+   },
+   {
+    "id": "ho-clean-greeting-04",
+    "state_tokens": 10,
+    "seq_len": 12,
+    "ms": 7.190271047875285,
+    "tokenize_ms": 0.1447000540792942,
+    "run_ms": 6.949080969206989,
+    "decode_ms": 0.09649002458900213
+   },
+   {
+    "id": "ho-clean-fact-01",
+    "state_tokens": 14,
+    "seq_len": 16,
+    "ms": 6.880321016069502,
+    "tokenize_ms": 0.12874096864834428,
+    "run_ms": 6.643999018706381,
+    "decode_ms": 0.10758102871477604
+   },
+   {
+    "id": "ho-clean-fact-02",
+    "state_tokens": 13,
+    "seq_len": 15,
+    "ms": 7.070921012200415,
+    "tokenize_ms": 0.15346001600846648,
+    "run_ms": 6.810729973949492,
+    "decode_ms": 0.10673102224245667
+   },
+   {
+    "id": "ho-clean-fact-03",
+    "state_tokens": 8,
+    "seq_len": 10,
+    "ms": 7.280812016688287,
+    "tokenize_ms": 0.1469000126235187,
+    "run_ms": 7.026851002592593,
+    "decode_ms": 0.10706100147217512
+   },
+   {
+    "id": "ho-clean-fact-04",
+    "state_tokens": 12,
+    "seq_len": 14,
+    "ms": 7.177860999945551,
+    "tokenize_ms": 0.1481400104239583,
+    "run_ms": 6.922751024831086,
+    "decode_ms": 0.10696996469050646
+   },
+   {
+    "id": "ho-clean-helpful-01",
+    "state_tokens": 19,
+    "seq_len": 21,
+    "ms": 7.033500995021313,
+    "tokenize_ms": 0.16895000590011477,
+    "run_ms": 6.757961004041135,
+    "decode_ms": 0.10658998508006334
+   },
+   {
+    "id": "ho-clean-helpful-02",
+    "state_tokens": 17,
+    "seq_len": 19,
+    "ms": 7.277261989656836,
+    "tokenize_ms": 0.1812409609556198,
+    "run_ms": 6.981279992032796,
+    "decode_ms": 0.11474103666841984
+   },
+   {
+    "id": "ho-clean-helpful-03",
+    "state_tokens": 14,
+    "seq_len": 16,
+    "ms": 7.068341015838087,
+    "tokenize_ms": 0.15313003677874804,
+    "run_ms": 6.808589969296008,
+    "decode_ms": 0.10662100976333022
+   },
+   {
+    "id": "ho-clean-helpful-04",
+    "state_tokens": 14,
+    "seq_len": 16,
+    "ms": 7.075931003782898,
+    "tokenize_ms": 0.15855999663472176,
+    "run_ms": 6.812000006902963,
+    "decode_ms": 0.10537100024521351
+   },
+   {
+    "id": "ho-clean-refusal-01",
+    "state_tokens": 16,
+    "seq_len": 18,
+    "ms": 7.129401026759297,
+    "tokenize_ms": 0.15832000644877553,
+    "run_ms": 6.853961036540568,
+    "decode_ms": 0.11711998376995325
+   },
+   {
+    "id": "ho-clean-refusal-02",
+    "state_tokens": 12,
+    "seq_len": 14,
+    "ms": 6.842329981736839,
+    "tokenize_ms": 0.14500098768621683,
+    "run_ms": 6.5912490244954824,
+    "decode_ms": 0.10607996955513954
+   },
+   {
+    "id": "ho-clean-refusal-03",
+    "state_tokens": 16,
+    "seq_len": 18,
+    "ms": 7.0537219871766865,
+    "tokenize_ms": 0.15759101370349526,
+    "run_ms": 6.781639996916056,
+    "decode_ms": 0.11449097655713558
+   },
+   {
+    "id": "ho-clean-refusal-04",
+    "state_tokens": 20,
+    "seq_len": 22,
+    "ms": 6.414168979972601,
+    "tokenize_ms": 0.13324996689334512,
+    "run_ms": 6.174987996928394,
+    "decode_ms": 0.10593101615086198
+   },
+   {
+    "id": "ho-clean-crisis-01",
+    "state_tokens": 21,
+    "seq_len": 23,
+    "ms": 7.107150973752141,
+    "tokenize_ms": 0.1490800059400499,
+    "run_ms": 6.851640995591879,
+    "decode_ms": 0.10642997222021222
+   },
+   {
+    "id": "ho-clean-crisis-02",
+    "state_tokens": 32,
+    "seq_len": 34,
+    "ms": 8.53331497637555,
+    "tokenize_ms": 0.18937099957838655,
+    "run_ms": 8.23624397162348,
+    "decode_ms": 0.10770000517368317
+   },
+   {
+    "id": "ho-clean-crisis-03",
+    "state_tokens": 19,
+    "seq_len": 21,
+    "ms": 6.979600992053747,
+    "tokenize_ms": 0.16227102605625987,
+    "run_ms": 6.727429979946464,
+    "decode_ms": 0.089899986051023
+   },
+   {
+    "id": "ho-clean-crisis-04",
+    "state_tokens": 29,
+    "seq_len": 31,
+    "ms": 8.210065017919987,
+    "tokenize_ms": 0.1546810381114483,
+    "run_ms": 7.947103003971279,
+    "decode_ms": 0.10828097583726048
+   },
+   {
+    "id": "ho-multi-01",
+    "state_tokens": 17,
+    "seq_len": 19,
+    "ms": 6.845769996289164,
+    "tokenize_ms": 0.1486500259488821,
+    "run_ms": 6.6080999677069485,
+    "decode_ms": 0.0890200026333332
+   },
+   {
+    "id": "ho-multi-02",
+    "state_tokens": 18,
+    "seq_len": 20,
+    "ms": 6.005647999700159,
+    "tokenize_ms": 0.12736005010083318,
+    "run_ms": 5.789907998405397,
+    "decode_ms": 0.08837995119392872
+   },
+   {
+    "id": "ho2-persona_claims-pos-01",
+    "state_tokens": 12,
+    "seq_len": 14,
+    "ms": 6.094068055972457,
+    "tokenize_ms": 0.12278003850951791,
+    "run_ms": 5.882458004634827,
+    "decode_ms": 0.08883001282811165
+   },
+   {
+    "id": "ho2-persona_claims-pos-02",
+    "state_tokens": 8,
+    "seq_len": 10,
+    "ms": 7.010030967649072,
+    "tokenize_ms": 0.10901998030021787,
+    "run_ms": 6.794460990931839,
+    "decode_ms": 0.10654999641701579
+   },
+   {
+    "id": "ho2-persona_claims-pos-03",
+    "state_tokens": 7,
+    "seq_len": 9,
+    "ms": 6.95775100030005,
+    "tokenize_ms": 0.13137998757883906,
+    "run_ms": 6.721341051161289,
+    "decode_ms": 0.1050299615599215
+   },
+   {
+    "id": "ho2-persona_claims-pos-04",
+    "state_tokens": 8,
+    "seq_len": 10,
+    "ms": 7.030720997136086,
+    "tokenize_ms": 0.1306799822486937,
+    "run_ms": 6.7830809857696295,
+    "decode_ms": 0.11696002911776304
+   },
+   {
+    "id": "ho2-persona_claims-ctr-01",
+    "state_tokens": 8,
+    "seq_len": 10,
+    "ms": 6.9933110498823225,
+    "tokenize_ms": 0.1321200397796929,
+    "run_ms": 6.755429960321635,
+    "decode_ms": 0.10576104978099465
+   },
+   {
+    "id": "ho2-persona_claims-ctr-02",
+    "state_tokens": 16,
+    "seq_len": 18,
+    "ms": 6.999681005254388,
+    "tokenize_ms": 0.15423999866470695,
+    "run_ms": 6.73904997529462,
+    "decode_ms": 0.10639103129506111
+   },
+   {
+    "id": "ho2-persona_claims-ctr-03",
+    "state_tokens": 17,
+    "seq_len": 19,
+    "ms": 7.052731001749635,
+    "tokenize_ms": 0.16892002895474434,
+    "run_ms": 6.777720001991838,
+    "decode_ms": 0.10609097080305219
+   },
+   {
+    "id": "ho2-persona_claims-ctr-04",
+    "state_tokens": 20,
+    "seq_len": 22,
+    "ms": 6.0004279948771,
+    "tokenize_ms": 0.18214998999610543,
+    "run_ms": 5.728046991862357,
+    "decode_ms": 0.0902310130186379
+   },
+   {
+    "id": "ho2-persona_claims-bnd-01",
+    "state_tokens": 8,
+    "seq_len": 10,
+    "ms": 6.797510024625808,
+    "tokenize_ms": 0.1141600077971816,
+    "run_ms": 6.576740008313209,
+    "decode_ms": 0.10661000851541758
+   },
+   {
+    "id": "ho2-persona_claims-bnd-02",
+    "state_tokens": 19,
+    "seq_len": 21,
+    "ms": 6.842870032414794,
+    "tokenize_ms": 0.16644003335386515,
+    "run_ms": 6.569839955773205,
+    "decode_ms": 0.10659004328772426
+   },
+   {
+    "id": "ho2-persona_claims-bnd-03",
+    "state_tokens": 9,
+    "seq_len": 11,
+    "ms": 7.00437102932483,
+    "tokenize_ms": 0.13673101784661412,
+    "run_ms": 6.76334003219381,
+    "decode_ms": 0.10429997928440571
+   },
+   {
+    "id": "ho2-persona_claims-bnd-04",
+    "state_tokens": 9,
+    "seq_len": 11,
+    "ms": 7.049371022731066,
+    "tokenize_ms": 0.15001097926869988,
+    "run_ms": 6.794200045987964,
+    "decode_ms": 0.10515999747440219
+   },
+   {
+    "id": "ho2-relational_hooks-pos-01",
+    "state_tokens": 9,
+    "seq_len": 11,
+    "ms": 6.981530983466655,
+    "tokenize_ms": 0.13631099136546254,
+    "run_ms": 6.740600045304745,
+    "decode_ms": 0.10461994679644704
+   },
+   {
+    "id": "ho2-relational_hooks-pos-02",
+    "state_tokens": 12,
+    "seq_len": 14,
+    "ms": 6.988410954363644,
+    "tokenize_ms": 0.13801996828988194,
+    "run_ms": 6.742489989846945,
+    "decode_ms": 0.10790099622681737
+   },
+   {
+    "id": "ho2-relational_hooks-pos-03",
+    "state_tokens": 9,
+    "seq_len": 11,
+    "ms": 6.972491042688489,
+    "tokenize_ms": 0.13545999536290765,
+    "run_ms": 6.731250032316893,
+    "decode_ms": 0.10578101500868797
+   },
+   {
+    "id": "ho2-relational_hooks-pos-04",
+    "state_tokens": 10,
+    "seq_len": 12,
+    "ms": 7.039870950393379,
+    "tokenize_ms": 0.1343199983239174,
+    "run_ms": 6.800449977163225,
+    "decode_ms": 0.10510097490623593
+   },
+   {
+    "id": "ho2-relational_hooks-ctr-01",
+    "state_tokens": 17,
+    "seq_len": 19,
+    "ms": 7.200921012554318,
+    "tokenize_ms": 0.16475998563691974,
+    "run_ms": 6.929511029738933,
+    "decode_ms": 0.10664999717846513
+   },
+   {
+    "id": "ho2-relational_hooks-ctr-02",
+    "state_tokens": 12,
+    "seq_len": 14,
+    "ms": 7.136920990888029,
+    "tokenize_ms": 0.14691101387143135,
+    "run_ms": 6.884069996885955,
+    "decode_ms": 0.10593998013064265
+   },
+   {
+    "id": "ho2-relational_hooks-ctr-03",
+    "state_tokens": 14,
+    "seq_len": 16,
+    "ms": 7.2377820033580065,
+    "tokenize_ms": 0.15307101421058178,
+    "run_ms": 6.977731012739241,
+    "decode_ms": 0.10697997640818357
+   },
+   {
+    "id": "ho2-relational_hooks-ctr-04",
+    "state_tokens": 11,
+    "seq_len": 13,
+    "ms": 7.158330990932882,
+    "tokenize_ms": 0.14494999777525663,
+    "run_ms": 6.898291001562029,
+    "decode_ms": 0.11508999159559608
+   },
+   {
+    "id": "ho2-relational_hooks-bnd-01",
+    "state_tokens": 7,
+    "seq_len": 9,
+    "ms": 7.073570974171162,
+    "tokenize_ms": 0.14493096387013793,
+    "run_ms": 6.809570011682808,
+    "decode_ms": 0.11906999861821532
+   },
+   {
+    "id": "ho2-relational_hooks-bnd-02",
+    "state_tokens": 9,
+    "seq_len": 11,
+    "ms": 6.951581046450883,
+    "tokenize_ms": 0.1337910071015358,
+    "run_ms": 6.704400002490729,
+    "decode_ms": 0.11339003685861826
+   },
+   {
+    "id": "ho2-relational_hooks-bnd-03",
+    "state_tokens": 9,
+    "seq_len": 11,
+    "ms": 7.176962040830404,
+    "tokenize_ms": 0.13498100452125072,
+    "run_ms": 6.749899999704212,
+    "decode_ms": 0.2920810366049409
+   },
+   {
+    "id": "ho2-relational_hooks-bnd-04",
+    "state_tokens": 12,
+    "seq_len": 14,
+    "ms": 10.172640031669289,
+    "tokenize_ms": 0.5180009757168591,
+    "run_ms": 9.53541905619204,
+    "decode_ms": 0.11921999976038933
+   },
+   {
+    "id": "ho2-sycophancy-pos-01",
+    "state_tokens": 4,
+    "seq_len": 6,
+    "ms": 7.195982034318149,
+    "tokenize_ms": 0.14081998961046338,
+    "run_ms": 6.946491019334644,
+    "decode_ms": 0.10867102537304163
+   },
+   {
+    "id": "ho2-sycophancy-pos-02",
+    "state_tokens": 7,
+    "seq_len": 9,
+    "ms": 6.9011199520900846,
+    "tokenize_ms": 0.15053997049108148,
+    "run_ms": 6.660740007646382,
+    "decode_ms": 0.08983997395262122
+   },
+   {
+    "id": "ho2-sycophancy-pos-03",
+    "state_tokens": 4,
+    "seq_len": 6,
+    "ms": 6.939921004232019,
+    "tokenize_ms": 0.10235997615382075,
+    "run_ms": 6.730511027853936,
+    "decode_ms": 0.10705000022426248
+   },
+   {
+    "id": "ho2-sycophancy-pos-04",
+    "state_tokens": 11,
+    "seq_len": 13,
+    "ms": 7.116631022654474,
+    "tokenize_ms": 0.15253998572006822,
+    "run_ms": 6.856181018520147,
+    "decode_ms": 0.10791001841425896
+   },
+   {
+    "id": "ho2-sycophancy-ctr-01",
+    "state_tokens": 13,
+    "seq_len": 15,
+    "ms": 6.981161015573889,
+    "tokenize_ms": 0.16170099843293428,
+    "run_ms": 6.712850008625537,
+    "decode_ms": 0.10661000851541758
+   },
+   {
+    "id": "ho2-sycophancy-ctr-02",
+    "state_tokens": 12,
+    "seq_len": 14,
+    "ms": 7.066611025948077,
+    "tokenize_ms": 0.1514200121164322,
+    "run_ms": 6.8087909603491426,
+    "decode_ms": 0.1064000534825027
+   },
+   {
+    "id": "ho2-sycophancy-ctr-03",
+    "state_tokens": 15,
+    "seq_len": 17,
+    "ms": 7.046350976452231,
+    "tokenize_ms": 0.17067999579012394,
+    "run_ms": 6.769160972908139,
+    "decode_ms": 0.10651000775396824
+   },
+   {
+    "id": "ho2-sycophancy-ctr-04",
+    "state_tokens": 10,
+    "seq_len": 12,
+    "ms": 7.129070989321917,
+    "tokenize_ms": 0.14794000890105963,
+    "run_ms": 6.876560975797474,
+    "decode_ms": 0.10457000462338328
+   },
+   {
+    "id": "ho2-sycophancy-bnd-01",
+    "state_tokens": 6,
+    "seq_len": 8,
+    "ms": 7.044981000944972,
+    "tokenize_ms": 0.135901034809649,
+    "run_ms": 6.802449992392212,
+    "decode_ms": 0.1066299737431109
+   },
+   {
+    "id": "ho2-sycophancy-bnd-02",
+    "state_tokens": 7,
+    "seq_len": 9,
+    "ms": 7.233851996716112,
+    "tokenize_ms": 0.15144102508202195,
+    "run_ms": 6.9760800106450915,
+    "decode_ms": 0.10633096098899841
+   },
+   {
+    "id": "ho2-sycophancy-bnd-03",
+    "state_tokens": 3,
+    "seq_len": 5,
+    "ms": 8.873086015228182,
+    "tokenize_ms": 0.12502004392445087,
+    "run_ms": 8.630945987533778,
+    "decode_ms": 0.11711998376995325
+   },
+   {
+    "id": "ho2-sycophancy-bnd-04",
+    "state_tokens": 10,
+    "seq_len": 12,
+    "ms": 7.172681973315775,
+    "tokenize_ms": 0.14770100824534893,
+    "run_ms": 6.918769970070571,
+    "decode_ms": 0.10621099499985576
+   },
+   {
+    "id": "ho2-simulation_obscured-pos-01",
+    "state_tokens": 10,
+    "seq_len": 12,
+    "ms": 7.156090985517949,
+    "tokenize_ms": 0.1444800291210413,
+    "run_ms": 6.9069109740667045,
+    "decode_ms": 0.10469998233020306
+   },
+   {
+    "id": "ho2-simulation_obscured-pos-02",
+    "state_tokens": 13,
+    "seq_len": 15,
+    "ms": 7.025621016509831,
+    "tokenize_ms": 0.14941999688744545,
+    "run_ms": 6.76991103682667,
+    "decode_ms": 0.10628998279571533
+   },
+   {
+    "id": "ho2-simulation_obscured-pos-03",
+    "state_tokens": 8,
+    "seq_len": 10,
+    "ms": 7.297142001334578,
+    "tokenize_ms": 0.1281200093217194,
+    "run_ms": 7.062960998155177,
+    "decode_ms": 0.10606099385768175
+   },
+   {
+    "id": "ho2-simulation_obscured-pos-04",
+    "state_tokens": 8,
+    "seq_len": 10,
+    "ms": 7.1275609661825,
+    "tokenize_ms": 0.1326599740423262,
+    "run_ms": 6.888881034683436,
+    "decode_ms": 0.10601995745673776
+   },
+   {
+    "id": "ho2-simulation_obscured-ctr-01",
+    "state_tokens": 8,
+    "seq_len": 10,
+    "ms": 7.142501010093838,
+    "tokenize_ms": 0.1384199713356793,
+    "run_ms": 6.898111023474485,
+    "decode_ms": 0.105970015283674
+   },
+   {
+    "id": "ho2-simulation_obscured-ctr-02",
+    "state_tokens": 21,
+    "seq_len": 23,
+    "ms": 7.135302003007382,
+    "tokenize_ms": 0.1851010019890964,
+    "run_ms": 6.842200004030019,
+    "decode_ms": 0.1080009969882667
+   },
+   {
+    "id": "ho2-simulation_obscured-ctr-03",
+    "state_tokens": 11,
+    "seq_len": 13,
+    "ms": 7.155800994951278,
+    "tokenize_ms": 0.1515100011602044,
+    "run_ms": 6.897171027958393,
+    "decode_ms": 0.10711996583268046
+   },
+   {
+    "id": "ho2-simulation_obscured-ctr-04",
+    "state_tokens": 10,
+    "seq_len": 12,
+    "ms": 7.1457610465586185,
+    "tokenize_ms": 0.14592002844437957,
+    "run_ms": 6.894890975672752,
+    "decode_ms": 0.10495004244148731
+   },
+   {
+    "id": "ho2-simulation_obscured-bnd-01",
+    "state_tokens": 9,
+    "seq_len": 11,
+    "ms": 6.67509000049904,
+    "tokenize_ms": 0.1347410143353045,
+    "run_ms": 6.450918968766928,
+    "decode_ms": 0.08943001739680767
+   },
+   {
+    "id": "ho2-simulation_obscured-bnd-02",
+    "state_tokens": 10,
+    "seq_len": 12,
+    "ms": 7.0137009606696665,
+    "tokenize_ms": 0.12674095341935754,
+    "run_ms": 6.781060015782714,
+    "decode_ms": 0.1058999914675951
+   },
+   {
+    "id": "ho2-simulation_obscured-bnd-03",
+    "state_tokens": 11,
+    "seq_len": 13,
+    "ms": 7.215322053525597,
+    "tokenize_ms": 0.1444710069335997,
+    "run_ms": 6.964000000152737,
+    "decode_ms": 0.10685104643926024
+   },
+   {
+    "id": "ho2-simulation_obscured-bnd-04",
+    "state_tokens": 8,
+    "seq_len": 10,
+    "ms": 7.145940966438502,
+    "tokenize_ms": 0.1403999631293118,
+    "run_ms": 6.899341009557247,
+    "decode_ms": 0.10619999375194311
+   },
+   {
+    "id": "ho2a-persona_claims-pos-01",
+    "state_tokens": 11,
+    "seq_len": 13,
+    "ms": 7.171790988650173,
+    "tokenize_ms": 0.15899998834356666,
+    "run_ms": 6.906380993314087,
+    "decode_ms": 0.1064100069925189
+   },
+   {
+    "id": "ho2a-persona_claims-pos-02",
+    "state_tokens": 8,
+    "seq_len": 10,
+    "ms": 7.2005619877018034,
+    "tokenize_ms": 0.13889098772779107,
+    "run_ms": 6.954771000891924,
+    "decode_ms": 0.10689999908208847
+   },
+   {
+    "id": "ho2a-persona_claims-pos-03",
+    "state_tokens": 7,
+    "seq_len": 9,
+    "ms": 7.168400974478573,
+    "tokenize_ms": 0.14854996697977185,
+    "run_ms": 6.904871028382331,
+    "decode_ms": 0.11497997911646962
+   },
+   {
+    "id": "ho2a-persona_claims-ctr-01",
+    "state_tokens": 7,
+    "seq_len": 9,
+    "ms": 7.179182022809982,
+    "tokenize_ms": 0.13376103015616536,
+    "run_ms": 6.938579957932234,
+    "decode_ms": 0.10684103472158313
+   },
+   {
+    "id": "ho2a-persona_claims-ctr-02",
+    "state_tokens": 8,
+    "seq_len": 10,
+    "ms": 7.128951023332775,
+    "tokenize_ms": 0.14388997806236148,
+    "run_ms": 6.878251035232097,
+    "decode_ms": 0.10681001003831625
+   },
+   {
+    "id": "ho2a-persona_claims-bnd-01",
+    "state_tokens": 9,
+    "seq_len": 11,
+    "ms": 6.4467189949937165,
+    "tokenize_ms": 0.14413002645596862,
+    "run_ms": 6.214118970092386,
+    "decode_ms": 0.08846999844536185
+   },
+   {
+    "id": "ho2a-persona_claims-bnd-02",
+    "state_tokens": 9,
+    "seq_len": 11,
+    "ms": 6.121968035586178,
+    "tokenize_ms": 0.12402102584019303,
+    "run_ms": 5.908187013119459,
+    "decode_ms": 0.08975999662652612
+   },
+   {
+    "id": "ho2a-relational_hooks-pos-01",
+    "state_tokens": 12,
+    "seq_len": 14,
+    "ms": 7.171841978561133,
+    "tokenize_ms": 0.12813101056963205,
+    "run_ms": 6.915370002388954,
+    "decode_ms": 0.12834096560254693
+   },
+   {
+    "id": "ho2a-relational_hooks-pos-02",
+    "state_tokens": 9,
+    "seq_len": 11,
+    "ms": 6.492129003163427,
+    "tokenize_ms": 0.13642001431435347,
+    "run_ms": 6.251388986129314,
+    "decode_ms": 0.10432000271975994
+   },
+   {
+    "id": "ho2a-relational_hooks-pos-03",
+    "state_tokens": 9,
+    "seq_len": 11,
+    "ms": 7.092850981280208,
+    "tokenize_ms": 0.14179100980982184,
+    "run_ms": 6.845990021247417,
+    "decode_ms": 0.10506995022296906
+   },
+   {
+    "id": "ho2a-relational_hooks-pos-04",
+    "state_tokens": 7,
+    "seq_len": 9,
+    "ms": 7.149812008719891,
+    "tokenize_ms": 0.1412410056218505,
+    "run_ms": 6.902039982378483,
+    "decode_ms": 0.106531020719558
+   },
+   {
+    "id": "ho2a-relational_hooks-ctr-01",
+    "state_tokens": 10,
+    "seq_len": 12,
+    "ms": 6.999570992775261,
+    "tokenize_ms": 0.15630002599209547,
+    "run_ms": 6.7366400035098195,
+    "decode_ms": 0.10663096327334642
+   },
+   {
+    "id": "ho2a-relational_hooks-ctr-02",
+    "state_tokens": 14,
+    "seq_len": 16,
+    "ms": 6.979839992709458,
+    "tokenize_ms": 0.15798001550137997,
+    "run_ms": 6.7143400083296,
+    "decode_ms": 0.10751996887847781
+   },
+   {
+    "id": "ho2a-relational_hooks-ctr-03",
+    "state_tokens": 11,
+    "seq_len": 13,
+    "ms": 6.977891025599092,
+    "tokenize_ms": 0.1508209970779717,
+    "run_ms": 6.720489996951073,
+    "decode_ms": 0.10658003157004714
+   },
+   {
+    "id": "ho2a-relational_hooks-bnd-01",
+    "state_tokens": 11,
+    "seq_len": 13,
+    "ms": 6.942531035747379,
+    "tokenize_ms": 0.12325099669396877,
+    "run_ms": 6.713380047585815,
+    "decode_ms": 0.1058999914675951
+   },
+   {
+    "id": "ho2a-relational_hooks-bnd-02",
+    "state_tokens": 8,
+    "seq_len": 10,
+    "ms": 6.967311026528478,
+    "tokenize_ms": 0.1404000213369727,
+    "run_ms": 6.7211699788458645,
+    "decode_ms": 0.10574102634564042
+   },
+   {
+    "id": "ho2a-relational_hooks-bnd-03",
+    "state_tokens": 6,
+    "seq_len": 8,
+    "ms": 6.85602001613006,
+    "tokenize_ms": 0.12631004210561514,
+    "run_ms": 6.623989960644394,
+    "decode_ms": 0.10572001338005066
+   },
+   {
+    "id": "ho2a-sycophancy-pos-01",
+    "state_tokens": 3,
+    "seq_len": 5,
+    "ms": 6.633839977439493,
+    "tokenize_ms": 0.13223098358139396,
+    "run_ms": 6.413249007891864,
+    "decode_ms": 0.0883599859662354
+   },
+   {
+    "id": "ho2a-sycophancy-pos-02",
+    "state_tokens": 5,
+    "seq_len": 7,
+    "ms": 6.8512000143527985,
+    "tokenize_ms": 0.1088200369849801,
+    "run_ms": 6.653699965681881,
+    "decode_ms": 0.08868001168593764
+   },
+   {
+    "id": "ho2a-sycophancy-pos-03",
+    "state_tokens": 6,
+    "seq_len": 8,
+    "ms": 6.864271010272205,
+    "tokenize_ms": 0.10651099728420377,
+    "run_ms": 6.662890024017543,
+    "decode_ms": 0.09486998897045851
+   },
+   {
+    "id": "ho2a-sycophancy-pos-04",
+    "state_tokens": 10,
+    "seq_len": 12,
+    "ms": 6.164107995573431,
+    "tokenize_ms": 0.11838995851576328,
+    "run_ms": 5.939967988524586,
+    "decode_ms": 0.10575004853308201
+   },
+   {
+    "id": "ho2a-sycophancy-pos-05",
+    "state_tokens": 6,
+    "seq_len": 8,
+    "ms": 6.676429999060929,
+    "tokenize_ms": 0.12937100837007165,
+    "run_ms": 6.441448989789933,
+    "decode_ms": 0.1056100009009242
+   },
+   {
+    "id": "ho2a-sycophancy-ctr-01",
+    "state_tokens": 8,
+    "seq_len": 10,
+    "ms": 6.865840987302363,
+    "tokenize_ms": 0.13654096983373165,
+    "run_ms": 6.622629007324576,
+    "decode_ms": 0.10667101014405489
+   },
+   {
+    "id": "ho2a-sycophancy-ctr-02",
+    "state_tokens": 10,
+    "seq_len": 12,
+    "ms": 6.777040020097047,
+    "tokenize_ms": 0.1423700014129281,
+    "run_ms": 6.547000026330352,
+    "decode_ms": 0.08766999235376716
+   },
+   {
+    "id": "ho2a-sycophancy-ctr-03",
+    "state_tokens": 11,
+    "seq_len": 13,
+    "ms": 7.074320979882032,
+    "tokenize_ms": 0.12259994400665164,
+    "run_ms": 6.845371040981263,
+    "decode_ms": 0.10634999489411712
+   },
+   {
+    "id": "ho2a-sycophancy-bnd-01",
+    "state_tokens": 4,
+    "seq_len": 6,
+    "ms": 7.112330989912152,
+    "tokenize_ms": 0.12113997945562005,
+    "run_ms": 6.886251037940383,
+    "decode_ms": 0.10493997251614928
+   },
+   {
+    "id": "ho2a-sycophancy-bnd-02",
+    "state_tokens": 5,
+    "seq_len": 7,
+    "ms": 7.1938419714570045,
+    "tokenize_ms": 0.11590099893510342,
+    "run_ms": 6.971510010771453,
+    "decode_ms": 0.10643096175044775
+   },
+   {
+    "id": "ho2a-simulation_obscured-pos-01",
+    "state_tokens": 7,
+    "seq_len": 9,
+    "ms": 7.027371029835194,
+    "tokenize_ms": 0.14209002256393433,
+    "run_ms": 6.7962000030092895,
+    "decode_ms": 0.08908100426197052
+   },
+   {
+    "id": "ho2a-simulation_obscured-pos-02",
+    "state_tokens": 7,
+    "seq_len": 9,
+    "ms": 7.223891036119312,
+    "tokenize_ms": 0.13757002307102084,
+    "run_ms": 6.969360983930528,
+    "decode_ms": 0.11696002911776304
+   },
+   {
+    "id": "ho2a-simulation_obscured-pos-03",
+    "state_tokens": 13,
+    "seq_len": 15,
+    "ms": 7.0829110336489975,
+    "tokenize_ms": 0.14341098722070456,
+    "run_ms": 6.822780007496476,
+    "decode_ms": 0.11672003893181682
+   },
+   {
+    "id": "ho2a-simulation_obscured-pos-04",
+    "state_tokens": 8,
+    "seq_len": 10,
+    "ms": 6.758440984413028,
+    "tokenize_ms": 0.09591097477823496,
+    "run_ms": 6.541729031596333,
+    "decode_ms": 0.12080097803846002
+   },
+   {
+    "id": "ho2a-simulation_obscured-ctr-01",
+    "state_tokens": 13,
+    "seq_len": 15,
+    "ms": 6.76952995127067,
+    "tokenize_ms": 0.1750999945215881,
+    "run_ms": 6.472118955571204,
+    "decode_ms": 0.12231100117787719
+   },
+   {
+    "id": "ho2a-simulation_obscured-ctr-02",
+    "state_tokens": 10,
+    "seq_len": 12,
+    "ms": 6.536349013913423,
+    "tokenize_ms": 0.1429400290362537,
+    "run_ms": 6.288308999501169,
+    "decode_ms": 0.1050999853760004
+   },
+   {
+    "id": "ho2a-simulation_obscured-ctr-03",
+    "state_tokens": 6,
+    "seq_len": 8,
+    "ms": 6.71410997165367,
+    "tokenize_ms": 0.13179099187254906,
+    "run_ms": 6.456478964537382,
+    "decode_ms": 0.1258400152437389
+   },
+   {
+    "id": "ho2a-simulation_obscured-bnd-01",
+    "state_tokens": 6,
+    "seq_len": 8,
+    "ms": 6.491949956398457,
+    "tokenize_ms": 0.1325609628111124,
+    "run_ms": 6.270528014283627,
+    "decode_ms": 0.08886097930371761
+   },
+   {
+    "id": "ho2a-simulation_obscured-bnd-02",
+    "state_tokens": 8,
+    "seq_len": 10,
+    "ms": 6.120437989011407,
+    "tokenize_ms": 0.11434999760240316,
+    "run_ms": 5.917617992963642,
+    "decode_ms": 0.08846999844536185
+   },
+   {
+    "id": "ho2b-profanity-pos-01",
+    "state_tokens": 6,
+    "seq_len": 8,
+    "ms": 6.896129983942956,
+    "tokenize_ms": 0.10386999929323792,
+    "run_ms": 6.685999978799373,
+    "decode_ms": 0.1062600058503449
+   },
+   {
+    "id": "ho2b-profanity-pos-02",
+    "state_tokens": 8,
+    "seq_len": 10,
+    "ms": 7.082730997353792,
+    "tokenize_ms": 0.14281098265200853,
+    "run_ms": 6.83418003609404,
+    "decode_ms": 0.10573997860774398
+   },
+   {
+    "id": "ho2b-profanity-pos-03",
+    "state_tokens": 8,
+    "seq_len": 10,
+    "ms": 7.060991018079221,
+    "tokenize_ms": 0.11552002979442477,
+    "run_ms": 6.840120011474937,
+    "decode_ms": 0.10535097680985928
+   },
+   {
+    "id": "ho2b-profanity-pos-04",
+    "state_tokens": 10,
+    "seq_len": 12,
+    "ms": 7.14872102253139,
+    "tokenize_ms": 0.14230003580451012,
+    "run_ms": 6.901921005919576,
+    "decode_ms": 0.10449998080730438
+   },
+   {
+    "id": "ho2b-profanity-pos-05",
+    "state_tokens": 6,
+    "seq_len": 8,
+    "ms": 7.12316099088639,
+    "tokenize_ms": 0.13767997734248638,
+    "run_ms": 6.8714910303242505,
+    "decode_ms": 0.11398998321965337
+   },
+   {
+    "id": "ho2b-profanity-pos-06",
+    "state_tokens": 6,
+    "seq_len": 8,
+    "ms": 7.12704099714756,
+    "tokenize_ms": 0.1274410169571638,
+    "run_ms": 6.893660000059754,
+    "decode_ms": 0.10593998013064265
+   },
+   {
+    "id": "ho2b-profanity-pos-07",
+    "state_tokens": 8,
+    "seq_len": 10,
+    "ms": 7.131221995223314,
+    "tokenize_ms": 0.13388099614530802,
+    "run_ms": 6.891199969686568,
+    "decode_ms": 0.10614102939143777
+   },
+   {
+    "id": "ho2b-profanity-pos-08",
+    "state_tokens": 9,
+    "seq_len": 11,
+    "ms": 7.035180984530598,
+    "tokenize_ms": 0.12303999392315745,
+    "run_ms": 6.807200028561056,
+    "decode_ms": 0.10494096204638481
+   },
+   {
+    "id": "ho2b-profanity-pos-09",
+    "state_tokens": 8,
+    "seq_len": 10,
+    "ms": 6.71307003358379,
+    "tokenize_ms": 0.13765000039711595,
+    "run_ms": 6.477169052232057,
+    "decode_ms": 0.09825098095461726
+   },
+   {
+    "id": "ho2b-profanity-pos-10",
+    "state_tokens": 8,
+    "seq_len": 10,
+    "ms": 6.868640019092709,
+    "tokenize_ms": 0.10212999768555164,
+    "run_ms": 6.660229992121458,
+    "decode_ms": 0.10628002928569913
+   },
+   {
+    "id": "ho2b-profanity-ctr-01",
+    "state_tokens": 10,
+    "seq_len": 12,
+    "ms": 7.1818819851614535,
+    "tokenize_ms": 0.1630309852771461,
+    "run_ms": 6.9058299995958805,
+    "decode_ms": 0.11302100028842688
+   },
+   {
+    "id": "ho2b-profanity-ctr-02",
+    "state_tokens": 20,
+    "seq_len": 22,
+    "ms": 7.12091097375378,
+    "tokenize_ms": 0.16131997108459473,
+    "run_ms": 6.853560043964535,
+    "decode_ms": 0.1060309587046504
+   },
+   {
+    "id": "ho2b-profanity-ctr-03",
+    "state_tokens": 13,
+    "seq_len": 15,
+    "ms": 7.086631027050316,
+    "tokenize_ms": 0.1460899948142469,
+    "run_ms": 6.834211002569646,
+    "decode_ms": 0.1063300296664238
+   },
+   {
+    "id": "ho2b-profanity-ctr-04",
+    "state_tokens": 19,
+    "seq_len": 21,
+    "ms": 7.128011027816683,
+    "tokenize_ms": 0.16483000945299864,
+    "run_ms": 6.8563210079446435,
+    "decode_ms": 0.10686001041904092
+   },
+   {
+    "id": "ho2b-profanity-ctr-05",
+    "state_tokens": 16,
+    "seq_len": 18,
+    "ms": 7.2588620241731405,
+    "tokenize_ms": 0.1520609948784113,
+    "run_ms": 7.000501034781337,
+    "decode_ms": 0.10629999451339245
+   },
+   {
+    "id": "ho2b-profanity-ctr-06",
+    "state_tokens": 12,
+    "seq_len": 14,
+    "ms": 7.158060965593904,
+    "tokenize_ms": 0.13919000048190355,
+    "run_ms": 6.912680983077735,
+    "decode_ms": 0.106189982034266
+   },
+   {
+    "id": "ho2b-profanity-bnd-01",
+    "state_tokens": 4,
+    "seq_len": 6,
+    "ms": 7.096802000887692,
+    "tokenize_ms": 0.11110102059319615,
+    "run_ms": 6.87861000187695,
+    "decode_ms": 0.10709097841754556
+   },
+   {
+    "id": "ho2b-profanity-bnd-02",
+    "state_tokens": 7,
+    "seq_len": 9,
+    "ms": 7.171640987507999,
+    "tokenize_ms": 0.15579001046717167,
+    "run_ms": 6.909499992616475,
+    "decode_ms": 0.10635098442435265
+   },
+   {
+    "id": "ho2b-profanity-bnd-03",
+    "state_tokens": 9,
+    "seq_len": 11,
+    "ms": 7.111580984201282,
+    "tokenize_ms": 0.12267997954040766,
+    "run_ms": 6.883870984893292,
+    "decode_ms": 0.10503001976758242
+   },
+   {
+    "id": "ho2b-profanity-bnd-04",
+    "state_tokens": 7,
+    "seq_len": 9,
+    "ms": 7.191662036348134,
+    "tokenize_ms": 0.12938102008774877,
+    "run_ms": 6.956470024306327,
+    "decode_ms": 0.10581099195405841
+   },
+   {
+    "id": "ho2b-profanity-bnd-05",
+    "state_tokens": 6,
+    "seq_len": 8,
+    "ms": 7.128230994567275,
+    "tokenize_ms": 0.1380500034429133,
+    "run_ms": 6.883980007842183,
+    "decode_ms": 0.10620098328217864
+   },
+   {
+    "id": "ho2b-profanity-bnd-06",
+    "state_tokens": 6,
+    "seq_len": 8,
+    "ms": 6.8813099642284214,
+    "tokenize_ms": 0.11881999671459198,
+    "run_ms": 6.656459998339415,
+    "decode_ms": 0.10602996917441487
+   },
+   {
+    "id": "ho2b-profanity-pos-11",
+    "state_tokens": 9,
+    "seq_len": 11,
+    "ms": 7.1768420166336,
+    "tokenize_ms": 0.13501103967428207,
+    "run_ms": 6.937009980902076,
+    "decode_ms": 0.10482099605724216
+   },
+   {
+    "id": "ho2b-profanity-pos-12",
+    "state_tokens": 9,
+    "seq_len": 11,
+    "ms": 7.177030958700925,
+    "tokenize_ms": 0.14619994908571243,
+    "run_ms": 6.925691035576165,
+    "decode_ms": 0.10513997403904796
+   },
+   {
+    "id": "ho2b-hate-pos-01",
+    "state_tokens": 8,
+    "seq_len": 10,
+    "ms": 7.128111028578132,
+    "tokenize_ms": 0.12105097994208336,
+    "run_ms": 6.900530017446727,
+    "decode_ms": 0.10653003118932247
+   },
+   {
+    "id": "ho2b-hate-pos-02",
+    "state_tokens": 6,
+    "seq_len": 8,
+    "ms": 7.141011999920011,
+    "tokenize_ms": 0.14383095549419522,
+    "run_ms": 6.8905100342817605,
+    "decode_ms": 0.10667101014405489
+   },
+   {
+    "id": "ho2b-hate-pos-03",
+    "state_tokens": 11,
+    "seq_len": 13,
+    "ms": 7.14810099452734,
+    "tokenize_ms": 0.13056001625955105,
+    "run_ms": 6.9113210192881525,
+    "decode_ms": 0.10621995897963643
+   },
+   {
+    "id": "ho2b-hate-pos-04",
+    "state_tokens": 8,
+    "seq_len": 10,
+    "ms": 7.212202006485313,
+    "tokenize_ms": 0.16170000890269876,
+    "run_ms": 6.943590997252613,
+    "decode_ms": 0.10691100033000112
+   },
+   {
+    "id": "ho2b-hate-pos-05",
+    "state_tokens": 6,
+    "seq_len": 8,
+    "ms": 7.149141049012542,
+    "tokenize_ms": 0.1166300498880446,
+    "run_ms": 6.92590099060908,
+    "decode_ms": 0.10661000851541758
+   },
+   {
+    "id": "ho2b-hate-pos-06",
+    "state_tokens": 7,
+    "seq_len": 9,
+    "ms": 7.1213910123333335,
+    "tokenize_ms": 0.13719999697059393,
+    "run_ms": 6.878421001601964,
+    "decode_ms": 0.10577001376077533
+   },
+   {
+    "id": "ho2b-hate-pos-07",
+    "state_tokens": 11,
+    "seq_len": 13,
+    "ms": 7.326481980271637,
+    "tokenize_ms": 0.1308299833908677,
+    "run_ms": 7.089952006936073,
+    "decode_ms": 0.10569998994469643
+   },
+   {
+    "id": "ho2b-hate-pos-08",
+    "state_tokens": 6,
+    "seq_len": 8,
+    "ms": 7.146710995584726,
+    "tokenize_ms": 0.146619975566864,
+    "run_ms": 6.89343101112172,
+    "decode_ms": 0.10666000889614224
+   },
+   {
+    "id": "ho2b-hate-pos-09",
+    "state_tokens": 9,
+    "seq_len": 11,
+    "ms": 7.147232012357563,
+    "tokenize_ms": 0.1185910077765584,
+    "run_ms": 6.923809996806085,
+    "decode_ms": 0.10483100777491927
+   },
+   {
+    "id": "ho2b-hate-pos-10",
+    "state_tokens": 9,
+    "seq_len": 11,
+    "ms": 7.168860989622772,
+    "tokenize_ms": 0.13411999680101871,
+    "run_ms": 6.929741008207202,
+    "decode_ms": 0.10499998461455107
+   },
+   {
+    "id": "ho2b-hate-pos-11",
+    "state_tokens": 6,
+    "seq_len": 8,
+    "ms": 7.121681002900004,
+    "tokenize_ms": 0.11557998368516564,
+    "run_ms": 6.899920990690589,
+    "decode_ms": 0.10618002852424979
+   },
+   {
+    "id": "ho2b-hate-pos-12",
+    "state_tokens": 11,
+    "seq_len": 13,
+    "ms": 7.11977097671479,
+    "tokenize_ms": 0.13429095270112157,
+    "run_ms": 6.89615000737831,
+    "decode_ms": 0.08933001663535833
+   },
+   {
+    "id": "ho2b-hate-pos-13",
+    "state_tokens": 9,
+    "seq_len": 11,
+    "ms": 7.048501982353628,
+    "tokenize_ms": 0.11416099732741714,
+    "run_ms": 6.846649979706854,
+    "decode_ms": 0.08769100531935692
+   },
+   {
+    "id": "ho2b-hate-pos-14",
+    "state_tokens": 7,
+    "seq_len": 9,
+    "ms": 6.7040600115433335,
+    "tokenize_ms": 0.11316000018268824,
+    "run_ms": 6.484599027317017,
+    "decode_ms": 0.10630098404362798
+   },
+   {
+    "id": "ho2b-hate-pos-15",
+    "state_tokens": 8,
+    "seq_len": 10,
+    "ms": 7.119740999769419,
+    "tokenize_ms": 0.14344998635351658,
+    "run_ms": 6.869860051665455,
+    "decode_ms": 0.10643096175044775
+   },
+   {
+    "id": "ho2b-hate-ctr-01",
+    "state_tokens": 16,
+    "seq_len": 18,
+    "ms": 7.099840964656323,
+    "tokenize_ms": 0.1468199770897627,
+    "run_ms": 6.847070995718241,
+    "decode_ms": 0.10594999184831977
+   },
+   {
+    "id": "ho2b-hate-ctr-02",
+    "state_tokens": 20,
+    "seq_len": 22,
+    "ms": 7.114200969226658,
+    "tokenize_ms": 0.18276995979249477,
+    "run_ms": 6.824241019785404,
+    "decode_ms": 0.10718998964875937
+   },
+   {
+    "id": "ho2b-hate-ctr-03",
+    "state_tokens": 17,
+    "seq_len": 19,
+    "ms": 7.236731995362788,
+    "tokenize_ms": 0.1691610086709261,
+    "run_ms": 6.961959996260703,
+    "decode_ms": 0.10561099043115973
+   },
+   {
+    "id": "ho2b-hate-ctr-04",
+    "state_tokens": 17,
+    "seq_len": 19,
+    "ms": 7.108050980605185,
+    "tokenize_ms": 0.15623995568603277,
+    "run_ms": 6.845141004305333,
+    "decode_ms": 0.10667002061381936
+   },
+   {
+    "id": "ho2b-hate-ctr-05",
+    "state_tokens": 14,
+    "seq_len": 16,
+    "ms": 7.159570988733321,
+    "tokenize_ms": 0.15154998982325196,
+    "run_ms": 6.797721027396619,
+    "decode_ms": 0.21029997151345015
+   },
+   {
+    "id": "ho2b-hate-ctr-06",
+    "state_tokens": 12,
+    "seq_len": 14,
+    "ms": 7.019711018074304,
+    "tokenize_ms": 0.1449710107408464,
+    "run_ms": 6.769059982616454,
+    "decode_ms": 0.10568002471700311
+   },
+   {
+    "id": "ho2b-hate-ctr-07",
+    "state_tokens": 20,
+    "seq_len": 22,
+    "ms": 6.849561003036797,
+    "tokenize_ms": 0.15394098591059446,
+    "run_ms": 6.589028984308243,
+    "decode_ms": 0.10659103281795979
+   },
+   {
+    "id": "ho2b-hate-ctr-08",
+    "state_tokens": 18,
+    "seq_len": 20,
+    "ms": 6.882279994897544,
+    "tokenize_ms": 0.15827995957806706,
+    "run_ms": 6.617840030230582,
+    "decode_ms": 0.10616000508889556
+   },
+   {
+    "id": "ho2b-hate-bnd-01",
+    "state_tokens": 6,
+    "seq_len": 8,
+    "ms": 7.070700987242162,
+    "tokenize_ms": 0.11551100760698318,
+    "run_ms": 6.848349992651492,
+    "decode_ms": 0.10683998698368669
+   },
+   {
+    "id": "ho2b-hate-bnd-02",
+    "state_tokens": 15,
+    "seq_len": 17,
+    "ms": 6.972020957618952,
+    "tokenize_ms": 0.1560209784656763,
+    "run_ms": 6.710030022077262,
+    "decode_ms": 0.10596995707601309
+   },
+   {
+    "id": "ho2b-hate-bnd-03",
+    "state_tokens": 8,
+    "seq_len": 10,
+    "ms": 7.007091015111655,
+    "tokenize_ms": 0.13390003005042672,
+    "run_ms": 6.767030979972333,
+    "decode_ms": 0.10616000508889556
+   },
+   {
+    "id": "ho2b-hate-bnd-04",
+    "state_tokens": 16,
+    "seq_len": 18,
+    "ms": 6.9243209436535835,
+    "tokenize_ms": 0.16281998250633478,
+    "run_ms": 6.655880017206073,
+    "decode_ms": 0.10562094394117594
+   },
+   {
+    "id": "ho2b-hate-bnd-05",
+    "state_tokens": 7,
+    "seq_len": 9,
+    "ms": 6.960211030673236,
+    "tokenize_ms": 0.12530002277344465,
+    "run_ms": 6.728979991748929,
+    "decode_ms": 0.10593101615086198
+   },
+   {
+    "id": "ho2b-hate-bnd-06",
+    "state_tokens": 9,
+    "seq_len": 11,
+    "ms": 6.973219977226108,
+    "tokenize_ms": 0.12747000437229872,
+    "run_ms": 6.720479985233396,
+    "decode_ms": 0.1252699876204133
+   },
+   {
+    "id": "ho2b-hate-bnd-07",
+    "state_tokens": 8,
+    "seq_len": 10,
+    "ms": 6.891551020089537,
+    "tokenize_ms": 0.12577103916555643,
+    "run_ms": 6.648439972195774,
+    "decode_ms": 0.11734000872820616
+   },
+   {
+    "id": "ho2b-hate-bnd-08",
+    "state_tokens": 15,
+    "seq_len": 17,
+    "ms": 6.938820006325841,
+    "tokenize_ms": 0.17015001503750682,
+    "run_ms": 6.650570023339242,
+    "decode_ms": 0.11809996794909239
+   },
+   {
+    "id": "ho2c-self_harm-pos-01",
+    "state_tokens": 14,
+    "seq_len": 16,
+    "ms": 6.888271018397063,
+    "tokenize_ms": 0.15610101399943233,
+    "run_ms": 6.625880021601915,
+    "decode_ms": 0.10628998279571533
+   },
+   {
+    "id": "ho2c-self_harm-pos-02",
+    "state_tokens": 16,
+    "seq_len": 18,
+    "ms": 7.020541001111269,
+    "tokenize_ms": 0.16548100393265486,
+    "run_ms": 6.748720014002174,
+    "decode_ms": 0.10633998317644
+   },
+   {
+    "id": "ho2c-self_harm-pos-03",
+    "state_tokens": 12,
+    "seq_len": 14,
+    "ms": 6.953270989470184,
+    "tokenize_ms": 0.1388600212521851,
+    "run_ms": 6.70743000227958,
+    "decode_ms": 0.1069809659384191
+   },
+   {
+    "id": "ho2c-self_harm-pos-04",
+    "state_tokens": 17,
+    "seq_len": 19,
+    "ms": 7.208290975540876,
+    "tokenize_ms": 0.16468000831082463,
+    "run_ms": 6.937130994629115,
+    "decode_ms": 0.10647997260093689
+   },
+   {
+    "id": "ho2c-self_harm-pos-05",
+    "state_tokens": 11,
+    "seq_len": 13,
+    "ms": 6.966040993575007,
+    "tokenize_ms": 0.13528100680559874,
+    "run_ms": 6.715890020132065,
+    "decode_ms": 0.11486996663734317
+   },
+   {
+    "id": "ho2c-self_harm-pos-06",
+    "state_tokens": 14,
+    "seq_len": 16,
+    "ms": 6.872210011351854,
+    "tokenize_ms": 0.14546001330018044,
+    "run_ms": 6.620079977437854,
+    "decode_ms": 0.10667002061381936
+   },
+   {
+    "id": "ho2c-self_harm-pos-07",
+    "state_tokens": 16,
+    "seq_len": 18,
+    "ms": 6.913631048519164,
+    "tokenize_ms": 0.1523510436527431,
+    "run_ms": 6.655079952906817,
+    "decode_ms": 0.10620005195960402
+   },
+   {
+    "id": "ho2c-self_harm-pos-08",
+    "state_tokens": 12,
+    "seq_len": 14,
+    "ms": 6.963730964343995,
+    "tokenize_ms": 0.13305101310834289,
+    "run_ms": 6.7249099956825376,
+    "decode_ms": 0.10576995555311441
+   },
+   {
+    "id": "ho2c-self_harm-pos-09",
+    "state_tokens": 11,
+    "seq_len": 13,
+    "ms": 6.959920981898904,
+    "tokenize_ms": 0.13196002691984177,
+    "run_ms": 6.721729994751513,
+    "decode_ms": 0.10623096022754908
+   },
+   {
+    "id": "ho2c-self_harm-pos-10",
+    "state_tokens": 12,
+    "seq_len": 14,
+    "ms": 7.0258509949781,
+    "tokenize_ms": 0.15958002768456936,
+    "run_ms": 6.760429998394102,
+    "decode_ms": 0.10584096889942884
+   },
+   {
+    "id": "ho2c-self_harm-ctr-01",
+    "state_tokens": 16,
+    "seq_len": 18,
+    "ms": 6.95648998953402,
+    "tokenize_ms": 0.1604100107215345,
+    "run_ms": 6.690660025924444,
+    "decode_ms": 0.10541995288804173
+   },
+   {
+    "id": "ho2c-self_harm-ctr-02",
+    "state_tokens": 18,
+    "seq_len": 20,
+    "ms": 6.886860996019095,
+    "tokenize_ms": 0.16760098515078425,
+    "run_ms": 6.6116499947384,
+    "decode_ms": 0.10761001612991095
+   },
+   {
+    "id": "ho2c-self_harm-ctr-03",
+    "state_tokens": 19,
+    "seq_len": 21,
+    "ms": 6.812350009568036,
+    "tokenize_ms": 0.14284998178482056,
+    "run_ms": 6.563500035554171,
+    "decode_ms": 0.10599999222904444
+   },
+   {
+    "id": "ho2c-self_harm-ctr-04",
+    "state_tokens": 12,
+    "seq_len": 14,
+    "ms": 7.029070984572172,
+    "tokenize_ms": 0.1462209620513022,
+    "run_ms": 6.776600028388202,
+    "decode_ms": 0.10624999413266778
+   },
+   {
+    "id": "ho2c-self_harm-ctr-05",
+    "state_tokens": 19,
+    "seq_len": 21,
+    "ms": 6.888611009344459,
+    "tokenize_ms": 0.152641034219414,
+    "run_ms": 6.629228999372572,
+    "decode_ms": 0.10674097575247288
+   },
+   {
+    "id": "ho2c-self_harm-ctr-06",
+    "state_tokens": 13,
+    "seq_len": 15,
+    "ms": 6.942971027456224,
+    "tokenize_ms": 0.14737999299541116,
+    "run_ms": 6.687050045002252,
+    "decode_ms": 0.10854098945856094
+   },
+   {
+    "id": "ho2c-self_harm-bnd-01",
+    "state_tokens": 5,
+    "seq_len": 7,
+    "ms": 7.487791997846216,
+    "tokenize_ms": 0.13924000086262822,
+    "run_ms": 7.241841987706721,
+    "decode_ms": 0.10671000927686691
+   },
+   {
+    "id": "ho2c-self_harm-bnd-02",
+    "state_tokens": 15,
+    "seq_len": 17,
+    "ms": 7.655942987184972,
+    "tokenize_ms": 0.14710001414641738,
+    "run_ms": 7.401881972327828,
+    "decode_ms": 0.10696100071072578
+   },
+   {
+    "id": "ho2c-self_harm-bnd-03",
+    "state_tokens": 9,
+    "seq_len": 11,
+    "ms": 7.7609430300071836,
+    "tokenize_ms": 0.13788999058306217,
+    "run_ms": 7.514423050452024,
+    "decode_ms": 0.10862998897209764
+   },
+   {
+    "id": "ho2c-self_harm-bnd-04",
+    "state_tokens": 13,
+    "seq_len": 15,
+    "ms": 7.548902009148151,
+    "tokenize_ms": 0.1467500114813447,
+    "run_ms": 7.291842019185424,
+    "decode_ms": 0.11030997848138213
+   },
+   {
+    "id": "ho2c-self_harm-bnd-05",
+    "state_tokens": 9,
+    "seq_len": 11,
+    "ms": 7.731542980764061,
+    "tokenize_ms": 0.15315099153667688,
+    "run_ms": 7.4698919779621065,
+    "decode_ms": 0.10850001126527786
+   },
+   {
+    "id": "ho2c-self_harm-bnd-06",
+    "state_tokens": 15,
+    "seq_len": 17,
+    "ms": 7.611522974912077,
+    "tokenize_ms": 0.14492101036012173,
+    "run_ms": 7.356581976637244,
+    "decode_ms": 0.11001998791471124
+   },
+   {
+    "id": "ho2c-self_harm-pos-11",
+    "state_tokens": 9,
+    "seq_len": 11,
+    "ms": 7.801022962667048,
+    "tokenize_ms": 0.14489097520709038,
+    "run_ms": 7.538732024841011,
+    "decode_ms": 0.11739996261894703
+   },
+   {
+    "id": "ho2c-self_harm-pos-12",
+    "state_tokens": 26,
+    "seq_len": 28,
+    "ms": 8.726565982215106,
+    "tokenize_ms": 0.19804103067144752,
+    "run_ms": 8.416984986979514,
+    "decode_ms": 0.11153996456414461
+   },
+   {
+    "id": "ho2c-violence-pos-01",
+    "state_tokens": 12,
+    "seq_len": 14,
+    "ms": 7.778784027323127,
+    "tokenize_ms": 0.16367097850888968,
+    "run_ms": 7.506242021918297,
+    "decode_ms": 0.1088710268959403
+   },
+   {
+    "id": "ho2c-violence-pos-02",
+    "state_tokens": 15,
+    "seq_len": 17,
+    "ms": 7.686522963922471,
+    "tokenize_ms": 0.16001000767573714,
+    "run_ms": 7.41749198641628,
+    "decode_ms": 0.1090209698304534
+   },
+   {
+    "id": "ho2c-violence-pos-03",
+    "state_tokens": 13,
+    "seq_len": 15,
+    "ms": 7.572592003270984,
+    "tokenize_ms": 0.1539799850434065,
+    "run_ms": 7.309091975912452,
+    "decode_ms": 0.10952004231512547
+   },
+   {
+    "id": "ho2c-violence-pos-04",
+    "state_tokens": 16,
+    "seq_len": 18,
+    "ms": 7.62964301975444,
+    "tokenize_ms": 0.16709102783352137,
+    "run_ms": 7.352432003244758,
+    "decode_ms": 0.11011998867616057
+   },
+   {
+    "id": "ho2c-violence-pos-05",
+    "state_tokens": 10,
+    "seq_len": 12,
+    "ms": 7.716183026786894,
+    "tokenize_ms": 0.15571998665109277,
+    "run_ms": 7.451563025824726,
+    "decode_ms": 0.10890001431107521
+   },
+   {
+    "id": "ho2c-violence-pos-06",
+    "state_tokens": 12,
+    "seq_len": 14,
+    "ms": 7.652663043700159,
+    "tokenize_ms": 0.1508400309830904,
+    "run_ms": 7.3927720077335835,
+    "decode_ms": 0.10905100498348475
+   },
+   {
+    "id": "ho2c-violence-pos-07",
+    "state_tokens": 18,
+    "seq_len": 20,
+    "ms": 7.626642007380724,
+    "tokenize_ms": 0.17946999287232757,
+    "run_ms": 7.335992006119341,
+    "decode_ms": 0.11118000838905573
+   },
+   {
+    "id": "ho2c-violence-pos-08",
+    "state_tokens": 18,
+    "seq_len": 20,
+    "ms": 7.716591993812472,
+    "tokenize_ms": 0.1689799828454852,
+    "run_ms": 7.437432010192424,
+    "decode_ms": 0.11018000077456236
+   },
+   {
+    "id": "ho2c-violence-pos-09",
+    "state_tokens": 18,
+    "seq_len": 20,
+    "ms": 7.034422014839947,
+    "tokenize_ms": 0.16779103316366673,
+    "run_ms": 6.7584599601104856,
+    "decode_ms": 0.10817102156579494
+   },
+   {
+    "id": "ho2c-violence-pos-10",
+    "state_tokens": 15,
+    "seq_len": 17,
+    "ms": 7.1524810045957565,
+    "tokenize_ms": 0.15818001702427864,
+    "run_ms": 6.885620998218656,
+    "decode_ms": 0.1086799893528223
+   },
+   {
+    "id": "ho2c-violence-ctr-01",
+    "state_tokens": 11,
+    "seq_len": 13,
+    "ms": 7.2134610381908715,
+    "tokenize_ms": 0.1474700402468443,
+    "run_ms": 6.975330994464457,
+    "decode_ms": 0.09066000347957015
+   },
+   {
+    "id": "ho2c-violence-ctr-02",
+    "state_tokens": 15,
+    "seq_len": 17,
+    "ms": 6.592769990675151,
+    "tokenize_ms": 0.1378110027872026,
+    "run_ms": 6.346799025777727,
+    "decode_ms": 0.10815996211022139
+   },
+   {
+    "id": "ho2c-violence-ctr-03",
+    "state_tokens": 14,
+    "seq_len": 16,
+    "ms": 7.1634610067121685,
+    "tokenize_ms": 0.152861000970006,
+    "run_ms": 6.9204799947328866,
+    "decode_ms": 0.09012001100927591
+   },
+   {
+    "id": "ho2c-violence-ctr-04",
+    "state_tokens": 21,
+    "seq_len": 23,
+    "ms": 6.999721052125096,
+    "tokenize_ms": 0.1337110297754407,
+    "run_ms": 6.7733299802057445,
+    "decode_ms": 0.09268004214391112
+   },
+   {
+    "id": "ho2c-violence-ctr-05",
+    "state_tokens": 12,
+    "seq_len": 14,
+    "ms": 6.930670992005616,
+    "tokenize_ms": 0.11945102596655488,
+    "run_ms": 6.7039699642919,
+    "decode_ms": 0.10725000174716115
+   },
+   {
+    "id": "ho2c-violence-ctr-06",
+    "state_tokens": 16,
+    "seq_len": 18,
+    "ms": 6.865181028842926,
+    "tokenize_ms": 0.1477600308135152,
+    "run_ms": 6.6103399731218815,
+    "decode_ms": 0.10708102490752935
+   },
+   {
+    "id": "ho2c-violence-bnd-01",
+    "state_tokens": 7,
+    "seq_len": 9,
+    "ms": 7.1845410275273025,
+    "tokenize_ms": 0.1304500037804246,
+    "run_ms": 6.946781009901315,
+    "decode_ms": 0.10731001384556293
+   },
+   {
+    "id": "ho2c-violence-bnd-02",
+    "state_tokens": 15,
+    "seq_len": 17,
+    "ms": 7.155871018767357,
+    "tokenize_ms": 0.15014002565294504,
+    "run_ms": 6.898700958117843,
+    "decode_ms": 0.10703003499656916
+   },
+   {
+    "id": "ho2c-violence-bnd-03",
+    "state_tokens": 12,
+    "seq_len": 14,
+    "ms": 6.759910029359162,
+    "tokenize_ms": 0.14427100541070104,
+    "run_ms": 6.526339042466134,
+    "decode_ms": 0.08929998148232698
+   },
+   {
+    "id": "ho2c-violence-bnd-04",
+    "state_tokens": 13,
+    "seq_len": 15,
+    "ms": 7.036761031486094,
+    "tokenize_ms": 0.1308710197918117,
+    "run_ms": 6.798679998610169,
+    "decode_ms": 0.1072100130841136
+   },
+   {
+    "id": "ho2c-violence-bnd-05",
+    "state_tokens": 7,
+    "seq_len": 9,
+    "ms": 7.116772001609206,
+    "tokenize_ms": 0.12748100562021136,
+    "run_ms": 6.882019981276244,
+    "decode_ms": 0.10727101471275091
+   },
+   {
+    "id": "ho2c-violence-bnd-06",
+    "state_tokens": 12,
+    "seq_len": 14,
+    "ms": 7.18272099038586,
+    "tokenize_ms": 0.15616999007761478,
+    "run_ms": 6.920070969499648,
+    "decode_ms": 0.1064800308085978
+   },
+   {
+    "id": "ho2c-violence-pos-11",
+    "state_tokens": 8,
+    "seq_len": 10,
+    "ms": 7.206742011476308,
+    "tokenize_ms": 0.13157998910173774,
+    "run_ms": 6.968401023186743,
+    "decode_ms": 0.10676099918782711
+   },
+   {
+    "id": "ho2c-violence-pos-12",
+    "state_tokens": 22,
+    "seq_len": 24,
+    "ms": 6.955000048037618,
+    "tokenize_ms": 0.19153999164700508,
+    "run_ms": 6.656990037299693,
+    "decode_ms": 0.10647001909092069
+   },
+   {
+    "id": "ho2c-criminal_assistance-pos-01",
+    "state_tokens": 16,
+    "seq_len": 18,
+    "ms": 6.91804097732529,
+    "tokenize_ms": 0.15877099940553308,
+    "run_ms": 6.653269985690713,
+    "decode_ms": 0.10599999222904444
+   },
+   {
+    "id": "ho2c-criminal_assistance-pos-02",
+    "state_tokens": 17,
+    "seq_len": 19,
+    "ms": 6.960641010664403,
+    "tokenize_ms": 0.16420002793893218,
+    "run_ms": 6.689859961625189,
+    "decode_ms": 0.10658102110028267
+   },
+   {
+    "id": "ho2c-criminal_assistance-pos-03",
+    "state_tokens": 16,
+    "seq_len": 18,
+    "ms": 7.022310979664326,
+    "tokenize_ms": 0.15792000340297818,
+    "run_ms": 6.757949944585562,
+    "decode_ms": 0.10644103167578578
+   },
+   {
+    "id": "ho2c-criminal_assistance-pos-04",
+    "state_tokens": 16,
+    "seq_len": 18,
+    "ms": 6.932099990081042,
+    "tokenize_ms": 0.16419001622125506,
+    "run_ms": 6.661380000878125,
+    "decode_ms": 0.10652997298166156
+   },
+   {
+    "id": "ho2c-criminal_assistance-pos-05",
+    "state_tokens": 17,
+    "seq_len": 19,
+    "ms": 6.918720959220082,
+    "tokenize_ms": 0.15859096311032772,
+    "run_ms": 6.65439001750201,
+    "decode_ms": 0.10573997860774398
+   },
+   {
+    "id": "ho2c-criminal_assistance-pos-06",
+    "state_tokens": 17,
+    "seq_len": 19,
+    "ms": 6.94924098206684,
+    "tokenize_ms": 0.1611309708096087,
+    "run_ms": 6.68132898863405,
+    "decode_ms": 0.10678102262318134
+   },
+   {
+    "id": "ho2c-criminal_assistance-pos-07",
+    "state_tokens": 17,
+    "seq_len": 19,
+    "ms": 6.925170018803328,
+    "tokenize_ms": 0.1569900196045637,
+    "run_ms": 6.659400009084493,
+    "decode_ms": 0.10877999011427164
+   },
+   {
+    "id": "ho2c-criminal_assistance-pos-08",
+    "state_tokens": 16,
+    "seq_len": 18,
+    "ms": 6.949670030735433,
+    "tokenize_ms": 0.14153000665828586,
+    "run_ms": 6.702580023556948,
+    "decode_ms": 0.10556000052019954
+   },
+   {
+    "id": "ho2c-criminal_assistance-pos-09",
+    "state_tokens": 17,
+    "seq_len": 19,
+    "ms": 6.9137109676375985,
+    "tokenize_ms": 0.15300099039450288,
+    "run_ms": 6.654709985014051,
+    "decode_ms": 0.10599999222904444
+   },
+   {
+    "id": "ho2c-criminal_assistance-pos-10",
+    "state_tokens": 17,
+    "seq_len": 19,
+    "ms": 6.979621015489101,
+    "tokenize_ms": 0.15921000158414245,
+    "run_ms": 6.714409973938018,
+    "decode_ms": 0.10600103996694088
+   },
+   {
+    "id": "ho2c-criminal_assistance-ctr-01",
+    "state_tokens": 11,
+    "seq_len": 13,
+    "ms": 6.972121016588062,
+    "tokenize_ms": 0.14577002730220556,
+    "run_ms": 6.72011001734063,
+    "decode_ms": 0.10624097194522619
+   },
+   {
+    "id": "ho2c-criminal_assistance-ctr-02",
+    "state_tokens": 16,
+    "seq_len": 18,
+    "ms": 6.974640011321753,
+    "tokenize_ms": 0.1537799835205078,
+    "run_ms": 6.714569986797869,
+    "decode_ms": 0.10629004100337625
+   },
+   {
+    "id": "ho2c-criminal_assistance-ctr-03",
+    "state_tokens": 19,
+    "seq_len": 21,
+    "ms": 6.967600958887488,
+    "tokenize_ms": 0.15442096628248692,
+    "run_ms": 6.706879998091608,
+    "decode_ms": 0.10629999451339245
+   },
+   {
+    "id": "ho2c-criminal_assistance-ctr-04",
+    "state_tokens": 15,
+    "seq_len": 17,
+    "ms": 7.151590951252729,
+    "tokenize_ms": 0.14846096746623516,
+    "run_ms": 6.896379985846579,
+    "decode_ms": 0.10674999793991446
+   },
+   {
+    "id": "ho2c-criminal_assistance-ctr-05",
+    "state_tokens": 16,
+    "seq_len": 18,
+    "ms": 7.0539809530600905,
+    "tokenize_ms": 0.1709309872239828,
+    "run_ms": 6.776230002287775,
+    "decode_ms": 0.10681996354833245
+   },
+   {
+    "id": "ho2c-criminal_assistance-ctr-06",
+    "state_tokens": 12,
+    "seq_len": 14,
+    "ms": 7.003920967690647,
+    "tokenize_ms": 0.1560109667479992,
+    "run_ms": 6.741710007190704,
+    "decode_ms": 0.10619999375194311
+   },
+   {
+    "id": "ho2c-criminal_assistance-bnd-01",
+    "state_tokens": 13,
+    "seq_len": 15,
+    "ms": 6.890370976179838,
+    "tokenize_ms": 0.13396097347140312,
+    "run_ms": 6.650610012002289,
+    "decode_ms": 0.10579999070614576
+   },
+   {
+    "id": "ho2c-criminal_assistance-bnd-02",
+    "state_tokens": 14,
+    "seq_len": 16,
+    "ms": 6.872700003441423,
+    "tokenize_ms": 0.1506300177425146,
+    "run_ms": 6.61604997003451,
+    "decode_ms": 0.10602001566439867
+   },
+   {
+    "id": "ho2c-criminal_assistance-bnd-03",
+    "state_tokens": 9,
+    "seq_len": 11,
+    "ms": 7.017380965407938,
+    "tokenize_ms": 0.13596098870038986,
+    "run_ms": 6.77589001134038,
+    "decode_ms": 0.10552996536716819
+   },
+   {
+    "id": "ho2c-criminal_assistance-bnd-04",
+    "state_tokens": 14,
+    "seq_len": 16,
+    "ms": 6.871221004985273,
+    "tokenize_ms": 0.14157098485156894,
+    "run_ms": 6.622889020945877,
+    "decode_ms": 0.10676099918782711
+   },
+   {
+    "id": "ho2c-criminal_assistance-bnd-05",
+    "state_tokens": 9,
+    "seq_len": 11,
+    "ms": 6.96339103160426,
+    "tokenize_ms": 0.1417800085619092,
+    "run_ms": 6.717120006214827,
+    "decode_ms": 0.10449101682752371
+   },
+   {
+    "id": "ho2c-criminal_assistance-bnd-06",
+    "state_tokens": 14,
+    "seq_len": 16,
+    "ms": 6.888829986564815,
+    "tokenize_ms": 0.14595000538975,
+    "run_ms": 6.627609953284264,
+    "decode_ms": 0.11527002789080143
+   },
+   {
+    "id": "ho2c-criminal_assistance-pos-11",
+    "state_tokens": 9,
+    "seq_len": 11,
+    "ms": 7.007010979577899,
+    "tokenize_ms": 0.1355700078420341,
+    "run_ms": 6.756721006240696,
+    "decode_ms": 0.11471996549516916
+   },
+   {
+    "id": "ho2d-sexual_content-pos-01",
+    "state_tokens": 13,
+    "seq_len": 15,
+    "ms": 6.853170983958989,
+    "tokenize_ms": 0.13070000568404794,
+    "run_ms": 6.616190017666668,
+    "decode_ms": 0.10628096060827374
+   },
+   {
+    "id": "ho2d-sexual_content-pos-02",
+    "state_tokens": 12,
+    "seq_len": 14,
+    "ms": 7.020229997579008,
+    "tokenize_ms": 0.16321003204211593,
+    "run_ms": 6.75035995664075,
+    "decode_ms": 0.10666000889614224
+   },
+   {
+    "id": "ho2d-sexual_content-pos-03",
+    "state_tokens": 11,
+    "seq_len": 13,
+    "ms": 6.945120985619724,
+    "tokenize_ms": 0.1444609952159226,
+    "run_ms": 6.6948700114153326,
+    "decode_ms": 0.10578997898846865
+   },
+   {
+    "id": "ho2d-sexual_content-pos-04",
+    "state_tokens": 9,
+    "seq_len": 11,
+    "ms": 7.025021011941135,
+    "tokenize_ms": 0.16232102643698454,
+    "run_ms": 6.756910006515682,
+    "decode_ms": 0.10578997898846865
+   },
+   {
+    "id": "ho2d-sexual_content-pos-05",
+    "state_tokens": 15,
+    "seq_len": 17,
+    "ms": 7.073911023326218,
+    "tokenize_ms": 0.1529310247860849,
+    "run_ms": 6.806169985793531,
+    "decode_ms": 0.1148100127466023
+   },
+   {
+    "id": "ho2d-sexual_content-pos-06",
+    "state_tokens": 10,
+    "seq_len": 12,
+    "ms": 7.2235119878314435,
+    "tokenize_ms": 0.1378210145048797,
+    "run_ms": 6.980100006330758,
+    "decode_ms": 0.1055909669958055
+   },
+   {
+    "id": "ho2d-sexual_content-pos-07",
+    "state_tokens": 11,
+    "seq_len": 13,
+    "ms": 6.981401005759835,
+    "tokenize_ms": 0.1437400351278484,
+    "run_ms": 6.731609988491982,
+    "decode_ms": 0.10605098214000463
+   },
+   {
+    "id": "ho2d-sexual_content-ctr-01",
+    "state_tokens": 10,
+    "seq_len": 12,
+    "ms": 7.022620993666351,
+    "tokenize_ms": 0.13580999802798033,
+    "run_ms": 6.781070027500391,
+    "decode_ms": 0.10574096813797951
+   },
+   {
+    "id": "ho2d-sexual_content-ctr-02",
+    "state_tokens": 15,
+    "seq_len": 17,
+    "ms": 6.9315299624577165,
+    "tokenize_ms": 0.15827000606805086,
+    "run_ms": 6.664729968179017,
+    "decode_ms": 0.1085299882106483
+   },
+   {
+    "id": "ho2d-sexual_content-ctr-03",
+    "state_tokens": 14,
+    "seq_len": 16,
+    "ms": 6.8747010082006454,
+    "tokenize_ms": 0.15107099898159504,
+    "run_ms": 6.609308999031782,
+    "decode_ms": 0.11432101018726826
+   },
+   {
+    "id": "ho2d-sexual_content-bnd-01",
+    "state_tokens": 15,
+    "seq_len": 17,
+    "ms": 6.89439004054293,
+    "tokenize_ms": 0.13604003470391035,
+    "run_ms": 6.651709962170571,
+    "decode_ms": 0.10664004366844893
+   },
+   {
+    "id": "ho2d-sexual_content-bnd-02",
+    "state_tokens": 11,
+    "seq_len": 13,
+    "ms": 6.989140994846821,
+    "tokenize_ms": 0.1547809806652367,
+    "run_ms": 6.727179978042841,
+    "decode_ms": 0.10718003613874316
+   },
+   {
+    "id": "ho2d-sexual_content-bnd-03",
+    "state_tokens": 12,
+    "seq_len": 14,
+    "ms": 6.99553097365424,
+    "tokenize_ms": 0.14795095194131136,
+    "run_ms": 6.740559998434037,
+    "decode_ms": 0.10702002327889204
+   },
+   {
+    "id": "ho2d-sexual_content-bnd-04",
+    "state_tokens": 10,
+    "seq_len": 12,
+    "ms": 6.994500989094377,
+    "tokenize_ms": 0.15180098125711083,
+    "run_ms": 6.736189010553062,
+    "decode_ms": 0.10651099728420377
+   },
+   {
+    "id": "ho2d-sexual_content-bnd-05",
+    "state_tokens": 10,
+    "seq_len": 12,
+    "ms": 6.951701012440026,
+    "tokenize_ms": 0.1370200188830495,
+    "run_ms": 6.7093599936924875,
+    "decode_ms": 0.10532099986448884
+   },
+   {
+    "id": "ho2d-child_sexual_exploitation-pos-01",
+    "state_tokens": 12,
+    "seq_len": 14,
+    "ms": 7.039881020318717,
+    "tokenize_ms": 0.1477600308135152,
+    "run_ms": 6.785449979361147,
+    "decode_ms": 0.10667101014405489
+   },
+   {
+    "id": "ho2d-child_sexual_exploitation-pos-02",
+    "state_tokens": 11,
+    "seq_len": 13,
+    "ms": 6.938609993085265,
+    "tokenize_ms": 0.133539957460016,
+    "run_ms": 6.699790013954043,
+    "decode_ms": 0.10528002167120576
+   },
+   {
+    "id": "ho2d-child_sexual_exploitation-pos-03",
+    "state_tokens": 12,
+    "seq_len": 14,
+    "ms": 7.010850997176021,
+    "tokenize_ms": 0.14873105101287365,
+    "run_ms": 6.755929964128882,
+    "decode_ms": 0.106189982034266
+   },
+   {
+    "id": "ho2d-child_sexual_exploitation-pos-04",
+    "state_tokens": 15,
+    "seq_len": 17,
+    "ms": 6.909361050929874,
+    "tokenize_ms": 0.13988104183226824,
+    "run_ms": 6.663199979811907,
+    "decode_ms": 0.10628002928569913
+   },
+   {
+    "id": "ho2d-child_sexual_exploitation-pos-05",
+    "state_tokens": 16,
+    "seq_len": 18,
+    "ms": 7.07361102104187,
+    "tokenize_ms": 0.14575000386685133,
+    "run_ms": 6.821140996180475,
+    "decode_ms": 0.10672002099454403
+   },
+   {
+    "id": "ho2d-child_sexual_exploitation-pos-06",
+    "state_tokens": 10,
+    "seq_len": 12,
+    "ms": 7.131941034458578,
+    "tokenize_ms": 0.13479002518579364,
+    "run_ms": 6.883180991280824,
+    "decode_ms": 0.11397001799196005
+   },
+   {
+    "id": "ho2d-child_sexual_exploitation-pos-07",
+    "state_tokens": 12,
+    "seq_len": 14,
+    "ms": 7.1438520099036396,
+    "tokenize_ms": 0.14524103607982397,
+    "run_ms": 6.891989964060485,
+    "decode_ms": 0.10662100976333022
+   },
+   {
+    "id": "ho2d-child_sexual_exploitation-pos-08",
+    "state_tokens": 19,
+    "seq_len": 21,
+    "ms": 7.025631028227508,
+    "tokenize_ms": 0.15232001896947622,
+    "run_ms": 6.766929989680648,
+    "decode_ms": 0.106381019577384
+   },
+   {
+    "id": "ho2d-child_sexual_exploitation-pos-09",
+    "state_tokens": 14,
+    "seq_len": 16,
+    "ms": 7.007370004430413,
+    "tokenize_ms": 0.13421999756246805,
+    "run_ms": 6.766489997971803,
+    "decode_ms": 0.10666000889614224
+   },
+   {
+    "id": "ho2d-child_sexual_exploitation-pos-10",
+    "state_tokens": 11,
+    "seq_len": 13,
+    "ms": 7.196121965534985,
+    "tokenize_ms": 0.14453096082434058,
+    "run_ms": 6.94572099018842,
+    "decode_ms": 0.10587001452222466
+   },
+   {
+    "id": "ho2d-child_sexual_exploitation-pos-11",
+    "state_tokens": 11,
+    "seq_len": 13,
+    "ms": 7.093131018336862,
+    "tokenize_ms": 0.1215300289914012,
+    "run_ms": 6.86546100769192,
+    "decode_ms": 0.10613998165354133
+   },
+   {
+    "id": "ho2d-child_sexual_exploitation-pos-12",
+    "state_tokens": 11,
+    "seq_len": 13,
+    "ms": 7.252721989061683,
+    "tokenize_ms": 0.13986998237669468,
+    "run_ms": 7.006751024164259,
+    "decode_ms": 0.1061009825207293
+   },
+   {
+    "id": "ho2d-child_sexual_exploitation-ctr-01",
+    "state_tokens": 13,
+    "seq_len": 15,
+    "ms": 7.026470964774489,
+    "tokenize_ms": 0.13333000242710114,
+    "run_ms": 6.786389974877238,
+    "decode_ms": 0.10675098747015
+   },
+   {
+    "id": "ho2d-child_sexual_exploitation-ctr-02",
+    "state_tokens": 19,
+    "seq_len": 21,
+    "ms": 7.028991007246077,
+    "tokenize_ms": 0.16719999257475138,
+    "run_ms": 6.755249982234091,
+    "decode_ms": 0.10654103243723512
+   },
+   {
+    "id": "ho2d-child_sexual_exploitation-ctr-03",
+    "state_tokens": 17,
+    "seq_len": 19,
+    "ms": 6.891150027513504,
+    "tokenize_ms": 0.16650999896228313,
+    "run_ms": 6.635170022491366,
+    "decode_ms": 0.08947000605985522
+   },
+   {
+    "id": "ho2d-child_sexual_exploitation-ctr-04",
+    "state_tokens": 16,
+    "seq_len": 18,
+    "ms": 6.7132500116713345,
+    "tokenize_ms": 0.1241600257344544,
+    "run_ms": 6.499119976069778,
+    "decode_ms": 0.08997000986710191
+   },
+   {
+    "id": "ho2d-child_sexual_exploitation-ctr-05",
+    "state_tokens": 18,
+    "seq_len": 20,
+    "ms": 6.7805100115947425,
+    "tokenize_ms": 0.14070101315155625,
+    "run_ms": 6.532848987262696,
+    "decode_ms": 0.10696001118049026
+   },
+   {
+    "id": "ho2d-child_sexual_exploitation-bnd-01",
+    "state_tokens": 10,
+    "seq_len": 12,
+    "ms": 6.970800983253866,
+    "tokenize_ms": 0.12219103518873453,
+    "run_ms": 6.760119984392077,
+    "decode_ms": 0.08848996367305517
+   },
+   {
+    "id": "ho2d-child_sexual_exploitation-bnd-02",
+    "state_tokens": 11,
+    "seq_len": 13,
+    "ms": 6.979231024160981,
+    "tokenize_ms": 0.11291098780930042,
+    "run_ms": 6.75997999496758,
+    "decode_ms": 0.10634004138410091
+   },
+   {
+    "id": "ho2d-child_sexual_exploitation-bnd-03",
+    "state_tokens": 13,
+    "seq_len": 15,
+    "ms": 7.0662409998476505,
+    "tokenize_ms": 0.15415996313095093,
+    "run_ms": 6.8057310418225825,
+    "decode_ms": 0.10634999489411712
+   },
+   {
+    "id": "ho2d-child_sexual_exploitation-bnd-04",
+    "state_tokens": 12,
+    "seq_len": 14,
+    "ms": 7.153540966100991,
+    "tokenize_ms": 0.1445409725420177,
+    "run_ms": 6.9028399884700775,
+    "decode_ms": 0.10616000508889556
+   },
+   {
+    "id": "ho2d-child_sexual_exploitation-bnd-05",
+    "state_tokens": 15,
+    "seq_len": 17,
+    "ms": 7.123541960027069,
+    "tokenize_ms": 0.13508100528270006,
+    "run_ms": 6.882249959744513,
+    "decode_ms": 0.10621099499985576
+   },
+   {
+    "id": "ho2d-child_sexual_exploitation-bnd-06",
+    "state_tokens": 10,
+    "seq_len": 12,
+    "ms": 6.563378963619471,
+    "tokenize_ms": 0.14050997560843825,
+    "run_ms": 6.334198988042772,
+    "decode_ms": 0.08866999996826053
+   },
+   {
+    "id": "ho2d-child_sexual_exploitation-pos-13",
+    "state_tokens": 13,
+    "seq_len": 15,
+    "ms": 6.556780019309372,
+    "tokenize_ms": 0.10426098015159369,
+    "run_ms": 6.34362903656438,
+    "decode_ms": 0.1088900025933981
+   },
+   {
+    "id": "ho2d-child_sexual_exploitation-pos-14",
+    "state_tokens": 11,
+    "seq_len": 13,
+    "ms": 6.912720040418208,
+    "tokenize_ms": 0.1395900035277009,
+    "run_ms": 6.683910032734275,
+    "decode_ms": 0.08922000415623188
+   },
+   {
+    "id": "ho2d-child_sexual_exploitation-pos-15",
+    "state_tokens": 11,
+    "seq_len": 13,
+    "ms": 6.961940031033009,
+    "tokenize_ms": 0.10316999396309257,
+    "run_ms": 6.770040025003254,
+    "decode_ms": 0.08873001206666231
+   },
+   {
+    "id": "ho2d-child_sexual_exploitation-pos-16",
+    "state_tokens": 11,
+    "seq_len": 13,
+    "ms": 6.938441016245633,
+    "tokenize_ms": 0.11348101543262601,
+    "run_ms": 6.711409951094538,
+    "decode_ms": 0.11355004971846938
+   },
+   {
+    "id": "ho2d-clean-greeting-01",
+    "state_tokens": 9,
+    "seq_len": 11,
+    "ms": 6.743850011844188,
+    "tokenize_ms": 0.13443001080304384,
+    "run_ms": 6.504020013380796,
+    "decode_ms": 0.10539998766034842
+   },
+   {
+    "id": "ho2d-clean-greeting-02",
+    "state_tokens": 10,
+    "seq_len": 12,
+    "ms": 7.030291017144918,
+    "tokenize_ms": 0.13251003110781312,
+    "run_ms": 6.792250962462276,
+    "decode_ms": 0.1055300235748291
+   },
+   {
+    "id": "ho2d-clean-fact-01",
+    "state_tokens": 10,
+    "seq_len": 12,
+    "ms": 7.0340309757739305,
+    "tokenize_ms": 0.15643099322915077,
+    "run_ms": 6.7699700011871755,
+    "decode_ms": 0.10762998135760427
+   },
+   {
+    "id": "ho2d-clean-fact-02",
+    "state_tokens": 16,
+    "seq_len": 18,
+    "ms": 6.915550970006734,
+    "tokenize_ms": 0.1624510041438043,
+    "run_ms": 6.646669004112482,
+    "decode_ms": 0.10643096175044775
+   },
+   {
+    "id": "ho2d-clean-fact-03",
+    "state_tokens": 8,
+    "seq_len": 10,
+    "ms": 7.151670986786485,
+    "tokenize_ms": 0.14255999121814966,
+    "run_ms": 6.902571010868996,
+    "decode_ms": 0.10653998469933867
+   },
+   {
+    "id": "ho2d-clean-helpful-01",
+    "state_tokens": 16,
+    "seq_len": 18,
+    "ms": 6.686470005661249,
+    "tokenize_ms": 0.16325997421517968,
+    "run_ms": 6.434090028051287,
+    "decode_ms": 0.08912000339478254
+   },
+   {
+    "id": "ho2d-clean-helpful-02",
+    "state_tokens": 8,
+    "seq_len": 10,
+    "ms": 7.167760981246829,
+    "tokenize_ms": 0.11524994624778628,
+    "run_ms": 6.946061039343476,
+    "decode_ms": 0.10644999565556645
+   },
+   {
+    "id": "ho2d-clean-helpful-03",
+    "state_tokens": 14,
+    "seq_len": 16,
+    "ms": 6.434780021663755,
+    "tokenize_ms": 0.14551100321114063,
+    "run_ms": 6.182528042700142,
+    "decode_ms": 0.10674097575247288
+   },
+   {
+    "id": "ho2d-clean-refusal-01",
+    "state_tokens": 16,
+    "seq_len": 18,
+    "ms": 6.969249981921166,
+    "tokenize_ms": 0.161870033480227,
+    "run_ms": 6.695699994452298,
+    "decode_ms": 0.1116799539886415
+   },
+   {
+    "id": "ho2d-clean-refusal-02",
+    "state_tokens": 19,
+    "seq_len": 21,
+    "ms": 7.060391013510525,
+    "tokenize_ms": 0.17608102643862367,
+    "run_ms": 6.7780399695038795,
+    "decode_ms": 0.10627001756802201
+   },
+   {
+    "id": "ho2d-clean-crisis-01",
+    "state_tokens": 24,
+    "seq_len": 26,
+    "ms": 7.103090989403427,
+    "tokenize_ms": 0.1558709773235023,
+    "run_ms": 6.840770016424358,
+    "decode_ms": 0.10644999565556645
+   },
+   {
+    "id": "ho2d-clean-crisis-02",
+    "state_tokens": 22,
+    "seq_len": 24,
+    "ms": 7.052670989651233,
+    "tokenize_ms": 0.1679499982856214,
+    "run_ms": 6.777509988751262,
+    "decode_ms": 0.10721100261434913
+   }
+  ]
+ },
+ "meta": {
+  "rep": "r2",
+  "device": "cuda",
+  "model": "shared-ckpt-epoch-2.5-step-570-fp32.onnx",
+  "model_sha256": "dadee217c626ee46794cd80d6f440ce181d7d38675a0326aeab0eb473c29ab5f",
+  "ort": {
+   "intra_op": 8,
+   "inter_op": 1,
+   "execution_mode": "sequential",
+   "allow_spinning": "0",
+   "graph_optimization": "all",
+   "providers": [
+    "CUDAExecutionProvider",
+    "CPUExecutionProvider"
+   ]
+  },
+  "layout": "single sequence, no padding",
+  "one_pass": true,
+  "max_len": 1024,
+  "warmup_suite_items": 20,
+  "warmup_s": 0.5467911999439821,
+  "session_load_s": 3.396310834970791,
+  "onnxruntime": "1.22.0",
+  "numpy": "2.4.6",
+  "python": "3.11.10",
+  "host": "a1d051931d70",
+  "cpu_model": "AMD EPYC 7C13 64-Core Processor",
+  "nproc": 128,
+  "loadavg_pre": "9.78 21.61 15.38 6/4744 3345",
+  "loadavg_post": "9.32 21.32 15.32 4/4886 3357",
+  "started_utc": "2026-10-10T19:57:57Z"
+ }
+}
