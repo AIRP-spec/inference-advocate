@@ -9,6 +9,7 @@ sha256sum data/*.jsonl data/*.json
 pip install -q -r requirements.txt 2>&1 | tail -3
 pip install -q 'laya==0.3.21' 'transformers==4.48.3' 2>&1 | tail -2
 python3 -c "import torch,transformers,laya,onnxruntime as o;print(torch.__version__,torch.cuda.is_available(),transformers.__version__,o.__version__)"
+python3 -c "import torch,sys; sys.exit(0 if torch.cuda.is_available() else 7)" || { echo CUDA_BROKEN; exit 7; }
 python3 preprocess_shared.py --data-dir data --out-dir preprocessed 2>&1 | tee logs/preprocess.log
 grep -q PREPROCESS_DONE logs/preprocess.log || { echo "PREPROCESS_FAILED"; exit 21; }
 python3 -u train_shared.py --output-dir checkpoints-A --epochs 3 --batch-size 8 --grad-accum 4 --lr-encoder 2e-5 --lr-head 1e-4 --amp bf16 --sigma-start 0.25 2>&1 | tee logs/train-A.log
