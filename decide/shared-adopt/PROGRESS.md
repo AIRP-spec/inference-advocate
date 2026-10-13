@@ -67,3 +67,5 @@
 - 13:59Z VPS manifest b0a55f41… sha -c OK; pod zkjwujgkmty8ey terminated 13:59:40Z; pods empty. Spend ~$1.57, total ~$9.53. REPORT-FRESH: FAIL (s3 sh pos-05, s4 CSE ctr-03, worst E+M 39). STOPPED.
 - 18:50Z Justin 00:34: step1 SH-POS05.md done. DECLARATION-ENS written (ens5, ens3f; exploratory).
 - 18:54Z ENS scored (both pass; see REPORT-ENS when written). DECLARATION-ARMB written (w=5/5, seeds 6/7/8).
+- 18:55Z Arm B pod {"podFindAndDeployOnDemand": {"id": "h8vb23k77f3len", "name": "airp-shared-armb" created 18:54:45Z; pipeline + armb/stream.sh (per-ckpt VPS sha -c) running.
+- 18:56Z REPORT-ENS (ens5 29 PASS, ens3f 32 PASS; latency 2-model 1288/1456, 3-model 1956/2056 ms) + DISTILL-PROPOSAL (not run) written.
