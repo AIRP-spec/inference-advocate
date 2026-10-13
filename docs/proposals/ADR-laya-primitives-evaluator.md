@@ -1,7 +1,8 @@
 # ADR: Switch the primitives evaluator to Laya
 
 Date: 2026-10-06
-Status: **Proposed.** Justin Flores to accept or reject. When accepted, move this file to `docs/decisions/2026-10-06-primitives-evaluator-laya.md` and set the status to Accepted.
+Status: **Superseded, never accepted** (2026-10-13). Body unchanged.
+Superseded by: [`docs/decisions/2026-10-13-primitives-evaluator-shared-encoding.md`](../decisions/2026-10-13-primitives-evaluator-shared-encoding.md).
 Deciders: Justin Flores
 Supersedes, if accepted: the "stay with per-primitive Qwen" outcome of the deciding run (`decide/REPORT-deciding-run-2026-10-05.md` §1). It does not edit that report or its declared rule; both stay on record as they were.
 
