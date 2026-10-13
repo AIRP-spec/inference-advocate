@@ -69,3 +69,5 @@
 - 18:54Z ENS scored (both pass; see REPORT-ENS when written). DECLARATION-ARMB written (w=5/5, seeds 6/7/8).
 - 18:55Z Arm B pod {"podFindAndDeployOnDemand": {"id": "h8vb23k77f3len", "name": "airp-shared-armb" created 18:54:45Z; pipeline + armb/stream.sh (per-ckpt VPS sha -c) running.
 - 18:56Z REPORT-ENS (ens5 29 PASS, ens3f 32 PASS; latency 2-model 1288/1456, 3-model 1956/2056 ms) + DISTILL-PROPOSAL (not run) written.
+- 19:24Z box→VPS slow (~3 ckpt/28min); added stream2.sh (reverse order, claims) in parallel.
+- 19:36Z Arm B trained (PIPELINE_DONE 19:31Z). Gate: FAIL (s6 CSE miss pos-07 + E+M 40; s8 E+M 37; sh 0 all). REPORT-ARMB written. Pod idle only for VPS stream (link ~4MB/s; 4/21 units at 19:35Z).
