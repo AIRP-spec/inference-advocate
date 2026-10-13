@@ -52,3 +52,6 @@
 - 09:05Z Justin 14:48: lower LRs dropped. Step 1 read-only done: CSE-ITEMS-STEP1.md + item-probs.txt (pos-01 valid target; ctr-03 & hate-pos-04 flagged gold-vs-definition). Arm A/B/C cost est ~$2.3-3.2. STOP before declaration.
 - 09:45Z archive: VPS 7/12 pulled 8/12 (links flaky; workers retrying)
 - 10:06Z Justin 15:50: CSE composition correction ADR + rescore (no training). If later: Arm B cap 5; Arm A rows pos-01 shape only, no refusal negatives.
+- 10:08Z CSE correction ADR + composition 4e840f3b + RESCORE-CSE-CORRECTED.md committed 5476b93 (ls-remote OK, #31 draft). No group passes. STOP on training.
+- 10:22Z all 12 runs on box (sha -c vs pod). VPS 8/12; pod held only for VPS verify per rule.
+- 10:56:15Z (16:41 NPT) pod ke8kyz9qa7dh5b TERMINATED (all 12 runs sha-verified on box vs pod; VPS 9/12, push continues box→VPS). pods=[]. Sweep pod ~05:29–10:56Z = 5.45h x $0.89 = ~$4.85. TOTAL ~$7.96 of $30.
