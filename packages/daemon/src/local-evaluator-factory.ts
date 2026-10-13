@@ -11,7 +11,8 @@ export async function localEvaluatorFactory(
   cfg: LocalEvaluatorConfig,
   taxonomy: Taxonomy,
 ): Promise<Evaluator> {
-  const { createLocalEvaluator } = await import('@airp/evaluator-local');
-  // Whole config, including optional promptTemplateVersion. Do not pick fields here.
-  return createLocalEvaluator(cfg, taxonomy);
+  const { createOnDeviceEvaluator } = await import('@airp/evaluator-local');
+  // Whole config, including optional promptTemplateVersion and engine. Do not pick fields here.
+  // Omitted engine is the GGUF live pin; engine 'laya-onnx' is the Laya evaluator, off by default.
+  return createOnDeviceEvaluator(cfg, taxonomy);
 }

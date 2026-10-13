@@ -55,14 +55,43 @@ export function isLocalPromptTemplateVersion(value: unknown): value is LocalProm
 }
 
 /**
- * On-device GGUF evaluator. Core never loads the native runtime: the host injects a factory
+ * On-device engines. Omit `engine` (or set 'gguf') for the live pin: the vendor GGUF through
+ * llama.cpp. 'laya-onnx' is the Laya primitives evaluator through @receptron/laya on ONNX
+ * Runtime. It is off unless a config names it, and it is a non-default development path.
+ */
+export const LOCAL_ENGINES = ['gguf', 'laya-onnx'] as const;
+export type LocalEngine = (typeof LOCAL_ENGINES)[number];
+
+/**
+ * Laya engine settings. Temperature, thresholds and question wording change verdicts as much as
+ * the weights do, so they live in one pins file whose SHA-256 the config carries next to the
+ * model's. The composition the primitives feed is pinned the same way. Construction refuses on
+ * any mismatch.
+ */
+export interface LayaEngineConfig {
+  /** laya-pins JSON: checkpoint identity, tokenizer and laya_config SHAs, temperature, thresholds, questions SHA. */
+  pinsPath: string;
+  pinsSha256: string;
+  /** Composition the primitives are composed through (shared compose from @airp/evaluator-local). */
+  compositionPath: string;
+  compositionSha256: string;
+  /** ONNX Runtime intra-op threads. Omit for the ONNX Runtime default. Does not change the model. */
+  intraOpNumThreads?: number;
+}
+
+/**
+ * On-device evaluator. Core never loads the native runtime: the host injects a factory
  * that constructs `@airp/evaluator-local`. Same port pattern as StoreBackend.
  */
 export interface LocalEvaluatorConfig {
   kind: 'local';
+  /** Omit for the GGUF live pin. 'laya-onnx' requires `laya` and refuses promptTemplateVersion. */
+  engine?: LocalEngine;
   modelPath: string;
-  /** Hex SHA-256 of the GGUF file. Construction refuses to load on mismatch. */
+  /** Hex SHA-256 of the model file (GGUF, or laya.onnx). Construction refuses to load on mismatch. */
   modelSha256: string;
+  /** Required when engine is 'laya-onnx'; ignored otherwise. */
+  laya?: LayaEngineConfig;
   contextSize?: number;
   /** GPU offload is optional and never required. CPU-only must work. */
   gpu?: boolean;
@@ -112,6 +141,42 @@ function resolvedLocalPromptTemplate(value: unknown): LocalPromptTemplateVersion
   );
 }
 
+const SHA256_HEX = /^(sha-?256:)?[0-9a-fA-F]{64}$/;
+
+/**
+ * Validates engine selection before any model file is opened. A laya-onnx config that is missing
+ * a pin, or that also names a GGUF template, is refused here with the field named.
+ */
+function resolvedLocalEngine(config: LocalEvaluatorConfig): LocalEngine {
+  const engine = config.engine ?? 'gguf';
+  if (!(LOCAL_ENGINES as readonly string[]).includes(engine)) {
+    throw new Error(
+      `local evaluator config engine ${JSON.stringify(engine)} is not supported. ` +
+        `Accepted values: ${LOCAL_ENGINES.join(', ')}. Omit the field for the live pin (gguf).`,
+    );
+  }
+  if (engine !== 'laya-onnx') return engine;
+  if (config.promptTemplateVersion !== undefined) {
+    throw new Error('local evaluator config engine laya-onnx does not take promptTemplateVersion (that selects a GGUF template)');
+  }
+  const laya = config.laya;
+  if (!laya) throw new Error('local evaluator config engine laya-onnx requires a laya block (pinsPath, pinsSha256, compositionPath, compositionSha256)');
+  for (const key of ['pinsPath', 'compositionPath'] as const) {
+    if (typeof laya[key] !== 'string' || laya[key].length === 0) {
+      throw new Error(`local evaluator config engine laya-onnx requires laya.${key}`);
+    }
+  }
+  for (const key of ['pinsSha256', 'compositionSha256'] as const) {
+    if (typeof laya[key] !== 'string' || !SHA256_HEX.test(laya[key])) {
+      throw new Error(`local evaluator config engine laya-onnx requires laya.${key} as a hex SHA-256`);
+    }
+  }
+  if (!SHA256_HEX.test(config.modelSha256)) {
+    throw new Error('local evaluator config engine laya-onnx requires modelSha256 as a hex SHA-256');
+  }
+  return engine;
+}
+
 export interface ResolveEvaluatorInput {
   taxonomy: Taxonomy;
   config?: EvaluatorConfig;
@@ -147,6 +212,16 @@ export async function resolveEvaluator(input: ResolveEvaluatorInput): Promise<Re
     }
     if (!config.modelPath || !config.modelSha256) {
       throw new Error('local evaluator config requires modelPath and modelSha256');
+    }
+    const engine = resolvedLocalEngine(config);
+    if (engine === 'laya-onnx') {
+      const evaluator = await input.localEvaluatorFactory(config, input.taxonomy);
+      warnings.unshift(
+        `the semantic layer is running ${evaluator.id}@${evaluator.version} on-device against ${basename(config.modelPath)} ` +
+          '(engine laya-onnx, primitives composed through the shared composition). ' +
+          'This is a non-default development path. It is not a release. The live pin remains the vendor GGUF at v2.1.',
+      );
+      return { evaluator, outboundContentPaths: [], warnings };
     }
     // Named here, not only inside the constructor, so a JSON config that asks for a template
     // the constructor does not know cannot load a GGUF first and fail later. Configuration
