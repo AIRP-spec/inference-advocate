@@ -1,0 +1,57 @@
+{
+ "buckets": {
+  "50": {
+   "n": 20,
+   "median_ms": 98.10784799999965,
+   "p95_ms": 130.4847209999998,
+   "mean_ms": 99.79974909999969,
+   "min_ms": 77.88426200000049,
+   "max_ms": 132.38167599999906
+  },
+  "200": {
+   "n": 20,
+   "median_ms": 249.60780450000038,
+   "p95_ms": 274.7959150000006,
+   "mean_ms": 248.1640618999999,
+   "min_ms": 209.00333499999942,
+   "max_ms": 287.595781
+  },
+  "500": {
+   "n": 20,
+   "median_ms": 613.6996915,
+   "p95_ms": 647.7627739999989,
+   "mean_ms": 618.1365686000001,
+   "min_ms": 571.8505270000005,
+   "max_ms": 710.7407920000005
+  },
+  "1000": {
+   "n": 20,
+   "median_ms": 1400.9812754999984,
+   "p95_ms": 1680.956339999997,
+   "mean_ms": 1418.4005681,
+   "min_ms": 1148.5657350000038,
+   "max_ms": 1768.2182949999988
+  }
+ },
+ "verify_ms": 1453.775196,
+ "load_ms": 4012.1982420000004,
+ "warmup_ms": 34,
+ "evaluator": "local-laya-shared@dadee217c626+laya-shared-pins-006546c69517",
+ "node": "v22.23.2",
+ "onnxruntime_node": "1.30.0",
+ "hf_tokenizers": "0.2.0",
+ "allowSpinning": 0,
+ "layout": "shared (batch 1, no padding)",
+ "warmupItems": 20,
+ "intraOpNumThreads": 8,
+ "host": "himalogic",
+ "cpu": "Intel(R) Xeon(R) Gold 5418Y",
+ "nproc": 8,
+ "loadavg": [
+  4.92,
+  2.36,
+  0.96
+ ],
+ "rss_mb": 2936.28515625,
+ "finished": "2026-10-13T02:35:31.469Z"
+}
