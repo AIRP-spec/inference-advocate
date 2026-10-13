@@ -16,3 +16,9 @@
 "Justin chose option A (2026-10-13 08:22 NPT): 96 new rows PLUS the hate-vs-sh-sh relabel fix in relabel-from-slots.mjs."
 - Executing A: fix relabel code, author 96 composed contrast rows, regen+relabel, verify diff = 20 relabelled + 96 new only, checks, train-only split, declare+commit+push+ls-remote+archive BEFORE pod, one SECURE 4090 pod 3 runs, archive+terminate same turn. Then Task 5 prepare if rule valid. Budget $30.
 - 02:44 worktree OK after Node reset (HEAD 61a2002 = remote); MERGE-PLAN updated for #32 after #29
+- 02:48 DECLARATION-3 sha 6bdaa173 committed+pushed 6332c26, archived VPS MANIFEST-pre-pod; pack ready
+- 02:48 pod create attempted
+- 02:52 pod 02nqe5hbxwt3p4 SECURE 4090 $0.89/hr UP; pack pushed; pipeline started
+- 02:54 base2 training ~ep0.55; first ckpt saved; GPU OK. Est ~75-90min for 3 runs+infer.
+- 03:03 STOPPED pod 02nqe5hbxwt3p4 per Justin 08:47: kind-table audit before any training
+- 03:05 Justin 08:47 audit: hate NOT confirmed as cause; kind-table rewrite; diff vs v4 = exactly 20 hate-vs-sh-sh. PROCEED. Prior pod terminated (base2 ckpts discarded, not archived).

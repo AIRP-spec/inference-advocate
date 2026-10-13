@@ -74,3 +74,8 @@ If the rule has a valid output, proceed to Task 4's final step (Node identity+la
 ## What this declaration does not do
 
 Does not edit the held-out suite or any gate threshold. Does not touch tryairp.com / dev.tryairp.com. Does not publish. Does not merge.
+
+## Addendum (Justin 08:47 NPT, before any training pod that counts)
+
+1. Self_harm miss firing report and kind-table rewrite: see `JUSTIN-0847-AUDIT.md` (sha256 `b0e35b8b…9d8a`). Hate-shaped primitives did **not** fire on either miss; relabel bug **not confirmed as cause**. Kind-table rewrite: exact lookup only; unknown kind throws. Diff vs v4 (no new rows): **exactly the 20 hate-vs-sh-sh rows**. Proceeding under Justin's instruction.
+2. An earlier pod (`02nqe5hbxwt3p4`) had started base2 before the 08:47 message arrived; it was terminated without archive. No result from it is used. The runs below start on a fresh pod after this addendum is committed, pushed, and archived.
