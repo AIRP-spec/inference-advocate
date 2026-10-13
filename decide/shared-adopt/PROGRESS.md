@@ -46,3 +46,9 @@
 - 07:34Z push_worker restarted with --append-verify, -P2 (VPS link ~5MB/s, timeouts). Stale rsync temps removed on VPS.
 - 08:00Z PIPELINE_DONE 07:51Z (12/12 trained). All raw pulled to box sweep/raw for gating. pull_worker restarted with no ahead-cap (pull2.log). Archived to VPS 2/12.
 - 08:01Z GATED all 12 on box: NO setting passes → STOP per declaration (spread report REPORT-SWEEP.md). ctr-03 corpus target flag: L5e6-W10 (2/3). Pod kept only until VPS sha -c passes.
+- 08:03Z archive in flight: VPS ingest ~9.6MB/s, 2/12 verified; pull 4/12 + W10-s3 in progress. ETA ~09:15Z. Pod idles only for archive.
+- 08:30Z archive: VPS verified 3/12, pulled 6/12; box link ~10MB/s total (pull+push share), ETA ~10:30Z. Workers nohup'd; resume = just check pull2.log/push.log.
+- 09:03Z archive: VPS 5/12, pulled 8/12
+- 09:05Z Justin 14:48: lower LRs dropped. Step 1 read-only done: CSE-ITEMS-STEP1.md + item-probs.txt (pos-01 valid target; ctr-03 & hate-pos-04 flagged gold-vs-definition). Arm A/B/C cost est ~$2.3-3.2. STOP before declaration.
+- 09:45Z archive: VPS 7/12 pulled 8/12 (links flaky; workers retrying)
+- 10:06Z Justin 15:50: CSE composition correction ADR + rescore (no training). If later: Arm B cap 5; Arm A rows pos-01 shape only, no refusal negatives.
