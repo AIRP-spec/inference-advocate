@@ -60,3 +60,13 @@ Until all three hold, any integration stays behind config, default off, with the
 ## 7. The claim, stated modestly
 
 Neither model passes the held-out gate (`pass: false` for both, as in the deciding run). What is new is: accuracy matching the earlier best (v2 E+M 36, the same count as Laya 5766), at **under a second on a real-length (~500-token) response on CPU** (645 ms, against 16 s for Laya and 30.5 s for per-primitive Qwen), while keeping taxonomy swapping: classes are composed from primitive outputs through the composition file, so a change to the class composition does not need retraining (a change to the primitive set itself needs new heads).
+
+## 8. Follow-up (Justin 2026-10-13 10:50 NPT)
+
+Justin accepted the Task 3 corpus-round result: the round is **not** recommended (declared bar 3 CSE failed on converged round1 checkpoints and on round2 epoch 2.0; bars 1/2/4 passed). self_harm FN=0 on all converged round seeds.
+
+**Labels base for further training:** labels v5 `9480a89f…` (self_harm fix included). See `decide/shared-adopt/DECISIONS-2026-10-13-round-accepted.md`.
+
+**Rule shape going forward:** compare **per seed** or against the **worst seed**; never against a mean across seeds.
+
+Selected ship weights remain 3b run A epoch 2.5 until a later declared rule recommends otherwise. Merges and publishing stay with Justin.

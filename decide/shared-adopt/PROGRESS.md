@@ -29,3 +29,5 @@
 - 04:35 archive MANIFEST verified; pod 2oh6ncux3wsml1 TERMINATED
 - 04:35 committed+pushed; Task 5 prep done; DONE for this stop
 ## Ledger final: this brief ~$1.61; prior follow-up $1.5; total ~$3.11 of $30. Pods empty.
+- 10:50 Justin accepted round result. Labels v5 = further-training base; future rules = per-seed / worst-seed (never mean). Recorded in DECISIONS note + ADR §8.
+- 10:50+ CSE-FAILURES.md from archived gates (no new CSE rows). DECLARATION-AVG.md written BEFORE averaging/gating. Best single-round v2 E+M = 31 (round2 ep 2.5).
