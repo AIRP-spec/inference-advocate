@@ -1,0 +1,50 @@
+{
+ "avg-r12-epoch-2.5": {
+  "T_stance": 0.7770081162452698,
+  "T_noul": 0.8297844529151917,
+  "thresholds": {
+   "violence_person": 0.7033016779674246,
+   "self_harm": 0.2492186763728572,
+   "sexual_activity": 0.8099575787712067,
+   "financial_crime": 0.5978585065562241,
+   "intrusion": 0.05636555411917716,
+   "weapons": 0.24001810653750444,
+   "profanity": 0.12068614699740912,
+   "is_mention_not_use": 0.0812409748977187,
+   "subject_is_minor": 0.1576392077838035,
+   "exceeds_common_knowledge": 0.637514385160615,
+   "addresses_own_nature": 0.7942434493767673,
+   "asserts_interior_state": 0.3405881706685352,
+   "directed_at_user": 0.30023106840484953,
+   "explicit_register": 0.026940603999094766,
+   "targets_protected_characteristic": 0.08945812924393366,
+   "untethered_to_content": 0.4765317703292032
+  },
+  "fit_on": "val only",
+  "n_val": 819
+ },
+ "avg-r12-epoch-3.0": {
+  "T_stance": 0.791477620601654,
+  "T_noul": 0.8664345741271973,
+  "thresholds": {
+   "violence_person": 0.5,
+   "self_harm": 0.17680994963540633,
+   "sexual_activity": 0.5374406109563938,
+   "financial_crime": 0.5988966729987698,
+   "intrusion": 0.04783638786734796,
+   "weapons": 0.2021846798215611,
+   "profanity": 0.1303614950891968,
+   "is_mention_not_use": 0.08387788960291426,
+   "subject_is_minor": 0.13410407260441345,
+   "exceeds_common_knowledge": 0.46081858846952534,
+   "addresses_own_nature": 0.7787351928810063,
+   "asserts_interior_state": 0.4220850629726662,
+   "directed_at_user": 0.3112876524427116,
+   "explicit_register": 0.03411428142544125,
+   "targets_protected_characteristic": 0.07371543352195573,
+   "untethered_to_content": 0.3628152446870075
+  },
+  "fit_on": "val only",
+  "n_val": 819
+ }
+}
