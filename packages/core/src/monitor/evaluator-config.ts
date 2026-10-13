@@ -57,9 +57,11 @@ export function isLocalPromptTemplateVersion(value: unknown): value is LocalProm
 /**
  * On-device engines. Omit `engine` (or set 'gguf') for the live pin: the vendor GGUF through
  * llama.cpp. 'laya-onnx' is the Laya primitives evaluator through @receptron/laya on ONNX
- * Runtime. It is off unless a config names it, and it is a non-default development path.
+ * Runtime. 'laya-shared-onnx' is the shared-encoding primitives model (response encoded once, 17
+ * heads) on ONNX Runtime; it takes the same `laya` pins block. Both are off unless a config names
+ * them, and both are non-default development paths.
  */
-export const LOCAL_ENGINES = ['gguf', 'laya-onnx'] as const;
+export const LOCAL_ENGINES = ['gguf', 'laya-onnx', 'laya-shared-onnx'] as const;
 export type LocalEngine = (typeof LOCAL_ENGINES)[number];
 
 /**
@@ -155,24 +157,24 @@ function resolvedLocalEngine(config: LocalEvaluatorConfig): LocalEngine {
         `Accepted values: ${LOCAL_ENGINES.join(', ')}. Omit the field for the live pin (gguf).`,
     );
   }
-  if (engine !== 'laya-onnx') return engine;
+  if (engine !== 'laya-onnx' && engine !== 'laya-shared-onnx') return engine;
   if (config.promptTemplateVersion !== undefined) {
-    throw new Error('local evaluator config engine laya-onnx does not take promptTemplateVersion (that selects a GGUF template)');
+    throw new Error(`local evaluator config engine ${engine} does not take promptTemplateVersion (that selects a GGUF template)`);
   }
   const laya = config.laya;
-  if (!laya) throw new Error('local evaluator config engine laya-onnx requires a laya block (pinsPath, pinsSha256, compositionPath, compositionSha256)');
+  if (!laya) throw new Error(`local evaluator config engine ${engine} requires a laya block (pinsPath, pinsSha256, compositionPath, compositionSha256)`);
   for (const key of ['pinsPath', 'compositionPath'] as const) {
     if (typeof laya[key] !== 'string' || laya[key].length === 0) {
-      throw new Error(`local evaluator config engine laya-onnx requires laya.${key}`);
+      throw new Error(`local evaluator config engine ${engine} requires laya.${key}`);
     }
   }
   for (const key of ['pinsSha256', 'compositionSha256'] as const) {
     if (typeof laya[key] !== 'string' || !SHA256_HEX.test(laya[key])) {
-      throw new Error(`local evaluator config engine laya-onnx requires laya.${key} as a hex SHA-256`);
+      throw new Error(`local evaluator config engine ${engine} requires laya.${key} as a hex SHA-256`);
     }
   }
   if (!SHA256_HEX.test(config.modelSha256)) {
-    throw new Error('local evaluator config engine laya-onnx requires modelSha256 as a hex SHA-256');
+    throw new Error(`local evaluator config engine ${engine} requires modelSha256 as a hex SHA-256`);
   }
   return engine;
 }
@@ -214,11 +216,11 @@ export async function resolveEvaluator(input: ResolveEvaluatorInput): Promise<Re
       throw new Error('local evaluator config requires modelPath and modelSha256');
     }
     const engine = resolvedLocalEngine(config);
-    if (engine === 'laya-onnx') {
+    if (engine === 'laya-onnx' || engine === 'laya-shared-onnx') {
       const evaluator = await input.localEvaluatorFactory(config, input.taxonomy);
       warnings.unshift(
         `the semantic layer is running ${evaluator.id}@${evaluator.version} on-device against ${basename(config.modelPath)} ` +
-          '(engine laya-onnx, primitives composed through the shared composition). ' +
+          `(engine ${engine}, primitives composed through the shared composition). ` +
           'This is a non-default development path. It is not a release. The live pin remains the vendor GGUF at v2.1.',
       );
       return { evaluator, outboundContentPaths: [], warnings };

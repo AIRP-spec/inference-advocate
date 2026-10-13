@@ -73,7 +73,20 @@ export {
   type LayaLastPass,
   type LayaLocalEvaluatorOptions,
   type LayaLayoutPin,
+  type LayaDecodePins,
 } from './laya-evaluator.js';
+export {
+  LayaSharedLocalEvaluator,
+  createLayaSharedLocalEvaluator,
+  loadLayaSharedPins,
+  validateLayaSharedPins,
+  sharedFeedSha256,
+  LAYA_SHARED_PINS_SCHEMA,
+  LAYA_SHARED_ONNX_FILE,
+  type LayaSharedPins,
+  type LayaSharedLastPass,
+  type LayaSharedLocalEvaluatorOptions,
+} from './laya-shared-evaluator.js';
 export {
   packRows,
   chooseCap,

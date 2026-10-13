@@ -758,10 +758,14 @@ export async function createLocalEvaluator(
 
 /**
  * Host entry for kind 'local'. Dispatches on cfg.engine: omitted or 'gguf' is the GGUF live pin
- * (LocalEvaluator), 'laya-onnx' is the Laya primitives evaluator. The Laya module, and with it
+ * (LocalEvaluator), 'laya-onnx' is the Laya primitives evaluator, 'laya-shared-onnx' the shared-encoding one. The Laya module, and with it
  * ONNX Runtime, is imported only when a config names it.
  */
 export async function createOnDeviceEvaluator(cfg: LocalEvaluatorConfig, taxonomy: Taxonomy): Promise<Evaluator> {
+  if (cfg.engine === 'laya-shared-onnx') {
+    const { createLayaSharedLocalEvaluator } = await import('./laya-shared-evaluator.js');
+    return createLayaSharedLocalEvaluator(cfg, taxonomy);
+  }
   if (cfg.engine === 'laya-onnx') {
     const { createLayaLocalEvaluator } = await import('./laya-evaluator.js');
     return createLayaLocalEvaluator(cfg, taxonomy);

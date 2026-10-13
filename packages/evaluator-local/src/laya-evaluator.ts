@@ -114,7 +114,9 @@ function softmax(z: number[], temperature: number): number[] {
  * pinned threshold for yes/no primitives, argmax (first maximum in pinned order) for stance.
  * Object and qualifier lists are in the pinned order. This is the only decode the Node path has.
  */
-export function layaPrimitivesFromLogits(logits: LayaLogits, pins: LayaPins): PrimitivesVerdict & {
+export type LayaDecodePins = Pick<LayaPins, 'stanceQuestion' | 'stanceOrder' | 'temperature' | 'thresholds' | 'primitiveKinds'>;
+
+export function layaPrimitivesFromLogits(logits: LayaLogits, pins: LayaDecodePins): PrimitivesVerdict & {
   pTrue: Record<string, number>;
   stanceProbs: Record<string, number>;
 } {
