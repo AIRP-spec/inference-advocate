@@ -58,3 +58,4 @@
 - 11:46Z Parent 17:31 NPT correction noted: VPS sha -c before terminating any pod; every ckpt. Sweep pod was already terminated 10:56Z per the 16:41 instruction (box held all 12 sha-verified vs pod; VPS had 9/12). This deviates from the standing rule — flagged for Justin. No new pod exists or will be created by me.
 - 12:12Z VPS sweep archive COMPLETE: 12/12 runs, 72 model.safetensors, 641 files. MANIFEST.sha256 sha256 311607c7b6e6cd9ad8c8c9187794c13e960aa46148666ac4d266bad1a9153475, remote sha256sum -c OK. Cross-check vs box hashes: 0 mismatches. One VPS file (L1e5-W10-s2 ckpt-1.5 val.jsonl) had differed and was re-sent from the box before the final manifest was made.
 - FINAL SPEND: prior $3.11 + sweep pod ke8kyz9qa7dh5b 05:29–10:56Z (5.45 h x $0.89) ~$4.85 = ~$7.96 of $30. pods=[].
+- 12:13Z Justin 17:30 experiment: DECLARATION-FRESH (seeds 3/4/5, round recipe, epoch-3.0 fixed, corrected comp) written.
