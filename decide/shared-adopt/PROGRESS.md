@@ -66,3 +66,4 @@
 - 13:03Z s5 trained+pulled; gate final: s3 FAIL(sh pos-05) s4 FAIL(CSE ctr-03) s5 PASS-safety but E+M 39>36. Bar FAILED. Pipeline done; pod idle only for VPS push (0/3 verified, s3 ~done).
 - 13:59Z VPS manifest b0a55f41… sha -c OK; pod zkjwujgkmty8ey terminated 13:59:40Z; pods empty. Spend ~$1.57, total ~$9.53. REPORT-FRESH: FAIL (s3 sh pos-05, s4 CSE ctr-03, worst E+M 39). STOPPED.
 - 18:50Z Justin 00:34: step1 SH-POS05.md done. DECLARATION-ENS written (ens5, ens3f; exploratory).
+- 18:54Z ENS scored (both pass; see REPORT-ENS when written). DECLARATION-ARMB written (w=5/5, seeds 6/7/8).
