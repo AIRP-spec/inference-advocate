@@ -1,0 +1,25 @@
+{
+ "n": 471,
+ "median_ms": 2208.702457000036,
+ "p95_ms": 2603.810721000016,
+ "mean_ms": 2238.5887575817396,
+ "min_ms": 1644.4542350000702,
+ "max_ms": 2867.9672320000245,
+ "verify_ms": 2052.906817,
+ "load_ms": 7033.616847000001,
+ "warmup_ms": 1777,
+ "evaluator": "local-laya@0b5694036a20+laya-pins-b0c9dd23bb71",
+ "node": "v22.23.2",
+ "onnxruntime_node": "1.30.0",
+ "receptron_laya": "0.1.2",
+ "intraOpNumThreads": 8,
+ "host": "himalogic",
+ "cpu": "Intel(R) Xeon(R) Gold 5418Y",
+ "nproc": 8,
+ "loadavg": [
+  8.02,
+  7.93,
+  6.91
+ ],
+ "finished": "2026-10-05T22:27:31.011Z"
+}
