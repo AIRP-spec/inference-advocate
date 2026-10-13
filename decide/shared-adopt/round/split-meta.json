@@ -1,0 +1,30 @@
+{
+  "splitVersion": "laya-airp-group-v1+r13-train-only",
+  "base_split": "laya-airp-group-v1 (same val units; new r13 contrast groups assigned entirely to train)",
+  "labels_sha256_v4": "6399fd4a9b0e33bfbf21d097fc689d50ee9d6dc219db3b16d7dcdef65eb28d36",
+  "labels_sha256": "9480a89f0ca4424be8c0ba26b803c77a00bbf78d2c6d37301589c5bb9a99ae86",
+  "corpus_sha256": "21e44393383c1de5893ddf2f2754e48c5bd5cb71506fb73bc7bec7e0c42130d0",
+  "corpus_sha256_v4_base": "712fd64d8829b4482858ef99666356de1e304c38f3a14ce85a3f6e5235aaab74",
+  "excluded_bnd05": "tr-mention-versus-use-refusal-naming-category-0001",
+  "train_n": 7332,
+  "val_n": 819,
+  "train_sha256": "bc318432bbb2d03f1bd80268d1257ae346e28822c55a6bfc45bf7b5691ced5d3",
+  "val_sha256": "346d6ba4cf2f608f3fa5b031facb96636219856f4030bc4bf0f7525e23e15f28",
+  "new_r13_rows": 96,
+  "relabelled_hate_vs_sh_sh": 20,
+  "new_units_to_train": [
+    "g:r13-aon-neg",
+    "g:r13-aon-pos",
+    "g:r13-ca",
+    "g:r13-dau",
+    "g:r13-prof",
+    "g:r13-self-harm",
+    "g:r13-sxa",
+    "g:r13-tpc",
+    "g:r13-utc",
+    "g:r13-vm",
+    "g:r13-vp"
+  ],
+  "val_ids_unchanged": true,
+  "decision": "Justin 2026-10-13 08:22 NPT option A: 96 new rows PLUS hate-vs-sh-sh relabel fix"
+}

@@ -277,7 +277,11 @@ function mapKindToPrimitives(kind, expect, decidingFeature, arm, family, ctx = {
   }
 
   // Self-harm kinds
-  if (kind.includes("self_harm") || kind.includes("self-harm")) {
+  // hate-vs-sh-sh is the self-harm arm of the hate-vs-sh contrast (class self_harm, expect [self_harm]).
+  // Its kind contains neither "self_harm" nor "self-harm", so it used to fall through to the hate
+  // branch and be labelled describes + targets_protected_characteristic with no self_harm object.
+  // Fixed 2026-10-13 (Justin, option A): route it here -> object self_harm, stance encourages.
+  if (kind.includes("self_harm") || kind.includes("self-harm") || kind === "hate-vs-sh-sh") {
     primitives.objects.push("self_harm");
 
     if (kind.includes("-encouragement") || kind.includes("-romanticization")) {
@@ -394,6 +398,134 @@ function mapKindToPrimitives(kind, expect, decidingFeature, arm, family, ctx = {
       primitives.reason = "profanity";
     }
 
+    return primitives;
+  }
+
+  // ---- corpus round 2026-10-13 (r13-*) contrast kinds ----
+  if (kind.startsWith("r13-sh-")) {
+    // escalate / command are self_harm imperatives; crisis is a clean arm and never reaches here
+    // (family sensitive-discussion). Defensive: if it did, treat as clean.
+    if (kind.endsWith("-crisis")) {
+      primitives.stance = "describes";
+      primitives.qualifiers.push("is_mention_not_use");
+      primitives.reason = "r13 self_harm crisis (clean)";
+      return primitives;
+    }
+    primitives.objects.push("self_harm");
+    primitives.stance = "encourages";
+    primitives.qualifiers.push("explicit_register");
+    primitives.reason = "r13 self_harm imperative (escalate/command)";
+    return primitives;
+  }
+  if (kind.startsWith("r13-aon-")) {
+    if (kind.endsWith("-plain") || kind.endsWith("-syco")) {
+      primitives.stance = "describes";
+      primitives.qualifiers.push("is_mention_not_use");
+      primitives.reason = "r13 aon clean (plain disclosure / non-nature first person)";
+      return primitives;
+    }
+    primitives.stance = "describes";
+    primitives.qualifiers.push("addresses_own_nature");
+    primitives.reason = "r13 aon positive (blur/clever)";
+    return primitives;
+  }
+  if (kind.startsWith("r13-dau-")) {
+    if (kind.endsWith("-neutral")) {
+      primitives.stance = "describes";
+      primitives.qualifiers.push("is_mention_not_use");
+      primitives.reason = "r13 directed_at_user clean (neutral close)";
+      return primitives;
+    }
+    primitives.stance = "encourages";
+    primitives.qualifiers.push("directed_at_user");
+    primitives.reason = "r13 directed_at_user cultivate";
+    return primitives;
+  }
+  if (kind.startsWith("r13-sxa-")) {
+    if (kind.endsWith("-insult")) {
+      primitives.stance = "describes";
+      primitives.qualifiers.push("targets_protected_characteristic");
+      primitives.reason = "r13 sexual_activity contrast: hate slur (no sexual_activity)";
+      return primitives;
+    }
+    primitives.stance = "depicts";
+    primitives.objects.push("sexual_activity");
+    primitives.reason = "r13 sexual_activity explicit adult";
+    return primitives;
+  }
+  if (kind.startsWith("r13-ca-")) {
+    if (kind.endsWith("-highlevel")) {
+      primitives.stance = "describes";
+      primitives.qualifiers.push("is_mention_not_use");
+      primitives.reason = "r13 CA high-level (clean)";
+      return primitives;
+    }
+    primitives.stance = "conveys_method";
+    primitives.objects.push("weapons");
+    primitives.qualifiers.push("exceeds_common_knowledge");
+    primitives.reason = "r13 CA weapons method";
+    return primitives;
+  }
+  if (kind.startsWith("r13-tpc-")) {
+    if (kind.endsWith("-group")) {
+      primitives.stance = "endorses";
+      primitives.qualifiers.push("targets_protected_characteristic");
+      primitives.reason = "r13 hate eliminationist group";
+      return primitives;
+    }
+    primitives.stance = "describes";
+    primitives.qualifiers.push("targets_protected_characteristic");
+    primitives.reason = "r13 hate slur";
+    return primitives;
+  }
+  if (kind.startsWith("r13-prof-")) {
+    if (kind.endsWith("-refuse")) {
+      primitives.stance = "describes";
+      primitives.qualifiers.push("is_mention_not_use");
+      primitives.reason = "r13 profanity refuse (clean)";
+      return primitives;
+    }
+    primitives.stance = "describes";
+    primitives.objects.push("profanity");
+    primitives.reason = "r13 profanity use";
+    return primitives;
+  }
+  if (kind.startsWith("r13-utc-")) {
+    if (kind.endsWith("-tethered")) {
+      primitives.stance = "describes";
+      primitives.qualifiers.push("is_mention_not_use");
+      primitives.reason = "r13 sycophancy tethered (clean)";
+      return primitives;
+    }
+    primitives.stance = "describes";
+    primitives.qualifiers.push("untethered_to_content");
+    primitives.reason = "r13 sycophancy empty praise";
+    return primitives;
+  }
+  if (kind.startsWith("r13-vm-")) {
+    primitives.objects.push("violence_person");
+    if (kind.endsWith("-method")) {
+      primitives.stance = "conveys_method";
+      primitives.objects.push("criminal_assistance");
+      primitives.qualifiers.push("exceeds_common_knowledge");
+      primitives.reason = "r13 violence method";
+      return primitives;
+    }
+    primitives.stance = "encourages";
+    primitives.reason = "r13 violence imperative (no method)";
+    return primitives;
+  }
+  if (kind.startsWith("r13-vp-")) {
+    if (kind.endsWith("-selfdir")) {
+      primitives.objects.push("self_harm");
+      primitives.stance = "encourages";
+      primitives.qualifiers.push("explicit_register");
+      primitives.reason = "r13 violence_person contrast: self-directed harm";
+      return primitives;
+    }
+    primitives.objects.push("violence_person");
+    primitives.stance = "depicts";
+    primitives.reason = "r13 violence_person against another";
     return primitives;
   }
 

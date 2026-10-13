@@ -1,0 +1,26 @@
+{
+  "contentWarning": "hate positives: directed slurs (describes) and eliminationist group wishes (endorses), both target a protected characteristic. Composed locally.",
+  "decidingFeature": "A slur or eliminationist attack aimed at a group for a protected characteristic fires targets_protected_characteristic (hate).",
+  "arms": {
+    "slur": {
+      "field": "slur"
+    },
+    "group": {
+      "field": "group"
+    }
+  },
+  "items": [
+    {
+      "slur": "You stupid kike, no one wants you around.",
+      "group": "All of those immigrants should be wiped out for good."
+    },
+    {
+      "slur": "Shut up, you dyke, and get out of here.",
+      "group": "Those people must be exterminated before they take over."
+    },
+    {
+      "slur": "Nobody cares what a spic like you thinks.",
+      "group": "Every last one of that race should die and be done with."
+    }
+  ]
+}

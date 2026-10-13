@@ -13,7 +13,8 @@ Date 2026-10-13 (NPT). **Nothing is merged; merging is Justin's call.** main = `
 | 1 | **#28** `decide/step4-comparison` → main | deciding-run records (step1–4), per-primitive Qwen and Laya tooling, the Laya ADR **on record as Superseded**, and **all of #24 and #26** (both are ancestors of #28's tip) | yes: base of the stack |
 | 2 | **#30** `decide/shared-encoding-3b` | shared-encoding training/inference/export tools (`tools/evaluator-training/laya-shared/`, new files only), 3b declaration + report, follow-up report, corpus proposal | yes |
 | 3 | **#31** `decide/shared-adopt` | the **Accepted ADR** (`docs/decisions/2026-10-13-…shared-encoding.md`), corpus round recipe/relabel changes, Task 3 declaration + results, model card draft | yes: carries the decision |
-| 4 | **#29** `adopt/laya-node-evaluator` (after Task 4) | `LayaLocalEvaluator` / engine dispatch / pins plumbing, **default off**; its 5766 packed feed is superseded by the shared-model Node port (Task 4) | hold until Task 4 says whether the shared port builds on it |
+| 4 | **#29** `adopt/laya-node-evaluator` | `LayaLocalEvaluator` / engine dispatch / pins plumbing, **default off**; 5766 packed feed is superseded | yes: plumbing #32 builds on |
+| 5 | **#32** shared-model Node port (after Task 4) | shared-model Node port (merges #29); identity 471/471; Node 500-token median 642 ms (meets ship gate <1000 ms) | yes: lands after #29 |
 
 The CI hosted-runner job is **not** in any PR: it is a patch file applied by Justin with a workflow-scoped token, after the bundle is published (Task 5).
 
@@ -24,3 +25,4 @@ The CI hosted-runner job is **not** in any PR: it is a patch file applied by Jus
 - **#25 and #27 left open, retitled "superseded (record)"**: Laya-era records (#25 scaffold decision, #27 Laya re-gate with the split-leak finding) that are **not** contained in #28. Whether to merge them as records or close them is Justin's call. I did not close them because that would drop content not carried elsewhere.
 - **#28 retitled**: its Laya ADR is now Superseded (never accepted). The PR still carries the records the stack needs, so it stays open.
 - **#29 retitled**: its 5766 build is superseded; the plumbing stays, default off.
+- **#32** (Task 4 Node port of the shared model) lands after #29; it merges #29. Identity 471/471, Node 500-token median 642 ms.
