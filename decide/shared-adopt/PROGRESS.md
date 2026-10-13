@@ -27,3 +27,5 @@
 - 03:53 resume: pipeline already DONE; offline gated; pod still up; finishing archive+terminate
 - 04:13 Justin 09:58: report wording (retrained not reproduced; reflexive-pair next step). Pod kept up; archive pipe continues.
 - 04:35 archive MANIFEST verified; pod 2oh6ncux3wsml1 TERMINATED
+- 04:35 committed+pushed; Task 5 prep done; DONE for this stop
+## Ledger final: this brief ~$1.61; prior follow-up $1.5; total ~$3.11 of $30. Pods empty.
