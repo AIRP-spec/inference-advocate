@@ -20,3 +20,9 @@ Declaration sha256 `7a5b8f35…`. Commit `cfe41b8` at 18:54:03Z, with ls-remote 
 - Reference only (not decision-bearing): at epoch 2.5, s6 had E+M 35 with the same CSE miss, and s8 had E+M 31.
 
 Node identity and latency were not triggered.
+
+## Archive / pod / spend
+- VPS `…/shared-adopt/armb/`: all 18 checkpoints, raw, logs, pipeline.out. `MANIFEST.sha256` (158 files) sha256 `b7f0e2066aa30f32c9d63e9abc17749a9091765c320f92f945e3767c5555c926`; remote `sha256sum -c` passed at 20:16:11Z.
+- Pod `h8vb23k77f3len`: created 18:54:45Z, terminated 20:16:25Z (after the remote check). Pods list is empty.
+- Training ended at 19:31Z, so the pod sat idle about 45 min. Per-checkpoint streaming reached only 4/21 units: the box→VPS link stalled, and transient box snapshot files broke the sha lists. I replaced it with a full pull to the box (checked against the pod at 19:55Z) and a 3-stream push.
+- Spend this step: about $1.21. **Total about $10.74 of $30.** Distillation was not run.
