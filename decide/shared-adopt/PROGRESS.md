@@ -33,3 +33,16 @@
 - 10:50+ CSE-FAILURES.md from archived gates (no new CSE rows). DECLARATION-AVG.md written BEFORE averaging/gating. Best single-round v2 E+M = 31 (round2 ep 2.5).
 - 10:50–avg: DECLARATION-AVG declared/pushed/archived before gating. VPS CPU avg+infer under flock. Neither average recommended (CSE fail; v2EM 64>31; sh FN=0). Ensemble ref also CSE fail. STABILITY-SWEEP-PROPOSAL written (not run). Spend +$0; total ~$3.11/$30.
 - 11:13 Justin approved full 12-run sweep. DECLARATION-SWEEP written; averaging-init note in DECISIONS + ADR.
+- 05:30 pod create: {"podFindAndDeployOnDemand": {"id": "ke8kyz9qa7dh5b", "name": "airp-shared-sweep", "costPerHr": 0.89, "desiredStatus": "RUNNING", "machine": {"gpuTypeId": "NVIDIA GeForce RTX 4090"}}}
+- 05:33 pod ke8kyz9qa7dh5b SECURE 4090 $0.89/hr up; pipeline started (12 runs, resumable: pod_pipeline.sh skips .done). ssh 81.27.69.177:23628 key runpod_airp
+- 05:34 archive_loop.sh (box) streams each finished run pod→VPS sweep/ and raw→box sweep/raw; restart if interrupted (markers sweep/archived/)
+- 05:53Z run1 done 05:43Z (~11.3 min/run; ETA all trains ~07:48Z). Archive ~5MB/s (~16 min/run) → tail after training. Offline: sweep/analyze.sh + summarize.py (per-run val selection, setting pass bars). Node prep only if exactly/≥1 setting passes.
+- 06:13Z archive_loop rewritten: pod→box rsync→VPS 5 parallel + remote sha -c per run; markers sweep/archived/, local manifest sweep/MANIFEST-local.sha256. Box-relay tar pipe had timed out.
+- 06:19Z RESUME after interrupt: pod ke8kyz9qa7dh5b only pod, running; 4/12 runs done; archive_loop alive (pulling run1). No restart.
+- 06:46Z archive reset: 2 workers archive_loop2.sh (claims, retrying 3-parallel push, sha -c). Logs sweep/w1.log w2.log. Stage resumes via rsync --partial.
+- 06:59Z 7/12 trained; archived 1/12. Early: L1e5-W05 s1/s2 already fail (s1 CSE miss pos-07; s2 shFN 3, v2EM 48).
+- 07:09Z RESUME#2: pod running (uptime 99 min), 8/12 trained, archived 1/12; 2 workers alive (some PULLFAIL/VERIFYFAIL → auto-retry next loop). No restart.
+- 07:20Z archive redesigned: pull_worker.sh (pod→box stage, sha -c vs pod, cap 4 ahead; markers pulled/) + push_worker.sh (box→VPS, 3-way, 20 retries, remote sha -c; markers archived/). Logs pull.log push.log. Old loops killed.
+- 07:34Z push_worker restarted with --append-verify, -P2 (VPS link ~5MB/s, timeouts). Stale rsync temps removed on VPS.
+- 08:00Z PIPELINE_DONE 07:51Z (12/12 trained). All raw pulled to box sweep/raw for gating. pull_worker restarted with no ahead-cap (pull2.log). Archived to VPS 2/12.
+- 08:01Z GATED all 12 on box: NO setting passes → STOP per declaration (spread report REPORT-SWEEP.md). ctr-03 corpus target flag: L5e6-W10 (2/3). Pod kept only until VPS sha -c passes.
