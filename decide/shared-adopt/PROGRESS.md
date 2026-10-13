@@ -22,3 +22,8 @@
 - 02:54 base2 training ~ep0.55; first ckpt saved; GPU OK. Est ~75-90min for 3 runs+infer.
 - 03:03 STOPPED pod 02nqe5hbxwt3p4 per Justin 08:47: kind-table audit before any training
 - 03:05 Justin 08:47 audit: hate NOT confirmed as cause; kind-table rewrite; diff vs v4 = exactly 20 hate-vs-sh-sh. PROCEED. Prior pod terminated (base2 ckpts discarded, not archived).
+- 03:07 fresh pod 2oh6ncux3wsml1 SECURE 4090 $0.89/hr; pipeline started after kind-table audit. Ledger: prior ~$0.25 discarded pod + this run.
+- 03:44 PIPELINE_DONE; pulling archive
+- 03:53 resume: pipeline already DONE; offline gated; pod still up; finishing archive+terminate
+- 04:13 Justin 09:58: report wording (retrained not reproduced; reflexive-pair next step). Pod kept up; archive pipe continues.
+- 04:35 archive MANIFEST verified; pod 2oh6ncux3wsml1 TERMINATED
