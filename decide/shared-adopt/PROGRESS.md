@@ -32,3 +32,4 @@
 - 10:50 Justin accepted round result. Labels v5 = further-training base; future rules = per-seed / worst-seed (never mean). Recorded in DECISIONS note + ADR §8.
 - 10:50+ CSE-FAILURES.md from archived gates (no new CSE rows). DECLARATION-AVG.md written BEFORE averaging/gating. Best single-round v2 E+M = 31 (round2 ep 2.5).
 - 10:50–avg: DECLARATION-AVG declared/pushed/archived before gating. VPS CPU avg+infer under flock. Neither average recommended (CSE fail; v2EM 64>31; sh FN=0). Ensemble ref also CSE fail. STABILITY-SWEEP-PROPOSAL written (not run). Spend +$0; total ~$3.11/$30.
+- 11:13 Justin approved full 12-run sweep. DECLARATION-SWEEP written; averaging-init note in DECISIONS + ADR.

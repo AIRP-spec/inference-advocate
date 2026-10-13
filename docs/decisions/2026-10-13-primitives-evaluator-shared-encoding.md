@@ -70,3 +70,5 @@ Justin accepted the Task 3 corpus-round result: the round is **not** recommended
 **Rule shape going forward:** compare **per seed** or against the **worst seed**; never against a mean across seeds.
 
 Selected ship weights remain 3b run A epoch 2.5 until a later declared rule recommends otherwise. Merges and publishing stay with Justin.
+
+**Averaging (11:13 NPT):** weight averaging of round seeds failed; the seeds' heads started from different random init, so averaging isn't sound. If revisited it needs runs sharing the same initial heads. Justin approved the full 12-run stability sweep (`decide/shared-adopt/DECLARATION-SWEEP.md`).

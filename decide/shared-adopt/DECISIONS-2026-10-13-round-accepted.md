@@ -12,3 +12,7 @@ Decided by: Justin Flores (accepted the Task 3 corpus-round result)
 Future decision rules that compare seeds or runs **compare per seed, or against the worst seed**. They **never** compare against a **mean** across seeds (the Task 3 declared bars 1 and 4 used means; that shape is retired for future rules).
 
 This note does not amend the Task 3 declaration after the fact; Task 3's rule output (do not recommend the round model; bar 3 CSE failed) stands. It binds what comes next.
+
+## Averaging (Justin 11:13 NPT)
+
+Weight averaging of round seeds 1 and 2 failed (DECLARATION-AVG). The reason: the two seeds' heads started from different random init, so averaging them isn't sound. If revisited, it needs runs sharing the same initial heads.
