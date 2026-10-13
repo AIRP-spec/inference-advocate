@@ -258,3 +258,66 @@ test('a local config with an unsupported promptTemplateVersion names the accepte
     },
   );
 });
+
+const LAYA_OK = {
+  kind: 'local' as const,
+  engine: 'laya-onnx' as const,
+  modelPath: 'bundle/laya.onnx',
+  modelSha256: '0b'.repeat(32),
+  laya: {
+    pinsPath: 'laya-5766-fp32.pins.json',
+    pinsSha256: 'b0'.repeat(32),
+    compositionPath: 'airp-v0.5.0.json',
+    compositionSha256: '4d'.repeat(32),
+  },
+};
+
+test('no evaluator config resolves to the rule evaluator, so Laya stays off unless a config names it', async () => {
+  let called = false;
+  const resolved = await resolveEvaluator({
+    taxonomy,
+    localEvaluatorFactory: () => {
+      called = true;
+      return { id: 'local-laya', version: 'x', evaluate: () => [] };
+    },
+  });
+  assert.equal(resolved.evaluator.id, 'airp-rule-evaluator');
+  assert.equal(called, false);
+});
+
+test('a laya-onnx config passes the whole config to the factory and names the engine as a development path', async () => {
+  let seen: LocalEvaluatorConfig | undefined;
+  const resolved = await resolveEvaluator({
+    taxonomy,
+    config: LAYA_OK,
+    localEvaluatorFactory: (cfg) => {
+      seen = cfg;
+      return { id: 'local-laya', version: '0b5694036a20+laya-pins-b0c9dd23bb71', evaluate: () => [] };
+    },
+  });
+  assert.deepEqual(seen, LAYA_OK);
+  assert.ok(resolved.warnings[0]?.includes('local-laya@0b5694036a20+laya-pins-b0c9dd23bb71'));
+  assert.ok(resolved.warnings[0]?.includes('engine laya-onnx'));
+  assert.ok(resolved.warnings[0]?.includes('non-default development path'));
+  assert.equal(resolved.outboundContentPaths.length, 0);
+});
+
+test('a laya-onnx config missing a pin, or naming a GGUF template, is refused before the factory runs', async () => {
+  const factory = () => {
+    throw new Error('factory must not run');
+  };
+  const cases: Array<[unknown, RegExp]> = [
+    [{ ...LAYA_OK, laya: undefined }, /requires a laya block/],
+    [{ ...LAYA_OK, laya: { ...LAYA_OK.laya, pinsSha256: 'nope' } }, /laya\.pinsSha256/],
+    [{ ...LAYA_OK, laya: { ...LAYA_OK.laya, compositionSha256: undefined } }, /laya\.compositionSha256/],
+    [{ ...LAYA_OK, laya: { ...LAYA_OK.laya, pinsPath: '' } }, /laya\.pinsPath/],
+    [{ ...LAYA_OK, promptTemplateVersion: 'v3' }, /does not take promptTemplateVersion/],
+    [{ ...LAYA_OK, engine: 'laya' }, /Accepted values: gguf, laya-onnx/],
+  ];
+  for (const [config, re] of cases) {
+    await assert.rejects(
+      () => resolveEvaluator({ taxonomy, config: config as LocalEvaluatorConfig, localEvaluatorFactory: factory }),
+      re,
+    );
+  }
+});
