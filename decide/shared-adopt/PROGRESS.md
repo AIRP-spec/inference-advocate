@@ -75,3 +75,6 @@
 - 20:16Z Arm B VPS manifest b7f0e206… sha -c OK; pod h8vb23k77f3len terminated 20:16:25Z; pods empty. Spend ~$1.21, total ~$10.74. STOPPED. Distillation not run.
 - 10:37Z Justin 16:22 Oct14: ens+ArmB accepted; Arm B fails; no head weighting; no Arm B seed selectable (DECISIONS-2026-10-14-armb.md). Next: link test, then distillation.
 - 10:52Z Link test OK (box→VPS 5.3/5.7 MB/s, VPS→box 2.3 MB/s, no stalls; LINKTEST-2026-10-14.md). DECLARATION-DISTILL written; teacher on VPS CPU next.
+- 11:04Z Teacher integrity: 5/5 ckpts re-run on VPS CPU match archived held-out logits (max|d| ≤7.7e-4, 0 decision diffs). Teacher train-only inference running on VPS (distill/teacher.log).
+- 11:28Z resumed after interrupt: pods empty; link test + declaration already done (f8e4558); teacher 2/5 done on VPS, ETA ~12:05Z.
+- 12:02Z Teacher done: ens5-train-soft.jsonl 7a428e8d… (train-only verified). Addendum written.
