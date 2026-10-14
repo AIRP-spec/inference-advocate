@@ -73,3 +73,5 @@
 - 19:36Z Arm B trained (PIPELINE_DONE 19:31Z). Gate: FAIL (s6 CSE miss pos-07 + E+M 40; s8 E+M 37; sh 0 all). REPORT-ARMB written. Pod idle only for VPS stream (link ~4MB/s; 4/21 units at 19:35Z).
 - 19:55Z workers replaced: full pull to box (158 files, pod sha -c OK 19:55Z); push_full.sh box→VPS P3 running.
 - 20:16Z Arm B VPS manifest b7f0e206… sha -c OK; pod h8vb23k77f3len terminated 20:16:25Z; pods empty. Spend ~$1.21, total ~$10.74. STOPPED. Distillation not run.
+- 10:37Z Justin 16:22 Oct14: ens+ArmB accepted; Arm B fails; no head weighting; no Arm B seed selectable (DECISIONS-2026-10-14-armb.md). Next: link test, then distillation.
+- 10:52Z Link test OK (box→VPS 5.3/5.7 MB/s, VPS→box 2.3 MB/s, no stalls; LINKTEST-2026-10-14.md). DECLARATION-DISTILL written; teacher on VPS CPU next.
