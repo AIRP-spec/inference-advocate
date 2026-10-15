@@ -1,7 +1,8 @@
 # ADR: Switch the primitives evaluator to Laya
 
 Date: 2026-10-06
-Status: **Proposed.** Justin Flores to accept or reject. When accepted, move this file to `docs/decisions/2026-10-06-primitives-evaluator-laya.md` and set the status to Accepted.
+Status: **Superseded, never accepted** (2026-10-13). Body unchanged.
+Superseded by: [`docs/decisions/2026-10-13-primitives-evaluator-shared-encoding.md`](../decisions/2026-10-13-primitives-evaluator-shared-encoding.md).
 Deciders: Justin Flores
 Supersedes, if accepted: the "stay with per-primitive Qwen" outcome of the deciding run (`decide/REPORT-deciding-run-2026-10-05.md` §1). It does not edit that report or its declared rule; both stay on record as they were.
 
@@ -113,3 +114,7 @@ Status (2026-10-06 and follow-up):
 - `decide/adopt/CPU-SPEED.md`
 - `decide/adopt/PER-PRIMITIVE.md`
 - Settled proxies `gold-proxies.v0.5.0.settled.json` (sha256 `b086cdac11f8af39b2d3984232ee0372d9ffe909acbd4b8d7fe6d4f653d08455`)
+
+## Follow-up 2026-10-15: decision cutoffs fixed at 0.5 / argmax (shared-encoding)
+
+Justin 22:14 NPT: yes/no heads fire at P(yes) ≥ 0.5 and stance is argmax. Val-fitted temperature is kept for probability reporting only. Val-fitted per-head best-F1 cutoffs are dropped, because validation is too well separated (e.g. distill s10 `sexual_activity` +12.35 / `subject_is_minor` +8.39 logits above 0.5). The rule was set after held-out results had been seen both ways, so no existing run is certified under it. See `docs/decisions/2026-10-15-shared-encoding-cutoff-rule.md`.

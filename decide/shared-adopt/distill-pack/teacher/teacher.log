@@ -1,0 +1,19 @@
+ckpt-epoch-3.0-step-690 val n=0 0.0s
+ckpt-epoch-3.0-step-690 heldout n=471 38.1s
+ckpt-epoch-3.0-step-690 val n=0 0.0s
+ckpt-epoch-3.0-step-690 heldout n=471 37.7s
+ckpt-epoch-3.0-step-690 val n=0 0.0s
+ckpt-epoch-3.0-step-690 heldout n=471 38.1s
+ckpt-epoch-3.0-step-690 val n=0 0.0s
+ckpt-epoch-3.0-step-690 heldout n=471 37.3s
+ckpt-epoch-3.0-step-690 val n=0 0.0s
+ckpt-epoch-3.0-step-690 heldout n=471 39.3s
+CHECK_INFER_DONE 10:59:58Z
+/root/primitives-evaluator/decide-2026-10-13/shared-adopt/distill/teacher-ckpts/checkpoints-round1/ckpt-epoch-3.0-step-690 7332 736s
+/root/primitives-evaluator/decide-2026-10-13/shared-adopt/distill/teacher-ckpts/checkpoints-round2/ckpt-epoch-3.0-step-690 7332 763s
+/root/primitives-evaluator/decide-2026-10-13/shared-adopt/fresh/checkpoints-fresh-s3/ckpt-epoch-3.0-step-690 7332 700s
+/root/primitives-evaluator/decide-2026-10-13/shared-adopt/fresh/checkpoints-fresh-s4/ckpt-epoch-3.0-step-690 7332 681s
+/root/primitives-evaluator/decide-2026-10-13/shared-adopt/fresh/checkpoints-fresh-s5/ckpt-epoch-3.0-step-690 7332 721s
+WROTE /root/primitives-evaluator/decide-2026-10-13/shared-adopt/distill/ens5-train-soft.jsonl 5 teachers
+7a428e8d653c494a0da566b0f03828dda949e1c4a990a793539d60d24ccf8d36  ens5-train-soft.jsonl
+TEACHER_DONE 12:01:18Z

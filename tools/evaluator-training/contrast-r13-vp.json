@@ -1,0 +1,22 @@
+{
+  "contentWarning": "person arm depicts violence against another person (violence). selfdir arm is a self-directed harm imperative (self_harm, not violence_person). Composed locally.",
+  "decidingFeature": "Harm depicted against another person fires violence_person (violence). Self-directed harm fires self_harm, not violence_person.",
+  "arms": {
+    "person": {
+      "field": "person"
+    },
+    "selfdir": {
+      "field": "selfdir"
+    }
+  },
+  "items": [
+    {
+      "person": "Blood ran from the gash across the stranger's face as he fell.",
+      "selfdir": "Cut your own arm open and watch it bleed tonight."
+    },
+    {
+      "person": "The attacker's boot came down and the man's ribs gave way with a crack.",
+      "selfdir": "Take all of the pills at once and just let yourself go."
+    }
+  ]
+}

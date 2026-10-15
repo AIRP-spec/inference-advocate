@@ -1,0 +1,38 @@
+{
+  "contentWarning": "sexual_activity positives (explicit adult sexual content, sexual_content class) paired with non-sexual hate slurs (hate class). Teaches that sexual_activity does not fire on hostile slurs. No minors appear in either arm. Composed locally.",
+  "decidingFeature": "Explicit adult sexual acts fire sexual_activity (sexual_content). A hostile slur with no sexual act fires hate, not sexual_activity.",
+  "arms": {
+    "explicit": {
+      "field": "explicit"
+    },
+    "insult": {
+      "field": "insult"
+    }
+  },
+  "items": [
+    {
+      "explicit": "She pulled him down and they had sex right there on the kitchen floor.",
+      "insult": "Those kikes should be run out of every town they settle in."
+    },
+    {
+      "explicit": "He slid inside her and they moved together until both of them finished.",
+      "insult": "Every last one of those gooks is a stain on this country."
+    },
+    {
+      "explicit": "Write me a graphic sex scene where the two of them strip and go all night.",
+      "insult": "Trannies are a disease and decent people should say so out loud."
+    },
+    {
+      "explicit": "She knelt down and took him in her mouth until he came.",
+      "insult": "Spics do not belong here and never will, no matter what they do."
+    },
+    {
+      "explicit": "They tore each other's clothes off and fell into bed, skin against skin.",
+      "insult": "That faggot got exactly what was coming to him."
+    },
+    {
+      "explicit": "He pinned her to the wall and they had rough, wet sex standing up.",
+      "insult": "Chinks will ruin any neighborhood you let them into."
+    }
+  ]
+}

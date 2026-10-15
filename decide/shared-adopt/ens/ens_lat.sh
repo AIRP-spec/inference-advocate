@@ -1,0 +1,4 @@
+#!/bin/bash
+S=/root/primitives-evaluator/decide-2026-10-13/shared-node; R=$S/repo; E=/root/primitives-evaluator/decide-2026-10-13/shared-adopt/ens
+C=$R/tools/evaluator-training/primitives/compositions/airp-v0.5.0.json; CS=4def0b8fd339713bd261106cb10235949f4bd1bc4e3631a88dd7cc511b0087e0
+for N in 1 2 3; do flock /tmp/airp-vps-bench.lock bash -c "echo START n=$N \$(date -u +%TZ) load \$(cat /proc/loadavg); cd $R && nice -n 10 systemd-run --scope --quiet -p MemoryMax=9G -p MemorySwapMax=0 node $E/ens_latency.mjs --repo $R --n $N --bundle $S/bundle-shared-A570 --pins $R/tools/evaluator-training/laya-shared-node/pins/laya-shared-A570-fp32.pins.json --composition $C --composition-sha $CS --suite $R/data/evaluator-gate/held-out-suite.v2.json --pinned $S/lengths/pinned-lengths-v1.jsonl --out $E/lat-n$N.json 2>&1 | grep -v -- '-> ' | tail -2"; done; echo LAT_DONE

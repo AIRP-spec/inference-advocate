@@ -1,0 +1,89 @@
+diff --git a/.github/workflows/ci.yml b/.github/workflows/ci.yml
+index f6354cb..79365fd 100644
+--- a/.github/workflows/ci.yml
++++ b/.github/workflows/ci.yml
+@@ -41,3 +41,84 @@ jobs:
+ 
+       - name: build the interface
+         run: npm run build:ui
++
++  # Shared-encoding cross-path identity: Python gate path vs Node shipped path, item by item on the fixed held-out
++  # items, for the shipped build (packed S2c graph), packed feed included.
++  #
++  # Runs on a GitHub-hosted runner. There is deliberately no self-hosted runner: this repository is
++  # public, and a self-hosted runner would run fork code on our hardware.
++  #
++  # The 1.7 GB model bundle is downloaded from a pinned URL, and its SHA-256 is checked before it is
++  # extracted or used (the job fails on mismatch, on a cache hit too). The archive is cached between runs.
++  #
++  # Triggers: push to main and workflow_dispatch only, never pull_request. The job is skipped on
++  # pull requests. It also fails, by design, until the bundle is published at the URL below.
++  # To build the archive: tools/evaluator-training/laya-node/make-bundle-archive.sh
++  shared-crosspath:
++    if: ${{ github.event_name != 'pull_request' }}
++    runs-on: ubuntu-latest
++    timeout-minutes: 90
++    permissions:
++      contents: read
++    env:
++      AIRP_SHARED_CROSSPATH_REQUIRED: '1'
++      # Where the bundle is published. Override with the repository variable AIRP_SHARED_BUNDLE_URL.
++      SHARED_BUNDLE_URL: ${{ vars.AIRP_SHARED_BUNDLE_URL || 'https://github.com/AIRP-spec/inference-advocate/releases/download/laya-shared-a570/laya-shared-a570-bundle.tar.gz' }}
++      # What the bytes must be. Changing the model means changing this line in a reviewed commit.
++      SHARED_BUNDLE_SHA256: REPLACE_WHEN_BUNDLE_PUBLISHED_0000000000000000000000000000000000000000000000000000000000000000
++      SHARED_BUNDLE_FILE: ${{ github.workspace }}/.laya-cache/laya-shared-a570-bundle.tar.gz
++    steps:
++      - uses: actions/checkout@v4
++
++      - uses: actions/setup-node@v4
++        with:
++          node-version: '22.x'
++          cache: npm
++
++      - uses: actions/setup-python@v5
++        with:
++          python-version: '3.12'
++
++      - name: restore the model bundle archive
++        id: bundle-cache
++        uses: actions/cache@v4
++        with:
++          path: .laya-cache
++          key: shared-bundle-${{ env.SHARED_BUNDLE_SHA256 }}
++
++      - name: download the model bundle (cache miss only)
++        if: steps.bundle-cache.outputs.cache-hit != 'true'
++        run: |
++          mkdir -p "$(dirname "$SHARED_BUNDLE_FILE")"
++          curl --fail --location --retry 3 --retry-delay 10 --output "$SHARED_BUNDLE_FILE" "$SHARED_BUNDLE_URL" || {
++            echo "::error::could not download the shared-encoding bundle from $SHARED_BUNDLE_URL. It has to be published there first (or set the repository variable AIRP_SHARED_BUNDLE_URL)."
++            exit 1
++          }
++
++      - name: verify the bundle SHA-256 (always, before use)
++        run: |
++          echo "${SHARED_BUNDLE_SHA256}  ${SHARED_BUNDLE_FILE}" | sha256sum --check - || {
++            echo "::error::Laya bundle SHA-256 mismatch: refusing to use it"
++            rm -f "$SHARED_BUNDLE_FILE"
++            exit 1
++          }
++
++      - name: extract the bundle
++        run: |
++          mkdir -p "$RUNNER_TEMP/laya"
++          tar -xzf "$SHARED_BUNDLE_FILE" -C "$RUNNER_TEMP/laya"
++          echo "AIRP_SHARED_BUNDLE_DIR=$RUNNER_TEMP/laya/laya-shared-a570" >> "$GITHUB_ENV"
++
++      - name: python reference environment (pinned, CPU only)
++        run: |
++          python -m venv "$RUNNER_TEMP/laya-venv"
++          "$RUNNER_TEMP/laya-venv/bin/pip" install --quiet --index-url https://download.pytorch.org/whl/cpu torch==2.14.0
++          "$RUNNER_TEMP/laya-venv/bin/pip" install --quiet laya==0.3.21 onnxruntime==1.22.1 transformers==4.48.3 numpy==2.2.6
++          echo "AIRP_LAYA_PYTHON=$RUNNER_TEMP/laya-venv/bin/python" >> "$GITHUB_ENV"
++
++      - run: npm ci
++
++      - run: npm run build
++
++      - name: laya cross-path identity (packed feed, primitives, composed verdicts)
++        run: node --test tools/evaluator-training/laya-crosspath.test.mjs
