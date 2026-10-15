@@ -87,3 +87,4 @@
 - Step 3: systematic/SYSTEMATIC-12.md already complete vs ask (text/gold/emitted/wrong primitive; carry-over 0/12, strict 1/64). Not rewritten.
 - Step 5: podResume hc0ltnx3rwnvq0 gpuCount 0 and 1 refused again 15:59Z; no network volumes on account; options in STRANDED-POD-hc0ltnx3rwnvq0.md. NOT terminated. STOPPED for Justin.
 - 16:30Z Oct15 Justin 22:14: ADR cutoff rule (0.5/argmax; T for reporting only; no prior run certifiable) committed. REPORT-EXPLORATORY-05: no recipe meets bar; worst-seed round 39, Arm B 40, distill 37 (2 seeds). Stranded pod terminated by Justin; s9 2.5/3.0 + s11>1.0 permanently lost. Step 3 (DECLARATION-FRESH-05, distill recipe) NOT started; reporting first.
+- 16:32Z DECLARATION-FRESH-05 written (distill recipe, seeds 12/13/14, 0.5 cutoffs).
