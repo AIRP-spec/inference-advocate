@@ -88,3 +88,4 @@
 - Step 5: podResume hc0ltnx3rwnvq0 gpuCount 0 and 1 refused again 15:59Z; no network volumes on account; options in STRANDED-POD-hc0ltnx3rwnvq0.md. NOT terminated. STOPPED for Justin.
 - 16:30Z Oct15 Justin 22:14: ADR cutoff rule (0.5/argmax; T for reporting only; no prior run certifiable) committed. REPORT-EXPLORATORY-05: no recipe meets bar; worst-seed round 39, Arm B 40, distill 37 (2 seeds). Stranded pod terminated by Justin; s9 2.5/3.0 + s11>1.0 permanently lost. Step 3 (DECLARATION-FRESH-05, distill recipe) NOT started; reporting first.
 - 16:32Z DECLARATION-FRESH-05 written (distill recipe, seeds 12/13/14, 0.5 cutoffs).
+- 16:32Z BLOCKED before pod: createNetworkVolume (40GB EU-RO-1) refused: 'You must have at least $5 in your account' — RunPod clientBalance $4.50. VPS free 36G (need ~16G). No pod, no volume created. Waiting on Justin (top-up = purchase). Declaration cf6a9aa stands.
