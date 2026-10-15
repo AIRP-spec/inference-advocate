@@ -29,3 +29,6 @@ The val-fitted temperatures (about 3.3–4.0) raise the miss counts sharply (32�
 - Pod running 12:02:30Z Oct 14 to 00:13:43Z Oct 15 (when the user exited it): 12.19 h x $0.89 = **$10.85**. About 11.5 h of that was idle. Training finished in about 35 min, but the stream stalled because the VPS disk was full (ENOSPC) and nothing stopped the pod.
 - EXITED volume storage, 60 GB at about $0.20/GB-month, 14 h: about $0.23. Still accruing at about $0.40/day.
 - **Total about $21.82 of $30.**
+
+## Update 2026-10-15 22:14 NPT
+Justin terminated pod `hc0ltnx3rwnvq0`. s9 ckpt 2.5 and 3.0 and everything from s11 after ckpt 1.0 (including s11 raw outputs and logs) are **permanently lost**. `MANIFEST-partial.sha256` `eabfe772…` is the final distill archive.
