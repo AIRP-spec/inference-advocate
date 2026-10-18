@@ -119,3 +119,4 @@
 - 17:00Z Oct18 Justin 22:36 NPT: r17 numage approved (chore+phrasing); DECLARATION-FRESH-09 attempt 5 seeds 24-26; declare before pod.
 - 18:29Z Oct18 FRESH-09 FAIL seed24 avg E+M 37>33. Volume 02e56854… (157) VPS OK. Avg s24 sha -c OK. CPU+GPU terminated. Spend ≈$0.57. REPORT-FRESH-09.
 - 00:21 NPT Oct19 FRESH-09 confirmed archived c9d418e. ADR 2026-10-19 (accuracy on candidate only) 20ef5c3. DECLARATION-FRESH-10 attempt 6 seeds 27-29; selection-before-v2; declared before pod.
+- 01:16 NPT Oct19 FRESH-10 FAIL safety s27 ep2.0 class-level self_harm pos-12 (avg passes). Stopped; no candidate; E+M masked. Volume 833f0163 (92) VPS OK. Spend ≈$0.40. Certification stopped per ADR 2026-10-19; safety-clean list for Justin. Pods [].
