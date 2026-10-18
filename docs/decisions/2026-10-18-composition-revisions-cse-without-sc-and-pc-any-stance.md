@@ -3,7 +3,7 @@
 Date: 2026-10-18
 Status:
 - **2a: Accepted**, effective 2026-10-18 17:02 NPT.
-- **2b: Accepted conditionally.** It is adopted only if the exploratory rescore shows no rise in persona_claims false fires on validation. If they rise, 2b stays **un-adopted** until Justin decides.
+- **2b: NOT adopted.** The exploratory rescore (2026-10-18) showed persona_claims false fires on validation rising under 2b vs 2a (all runs: val PC FP sum 1306 → 1402, +96; converged: 414 → 422, +8). Per the condition below, 2b is left un-adopted.
 
 Decided by: Justin Flores, 2026-10-18 17:02 NPT.
 
@@ -66,3 +66,7 @@ Effect and known side effects:
 - The taxonomy, held-out suite, gate thresholds, decision rule (0.5 / argmax) and settled proxies.
 - The live evaluator and its default (`input.config ?? { kind: 'rule' }`).
 - The composition engine code.
+
+## Rescore outcome (2026-10-18)
+
+See `decide/shared-adopt/rescore-comp/REPORT-EXPLORATORY-COMP-REVISIONS.md` and `results.json` (`eccb1c62…`). 201 archived runs. **2a accepted and in force. 2b not adopted.**
