@@ -1,0 +1,70 @@
+{
+  "metric": "composed-class macro-F1 on validation (DECLARATION.md §2)",
+  "selected": "f06-s15-ckpt-epoch-2.0-step-464",
+  "tiebreak": "stance_accuracy then later step",
+  "checkpoints": [
+    {
+      "checkpoint": "f06-s15-ckpt-epoch-2.0-step-464",
+      "step": 464,
+      "composed_macro_f1": 0.7973371589103835,
+      "n_classes_in_macro": 11,
+      "per_class_f1": {
+        "violence": 0.9462365591397849,
+        "criminal_assistance": 0.813953488372093,
+        "self_harm": 0.3157894736842105,
+        "sexual_content": 0.8345323741007193,
+        "child_sexual_exploitation": 0.6964285714285714,
+        "hate": 0.7096774193548387,
+        "profanity": 1,
+        "persona_claims": 0.9272727272727272,
+        "relational_hooks": 0.7843137254901961,
+        "sycophancy": 0.9523809523809523,
+        "simulation_obscured": 0.7901234567901235
+      },
+      "stance_accuracy": 0.9047619047619048,
+      "n": 819
+    },
+    {
+      "checkpoint": "f06-s15-ckpt-epoch-3.0-step-693",
+      "step": 693,
+      "composed_macro_f1": 0.7670840675932418,
+      "n_classes_in_macro": 11,
+      "per_class_f1": {
+        "violence": 0.9534883720930233,
+        "criminal_assistance": 0.8333333333333333,
+        "self_harm": 0.43478260869565216,
+        "sexual_content": 0.8345323741007193,
+        "child_sexual_exploitation": 0.7027027027027027,
+        "hate": 0.2608695652173913,
+        "profanity": 1,
+        "persona_claims": 0.9622641509433962,
+        "relational_hooks": 0.7692307692307693,
+        "sycophancy": 0.975609756097561,
+        "simulation_obscured": 0.7111111111111111
+      },
+      "stance_accuracy": 0.9108669108669109,
+      "n": 819
+    },
+    {
+      "checkpoint": "f06-s15-ckpt-epoch-2.5-step-580",
+      "step": 580,
+      "composed_macro_f1": 0.7575505221118511,
+      "n_classes_in_macro": 11,
+      "per_class_f1": {
+        "violence": 0.9230769230769231,
+        "criminal_assistance": 0.8089887640449438,
+        "self_harm": 0.5,
+        "sexual_content": 0.8405797101449275,
+        "child_sexual_exploitation": 0.7027027027027027,
+        "hate": 0.18181818181818182,
+        "profanity": 1,
+        "persona_claims": 0.9357798165137614,
+        "relational_hooks": 0.7407407407407407,
+        "sycophancy": 0.9523809523809523,
+        "simulation_obscured": 0.7469879518072288
+      },
+      "stance_accuracy": 0.9047619047619048,
+      "n": 819
+    }
+  ]
+}

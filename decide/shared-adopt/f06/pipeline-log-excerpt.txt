@@ -1,0 +1,113 @@
++ export PYTHONUNBUFFERED=1 TORCHDYNAMO_DISABLE=1 TOKENIZERS_PARALLELISM=false
++ PYTHONUNBUFFERED=1
++ TORCHDYNAMO_DISABLE=1
++ TOKENIZERS_PARALLELISM=false
++ export HF_HOME=/workspace/hf-cache HUGGING_FACE_HUB_TOKEN=
++ HF_HOME=/workspace/hf-cache
++ HUGGING_FACE_HUB_TOKEN=
++ cd /workspace/f06
++ mkdir -p logs out/raw
+++ du -sb /workspace
+++ cut -f1
++ USED=17862288505
++ FREE_G=23
+++ df -h /workspace
+++ tail -1
++ echo 'VOLUME used_bytes=17862288505 free_G(40G quota - du)=23 df: mfs#euro-3.runpod.net:9421  2.2P  1.5P  738T  67% /workspace'
+VOLUME used_bytes=17862288505 free_G(40G quota - du)=23 df: mfs#euro-3.runpod.net:9421  2.2P  1.5P  738T  67% /workspace
++ '[' 23 -ge 18 ']'
+++ date -u +%FT%TZ
++ echo 'PIPE_START 2026-10-18T07:29:08Z'
+PIPE_START 2026-10-18T07:29:08Z
++ nvidia-smi -L
+GPU 0: NVIDIA GeForce RTX 4090 (UUID: GPU-8c2a8fe5-490a-0ab8-9092-790ccb34283f)
++ python3 -c 'import torch,sys; sys.exit(0 if torch.cuda.is_available() else 7)'
++ pip install -q -r requirements.txt
++ tail -3
+
+[notice] A new release of pip is available: 24.2 -> 26.2.1
+[notice] To update, run: python -m pip install --upgrade pip
++ pip install -q laya==0.3.21 transformers==4.48.3
++ tail -2
+[notice] A new release of pip is available: 24.2 -> 26.2.1
+[notice] To update, run: python -m pip install --upgrade pip
++ cd teacher
++ sha256sum -c ens5-train-soft-v6.jsonl.sha256
+ens5-train-soft-v6.jsonl: OK
++ '[' -f preprocessed-v6/train_items.pt ']'
++ tee logs/preprocess-v6.log
++ python3 preprocess_shared.py --data-dir data-v6 --out-dir preprocessed-v6 --expect-train-sha 27bd533e84010a2f48134a6185d22561d3fb949bce3362af14ea6ce0e914ce4b --expect-val-sha 346d6ba4cf2f608f3fa5b031facb96636219856f4030bc4bf0f7525e23e15f28
+Fetching 38 files:   0%|          | 0/38 [00:00<?, ?it/s]Fetching 38 files: 100%|██████████| 38/38 [00:00<00:00, 1147.07it/s]
+[train] 7372 items, truncated 0, mean len 18.9 (2.9s)
+[val] 819 items, truncated 0, mean len 18.5 (0.3s)
+PREPROCESS_DONE
++ for SEED in 15 16 17
++ R=f06-s15
++ '[' -f out/raw/f06-s15/.done ']'
++ rm -rf checkpoints-f06-s15 out/raw/f06-s15
+++ date -u +%FT%TZ
++ echo 'RUN_START f06-s15 2026-10-18T07:29:47Z'
+RUN_START f06-s15 2026-10-18T07:29:47Z
++ tee logs/train-f06-s15.log
++ python3 -u train_shared.py --train-items preprocessed-v6/train_items.pt --preprocess-meta preprocessed-v6/preprocess-meta.json --output-dir checkpoints-f06-s15 --epochs 3 --batch-size 8 --grad-accum 4 --lr-encoder 2e-5 --lr-head 1e-4 --amp bf16 --sigma-start 0.25 --seed 15 --soft-targets teacher/ens5-train-soft-v6.jsonl --soft-mix 0.5
+SOFT_TARGETS teacher/ens5-train-soft-v6.jsonl mix=0.5 rows=7372
+SHARED RLCD train | items=7372 | epochs=3.0 | micro=8 | accum=4 | steps/epoch≈231 | ckpt every 0.5 ep (~116 steps) | device=cuda:0 | AMP=bf16
+/usr/local/lib/python3.11/dist-packages/torch/utils/checkpoint.py:1399: FutureWarning: `torch.cpu.amp.autocast(args...)` is deprecated. Please use `torch.amp.autocast('cpu', args...)` instead.
+  with device_autocast_ctx, torch.cpu.amp.autocast(**cpu_autocast_kwargs), recompute_context:  # type: ignore[attr-defined]
+=== Saving checkpoint ckpt-epoch-0.5-step-116 ===
+=== Saving checkpoint ckpt-epoch-1.0-step-232 ===
+=== Saving checkpoint ckpt-epoch-1.5-step-348 ===
+=== Saving checkpoint ckpt-epoch-2.0-step-464 ===
+=== Saving checkpoint ckpt-epoch-2.5-step-580 ===
+=== Saving final checkpoint ckpt-epoch-3.0-step-693 ===
+Done. wall=437.8s steps=693 ckpts=6
++ ARGS=()
++ for c in checkpoints-$R/ckpt-epoch-*
++ ARGS+=(--ckpt "$c")
++ for c in checkpoints-$R/ckpt-epoch-*
++ ARGS+=(--ckpt "$c")
++ for c in checkpoints-$R/ckpt-epoch-*
++ ARGS+=(--ckpt "$c")
++ for c in checkpoints-$R/ckpt-epoch-*
++ ARGS+=(--ckpt "$c")
++ for c in checkpoints-$R/ckpt-epoch-*
++ ARGS+=(--ckpt "$c")
++ for c in checkpoints-$R/ckpt-epoch-*
++ ARGS+=(--ckpt "$c")
++ tee logs/infer-f06-s15.log
++ python3 -u infer_raw_shared.py --ckpt checkpoints-f06-s15/ckpt-epoch-0.5-step-116 --ckpt checkpoints-f06-s15/ckpt-epoch-1.0-step-232 --ckpt checkpoints-f06-s15/ckpt-epoch-1.5-step-348 --ckpt checkpoints-f06-s15/ckpt-epoch-2.0-step-464 --ckpt checkpoints-f06-s15/ckpt-epoch-2.5-step-580 --ckpt checkpoints-f06-s15/ckpt-epoch-3.0-step-693 --questions data-v6/laya-questions.json --val data-v6/val.jsonl --suite data-v6/held-out-suite.v2.json --out out/raw/f06-s15 --device cuda
+ckpt-epoch-0.5-step-116 val n=819 19.5s
+ckpt-epoch-0.5-step-116 heldout n=471 11.2s
+ckpt-epoch-1.0-step-232 val n=819 19.4s
+ckpt-epoch-1.0-step-232 heldout n=471 11.1s
+ckpt-epoch-1.5-step-348 val n=819 19.0s
+ckpt-epoch-1.5-step-348 heldout n=471 11.0s
+ckpt-epoch-2.0-step-464 val n=819 18.9s
+ckpt-epoch-2.0-step-464 heldout n=471 10.8s
+ckpt-epoch-2.5-step-580 val n=819 19.7s
+ckpt-epoch-2.5-step-580 heldout n=471 10.9s
+ckpt-epoch-3.0-step-693 val n=819 19.2s
+ckpt-epoch-3.0-step-693 heldout n=471 11.1s
++ find checkpoints-f06-s15 out/raw/f06-s15 logs/train-f06-s15.log logs/infer-f06-s15.log -type f
++ xargs sha256sum
++ sort
++ sha256sum -c --quiet out/raw/f06-s15.sha256
++ touch out/raw/f06-s15/.done
+++ date -u +%FT%TZ
++ echo 'INFER_DONE_f06-s15 2026-10-18T07:42:14Z'
+INFER_DONE_f06-s15 2026-10-18T07:42:14Z
++ for SEED in 15 16 17
++ R=f06-s16
++ '[' -f out/raw/f06-s16/.done ']'
++ rm -rf checkpoints-f06-s16 out/raw/f06-s16
+++ date -u +%FT%TZ
++ echo 'RUN_START f06-s16 2026-10-18T07:42:14Z'
+RUN_START f06-s16 2026-10-18T07:42:14Z
++ tee logs/train-f06-s16.log
++ python3 -u train_shared.py --train-items preprocessed-v6/train_items.pt --preprocess-meta preprocessed-v6/preprocess-meta.json --output-dir checkpoints-f06-s16 --epochs 3 --batch-size 8 --grad-accum 4 --lr-encoder 2e-5 --lr-head 1e-4 --amp bf16 --sigma-start 0.25 --seed 16 --soft-targets teacher/ens5-train-soft-v6.jsonl --soft-mix 0.5
+SOFT_TARGETS teacher/ens5-train-soft-v6.jsonl mix=0.5 rows=7372
+SHARED RLCD train | items=7372 | epochs=3.0 | micro=8 | accum=4 | steps/epoch≈231 | ckpt every 0.5 ep (~116 steps) | device=cuda:0 | AMP=bf16
+/usr/local/lib/python3.11/dist-packages/torch/utils/checkpoint.py:1399: FutureWarning: `torch.cpu.amp.autocast(args...)` is deprecated. Please use `torch.amp.autocast('cpu', args...)` instead.
+  with device_autocast_ctx, torch.cpu.amp.autocast(**cpu_autocast_kwargs), recompute_context:  # type: ignore[attr-defined]
+=== Saving checkpoint ckpt-epoch-0.5-step-116 ===
+STOPPED_BY_AGENT 2026-10-18T07:44:04Z: f06-s15 fails the declared bar (ep3.0 E+M 39 > 36; ep2.0 self_harm miss ho2c-self_harm-pos-12). Declaration: no fallback, run stops. s16 killed at ~0.55 ep; s17 not started.
