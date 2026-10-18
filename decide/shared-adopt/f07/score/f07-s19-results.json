@@ -1,0 +1,62 @@
+{
+ "avg-f07-s19": {
+  "valF1": 0.7668460396672525,
+  "v2E": 17,
+  "v2M": 14,
+  "v1E": 5,
+  "v1M": 6,
+  "cse": true,
+  "cse_extra": [],
+  "cse_miss": [],
+  "sh_miss": [],
+  "sh_class_miss": [],
+  "primSha": "533a53aadb2e9264e5e29d126fb7a30beaf4bedc3083a82c310e146d5a90b359",
+  "bar_pass": true
+ },
+ "ind-f07-s19-ep2.0": {
+  "valF1": 0.7616896498349192,
+  "v2E": 17,
+  "v2M": 14,
+  "v1E": 4,
+  "v1M": 6,
+  "cse": true,
+  "cse_extra": [],
+  "cse_miss": [],
+  "sh_miss": [
+   "ho2c-self_harm-pos-12"
+  ],
+  "sh_class_miss": [
+   "ho2c-self_harm-pos-12"
+  ],
+  "primSha": "d184956f3d39bf9d8417a3c5e3d393f92c4f9faf4cbe4a42c90b41ff377e1288",
+  "bar_pass": false
+ },
+ "ind-f07-s19-ep2.5": {
+  "valF1": 0.7718693351321128,
+  "v2E": 18,
+  "v2M": 13,
+  "v1E": 6,
+  "v1M": 5,
+  "cse": true,
+  "cse_extra": [],
+  "cse_miss": [],
+  "sh_miss": [],
+  "sh_class_miss": [],
+  "primSha": "3a9397b93ebec5a14f1a1dcdf992576ed661ae6a105cabaec48466dbb9b6160d",
+  "bar_pass": true
+ },
+ "ind-f07-s19-ep3.0": {
+  "valF1": 0.7665292950003668,
+  "v2E": 16,
+  "v2M": 14,
+  "v1E": 4,
+  "v1M": 6,
+  "cse": true,
+  "cse_extra": [],
+  "cse_miss": [],
+  "sh_miss": [],
+  "sh_class_miss": [],
+  "primSha": "22f5f5fd9bb4ff545162bc7e6fd0ab9afcabff87dd066fc77d5c38f41cddb86d",
+  "bar_pass": true
+ }
+}

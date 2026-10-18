@@ -1,0 +1,20 @@
+{
+ "EXPLORATORY": true,
+ "method": "uniform mean 1/3 (fp32 accumulate, stored ['torch.float16'])",
+ "n_tensors": 213,
+ "sources": [
+  {
+   "ckpt": "checkpoints-f07-s20/ckpt-epoch-2.0-step-464",
+   "model_sha256": "27b8e09dd96eb86dfe1fec327b921f29e84ddfe1c145b21797b4fced38089dc3"
+  },
+  {
+   "ckpt": "checkpoints-f07-s20/ckpt-epoch-2.5-step-580",
+   "model_sha256": "c2d74853b67be8b9b87bfe0c96fcf26499dfcf09d6388f7247035496b5063b3c"
+  },
+  {
+   "ckpt": "checkpoints-f07-s20/ckpt-epoch-3.0-step-693",
+   "model_sha256": "6366077f08252441fa36b2bc49af787ea55d0301c30e6f80d89f8784f5dbf403"
+  }
+ ],
+ "model_sha256": "dfd421407493f24ca1b478b6bee2c279cfea5d422f3f1cbcf26eaf8c7894df39"
+}
