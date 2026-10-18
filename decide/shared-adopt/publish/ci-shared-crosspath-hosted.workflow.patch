@@ -1,24 +1,22 @@
-diff --git a/.github/workflows/ci.yml b/.github/workflows/ci.yml
-index f6354cb..79365fd 100644
 --- a/.github/workflows/ci.yml
 +++ b/.github/workflows/ci.yml
-@@ -41,3 +41,84 @@ jobs:
+@@ -41,3 +41,84 @@
  
        - name: build the interface
          run: npm run build:ui
 +
-+  # Shared-encoding cross-path identity: Python gate path vs Node shipped path, item by item on the fixed held-out
-+  # items, for the shipped build (packed S2c graph), packed feed included.
++  # Shared-encoding primitives evaluator: cross-path identity (Python gate path vs Node shipped path),
++  # item by item on the fixed held-out items, for the certified bundle.
 +  #
-+  # Runs on a GitHub-hosted runner. There is deliberately no self-hosted runner: this repository is
-+  # public, and a self-hosted runner would run fork code on our hardware.
++  # GitHub-hosted runner only. There is deliberately no self-hosted runner: this repository is public,
++  # and a self-hosted runner would run fork code on our hardware.
 +  #
-+  # The 1.7 GB model bundle is downloaded from a pinned URL, and its SHA-256 is checked before it is
-+  # extracted or used (the job fails on mismatch, on a cache hit too). The archive is cached between runs.
++  # The model bundle (~1.7 GB ONNX) is downloaded from a pinned URL. Its SHA-256 is checked before it is
++  # extracted or used, on a cache hit too; the job fails on mismatch. The archive is cached between runs.
 +  #
-+  # Triggers: push to main and workflow_dispatch only, never pull_request. The job is skipped on
-+  # pull requests. It also fails, by design, until the bundle is published at the URL below.
-+  # To build the archive: tools/evaluator-training/laya-node/make-bundle-archive.sh
++  # Triggers: push to main and workflow_dispatch only, never pull_request (skipped on PRs).
++  # PLACEHOLDERS: the job fails by design until the bundle is public at SHARED_BUNDLE_URL and
++  # SHARED_BUNDLE_SHA256 holds the archive's real SHA-256 (set both in a reviewed commit).
 +  shared-crosspath:
 +    if: ${{ github.event_name != 'pull_request' }}
 +    runs-on: ubuntu-latest
@@ -26,12 +24,10 @@ index f6354cb..79365fd 100644
 +    permissions:
 +      contents: read
 +    env:
-+      AIRP_SHARED_CROSSPATH_REQUIRED: '1'
-+      # Where the bundle is published. Override with the repository variable AIRP_SHARED_BUNDLE_URL.
-+      SHARED_BUNDLE_URL: ${{ vars.AIRP_SHARED_BUNDLE_URL || 'https://github.com/AIRP-spec/inference-advocate/releases/download/laya-shared-a570/laya-shared-a570-bundle.tar.gz' }}
-+      # What the bytes must be. Changing the model means changing this line in a reviewed commit.
++      AIRP_LAYA_CROSSPATH_REQUIRED: '1'
++      SHARED_BUNDLE_URL: ${{ vars.AIRP_SHARED_BUNDLE_URL || 'https://huggingface.co/AIRP-spec/airp-shared-primitives-modernbert-large/resolve/REPLACE_WITH_CERTIFIED_TAG/airp-shared-primitives-bundle.tar.gz' }}
 +      SHARED_BUNDLE_SHA256: REPLACE_WHEN_BUNDLE_PUBLISHED_0000000000000000000000000000000000000000000000000000000000000000
-+      SHARED_BUNDLE_FILE: ${{ github.workspace }}/.laya-cache/laya-shared-a570-bundle.tar.gz
++      SHARED_BUNDLE_FILE: ${{ github.workspace }}/.laya-cache/airp-shared-primitives-bundle.tar.gz
 +    steps:
 +      - uses: actions/checkout@v4
 +
@@ -44,6 +40,12 @@ index f6354cb..79365fd 100644
 +        with:
 +          python-version: '3.12'
 +
++      - name: refuse placeholders
++        run: |
++          case "$SHARED_BUNDLE_SHA256$SHARED_BUNDLE_URL" in
++            *REPLACE_*) echo "::error::shared bundle URL/SHA-256 are placeholders; publish the bundle and pin them first"; exit 1;;
++          esac
++
 +      - name: restore the model bundle archive
 +        id: bundle-cache
 +        uses: actions/cache@v4
@@ -55,24 +57,20 @@ index f6354cb..79365fd 100644
 +        if: steps.bundle-cache.outputs.cache-hit != 'true'
 +        run: |
 +          mkdir -p "$(dirname "$SHARED_BUNDLE_FILE")"
-+          curl --fail --location --retry 3 --retry-delay 10 --output "$SHARED_BUNDLE_FILE" "$SHARED_BUNDLE_URL" || {
-+            echo "::error::could not download the shared-encoding bundle from $SHARED_BUNDLE_URL. It has to be published there first (or set the repository variable AIRP_SHARED_BUNDLE_URL)."
-+            exit 1
-+          }
++          curl --fail --location --retry 3 --retry-delay 10 --output "$SHARED_BUNDLE_FILE" "$SHARED_BUNDLE_URL"
 +
 +      - name: verify the bundle SHA-256 (always, before use)
 +        run: |
 +          echo "${SHARED_BUNDLE_SHA256}  ${SHARED_BUNDLE_FILE}" | sha256sum --check - || {
-+            echo "::error::Laya bundle SHA-256 mismatch: refusing to use it"
-+            rm -f "$SHARED_BUNDLE_FILE"
-+            exit 1
-+          }
++            echo "::error::shared bundle SHA-256 mismatch: refusing to use it"; rm -f "$SHARED_BUNDLE_FILE"; exit 1; }
 +
-+      - name: extract the bundle
++      - name: extract the bundle and check its manifest
 +        run: |
-+          mkdir -p "$RUNNER_TEMP/laya"
-+          tar -xzf "$SHARED_BUNDLE_FILE" -C "$RUNNER_TEMP/laya"
-+          echo "AIRP_SHARED_BUNDLE_DIR=$RUNNER_TEMP/laya/laya-shared-a570" >> "$GITHUB_ENV"
++          mkdir -p "$RUNNER_TEMP/shared"
++          tar -xzf "$SHARED_BUNDLE_FILE" -C "$RUNNER_TEMP/shared"
++          D=$(find "$RUNNER_TEMP/shared" -maxdepth 2 -name MANIFEST.sha256 -printf '%h\n' | head -1)
++          (cd "$D" && sha256sum -c --quiet MANIFEST.sha256)
++          echo "AIRP_LAYA_SHARED_BUNDLE_DIR=$D" >> "$GITHUB_ENV"
 +
 +      - name: python reference environment (pinned, CPU only)
 +        run: |
@@ -85,5 +83,5 @@ index f6354cb..79365fd 100644
 +
 +      - run: npm run build
 +
-+      - name: laya cross-path identity (packed feed, primitives, composed verdicts)
-+        run: node --test tools/evaluator-training/laya-crosspath.test.mjs
++      - name: shared-encoding cross-path identity (feeds, primitives, composed verdicts)
++        run: node --test tools/evaluator-training/laya-shared-crosspath.test.mjs

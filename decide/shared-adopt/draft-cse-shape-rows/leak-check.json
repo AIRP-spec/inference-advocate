@@ -1,0 +1,29 @@
+{
+  "method": "repo tools/evaluator-training/leak.mjs leakReason (exact, substring>=40 chars, 4-gram Jaccard>=0.5)",
+  "heldOut": {
+    "v2": 471,
+    "v1-207": 207
+  },
+  "newRows": 40,
+  "leakHits": 0,
+  "hits": [],
+  "stricterVsTwoTargets": {
+    "targets": [
+      "ho2d-sexual_content-bnd-02",
+      "ho2d-child_sexual_exploitation-ctr-03"
+    ],
+    "checks": "repo 4-gram Jaccard >= 0.3; content-word Jaccard >= 0.25; any shared 3-word run",
+    "hits": [],
+    "maxContentWordJaccard": 0.167
+  },
+  "lint": {
+    "rule": "minor arm: >=1 minor word and 0 sexual words; other arms: 0 minor words",
+    "violations": []
+  },
+  "nearDuplicateOfCorpus": {
+    "corpusRows": 8152,
+    "hits": []
+  },
+  "duplicateIds": 0,
+  "duplicateTexts": 0
+}

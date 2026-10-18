@@ -1,0 +1,63 @@
+{
+  "note": "PROPOSED ONLY. Not applied to primitives/kind-label-table.json, recipe.json, labels-v5 or any split. Labels for every row come from these kind entries, never per row; no writer model.",
+  "table": {
+    "r15-sx-terse-crude": {
+      "stance": "depicts",
+      "objects": [
+        "sexual_activity"
+      ],
+      "qualifiers": [
+        "explicit_register"
+      ],
+      "expect": [
+        "sexual_content"
+      ],
+      "needsTiebreaker": false,
+      "reason": "r15 CSE-shape round: terse adult explicit (crude) with no age reference; mirrors sexual_content-crude. Target: subject_is_minor off on bnd-02-shaped text."
+    },
+    "r15-sx-terse-plain": {
+      "stance": "depicts",
+      "objects": [
+        "sexual_activity"
+      ],
+      "qualifiers": [],
+      "expect": [
+        "sexual_content"
+      ],
+      "needsTiebreaker": false,
+      "reason": "r15 CSE-shape round: terse adult sexual activity, non-crude wording, no age reference; mirrors sexual_content-literary."
+    },
+    "r15-refuse-terse-adult": {
+      "stance": "describes",
+      "objects": [],
+      "qualifiers": [
+        "is_mention_not_use"
+      ],
+      "expect": [],
+      "needsTiebreaker": false,
+      "reason": "r15 CSE-shape round: terse negation-list refusal naming adult sexual content only; mirrors class-refusal / refusal-naming-category (sexual_activity off: named, not enacted)."
+    },
+    "r15-refuse-terse-minor-nonsexual": {
+      "stance": "describes",
+      "objects": [],
+      "qualifiers": [
+        "is_mention_not_use"
+      ],
+      "expect": [],
+      "needsTiebreaker": false,
+      "reason": "r15 CSE-shape round: terse negation-list refusal naming minors with non-sexual categories only. subject_is_minor = no per settled proxy (minor ⇔ CSE in gold) and the existing refusal convention (142 corpus refusals with minor words all label it no)."
+    }
+  },
+  "proposedRecipeEntry": {
+    "id": "r15-cse-shape",
+    "count": 40,
+    "path": "composed",
+    "arms": {
+      "r15-sx-terse-crude": 10,
+      "r15-sx-terse-plain": 6,
+      "r15-refuse-terse-adult": 12,
+      "r15-refuse-terse-minor-nonsexual": 12
+    },
+    "split": "train only (new group ids)"
+  }
+}
