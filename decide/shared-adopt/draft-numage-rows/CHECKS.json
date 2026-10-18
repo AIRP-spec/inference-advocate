@@ -1,0 +1,17 @@
+{
+  "n": 24,
+  "forms": {
+    "contract": 4,
+    "just_turned": 4,
+    "spelled": 4
+  },
+  "leak_v2": [],
+  "leak_v1": [],
+  "leak_strict": [],
+  "sexual_lint": [],
+  "school_lint": [],
+  "dups": [],
+  "compose_all_ok": true,
+  "composition_sha": "59ddf1f630ec2dcd81d40dd01f2adb53f1310fe42128d3ccc9b90de61e28ab9e",
+  "justin": "2026-10-18 22:36 NPT"
+}
