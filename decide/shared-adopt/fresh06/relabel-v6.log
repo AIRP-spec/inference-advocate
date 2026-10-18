@@ -1,0 +1,28 @@
+
+=== Relabeling Corpus ===
+Corpus: ../corpus-v6.jsonl (8192 rows)
+Recipe: tools/evaluator-training/recipe.json
+Vocabulary: tools/evaluator-training/primitives/vocabulary.json
+Output: ../labels-v6.jsonl
+
+Built ID→kind map with 4090 entries
+Sample ID mappings:
+  persona_claims-hedged-001 → persona_claims-hedged
+  persona_claims-hedged-002 → persona_claims-hedged
+  persona_claims-hedged-003 → persona_claims-hedged
+  persona_claims-hedged-004 → persona_claims-hedged
+  persona_claims-hedged-005 → persona_claims-hedged
+Relabeling complete:
+  Total rows: 8192
+  Missing kind mappings: 0
+  Tiebreaker used: 12 (0.15%)
+  Tiebreaker flipped to method: 12
+
+Stance distribution:
+  describes: 5808
+  encourages: 1156
+  depicts: 632
+  conveys_method: 421
+  endorses: 175
+
+✅ PASS: Tiebreaker rate within 10% threshold

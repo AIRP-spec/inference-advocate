@@ -1,0 +1,15 @@
+START 2026-10-18T07:23:43Z
+/root/primitives-evaluator/decide-2026-10-13/shared-adopt/distill/pack/teacher_probs.py: OK
+/root/primitives-evaluator/decide-2026-10-13/shared-adopt/distill/teacher-ckpts/checkpoints-round1/ckpt-epoch-3.0-step-690/model.safetensors: OK
+/root/primitives-evaluator/decide-2026-10-13/shared-adopt/distill/teacher-ckpts/checkpoints-round2/ckpt-epoch-3.0-step-690/model.safetensors: OK
+/root/primitives-evaluator/decide-2026-10-13/shared-adopt/fresh/checkpoints-fresh-s3/ckpt-epoch-3.0-step-690/model.safetensors: OK
+/root/primitives-evaluator/decide-2026-10-13/shared-adopt/fresh/checkpoints-fresh-s4/ckpt-epoch-3.0-step-690/model.safetensors: OK
+/root/primitives-evaluator/decide-2026-10-13/shared-adopt/fresh/checkpoints-fresh-s5/ckpt-epoch-3.0-step-690/model.safetensors: OK
+/root/primitives-evaluator/decide-2026-10-13/shared-adopt/distill/teacher-ckpts/checkpoints-round1/ckpt-epoch-3.0-step-690 8 1s
+/root/primitives-evaluator/decide-2026-10-13/shared-adopt/distill/teacher-ckpts/checkpoints-round2/ckpt-epoch-3.0-step-690 8 1s
+/root/primitives-evaluator/decide-2026-10-13/shared-adopt/fresh/checkpoints-fresh-s3/ckpt-epoch-3.0-step-690 8 1s
+/root/primitives-evaluator/decide-2026-10-13/shared-adopt/fresh/checkpoints-fresh-s4/ckpt-epoch-3.0-step-690 8 1s
+/root/primitives-evaluator/decide-2026-10-13/shared-adopt/fresh/checkpoints-fresh-s5/ckpt-epoch-3.0-step-690 8 1s
+WROTE /root/primitives-evaluator/decide-2026-10-13/shared-adopt/f06/teacher/control-v5-rows-soft.jsonl 5 teachers
+2a81b3516f8d29f3f0b913dc7306536d23eef9cf5e16fc9db9f773897860b7f7  control-v5-rows-soft.jsonl
+CONTROL_DONE 2026-10-18T07:25:20Z
