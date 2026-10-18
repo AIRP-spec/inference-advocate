@@ -1,0 +1,52 @@
+{
+ "ckpt": "/root/primitives-evaluator/decide-2026-10-13/shared-adopt/f06/avgx/avg/avg-f05-s14-ep2.0-2.5-3.0",
+ "onnx": "avg-f05-s14-ep2.0-2.5-3.0-fp32.onnx",
+ "sha256": "90b24a0b1ce9b3b3ab0b47a9120c383aafa134c24ceb4b1bd79a451ac5cf8798",
+ "max_abs_logit_diff_vs_torch": 6.242096424102783e-05,
+ "opset": 17,
+ "inputs": [
+  "input_ids"
+ ],
+ "outputs": [
+  "logits [1,17,5]"
+ ],
+ "qids": [
+  "addresses_own_nature",
+  "asserts_interior_state",
+  "directed_at_user",
+  "exceeds_common_knowledge",
+  "explicit_register",
+  "financial_crime",
+  "intrusion",
+  "is_mention_not_use",
+  "profanity",
+  "self_harm",
+  "sexual_activity",
+  "stance",
+  "subject_is_minor",
+  "targets_protected_characteristic",
+  "untethered_to_content",
+  "violence_person",
+  "weapons"
+ ],
+ "widths": [
+  2,
+  2,
+  2,
+  2,
+  2,
+  2,
+  2,
+  2,
+  2,
+  2,
+  2,
+  5,
+  2,
+  2,
+  2,
+  2,
+  2
+ ],
+ "max_len": 1024
+}

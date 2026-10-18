@@ -1,12 +1,13 @@
 --- a/.github/workflows/ci.yml
 +++ b/.github/workflows/ci.yml
-@@ -41,3 +41,84 @@
+@@ -41,3 +41,85 @@
  
        - name: build the interface
          run: npm run build:ui
 +
 +  # Shared-encoding primitives evaluator: cross-path identity (Python gate path vs Node shipped path),
-+  # item by item on the fixed held-out items, for the certified bundle.
++  # item by item on the fixed held-out items, for the NON-DEFAULT RESEARCH RELEASE bundle avg-f05-s14
++  # (did NOT pass AIRP certification; the rule evaluator stays the default).
 +  #
 +  # GitHub-hosted runner only. There is deliberately no self-hosted runner: this repository is public,
 +  # and a self-hosted runner would run fork code on our hardware.
@@ -25,9 +26,9 @@
 +      contents: read
 +    env:
 +      AIRP_LAYA_CROSSPATH_REQUIRED: '1'
-+      SHARED_BUNDLE_URL: ${{ vars.AIRP_SHARED_BUNDLE_URL || 'https://huggingface.co/AIRP-spec/airp-shared-primitives-modernbert-large/resolve/REPLACE_WITH_CERTIFIED_TAG/airp-shared-primitives-bundle.tar.gz' }}
++      SHARED_BUNDLE_URL: ${{ vars.AIRP_SHARED_BUNDLE_URL || 'https://huggingface.co/AIRP-spec/airp-shared-primitives-modernbert-large-research/resolve/research-avg-f05-s14/airp-shared-primitives-research-avg-f05-s14.tar.gz' }}
 +      SHARED_BUNDLE_SHA256: REPLACE_WHEN_BUNDLE_PUBLISHED_0000000000000000000000000000000000000000000000000000000000000000
-+      SHARED_BUNDLE_FILE: ${{ github.workspace }}/.laya-cache/airp-shared-primitives-bundle.tar.gz
++      SHARED_BUNDLE_FILE: ${{ github.workspace }}/.laya-cache/airp-shared-primitives-research-avg-f05-s14.tar.gz
 +    steps:
 +      - uses: actions/checkout@v4
 +

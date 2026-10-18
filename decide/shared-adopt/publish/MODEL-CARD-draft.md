@@ -1,95 +1,147 @@
 ---
-# DRAFT: NOT PUBLISHED. Numbers are blank until a certification passes every ship gate (ADR 2026-10-18).
+# DRAFT: NOT PUBLISHED. Justin Flores approves and uploads any release himself.
 license: apache-2.0
 language:
 - en
 base_model: convaiinnovations/laya
 library_name: onnx
 pipeline_tag: text-classification
-tags: [content-moderation, airp, primitives, modernbert, onnx]
+tags: [content-moderation, airp, primitives, modernbert, onnx, research-release, not-certified]
 ---
 
-# AIRP shared-encoding primitives evaluator (DRAFT)
+# AIRP shared-encoding primitives evaluator: NON-DEFAULT RESEARCH RELEASE (avg-f05-s14)
 
-> **Status: draft for Justin. Do not publish.** Publishing waits until a model meets every ship gate (ADR `docs/decisions/2026-10-18-distillation-cse-ship-gate-and-converged-definition.md`). Blanks `____` are filled from the certification report that passes. The FRESH-05 candidate (f05-s13) failed the converged-checkpoint CSE gate and will not be published.
+> **NON-DEFAULT RESEARCH RELEASE. This model did NOT pass AIRP certification.**
+> It is **not** the AIRP default evaluator and must never become one through this release. The AIRP default stays the rule evaluator (`input.config ?? { kind: 'rule' }`), and the live demos are unchanged. You only get this model by naming it in an explicit config with pinned digests.
+>
+> **Stopping rule (ADR `docs/decisions/2026-10-19-gate-revision-accuracy-on-candidate-only.md`, Justin Flores):** "if attempt 6 fails, certification stops and the best safety-clean artifact goes to a non-default research release." Attempt 6 (FRESH-10) failed its safety gate: seed 27's epoch-2.0 checkpoint missed `ho2c-self_harm-pos-12` at class level. Certification of the shared-encoding recipe has stopped. This card describes the artifact chosen under that rule.
 
 ## What the model is
 
-- **Architecture:** a ModernBERT-large encoder reads the response **once** (`[CLS] response [SEP]`, at most 1024 tokens, response cut to its first 1022). **17 small heads** read the shared representation: one five-way **stance** head (conveys_method / depicts / describes / encourages / endorses) and **16 yes/no primitive heads**, one per object and qualifier. The objects are violence_person, self_harm, sexual_activity, financial_crime, intrusion, weapons and profanity. The qualifiers are is_mention_not_use, subject_is_minor, exceeds_common_knowledge, addresses_own_nature, asserts_interior_state, directed_at_user, explicit_register, targets_protected_characteristic and untethered_to_content.
-- It **does not output taxonomy classes directly.** A swappable composition file maps the primitives to classes at runtime, so a different taxonomy needs no retraining.
-- **Weights initialization:** encoder from `convaiinnovations/laya` (root English checkpoint, snapshot `55cf4c4ebb4ebe31b2550e8bdf3bd21b99753851`), whose backbone is `answerdotai/ModernBERT-large`. The heads are trained from scratch.
-- **Recipe (distillation):** per-head target = **0.5 × gold label + 0.5 × teacher probability**, with cross-entropy and an RL term on that target and no head weighting. The teacher is **ens5**, the mean of five earlier shared-encoding models (round1, round2, fresh s3/s4/s5, all at epoch 3.0), evaluated on train rows only. Encoder LR 2e-5 and head LR 1e-4, cosine with no warmup, 3 epochs, micro-batch 8 × accumulation 4, bf16, exploration sigma 0.25 → 0.1. The checkpoint is selected by validation composed-class macro-F1.
-- **Certified weights:** seed `____`, epoch 3.0, step `____`. Declaration `____` (sha `____`); report `____`.
+- **Architecture:** a ModernBERT-large encoder reads the response **once** (`[CLS] response [SEP]`, at most 1024 tokens; the response is cut to its first 1022). **17 small heads** read the shared representation:
+  - one five-way **stance** head: conveys_method, depicts, describes, encourages, endorses;
+  - **16 yes/no primitive heads**:
+    - objects: violence_person, self_harm, sexual_activity, financial_crime, intrusion, weapons, profanity;
+    - qualifiers: is_mention_not_use, subject_is_minor, exceeds_common_knowledge, addresses_own_nature, asserts_interior_state, directed_at_user, explicit_register, targets_protected_characteristic, untethered_to_content.
+- It **does not output taxonomy classes directly.** A swappable composition file maps the primitives to classes at runtime.
+- **This artifact:** `avg-f05-s14-ep2.0-2.5-3.0` is the **uniform weight average** of seed 14's epoch-2.0, 2.5 and 3.0 checkpoints from the FRESH-05 distillation run (`average_n.py` `88f9cbce…`, fp32 accumulate).
+  - `model.safetensors` sha256 `0b09a470a1e4972a1bcdf374c58affff26ee98010a76e7539397f6904fd9fa4a`
+  - sources: ep2.0 step 460 `8f1a37ef…`, ep2.5 step 575 `afcb23f7…`, ep3.0 step 690 `d9f6c923…`
+  - ONNX fp32 export (opset 17) `90b24a0b1ce9b3b3ab0b47a9120c383aafa134c24ceb4b1bd79a451ac5cf8798`, max |Δ logit| vs torch 6.24e-5
+  - pins `laya-shared-avg-f05-s14-RESEARCH.pins.json` `8ef0b322925bc45d4a17cfd17a9cbed17b75abc41ebc6e926e25904c635ca5b1`
+- **Weights initialization:** the encoder comes from `convaiinnovations/laya` (root English checkpoint, snapshot `55cf4c4ebb4ebe31b2550e8bdf3bd21b99753851`), whose backbone is `answerdotai/ModernBERT-large`. The heads are trained from scratch.
+- **Recipe (distillation, FRESH-05, declaration `cf6a9aa`, report `fcf74b5`):**
+  - Per-head target = **0.5 × gold label + 0.5 × teacher probability**, with CE and an RL term and no head weighting.
+  - The teacher is **ens5**, the mean of five earlier shared-encoding models, run on train rows only (`ens5-train-soft.jsonl` `7a428e8d…`).
+  - Optimization: encoder LR 2e-5, head LR 1e-4, cosine with no warmup, 3 epochs, micro-batch 8 × accumulation 4, bf16, sigma 0.25 → 0.1.
+  - Labels v5 `9480a89f…`: train `bc318432…` (7332), val `346d6ba4…` (819).
+  - This is the **older** recipe and data. It has none of the later corpus rounds (r15/r16/r17, labels v6–v8).
 
-## Taxonomy and compositions
+## How this artifact was chosen
 
-- **AIRP taxonomy v0.5.0** (`data/taxonomy/flags.v0.json`, sha256 `0de1cacc…`). Shipped composition: **`airp-v0.5.0-cse-corrected.json`, sha256 `4e840f3b77c4a15fca46bc1bb537e5d4f3f6cbe37e4dde94d4e5d411f585be38`**. In it, CSE fires only when subject_is_minor **and** sexual_activity both fire, per `docs/decisions/2026-10-13-cse-composition-correction.md`. A mention (stance describes + is_mention_not_use) suppresses it.
-- **AILuminate v1.0 composition:** `ailuminate-v1.0.json`, sha256 `508084b647684fc3e9e76cadb1f60c49911d435d876d13ea13bbc990a45c82b6`.
-  - Strongly supported (7): Violence, Self-Harm, Sexual Content, Child Sexual Exploitation, Hate Speech, Criminal Activity, Profanity.
-  - Partial (2): Harassment, Misinformation. Misinformation's rule is `none` because it needs factual verification, so it never fires.
-  - **Unsupported (3): Defamation, Intellectual Property, Privacy.** They need external fact-checking, so their rule is `null` and they never fire.
-  - **Caveat:** this composition's CSE rule is the *uncorrected* one (`subject_is_minor` alone) with no mention suppression. It is **not validated** on the AIRP held-out suite or any AILuminate data. Use it as a demonstration of swapping taxonomies, not as a measured classifier.
+1. **Eligibility (safety is a recipe property):** only seeds whose averaged artifact **and** every converged single checkpoint (epoch ≥ 2.0) are CSE-clean with **zero self_harm misses, class-level and primitive-level** (clarification `docs/decisions/2026-10-19-clarification-single-checkpoint-self-harm-misses.md`). Across every declared run, only **f05-s12** and **f05-s14** qualify (`f10/record/SAFETY-CLEAN.md`).
+2. **Selection on validation only:** the eligible average with the higher val composed-class macro-F1 (0.5 / argmax, composition 2a). Selection record: `decide/shared-adopt/SELECTION-RESEARCH-RELEASE.md`, committed and pushed (`4237006`) before this card cites any held-out number.
 
-## Results: this model does NOT pass the AIRP held-out gate
+| eligible artifact | val macro-F1 (2a) | selected |
+|---|---|---|
+| avg-f05-s14 | **0.8021** | **yes** |
+| avg-f05-s12 | 0.7747 | no (lower val F1); v2 E+M 18/16 = 34 for the record |
 
-Held-out v2 (471 items) and its v1-207 subset, 0.5 rule, corrected composition. **This model does not pass the AIRP held-out gate** (the claim stays as modest as `docs/proposals/ADR-laya-primitives-evaluator.md` §5). These numbers are reported as-is.
+## Results on the AIRP held-out suite
 
-| seed | v2 extras / misses / clean fires | v2 E+M | v1-207 E/M/C | CSE (n 29) | self_harm misses | val macro-F1 |
-|---|---|---|---|---|---|---|
-| `____` | `__ / __ / __` | `__` | `__ / __ / __` | `____` | `__` | `____` |
-| `____` | `__ / __ / __` | `__` | `__ / __ / __` | `____` | `__` | `____` |
-| `____` | `__ / __ / __` | `__` | `__ / __ / __` | `____` | `__` | `____` |
+Held-out v2 (471 items, suite `82f8e720fbb1d146a93a09da86484dada04561cffd85293be435c0ed0000ad77`, ho-violence-bnd-05 amended), plus its v1-207 subset. Decision rule P(yes) ≥ 0.5 at T=1, stance argmax. Composition **2a** `59ddf1f6…`, proxies `b086cdac…`, gate.json `0dc50f80…`. Torch CPU record: `f10/rescore/all-avgs` (results `838e3831…`).
 
-## Ship gates (all must hold before publishing)
+| | extras | misses | clean fires | E+M |
+|---|---|---|---|---|
+| v2 (n 471; clean n 212) | 14 | 13 | 11 | **27** |
+| v1-207 (n 207; clean n 100) | 3 | 5 | 2 | 8 |
 
-| gate | result |
+- **CSE (n 29):** 0 missed, 0 extra.
+- **self_harm:** 0 misses (primitive, 24/24) and 0 class-level misses.
+- **Accuracy limit used during certification:** v2 E+M ≤ 33, which is the live step-744 evaluator under the amended suite. Live step-744 itself has 2 self_harm misses. This artifact scores 27. That number was **not** a certification result: certification had already stopped. The held-out `pass` field in gate.json (whole-suite gate) is **false**, as for every evaluator measured so far.
+- **Safety by checkpoint for seed 14 (composition 2a, amended suite):**
+
+| artifact | val F1 | CSE | self_harm (prim / class) | v2 E+M |
+|---|---|---|---|---|
+| avg-f05-s14 (this artifact) | 0.8021 | clean | 0 / 0 | 27 |
+| ind-f05-s14-ep2.0 | 0.7937 | clean | 0 / 0 | 33 |
+| ind-f05-s14-ep2.5 | 0.8129 | clean | 0 / 0 | 25 |
+| ind-f05-s14-ep3.0 | 0.7880 | clean | 0 / 0 | 27 |
+
+### Observed spread across averaged models
+
+Every averaged artifact (seeds 12–15, 18–21, 24) rescored on the same suite and composition: **n = 9, mean v2 E+M 31.78, sample SD 3.77, range 27–37** (ADR 2026-10-19 table). This artifact sits at the bottom of that range. Expect a different seed of the same recipe to land anywhere in that band.
+
+### Unselected results (not eligible)
+
+Shown for transparency. Neither came from a fully safety-clean seed, so under Justin's rule neither could be chosen, whatever its accuracy.
+
+| artifact | kind | val F1 | v2 E+M | why not eligible |
+|---|---|---|---|---|
+| ind-f10-s27-ep2.5 | **single checkpoint** (FRESH-10, recipe v8) | 0.7691 | 24 (14/10) | Seed 27 is not fully safety-clean: its epoch-2.0 checkpoint missed `ho2c-self_harm-pos-12` at class level (the FRESH-10 FAIL). It is also a single checkpoint, not the declared averaged test unit. The number was computed after the stop, as an observation only. |
+| avg-f07-s18 | **averaged model from a partially clean seed** (FRESH-07, recipe v5+) | 0.8315 | 29 (14/15) | Seed 18 is not fully safety-clean: its epoch-2.5 checkpoint missed `ho2c-self_harm-pos-12` at class level. The average itself is clean. |
+
+## Ship checks on this artifact (Nepal VPS CPU)
+
+| check | result |
 |---|---|
-| CSE clean and 0 self_harm misses on **every converged checkpoint (epoch ≥ 2.0) of every seed** | `____` (9 checkpoints) |
-| Python vs Node identity on all 471 held-out items (primitives, composed verdicts, input feeds) | `____ / 471` (max \|Δ logit\| `____`) |
-| Node CPU median < 1000 ms at the 500-token bucket, Nepal VPS | `____ ms` |
+| Python (onnxruntime) vs Node `evaluate()` identity on all 471 held-out items: primitives, composed verdicts, decode, input feeds | **PASS 471/471** (primitives 471, composed 471, decode 471, feeds 471; max \|Δ logit\| 2.04e-4; smallest Python logit margin 0.097) |
+| Node `evaluate()` primitives vs the torch-CPU gate record | **471/471** identical |
+| Node CPU median < 1000 ms at the 500-token bucket | **677 ms** (p95 808 ms): **met** |
 
 ## Latency by length (Node `evaluate()`, Nepal VPS)
 
-Setup: Xeon Gold 5418Y, 8 vCPU, Node 22, onnxruntime-node 1.30.0, 8 intra-op threads, batch 1, no padding. Pinned length set `pinned-lengths-v1.jsonl`, n = 20 per bucket. Per-item time covers tokenize + one session.run + decode + compose.
+Setup: Xeon Gold 5418Y, 8 vCPU, Node v22.23.2, onnxruntime-node 1.30.0, 8 intra-op threads, allowSpinning 0, batch 1, no padding, flock-serialized with nice 10 and a 9 GB cgroup (the host also serves production). Pinned length set `pinned-lengths-v1.jsonl` (`6ad799d2…`), n = 20 per bucket. Per-item time covers tokenize, one session.run, decode and compose. Run 2026-10-19 01:24–01:26 NPT.
 
 | bucket (tokens) | median ms | p95 ms |
 |---|---|---|
-| ~50 | `____` | `____` |
-| ~200 | `____` | `____` |
-| ~500 | `____` | `____` |
-| ~1000 | `____` | `____` |
-| short held-out suite (471) | `____` | `____` |
+| ~50 | 103 | 138 |
+| ~200 | 286 | 335 |
+| ~500 | **677** | **808** |
+| ~1000 | 1493 | 1773 |
+| held-out suite (471 items) | 51 | 69 |
 
-## Decision rule (cutoff) and why
+## Decision rule
 
-- Every yes/no head fires iff **P(yes) ≥ 0.5 at T = 1** (z_yes > z_no); stance is **argmax**. Temperature is fitted on validation **for reporting probabilities only** and changes no decision. This is ADR `docs/decisions/2026-10-15-shared-encoding-cutoff-rule.md`.
-- **Why not val-fitted per-head cutoffs?** `TEMP-TRACE.md` showed that the fitted T (about 4) divides the logits and is applied on the same scale where it is fitted, so T never changes a decision. The difference between the modes comes from per-head best-F1 thresholds. The models separate validation by very large logit gaps; for example `sexual_activity` sits +12.35 logits and `subject_is_minor` +8.39 logits above the 0.5 cutoff on distill s10. Best F1 can then land anywhere inside the gap, and the search lands deep inside the positive mass. That traded validation false negatives for held-out misses.
-- Fitted temperatures (reporting only): T_stance `____`, T_yes/no `____`.
+Every yes/no head fires iff **P(yes) ≥ 0.5 at T = 1**; stance is **argmax** (ADR `docs/decisions/2026-10-15-shared-encoding-cutoff-rule.md`). There is no temperature or per-head threshold fitting.
 
-## Disclosure: the held-out suite informed method selection
+## Compositions
 
-The AIRP held-out v2 suite was **not** used to fit weights, thresholds or temperatures. It **was** used, across many earlier runs, to choose between methods: model family, recipe (distillation vs round vs head weighting), composition correction and cutoff rule. The cutoff rule was fixed after held-out results had been seen under both rules. For that reason only fresh seeds declared after the rule count, but **the suite is not a clean, untouched test set for this model family**, and held-out numbers here are optimistic relative to unseen data.
+- **Shipped composition: 2a**, `airp-v0.5.0-cse-corrected-2a.json`, sha256 `59ddf1f630ec2dcd81d40dd01f2adb53f1310fe42128d3ccc9b90de61e28ab9e`.
+  - CSE fires only when subject_is_minor **and** sexual_activity both fire, and a mention suppresses it.
+  - sexual_content no longer co-fires merely because CSE does (ADR `2026-10-18-composition-revisions-cse-without-sc-and-pc-any-stance.md`). Revision 2b was not adopted.
+- **AILuminate v1.0** (`ailuminate-v1.0.json`, `508084b6…`) is included as a demonstration of swapping taxonomies only:
+  - its CSE rule is the uncorrected one;
+  - it is not validated;
+  - Defamation, Intellectual Property and Privacy never fire.
+
+## Disclosures
+
+- **Held-out reuse.** The held-out v2 suite was never used to fit weights, thresholds or temperatures. It **was** used across many runs to choose model family, recipe, composition, cutoff rule and the averaged test unit, and it was amended once (ho-violence-bnd-05). The averaging method was first tried on these f05 seeds *after* their held-out results were known (REPORT-EXPLORATORY-AVG-06). This artifact was chosen after certification stopped, from a two-model set whose held-out numbers were already on record (the choice itself used val F1 only). **Treat the held-out numbers as optimistic.**
+- **Gate revisions.** The gates were revised four times while this family was being tested (ADR 2026-10-19 lists them). No gate or suite change was made to admit this artifact.
+- **Seed instability.** CSE false fires on refusal lines that name minors (`ho2d-child_sexual_exploitation-ctr-03`, `CTR03-TRACE.md`), the CSE miss on `pos-07` (FRESH-08), and the self_harm miss on `ho2c-self_harm-pos-12` (FRESH-06/07/10) come and go across seeds and half-epochs. One clean seed does not show that the recipe is stable.
 
 ## Training data provenance
 
-- **Corpus:** 8152 rows (labels v5 `9480a89f…`, corpus `712fd64d…` lineage), plus `____` approved r15 rows. All English. **Labels come from the slot spec (kind → primitives table), never from a model.** Val split: 819 rows (group-held-out). Train: `____`.
+- **Corpus:** labels v5 (`9480a89f…`): 7332 train and 819 val rows (group-held-out split). All English. **Labels come from the slot spec (kind → primitives table), never from a model.**
 - **Who wrote the rows:**
-  - **Composed locally** from templates and scaffolds, with no model: 3732 rows marked `path: composed`, plus the r15 rows. This includes **every** CSE-class row; CSE content was never sent to any writer.
-  - **Writer model:** 408 rows marked `path: writer`. The repository's generator config (`tools/evaluator-training/recipe.json`, `generator.model`) and RUNBOOK name exactly one writer, **`Qwen/Qwen2.5-32B-Instruct`**, self-hosted with vLLM.
-  - **4012 earlier rows carry no `path` field.** Their families are helpful, refusal, fact, crisis, greetings and denials. The repository does not record per-row writer attribution for them. The only generator configured in the available history is Qwen2.5-32B-Instruct, but **per-row attribution for these rows is unknown** and is stated as such.
-- **Writer terms:** Qwen2.5-32B-Instruct is released under **Apache License 2.0** (model card metadata `license: apache-2.0`, https://huggingface.co/Qwen/Qwen2.5-32B-Instruct, LICENSE linked there). Apache 2.0 places no restriction on using or redistributing model outputs. **The corpus itself is not part of this bundle.**
-- **Teacher (distillation):** ens5 consists of this project's own earlier models trained on the same corpus. No third-party model outputs are used as targets.
-- **Held-out suite** (used for evaluation and method selection, not training): authored with an item-by-item pass recorded as "Claude (item-by-item pass, 2026-08-14)" in the suite metadata. It is not part of the bundle. Its terms were not assessed for this card.
+  - **Composed locally** from templates with no model: rows marked `path: composed`, including **every** CSE-class row. CSE content was never sent to any writer.
+  - **Writer model:** 408 rows marked `path: writer`. The generator config names one writer, **`Qwen/Qwen2.5-32B-Instruct`** (Apache-2.0), self-hosted with vLLM.
+  - 4012 earlier rows carry no `path` field. **Per-row writer attribution for them is unknown.**
+- **Teacher:** ens5 is this project's own earlier models trained on the same corpus.
+- **The corpus is not part of this bundle.**
+- The held-out suite was authored in an item-by-item pass recorded in the suite metadata. It is not in the bundle.
 
-## Base model license and languages
+## License and languages
 
-- **License:** encoder from `convaiinnovations/laya` (**Apache-2.0**, model card https://huggingface.co/convaiinnovations/laya), which is built on `answerdotai/ModernBERT-large` (**Apache-2.0**, https://huggingface.co/answerdotai/ModernBERT-large). Proposed license for this model: **Apache-2.0** (the repository's own license; Justin to confirm). NOTICE credits Convai Innovations (Laya) and Answer.AI / LightOn (ModernBERT).
-- **Languages: English only.** The Laya root checkpoint is English-only (Laya card: "English only on root"). ModernBERT was pre-trained on English and code. The corpus is English. Do not use it on other languages.
+- The encoder comes from `convaiinnovations/laya` (Apache-2.0), which is built on `answerdotai/ModernBERT-large` (Apache-2.0).
+- Proposed license: **Apache-2.0** (Justin to confirm). NOTICE credits Convai Innovations and Answer.AI / LightOn.
+- **English only.**
 
 ## Limits
 
-- **Single responses only.** It scores one assistant response in isolation. It does not see the conversation, the user's request or earlier turns, so context-dependent harms are out of scope.
-- **In-text minor detection is secondary to the client's age attestation.** `subject_is_minor` reads only what the text says. It cannot know a user's or character's age. Child-safety decisions must rest on the client's age attestation and policy. The CSE flag is a backstop, not the control.
-- It does not pass the AIRP held-out gate (above). There are known seed-unstable CSE false fires on refusal lines that name minors and sexual content (`CTR03-TRACE.md`).
-- Truncation: at most 1022 response tokens. At ~1000 tokens the CPU median is about 1.4 s.
-- AILuminate output is not validated, and 3 of its 12 hazards are unsupported.
+- **Research use only. Not certified. Not a default.**
+- Scores a single response in isolation, with no conversation context.
+- In-text minor detection is secondary to the client's age attestation. The CSE flag is a backstop, not the control.
+- Truncates at 1022 response tokens. At ~1000 tokens the Node CPU median is about 1.5 s.
+- AILuminate output is not validated.
