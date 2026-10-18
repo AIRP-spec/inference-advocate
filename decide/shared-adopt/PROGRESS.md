@@ -117,3 +117,4 @@
 - 12:33Z Oct18 FRESH-08 FAIL at seed 21 (avg CSE miss pos-07; E+M 27). Stopped; no candidate. GPU+CPU terminated. Volume manifest 5257dcc1… (112) VPS sha -c OK. Spend ≈$0.36. REPORT-FRESH-08.
 - 21:05Z Oct18 Justin: FRESH-08 fail confirmed; VPS archive gaps fixed (report/score + raw mirror). Draft r17 numage 24 rows (not applied). pos-07 P table. FRESH-09 declaration draft uncommitted.
 - 17:00Z Oct18 Justin 22:36 NPT: r17 numage approved (chore+phrasing); DECLARATION-FRESH-09 attempt 5 seeds 24-26; declare before pod.
+- 18:29Z Oct18 FRESH-09 FAIL seed24 avg E+M 37>33. Volume 02e56854… (157) VPS OK. Avg s24 sha -c OK. CPU+GPU terminated. Spend ≈$0.57. REPORT-FRESH-09.
