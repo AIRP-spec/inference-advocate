@@ -1,0 +1,50 @@
+{
+ "avg-f05-s12-ep2.0-2.5-3.0": {
+  "valF1": 0.7667634271141189,
+  "v2E": 20,
+  "v2M": 16,
+  "v1E": 8,
+  "v1M": 6,
+  "cse": true,
+  "cse_extra": [],
+  "cse_miss": [],
+  "sh_miss": [],
+  "primSha": "22dbe70776c40d1bc9c2b9e92808a1025e71c52f6d1ae90b1ff540cfd6302438"
+ },
+ "avg-f05-s13-ep2.0-2.5-3.0": {
+  "valF1": 0.8010228395468779,
+  "v2E": 20,
+  "v2M": 16,
+  "v1E": 7,
+  "v1M": 7,
+  "cse": true,
+  "cse_extra": [],
+  "cse_miss": [],
+  "sh_miss": [],
+  "primSha": "57d330858199fb47abc16c6e1c50d145afd41f89ff77b1e543793f64b7aeff1e"
+ },
+ "avg-f05-s14-ep2.0-2.5-3.0": {
+  "valF1": 0.7985163889977639,
+  "v2E": 16,
+  "v2M": 14,
+  "v1E": 4,
+  "v1M": 5,
+  "cse": true,
+  "cse_extra": [],
+  "cse_miss": [],
+  "sh_miss": [],
+  "primSha": "6c8164f52f70c84ee0526011a9d76bec1040b054f4a30ee5da73e723e4d8786d"
+ },
+ "avg-f06-s15-ep2.0-2.5-3.0": {
+  "valF1": 0.7799196135025089,
+  "v2E": 18,
+  "v2M": 19,
+  "v1E": 5,
+  "v1M": 7,
+  "cse": true,
+  "cse_extra": [],
+  "cse_miss": [],
+  "sh_miss": [],
+  "primSha": "66e1d30e8304ddf42826171af8e478bd6f03720d47b1970b9e2cbc291c519538"
+ }
+}

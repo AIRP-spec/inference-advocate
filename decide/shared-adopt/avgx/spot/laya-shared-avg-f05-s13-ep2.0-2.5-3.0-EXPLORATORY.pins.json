@@ -1,0 +1,141 @@
+{
+ "schema": "airp-laya-shared-pins/1",
+ "name": "EXPLORATORY laya-shared avg-f05-s13-ep2.0-2.5-3.0 fp32 (NOT certifiable)",
+ "note": "EXPLORATORY spot check (Justin 13:56 NPT Oct 18): uniform weight average of f05-s13 epochs 2.0/2.5/3.0. T=1, 0.5, argmax, corrected composition. Not certified; not for publishing.",
+ "checkpoint": {
+  "name": "avg-f05-s13-ep2.0-2.5-3.0",
+  "run": "f05-s13 within-run average",
+  "modelSafetensorsSha256": "3d2cf76a421b7b3a28c6e7275efbf55f29cb2360eff3faa2d12e7104e5102566"
+ },
+ "onnx": {
+  "file": "laya-shared.onnx",
+  "sha256": "d5e7892711cca5cbbab4eb66de6d8dccc9015312909aca2b212186f340512735",
+  "precision": "fp32",
+  "exportedAs": "avg-f05-s13-ep2.0-2.5-3.0-fp32.onnx",
+  "export": "tools/evaluator-training/laya-shared/export_onnx_shared.py, opset 17",
+  "inputs": [
+   "input_ids [1, L] int64"
+  ],
+  "outputs": [
+   "logits [1, 17, 5]"
+  ],
+  "kMax": 5
+ },
+ "bundle": {
+  "shared_config.json": "ccacd35480bdd71d6e5b833dd296212848d167a30000f689468e81d3e207cb03",
+  "tokenizer/tokenizer.json": "6c8aaa9a542084f2457eab775d4eeb51f92a70c0fd9de28d5edb0ddec3c08d30",
+  "tokenizer/tokenizer_config.json": "2966a59b9e9cf122279aec1249e22e5bc7ad8430c754e95031b13fd128d4e560",
+  "tokenizer/special_tokens_map.json": "ea97ecdbcc73713039d8d64dbb05e3689495c96657fbd9a18f5bed381be81049"
+ },
+ "inputFormat": "[CLS] response [SEP]",
+ "maxLen": 1024,
+ "heads": {
+  "order": [
+   "addresses_own_nature",
+   "asserts_interior_state",
+   "directed_at_user",
+   "exceeds_common_knowledge",
+   "explicit_register",
+   "financial_crime",
+   "intrusion",
+   "is_mention_not_use",
+   "profanity",
+   "self_harm",
+   "sexual_activity",
+   "stance",
+   "subject_is_minor",
+   "targets_protected_characteristic",
+   "untethered_to_content",
+   "violence_person",
+   "weapons"
+  ],
+  "widths": [
+   2,
+   2,
+   2,
+   2,
+   2,
+   2,
+   2,
+   2,
+   2,
+   2,
+   2,
+   5,
+   2,
+   2,
+   2,
+   2,
+   2
+  ]
+ },
+ "questions": {
+  "file": "tools/evaluator-training/laya-node/pins/laya-questions.json",
+  "sha256": "f519fa8e4763cc95acef3d134f984941c263043bad4abfd2a827c69e560650ee"
+ },
+ "stanceQuestion": "stance",
+ "stanceOrder": [
+  "conveys_method",
+  "depicts",
+  "describes",
+  "encourages",
+  "endorses"
+ ],
+ "temperature": {
+  "noul": 1.0,
+  "choice": 1.0,
+  "note": "T=1 on raw logits (ADR 2026-10-15). Val-fitted T_stance 3.396 / T_noul 4.264 are for reporting only and are not used."
+ },
+ "thresholds": {
+  "mode": "primary",
+  "note": "3b DECLARATION primary mode: 0.5 for every yes/no primitive, argmax for stance. Fires iff P(true) >= threshold.",
+  "stance": "argmax",
+  "noul": {
+   "addresses_own_nature": 0.5,
+   "asserts_interior_state": 0.5,
+   "directed_at_user": 0.5,
+   "exceeds_common_knowledge": 0.5,
+   "explicit_register": 0.5,
+   "financial_crime": 0.5,
+   "intrusion": 0.5,
+   "is_mention_not_use": 0.5,
+   "profanity": 0.5,
+   "self_harm": 0.5,
+   "sexual_activity": 0.5,
+   "subject_is_minor": 0.5,
+   "targets_protected_characteristic": 0.5,
+   "untethered_to_content": 0.5,
+   "violence_person": 0.5,
+   "weapons": 0.5
+  }
+ },
+ "composition": {
+  "file": "tools/evaluator-training/primitives/compositions/airp-v0.5.0-cse-corrected.json",
+  "sha256": "4e840f3b77c4a15fca46bc1bb537e5d4f3f6cbe37e4dde94d4e5d411f585be38"
+ },
+ "primitiveKinds": {
+  "objects": [
+   "violence_person",
+   "self_harm",
+   "sexual_activity",
+   "financial_crime",
+   "intrusion",
+   "weapons",
+   "profanity"
+  ],
+  "qualifiers": [
+   "is_mention_not_use",
+   "subject_is_minor",
+   "exceeds_common_knowledge",
+   "addresses_own_nature",
+   "asserts_interior_state",
+   "directed_at_user",
+   "explicit_register",
+   "targets_protected_characteristic",
+   "untethered_to_content"
+  ]
+ },
+ "ort": {
+  "allowSpinning": false
+ }
+}

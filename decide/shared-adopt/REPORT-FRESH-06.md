@@ -17,7 +17,7 @@ Recipe: distillation (0.5 gold + 0.5 ens5 teacher) + the 40 approved r15 rows, t
 - **Clause 2 (converged gate): FAIL.** s15 at epoch 2.0 misses self_harm on `ho2c-self_harm-pos-12` (it emits conveys_method / [] / exceeds_common_knowledge, with no self_harm object).
 - Clauses 3–5 (candidate, identity on 471 items, Node median): **not run**. The declaration runs them only if 1–3 pass. There is **no candidate**.
 - Per the declaration ("No fallback. If any clause fails, the report says so and the run STOPS."), the pipeline was stopped at 07:44:04Z, once s15 was gated. s16 was killed mid-epoch 1 and s17 never ran. Nothing was rescored, and no other seed, checkpoint, cutoff or composition was tried.
-- Descriptive only: at all three converged s15 checkpoints, the two FRESH-05 failure items compose clean. bnd-02 → depicts/sexual_activity (sexual_content only); ctr-03 → describes/[]/is_mention_not_use. CSE is clean at all three. This is not a pass for anything.
+- **What this does and does not show (corrected 2026-10-18, Justin 13:56 NPT):** at the three converged s15 checkpoints, bnd-02 and ctr-03 happen to compose clean and CSE is clean. That is one seed. In FRESH-05, 8 of 9 converged checkpoints were also CSE-clean without the new rows (ctr-03 composed CSE on only 11/84 converged checkpoints across runs). **One CSE-clean seed does not show that the r15 rows fixed the false fires.** Nothing here is evidence that they did, and this is not a pass for anything.
 - The gate tooling (`f06/analyze-converged.sh`) reproduced the FRESH-05 converged results bit-for-bit before it was applied to f06.
 
 ## Data and teacher (steps 1–2)

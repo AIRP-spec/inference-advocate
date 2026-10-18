@@ -1,0 +1,44 @@
+START 2026-10-18T08:13:41Z
+/root/primitives-evaluator/decide-2026-10-13/shared-adopt/f05/volume/f05/MANIFEST-volume.sha256: OK
+/root/primitives-evaluator/decide-2026-10-13/shared-adopt/f06/volume/f06/MANIFEST-volume-f06.sha256: OK
+F05_MANIFEST_OK
+F06_MANIFEST_OK
+AVG_DONE avg/avg-f05-s12-ep2.0-2.5-3.0 7a4d4be627257af4943c46e9c6b02b1f45a135158be2c920a9015867982da0ba
+AVG_DONE avg/avg-f05-s13-ep2.0-2.5-3.0 3d2cf76a421b7b3a28c6e7275efbf55f29cb2360eff3faa2d12e7104e5102566
+AVG_DONE avg/avg-f05-s14-ep2.0-2.5-3.0 0b09a470a1e4972a1bcdf374c58affff26ee98010a76e7539397f6904fd9fa4a
+AVG_DONE avg/avg-f06-s15-ep2.0-2.5-3.0 5e531aba8dbf0bdb86e9fe6f15a0118f2b7d1d8427b260b9ee3965e0f15ee188
+avg-f05-s12-ep2.0-2.5-3.0 val n=819 72.4s
+avg-f05-s12-ep2.0-2.5-3.0 heldout n=471 39.2s
+avg-f05-s13-ep2.0-2.5-3.0 val n=819 72.8s
+avg-f05-s13-ep2.0-2.5-3.0 heldout n=471 39.0s
+avg-f05-s14-ep2.0-2.5-3.0 val n=819 74.9s
+avg-f05-s14-ep2.0-2.5-3.0 heldout n=471 39.2s
+avg-f06-s15-ep2.0-2.5-3.0 val n=819 72.9s
+avg-f06-s15-ep2.0-2.5-3.0 heldout n=471 40.1s
+INFER_AVG_DONE 2026-10-18T08:24:31Z
+ckpt-epoch-2.0-step-460 val n=819 73.1s
+ckpt-epoch-2.0-step-460 heldout n=471 38.9s
+ckpt-epoch-2.5-step-575 val n=819 74.3s
+ckpt-epoch-2.5-step-575 heldout n=471 41.3s
+ckpt-epoch-3.0-step-690 val n=819 73.3s
+ckpt-epoch-3.0-step-690 heldout n=471 40.3s
+ckpt-epoch-2.0-step-460 val n=819 71.5s
+ckpt-epoch-2.0-step-460 heldout n=471 39.5s
+ckpt-epoch-2.5-step-575 val n=819 74.2s
+ckpt-epoch-2.5-step-575 heldout n=471 40.0s
+ckpt-epoch-3.0-step-690 val n=819 74.1s
+ckpt-epoch-3.0-step-690 heldout n=471 41.0s
+ckpt-epoch-2.0-step-460 val n=819 76.4s
+ckpt-epoch-2.0-step-460 heldout n=471 40.7s
+ckpt-epoch-2.5-step-575 val n=819 73.1s
+ckpt-epoch-2.5-step-575 heldout n=471 40.4s
+ckpt-epoch-3.0-step-690 val n=819 74.5s
+ckpt-epoch-3.0-step-690 heldout n=471 41.3s
+ckpt-epoch-2.0-step-464 val n=819 72.1s
+ckpt-epoch-2.0-step-464 heldout n=471 38.6s
+ckpt-epoch-2.5-step-580 val n=819 90.2s
+ckpt-epoch-2.5-step-580 heldout n=471 40.5s
+ckpt-epoch-3.0-step-693 val n=819 75.1s
+ckpt-epoch-3.0-step-693 heldout n=471 40.5s
+INFER_IND_DONE 2026-10-18T08:53:22Z
+AVGX_DONE 2026-10-18T08:53:33Z
