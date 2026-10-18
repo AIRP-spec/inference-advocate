@@ -1,0 +1,11 @@
+comparable under suite 82f8e720 / composition 2a
+avg-f05-s12 E+M=34 F1=0.7747 cse=True
+avg-f05-s13 E+M=34 F1=0.8074 cse=True
+avg-f05-s14 E+M=27 F1=0.8021 cse=True
+avg-f06-s15 E+M=35 F1=0.7841 cse=True
+avg-f07-s18 E+M=29 F1=0.8315 cse=True
+avg-f07-s19 E+M=29 F1=0.7703 cse=True
+avg-f07-s20 E+M=34 F1=0.7591 cse=True
+avg-f08-s21 E+M=27 F1=0.7854 cse=False
+avg-f09-s24 E+M=37 F1=0.7782 cse=True
+mean=31.7778 sd=3.7676 range=27-37

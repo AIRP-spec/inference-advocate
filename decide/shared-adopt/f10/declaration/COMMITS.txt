@@ -1,0 +1,2 @@
+20ef5c3 ADR 2026-10-19 gate revision
+DECLARATION-FRESH-10 (this archive)

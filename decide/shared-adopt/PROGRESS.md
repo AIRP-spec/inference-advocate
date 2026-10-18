@@ -118,3 +118,4 @@
 - 21:05Z Oct18 Justin: FRESH-08 fail confirmed; VPS archive gaps fixed (report/score + raw mirror). Draft r17 numage 24 rows (not applied). pos-07 P table. FRESH-09 declaration draft uncommitted.
 - 17:00Z Oct18 Justin 22:36 NPT: r17 numage approved (chore+phrasing); DECLARATION-FRESH-09 attempt 5 seeds 24-26; declare before pod.
 - 18:29Z Oct18 FRESH-09 FAIL seed24 avg E+M 37>33. Volume 02e56854… (157) VPS OK. Avg s24 sha -c OK. CPU+GPU terminated. Spend ≈$0.57. REPORT-FRESH-09.
+- 00:21 NPT Oct19 FRESH-09 confirmed archived c9d418e. ADR 2026-10-19 (accuracy on candidate only) 20ef5c3. DECLARATION-FRESH-10 attempt 6 seeds 27-29; selection-before-v2; declared before pod.
