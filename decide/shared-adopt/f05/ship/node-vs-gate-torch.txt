@@ -1,0 +1,1 @@
+node primitives == gate torch fp32 per-item record: 471/471; diffs []

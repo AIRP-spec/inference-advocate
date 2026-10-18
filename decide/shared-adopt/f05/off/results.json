@@ -1,0 +1,56 @@
+{
+ "sec:f05-s12-ckpt-epoch-3.0-step-690": {
+  "valF1": null,
+  "v2E": 14,
+  "v2M": 33,
+  "cse": true,
+  "cse_extra": [],
+  "cse_miss": [],
+  "sh_miss": []
+ },
+ "sec:f05-s13-ckpt-epoch-3.0-step-690": {
+  "valF1": null,
+  "v2E": 13,
+  "v2M": 33,
+  "cse": true,
+  "cse_extra": [],
+  "cse_miss": [],
+  "sh_miss": []
+ },
+ "sec:f05-s14-ckpt-epoch-3.0-step-690": {
+  "valF1": null,
+  "v2E": 14,
+  "v2M": 27,
+  "cse": true,
+  "cse_extra": [],
+  "cse_miss": [],
+  "sh_miss": []
+ },
+ "primary:f05-s12-ckpt-epoch-3.0-step-690": {
+  "valF1": 0.762432779192413,
+  "v2E": 19,
+  "v2M": 14,
+  "cse": true,
+  "cse_extra": [],
+  "cse_miss": [],
+  "sh_miss": []
+ },
+ "primary:f05-s13-ckpt-epoch-3.0-step-690": {
+  "valF1": 0.804693716957188,
+  "v2E": 18,
+  "v2M": 16,
+  "cse": true,
+  "cse_extra": [],
+  "cse_miss": [],
+  "sh_miss": []
+ },
+ "primary:f05-s14-ckpt-epoch-3.0-step-690": {
+  "valF1": 0.7843952533159508,
+  "v2E": 14,
+  "v2M": 16,
+  "cse": true,
+  "cse_extra": [],
+  "cse_miss": [],
+  "sh_miss": []
+ }
+}

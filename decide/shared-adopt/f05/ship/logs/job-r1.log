@@ -1,0 +1,29 @@
+JOB f05s13-r1 steps=python,suite,lengths pins e7cc6521c1ad54a094e858c82ffdb18e289b1b10c968e339013e4bc6918bafc5 start 2026-10-18T05:06:52Z
+START python 2026-10-18T05:06:52Z load 0.19 0.46 0.25 1/420 2402745
+{"n": 471, "median_ms": 48.10643009841442, "p95_ms": 67.9537900723517, "onnxruntime": "1.22.1", "python": "3.12.3", "host": "himalogic"}
+PYTHON_REF_DONE
+END python 2026-10-18T05:07:27Z
+START node-suite 2026-10-18T05:07:27Z load 2.17 0.91 0.41 1/422 2402788
+local-laya-shared@411e805e9676+laya-shared-pins-e7cc6521c1ad: session open (laya-shared FRESH-05 f05-s13 ckpt-epoch-3.0-step-690 fp32) in 3988ms
+local-laya-shared@411e805e9676+laya-shared-pins-e7cc6521c1ad: warm-up ran (template laya-shared-onnx) in 42ms
+node path 100/471
+node path 200/471
+node path 300/471
+node path 400/471
+{"suite":{"n":471,"median_ms":46.74707499999931,"p95_ms":60.52349199999844,"mean_ms":47.42820813800424,"min_ms":30.481854000001476,"max_ms":90.91470100000151},"verify_ms":1466.944254,"load_ms":4031.498926,"warmup_ms":42,"evaluator":"local-laya-shared@411e805e9676+laya-shared-pins-e7cc6521c1ad","node":"v22.23.2","onnxruntime_node":"1.30.0","hf_tokenizers":"0.2.0","allowSpinning":0,"layout":"shared (batch 1, no padding)","warmupItems":20,"intraOpNumThreads":8,"host":"himalogic","cpu":"Intel(R) Xeon(R) Gold 5418Y","nproc":8,"loadavg":[2.69,1.15,0.51],"rss_mb":2528.546875,"finished":"2026-10-18T05:07:56.963Z"}
+NODE_PATH_DONE
+END node-suite 2026-10-18T05:07:57Z load 2.69 1.15 0.51 1/421 2402821
+{"n":471,"primsIdentical":471,"composedIdentical":471,"decodeIdentical":471,"feedChecked":471,"feedIdentical":471,"maxAbsLogitDiff":0.00020933151245117188,"minPythonMargin":0.007885098457336426,"pass":true,"problems":[]}
+CROSSPATH_PASS
+COMPARE exit 0
+START node-lengths 2026-10-18T05:07:57Z load 2.69 1.15 0.51 1/421 2402836
+local-laya-shared@411e805e9676+laya-shared-pins-e7cc6521c1ad: session open (laya-shared FRESH-05 f05-s13 ckpt-epoch-3.0-step-690 fp32) in 4083ms
+local-laya-shared@411e805e9676+laya-shared-pins-e7cc6521c1ad: warm-up ran (template laya-shared-onnx) in 47ms
+bucket 50: {"n":20,"median_ms":102.1267714999999,"p95_ms":125.54179599999952,"mean_ms":103.61717879999992,"min_ms":84.58412000000044,"max_ms":155.27179799999976}
+bucket 200: {"n":20,"median_ms":251.44724449999921,"p95_ms":268.8407019999995,"mean_ms":246.25572539999976,"min_ms":203.99155500000052,"max_ms":271.1320020000003}
+bucket 500: {"n":20,"median_ms":643.0728194999992,"p95_ms":727.3114829999977,"mean_ms":655.7177877499997,"min_ms":597.2087939999983,"max_ms":741.4381470000008}
+bucket 1000: {"n":20,"median_ms":1438.644301500004,"p95_ms":1568.6617790000018,"mean_ms":1422.0436342500007,"min_ms":1162.4190820000003,"max_ms":1615.219713999999}
+{"buckets":{"50":{"n":20,"median_ms":102.1267714999999,"p95_ms":125.54179599999952,"mean_ms":103.61717879999992,"min_ms":84.58412000000044,"max_ms":155.27179799999976},"200":{"n":20,"median_ms":251.44724449999921,"p95_ms":268.8407019999995,"mean_ms":246.25572539999976,"min_ms":203.99155500000052,"max_ms":271.1320020000003},"500":{"n":20,"median_ms":643.0728194999992,"p95_ms":727.3114829999977,"mean_ms":655.7177877499997,"min_ms":597.2087939999983,"max_ms":741.4381470000008},"1000":{"n":20,"median_ms":1438.644301500004,"p95_ms":1568.6617790000018,"mean_ms":1422.0436342500007,"min_ms":1162.4190820000003,"max_ms":1615.219713999999}},"verify_ms":1450.279416,"load_ms":4131.418482,"warmup_ms":47,"evaluator":"local-laya-shared@411e805e9676+laya-shared-pins-e7cc6521c1ad","node":"v22.23.2","onnxruntime_node":"1.30.0","hf_tokenizers":"0.2.0","allowSpinning":0,"layout":"shared (batch 1, no padding)","warmupItems":20,"intraOpNumThreads":8,"host":"himalogic","cpu":"Intel(R) Xeon(R) Gold 5418Y","nproc":8,"loadavg":[4.6,1.97,0.83],"rss_mb":2930.78515625,"finished":"2026-10-18T05:08:58.018Z"}
+NODE_PATH_DONE
+END node-lengths 2026-10-18T05:08:58Z load 4.60 1.97 0.83 1/420 2402876
+JOB_DONE 2026-10-18T05:08:58Z
