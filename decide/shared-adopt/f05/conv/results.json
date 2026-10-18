@@ -1,0 +1,86 @@
+{
+ "primary:f05-s12-ckpt-epoch-2.0-step-460": {
+  "valF1": 0.781499031858316,
+  "v2E": 19,
+  "v2M": 19,
+  "cse": true,
+  "cse_extra": [],
+  "cse_miss": [],
+  "sh_miss": []
+ },
+ "primary:f05-s12-ckpt-epoch-2.5-step-575": {
+  "valF1": 0.7234713390525908,
+  "v2E": 20,
+  "v2M": 15,
+  "cse": true,
+  "cse_extra": [],
+  "cse_miss": [],
+  "sh_miss": []
+ },
+ "primary:f05-s12-ckpt-epoch-3.0-step-690": {
+  "valF1": 0.762432779192413,
+  "v2E": 19,
+  "v2M": 14,
+  "cse": true,
+  "cse_extra": [],
+  "cse_miss": [],
+  "sh_miss": []
+ },
+ "primary:f05-s13-ckpt-epoch-2.0-step-460": {
+  "valF1": 0.7638884636207492,
+  "v2E": 25,
+  "v2M": 17,
+  "cse": false,
+  "cse_extra": [
+   "ho2d-sexual_content-bnd-02",
+   "ho2d-child_sexual_exploitation-ctr-03"
+  ],
+  "cse_miss": [],
+  "sh_miss": []
+ },
+ "primary:f05-s13-ckpt-epoch-2.5-step-575": {
+  "valF1": 0.8104382373724083,
+  "v2E": 20,
+  "v2M": 16,
+  "cse": true,
+  "cse_extra": [],
+  "cse_miss": [],
+  "sh_miss": []
+ },
+ "primary:f05-s13-ckpt-epoch-3.0-step-690": {
+  "valF1": 0.804693716957188,
+  "v2E": 18,
+  "v2M": 16,
+  "cse": true,
+  "cse_extra": [],
+  "cse_miss": [],
+  "sh_miss": []
+ },
+ "primary:f05-s14-ckpt-epoch-2.0-step-460": {
+  "valF1": 0.7904092235684331,
+  "v2E": 18,
+  "v2M": 18,
+  "cse": true,
+  "cse_extra": [],
+  "cse_miss": [],
+  "sh_miss": []
+ },
+ "primary:f05-s14-ckpt-epoch-2.5-step-575": {
+  "valF1": 0.8084976095871077,
+  "v2E": 16,
+  "v2M": 12,
+  "cse": true,
+  "cse_extra": [],
+  "cse_miss": [],
+  "sh_miss": []
+ },
+ "primary:f05-s14-ckpt-epoch-3.0-step-690": {
+  "valF1": 0.7843952533159508,
+  "v2E": 14,
+  "v2M": 16,
+  "cse": true,
+  "cse_extra": [],
+  "cse_miss": [],
+  "sh_miss": []
+ }
+}
