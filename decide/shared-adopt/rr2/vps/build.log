@@ -1,0 +1,10 @@
+MANIFEST_OK e485d4974d55472952c35d0766b44ad5e59c60ec1ce77b75c6850179ecd449fb files 16
+541ef498e5184c0111387f069cb92ee24604698e3f8cdc4a382414775dce6596  airp-shared-primitives-avg-f05-s14.tar.gz
+TARBALL_VERIFY_OK files 16 manifest e485d4974d55472952c35d0766b44ad5e59c60ec1ce77b75c6850179ecd449fb
+total 1725700
+drwxr-xr-x 3 root root       4096 Oct 19 03:24 .
+drwxr-xr-x 5 root root       4096 Oct 19 03:25 ..
+drwxr-xr-x 7 root root       4096 Oct 19 03:17 airp-shared-primitives-avg-f05-s14
+-rw-r--r-- 1 root root 1767093724 Oct 19 03:24 airp-shared-primitives-avg-f05-s14.tar.gz
+-rw-r--r-- 1 root root        108 Oct 19 03:24 airp-shared-primitives-avg-f05-s14.tar.gz.sha256
+BUILD_DONE 2026-10-19T03:25:14Z

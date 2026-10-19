@@ -1,0 +1,27 @@
+JOB avgs14-v2pins-rep2 steps=lengths pins 7d3ec1cb494aebf81703fe29963cf31a1621ffdcfb81fbd2da04708398db1158 start 2026-10-19T03:11:40Z
+START node-lengths 2026-10-19T03:11:40Z load 2.01 1.59 0.86 2/585 71898
+local-laya-shared@90b24a0b1ce9+laya-shared-pins-7d3ec1cb494a: session open (laya-shared avg-f05-s14-ep2.0-2.5-3.0 fp32 (tryairp demo default; NOT certified for production)) in 4137ms
+local-laya-shared@90b24a0b1ce9+laya-shared-pins-7d3ec1cb494a: warm-up ran (template laya-shared-onnx) in 39ms
+bucket 50: {"n":20,"median_ms":104.00265150000041,"p95_ms":145.69348600000012,"mean_ms":111.33938970000017,"min_ms":88.9932340000014,"max_ms":149.21854600000006}
+bucket 200: {"n":20,"median_ms":282.52706900000067,"p95_ms":338.1011899999994,"mean_ms":281.60044800000014,"min_ms":225.17869100000098,"max_ms":358.44417599999906}
+bucket 500: {"n":20,"median_ms":693.7122870000003,"p95_ms":737.8081569999995,"mean_ms":696.1783021499996,"min_ms":639.6993430000002,"max_ms":783.433685}
+bucket 1000: {"n":20,"median_ms":1484.5526135,"p95_ms":1691.202882999998,"mean_ms":1501.71948935,"min_ms":1183.028572999996,"max_ms":1770.8815230000037}
+{"buckets":{"50":{"n":20,"median_ms":104.00265150000041,"p95_ms":145.69348600000012,"mean_ms":111.33938970000017,"min_ms":88.9932340000014,"max_ms":149.21854600000006},"200":{"n":20,"median_ms":282.52706900000067,"p95_ms":338.1011899999994,"mean_ms":281.60044800000014,"min_ms":225.17869100000098,"max_ms":358.44417599999906},"500":{"n":20,"median_ms":693.7122870000003,"p95_ms":737.8081569999995,"mean_ms":696.1783021499996,"min_ms":639.6993430000002,"max_ms":783.433685},"1000":{"n":20,"median_ms":1484.5526135,"p95_ms":1691.202882999998,"mean_ms":1501.71948935,"min_ms":1183.028572999996,"max_ms":1770.8815230000037}},"verify_ms":1488.227502,"load_ms":4177.440488,"warmup_ms":40,"evaluator":"local-laya-shared@90b24a0b1ce9+laya-shared-pins-7d3ec1cb494a","node":"v22.23.2","onnxruntime_node":"1.30.0","hf_tokenizers":"0.2.0","allowSpinning":0,"layout":"shared (batch 1, no padding)","warmupItems":20,"intraOpNumThreads":8,"host":"himalogic","cpu":"Intel(R) Xeon(R) Gold 5418Y","nproc":8,"loadavg":[5.78,2.74,1.3],"rss_mb":2930.703125,"finished":"2026-10-19T03:12:44.720Z"}
+NODE_PATH_DONE
+END node-lengths 2026-10-19T03:12:44Z load 5.78 2.74 1.30 1/584 71959
+JOB_DONE 2026-10-19T03:12:44Z
+ 03:12:44 up 20:02,  4 users,  load average: 5.78, 2.74, 1.30
+JOB avgs14-v2pins-rep3 steps=lengths pins 7d3ec1cb494aebf81703fe29963cf31a1621ffdcfb81fbd2da04708398db1158 start 2026-10-19T03:12:44Z
+START node-lengths 2026-10-19T03:12:44Z load 5.78 2.74 1.30 1/585 71977
+local-laya-shared@90b24a0b1ce9+laya-shared-pins-7d3ec1cb494a: session open (laya-shared avg-f05-s14-ep2.0-2.5-3.0 fp32 (tryairp demo default; NOT certified for production)) in 3974ms
+local-laya-shared@90b24a0b1ce9+laya-shared-pins-7d3ec1cb494a: warm-up ran (template laya-shared-onnx) in 46ms
+bucket 50: {"n":20,"median_ms":97.83339849999993,"p95_ms":129.81414100000075,"mean_ms":104.07978285000004,"min_ms":86.66391899999962,"max_ms":151.2009109999999}
+bucket 200: {"n":20,"median_ms":277.5163590000011,"p95_ms":314.40274900000077,"mean_ms":282.4801474500001,"min_ms":237.22959900000023,"max_ms":341.4002280000004}
+bucket 500: {"n":20,"median_ms":738.2187150000009,"p95_ms":792.1737940000021,"mean_ms":730.2344121000006,"min_ms":615.9875860000029,"max_ms":800.3259780000008}
+bucket 1000: {"n":20,"median_ms":1455.5165295000006,"p95_ms":1692.4449380000005,"mean_ms":1488.8665231000002,"min_ms":1282.5709050000005,"max_ms":1741.2192250000007}
+{"buckets":{"50":{"n":20,"median_ms":97.83339849999993,"p95_ms":129.81414100000075,"mean_ms":104.07978285000004,"min_ms":86.66391899999962,"max_ms":151.2009109999999},"200":{"n":20,"median_ms":277.5163590000011,"p95_ms":314.40274900000077,"mean_ms":282.4801474500001,"min_ms":237.22959900000023,"max_ms":341.4002280000004},"500":{"n":20,"median_ms":738.2187150000009,"p95_ms":792.1737940000021,"mean_ms":730.2344121000006,"min_ms":615.9875860000029,"max_ms":800.3259780000008},"1000":{"n":20,"median_ms":1455.5165295000006,"p95_ms":1692.4449380000005,"mean_ms":1488.8665231000002,"min_ms":1282.5709050000005,"max_ms":1741.2192250000007}},"verify_ms":1488.2966940000001,"load_ms":4021.3406970000005,"warmup_ms":47,"evaluator":"local-laya-shared@90b24a0b1ce9+laya-shared-pins-7d3ec1cb494a","node":"v22.23.2","onnxruntime_node":"1.30.0","hf_tokenizers":"0.2.0","allowSpinning":0,"layout":"shared (batch 1, no padding)","warmupItems":20,"intraOpNumThreads":8,"host":"himalogic","cpu":"Intel(R) Xeon(R) Gold 5418Y","nproc":8,"loadavg":[5.84,3.3,1.59],"rss_mb":2924.96875,"finished":"2026-10-19T03:13:49.332Z"}
+NODE_PATH_DONE
+END node-lengths 2026-10-19T03:13:49Z load 5.84 3.30 1.59 1/585 72039
+JOB_DONE 2026-10-19T03:13:49Z
+ 03:13:49 up 20:03,  4 users,  load average: 5.84, 3.30, 1.59
+REPS_DONE

@@ -1,23 +1,24 @@
 --- a/.github/workflows/ci.yml
 +++ b/.github/workflows/ci.yml
-@@ -41,3 +41,85 @@
+@@ -41,3 +41,86 @@
  
        - name: build the interface
          run: npm run build:ui
 +
 +  # Shared-encoding primitives evaluator: cross-path identity (Python gate path vs Node shipped path),
-+  # item by item on the fixed held-out items, for the NON-DEFAULT RESEARCH RELEASE bundle avg-f05-s14
-+  # (did NOT pass AIRP certification; the rule evaluator stays the default).
++  # item by item on the fixed held-out items, for the public bundle avg-f05-s14. It is the default
++  # evaluator of the tryairp.com / dev.tryairp.com demos (t164u) but did NOT pass AIRP certification
++  # and is not certified for production; the @airp/core package default stays the rule evaluator.
 +  #
 +  # GitHub-hosted runner only. There is deliberately no self-hosted runner: this repository is public,
 +  # and a self-hosted runner would run fork code on our hardware.
 +  #
-+  # The model bundle (~1.7 GB ONNX) is downloaded from a pinned URL. Its SHA-256 is checked before it is
-+  # extracted or used, on a cache hit too; the job fails on mismatch. The archive is cached between runs.
++  # The model bundle (~1.7 GB ONNX) is downloaded from a pinned public URL. Its SHA-256 is checked before
++  # it is extracted or used, on a cache hit too; the job fails on mismatch. The archive is cached between runs.
 +  #
 +  # Triggers: push to main and workflow_dispatch only, never pull_request (skipped on PRs).
-+  # PLACEHOLDERS: the job fails by design until the bundle is public at SHARED_BUNDLE_URL and
-+  # SHARED_BUNDLE_SHA256 holds the archive's real SHA-256 (set both in a reviewed commit).
++  # SHARED_BUNDLE_SHA256 is the sha of the tarball built 2026-10-19; the job fails closed until that exact file
++  # is public at SHARED_BUNDLE_URL. If the bundle is rebuilt before upload, re-pin it in a reviewed commit.
 +  shared-crosspath:
 +    if: ${{ github.event_name != 'pull_request' }}
 +    runs-on: ubuntu-latest
@@ -26,9 +27,9 @@
 +      contents: read
 +    env:
 +      AIRP_LAYA_CROSSPATH_REQUIRED: '1'
-+      SHARED_BUNDLE_URL: ${{ vars.AIRP_SHARED_BUNDLE_URL || 'https://huggingface.co/AIRP-spec/airp-shared-primitives-modernbert-large-research/resolve/research-avg-f05-s14/airp-shared-primitives-research-avg-f05-s14.tar.gz' }}
-+      SHARED_BUNDLE_SHA256: REPLACE_WHEN_BUNDLE_PUBLISHED_0000000000000000000000000000000000000000000000000000000000000000
-+      SHARED_BUNDLE_FILE: ${{ github.workspace }}/.laya-cache/airp-shared-primitives-research-avg-f05-s14.tar.gz
++      SHARED_BUNDLE_URL: ${{ vars.AIRP_SHARED_BUNDLE_URL || 'https://huggingface.co/AIRP-spec/airp-shared-primitives-modernbert-large/resolve/avg-f05-s14/airp-shared-primitives-avg-f05-s14.tar.gz' }}
++      SHARED_BUNDLE_SHA256: 541ef498e5184c0111387f069cb92ee24604698e3f8cdc4a382414775dce6596
++      SHARED_BUNDLE_FILE: ${{ github.workspace }}/.laya-cache/airp-shared-primitives-avg-f05-s14.tar.gz
 +    steps:
 +      - uses: actions/checkout@v4
 +
