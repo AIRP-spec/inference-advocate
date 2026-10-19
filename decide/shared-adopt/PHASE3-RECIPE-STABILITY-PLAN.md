@@ -1,6 +1,7 @@
-# Phase 3 plan: recipe stability (READ-ONLY PLAN — no pod until Justin approves)
+# Phase 3 plan: recipe stability (APPROVED by Justin 2026-10-19 17:12 NPT, t165u)
 
-Written 2026-10-19 (NPT). Status: **plan only**. No pod was created, nothing was spent ($0.00), no gate, suite,
+Written 2026-10-19 (NPT). **Approved 2026-10-19 17:12 NPT (Justin, t165u)**, with the amendments in
+"Approval amendments" below. Status when first written: **plan only**. No pod was created, nothing was spent ($0.00), no gate, suite,
 evaluator, workflow or secret was touched. Every experiment below needs (1) Justin's approval of this plan and
 (2) its own DECLARATION committed, pushed (verified with `git ls-remote`) and archived to the VPS before any pod exists.
 
@@ -16,6 +17,23 @@ FRESH-05…10 (all six half-epoch checkpoints per seed), pod train logs `train-f
 `f10-s27`, `REPORT-SWEEP.md`, `DECLARATION-FRESH-10.md`, `PROGRESS.md` (pod costs), `pack-f09/train_shared.py`
 and `shared_model.py`. Analysis script: `phase3/convergence_flips.py` → `phase3/convergence-flips.json`
 (sha256 `e72fac43…4da2b7c`), using the composition module from PR #34 (`v3/airp_v3`, 1767890).
+
+## Approval amendments (Justin, t165u, 2026-10-19 17:12 NPT)
+
+1. **The 5 % convergence rule (§0.3) is ANALYSIS-ONLY** until it is confirmed on new seeds (P3-3). It is reported in
+   every Phase 3 result, but no gate, pass/fail verdict or stop decision uses it. Using it in any gate needs an ADR.
+   Until then the ADR 2026-10-18 definition ("converged = epoch ≥ 2.0") is the only one with gate force, and the
+   Phase 3 safety reporting covers **every checkpoint at epoch ≥ 2.0** as well as the declared artifact.
+   Consequently, P3-1's declared artifact for an arm is the within-run average of its checkpoints at epoch ≥ 2.0
+   (the current rule, extended to 4.0 for the 4-epoch arms); the "average of converged checkpoints only" variant is
+   reported alongside as analysis.
+2. **Validation gold is derived** (ADR `docs/decisions/2026-10-19-val-gold-classes-derived.md`): Phase 3 pins the
+   label-free val split sha256 **`5be292a911f0082a74c6e24beb20a60455fab4a86baded561784d37f2b453009`** and selects
+   with `phase3/select-composed-f1-derived.mjs` (classes derived via 2a at load time, with assertions). The legacy
+   val sha `346d6ba4…` is no longer used. The flip-rate analysis (§0.2) is gold-free and is unaffected.
+3. Budget: $60 GPU, **stop and report at $30**, and stop and report after **each** experiment (P3-1 first). Each
+   experiment's declaration is committed before its pod; headroom check before each run; checksum-verified volume
+   copy before termination; terminate within 15 min of any failure.
 
 ---
 
@@ -66,7 +84,7 @@ The flip rate roughly halves every half epoch and tracks the cosine LR (encoder 
 
 ### 0.3 Empirical "converged" definition (proposed; post hoc, so it must be confirmed in P3-3)
 
-> A checkpoint *c* is **converged** iff its composed-class flip rate on val versus the previous half-epoch
+> **(Analysis-only; see Approval amendment 1.)** A checkpoint *c* is **converged** iff its composed-class flip rate on val versus the previous half-epoch
 > checkpoint is **≤ 5.0 %** (≤ 40 of 819 rows). Computed from val raw outputs only (no gold, no v2), before any
 > v2 number is opened.
 
