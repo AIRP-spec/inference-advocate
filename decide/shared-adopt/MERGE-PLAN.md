@@ -1,42 +1,52 @@
-# Merge plan: shared-encoding evaluator stack (research-release state)
+# Merge plan: shared-encoding evaluator stack (demo-default state, t164u)
 
-Updated 2026-10-19 (NPT, UTC+5:45). Replaces the 2026-10-18 version.
-- **Merges are Justin's.** Every PR is a draft.
-- **Certification has stopped** under the ADR 2026-10-19 stopping rule (FRESH-10 failed safety).
-- The only artifact on offer is a **NON-DEFAULT RESEARCH RELEASE**, avg-f05-s14-ep2.0-2.5-3.0, which **did not pass AIRP certification**. Justin uploads it himself; nothing here uploads it.
+Updated 2026-10-19 (NPT, UTC+5:45). Replaces the t161u version.
+- **Merges are Justin's.** Every PR stays a draft; nothing here merges.
+- Certification stopped under the ADR 2026-10-19 stopping rule. Justin approved avg-f05-s14-ep2.0-2.5-3.0 (t164u) as the **default evaluator of the tryairp.com and dev.tryairp.com demos** after he uploads it. It is **not certified**. The `@airp/core` package default stays `{ kind: 'rule' }`.
+- `decide/shared-adopt` **is** PR #31.
 
-## Stack (heads checked 2026-10-19 with `git ls-remote` / `gh pr list`)
+## Stack (heads checked 2026-10-19 09:05 NPT with `git ls-remote`)
 
-| PR | head → base | head sha | carries | non-doc code |
-|---|---|---|---|---|
-| #28 | decide/step4-comparison → main (d0a0dd7) | f56d63d | Laya vs per-prim Qwen records | `packages/evaluator-local` prompt-v4 / compose / stub (local engine only) |
-| #30 | decide/shared-encoding-3b → #28 | f7c9a97 | shared-encoding experiment records | none |
-| #31 | **decide/shared-adopt** → #30 | this push | adopt ADRs, FRESH-05…10 declarations and reports, gate-revision ADRs + 2026-10-19 clarification, selection record, research-release publish drafts, findings, CI patch (file only) | **none** (no packages/, deploy/ or .github/ change vs #30) |
-| #33 | decide/suite-amendment-ho-violence-bnd-05 → main | 373d7d9 | suite amendment ho-violence-bnd-05 (suite `82f8e720…`, gate.json suiteSha256) | none (data/evaluator-gate only) |
-| #32 | adopt/shared-node-evaluator → #30 | d7f5056 | shared model in Node, `engine: 'laya-shared-onnx'`, cross-path test | packages/core, daemon, evaluator-local; engine off by default |
-| #29 | adopt/laya-node-evaluator → #28 | a718ff5 | Laya 5766 Node plumbing (superseded) | packages; engine off by default |
+| PR | head → base | head sha | ahead of main | carries | code |
+|---|---|---|---|---|---|
+| #33 | decide/suite-amendment-ho-violence-bnd-05 → main | 373d7d9 | 1 commit, 3 files | suite amendment (suite `82f8e720…`, gate.json suiteSha256) | none (data/evaluator-gate only) |
+| #28 | decide/step4-comparison → main (d0a0dd7) | f56d63d | 35 | Laya vs per-prim Qwen records | `packages/evaluator-local` prompt-v4 / compose / stub |
+| #30 | decide/shared-encoding-3b → #28 | f7c9a97 | 42 | shared-encoding experiment records | none |
+| #31 | **decide/shared-adopt** → #30 | (this push) | ~100, ~700 files | adopt ADRs, FRESH-05…10, gate-revision ADRs, selection record, publish package (card, bundle layout, HF upload, CI patch file), demo-switch runbook, findings | **none** (no packages/, deploy/ or .github/ change) |
+| #32 | adopt/shared-node-evaluator → #30 | d7f5056 | 54 | Node engine `laya-shared-onnx`, `createOnDeviceEvaluator` dispatch, onnxruntime-node 1.30.0, @huggingface/tokenizers 0.2.0, cross-path test | packages/core, daemon, evaluator-local; engine used only when a config names it |
+| #29 | adopt/laya-node-evaluator → #28 | a718ff5 | 36 | Laya 5766 Node plumbing | **already contained in #32** (a718ff5 is an ancestor of d7f5056) |
 
-Superseded records: #25, #27 (keep open as records or close; Justin's call).
+Ancestry: main ⊂ #28 ⊂ #30 ⊂ #31; #30 ⊂ #32; #29 ⊂ #32. #33 is independent of the stack.
 
-## Order (when Justin decides)
+## Trial merges (`git merge-tree`, in memory, nothing written to any branch)
 
-1. **#33 → main** (suite amendment). It is independent of the stack and makes main's gate.json name suite `82f8e720…`, which every number in the research card uses.
-2. **#28 → main**, then retarget **#30 → main** and merge.
-3. Retarget **#31 → main** and merge. It holds records and drafts only, so it is safe at any point after #30.
-4. **#32: optional and research-only.** A certified model no longer exists, so #32 should merge only if Justin wants the Node engine to be able to *opt in* to the research bundle. Before that merge, #32 needs:
-   - `laya-shared-crosspath.test.mjs` pointed at `laya-shared-avg-f05-s14-RESEARCH.pins.json` (`8ef0b322…`) and composition 2a (`59ddf1f6…`), not the A570 pins and `airp-v0.5.0.json`;
-   - refreshed fixed-item goldens from `rr/vps/runs/avgs14-rr-id-*.jsonl`;
-   - the engine still off by default, with no change to `?? { kind: 'rule' }`.
-5. **#29:** close as superseded by #32, or leave open as a record.
-6. **CI patch** (`decide/shared-adopt/publish/ci-shared-crosspath-hosted.workflow.patch`): Justin applies it with a workflow-scoped token, **only after** he has uploaded the research bundle, its URL resolves, and #32 carries the research pins (step 4). If #32 is not merged, do not apply the patch.
+All **clean**, in the order below. #33 merges cleanly at any point. Merging #29 after #32 produces a tree identical to #32's (no-op). None of these PRs touches `.github/` or `deploy/`.
+
+## Order
+
+1. **#33 → main.** Independent. Makes main's gate.json name suite `82f8e720…`, which every number in the card uses.
+   - Check: `sha256sum data/evaluator-gate/held-out-suite.v2.json` = `82f8e720…`; gate.json `suiteSha256` matches.
+2. **#28 → main.**
+   - Check: `npm ci && npm run build && npm test`.
+3. **#30:** retarget to main, merge. Records only.
+   - Check: same build/test; diff vs main shows no packages/ change beyond #28.
+4. **#31 (decide/shared-adopt):** retarget to main, merge. Records and drafts only; safe any time after #30.
+   - Check: `git diff --stat main...decide/shared-adopt -- packages deploy .github` is empty.
+5. **#32 → main.** **Required for the demo switch**: the deployed demo code has no `laya-shared-onnx` engine, so the switch is a code deploy, not just a config change. Before merging, update on #32 (code, not workflow):
+   - `tools/evaluator-training/laya-shared-crosspath.test.mjs`: point at `pins/laya-shared-avg-f05-s14-fp32.pins.json` (`7d3ec1cb…`) and composition 2a (`59ddf1f6…`) instead of the A570 pins and `airp-v0.5.0.json`; refresh fixed-item goldens from `rr2/runs/avgs14-v2pins-{python,node}.jsonl`.
+   - Check: `npm ci && npm run build && npm test`; with the bundle present, `AIRP_LAYA_CROSSPATH_REQUIRED=1 node --test tools/evaluator-training/laya-shared-crosspath.test.mjs`; and `grep -n "?? { kind: 'rule' }" packages/core/src/monitor/evaluator-config.ts` still matches (l.197 on d7f5056).
+   - Retarget #32 to main after #30 lands; it brings #29's commits with it.
+6. **#29:** close as merged-via-#32 (its commits land with step 5). Merging it separately is a no-op.
+7. **CI patch** (`decide/shared-adopt/publish/ci-shared-crosspath-hosted.workflow.patch`): Justin applies it with a workflow-scoped token **only after** (a) the bundle is uploaded and its URL resolves with the pinned sha, and (b) #32 is merged with the new pins (step 5). `git apply --check` is OK on decide/shared-adopt HEAD, main (d0a0dd7) and #32 (d7f5056).
+8. **Demo switch** (runbook `decide/shared-adopt/runbook/DEMO-SWITCH-RUNBOOK.md`): dev first, then prod. Prod tracks `main`, so prod needs step 5 merged (or Justin's explicit approval to run a non-main ref there).
 
 ## Live default: unchanged on every branch
 
-`packages/core/src/monitor/evaluator-config.ts` `resolveEvaluator`: `const config = input.config ?? { kind: 'rule' };`, checked 2026-10-19 on main d0a0dd7 (l.130), #31 HEAD (l.130) and #32 d7f5056 (l.197). The rule evaluator stays the default. The research model is reachable only through an explicit config naming `engine: 'laya-shared-onnx'` with pinned digests. No branch changes `deploy/`, tryairp.com / dev.tryairp.com, or `.github/workflows/`.
+`packages/core/src/monitor/evaluator-config.ts` `resolveEvaluator`: `const config = input.config ?? { kind: 'rule' };`, checked on main d0a0dd7 (l.130), #31 (l.130) and #32 d7f5056 (l.197). The demos do not use that default: both run step-744 through an explicit `AIRP_EVALUATOR_CONFIG` (`.advocate/evaluator.json`, sha `aff92369…`). The demo switch changes that file, not the package default.
 
 ## Not to be merged, shipped or changed
 
-- No certified weights exist. The research bundle must not be labelled certified, wired as a default, or deployed to the demos.
-- f05-s13 (FRESH-05 selection) failed the converged CSE gate and is not released.
-- `draft-*` row folders outside the repo are proposals only.
-- The network volume `rmn62wuuzx` is kept until Justin decides (≈ $0.004/h).
+- The model is not certified. Card, bundle and config must keep "not certified for production".
+- The t161u research bundle (`airp-shared-primitives-research-avg-f05-s14`, `23474ee7…`) is superseded; do not upload it.
+- f05-s13 (failed converged CSE gate) is not released. `draft-*` row folders outside the repo are proposals only.
+- The local edits to `data/evaluator-gate/gate.json` and `held-out-suite.v2.json` in the decide/shared-adopt worktree belong to #33 and are not committed here.
