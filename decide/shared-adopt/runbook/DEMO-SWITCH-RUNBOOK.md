@@ -17,9 +17,20 @@ Status: **draft**. Nothing here has been run. It waits for Justin to upload the 
 
 Consequence: a config change alone cannot switch the demos. The `laya-shared-onnx` engine exists only on **#32** (`adopt/shared-node-evaluator`, d7f5056), which is unmerged. Each demo first needs a **code deploy** containing #32: `packages/evaluator-local` (engine, onnxruntime-node 1.30.0, @huggingface/tokenizers 0.2.0) and `packages/daemon/src/local-evaluator-factory.ts`. #32's code still runs the step-744 GGUF config unchanged (engine omitted = gguf), and that is what keeps rollback to one config change.
 
+## 0b. Update 2026-10-19 17:13–17:35 NPT (t165u): clean checkouts and dev pre-flight
+
+- **Checkouts.** I ran `git checkout -- .` on both demos (Justin discarded the local changes). Both were already clean before the command. `git status --porcelain --untracked-files=all` now shows **0 lines on both** and no untracked files.
+  - prod `/root/inference-advocate`: `main` at **44e66e9** (= origin/main). Justin pulled main (fast-forward a47c4ef → d0a0dd7, 16:53 NPT) and committed the `.cursor/rules` edit as 44e66e9 (16:54 NPT). The prod daemon (pid 1565) has not been restarted since 2026-10-18; `packages/daemon/dist` was built 2026-09-12.
+  - dev `/root/inference-advocate-dev`: `feat/local-evaluator` at **ce1785e** (= origin), a non-main branch. Its 4 deleted tracked files are back.
+- **dev runs a non-main branch, so the #32 switch is allowed on dev.** Before the switch, dev runs `feat/local-evaluator` ce1785e. That branch has 168 commits that are not on main and 165 non-merge commits that are not on #32. They are training, data and docs work. Runtime packages: #32 is a superset of dev's code (adds the ONNX engines; `node-llama-cpp ^3.14.0` on both), and the taxonomy file is identical (`0de1cacc…`, v0.5.0).
+- **Fetch path.** dev's `origin` is `git@github.com:…`, and the VPS has no GitHub SSH key (`Permission denied (publickey)`). Fetch #32 over https instead: `git -C $D fetch https://github.com/AIRP-spec/inference-advocate.git adopt/shared-node-evaluator` (ls-remote over https: d7f5056).
+- **Rollback config.** The live `evaluator.json` (`aff92369…`, step-744, engine omitted = gguf) parses with dev's current loader **and** with #32's `loadEvaluatorConfig` (box, d7f5056, byte-identical copy). The GGUF on dev hashes `3e5d2fd8…`.
+- **Host.** Node v22.23.2; 15 GiB RAM, about 12 GiB available; 267 GB disk free. `/api/state` on both demos names `local-llm@3e5d2fd83b37+v3`.
+- **Gate: STOPPED here.** `https://huggingface.co/AIRP-spec/airp-shared-primitives-modernbert-large` returns 401 to anonymous requests from both the box and the VPS. `https://huggingface.co/AIRP-spec` returns 404, and `api/models?author=AIRP-spec` is empty. So the published tarball cannot be verified (`c126ad6a…`). A3 onward (code switch, config switch, identity, smoke) has not been run.
+
 ## Prerequisites (all Justin's)
 
-1. The bundle is uploaded and public at `https://huggingface.co/AIRP-spec/airp-shared-primitives-modernbert-large/resolve/avg-f05-s14/airp-shared-primitives-avg-f05-s14.tar.gz` with sha256 `541ef498e5184c0111387f069cb92ee24604698e3f8cdc4a382414775dce6596`.
+1. The bundle is uploaded and public at `https://huggingface.co/AIRP-spec/airp-shared-primitives-modernbert-large/resolve/avg-f05-s14/airp-shared-primitives-avg-f05-s14.tar.gz` with sha256 `c126ad6a31de2c954f43ebe2e5a0607c316fb94b338427117a8e69acdfcef119`.
 2. A code ref containing #32 is chosen for each demo:
    - **dev:** merge or rebase `feat/local-evaluator` onto a ref containing #32, or deploy #32's head directly. Justin decides which. This is a deploy of unmerged code to dev, which is what dev is for.
    - **prod:** tryairp.com tracks `main`. Either merge the stack first (MERGE-PLAN steps 1–4, then main contains #32), or Justin explicitly approves running prod from a non-main ref. Do not deploy prod from an unmerged branch without that approval.
@@ -28,7 +39,7 @@ Consequence: a config change alone cannot switch the demos. The `laya-shared-onn
 Constants used below:
 ```bash
 TGZ_URL=https://huggingface.co/AIRP-spec/airp-shared-primitives-modernbert-large/resolve/avg-f05-s14/airp-shared-primitives-avg-f05-s14.tar.gz
-TGZ_SHA=541ef498e5184c0111387f069cb92ee24604698e3f8cdc4a382414775dce6596
+TGZ_SHA=c126ad6a31de2c954f43ebe2e5a0607c316fb94b338427117a8e69acdfcef119
 ONNX_SHA=90b24a0b1ce9b3b3ab0b47a9120c383aafa134c24ceb4b1bd79a451ac5cf8798
 PINS_SHA=7d3ec1cb494aebf81703fe29963cf31a1621ffdcfb81fbd2da04708398db1158
 COMP_SHA=59ddf1f630ec2dcd81d40dd01f2adb53f1310fe42128d3ccc9b90de61e28ab9e
@@ -60,7 +71,7 @@ tar -xzf bundle.tgz && cd airp-shared-primitives-avg-f05-s14 && sha256sum -c MAN
 
 **A3. Deploy the code containing #32** (the ref Justin chose), then build.
 ```bash
-cd $D && git fetch origin && git checkout <APPROVED_REF> && npm ci && npm run build
+cd $D && git fetch https://github.com/AIRP-spec/inference-advocate.git adopt/shared-node-evaluator && git checkout -B adopt/shared-node-evaluator FETCH_HEAD && npm ci && npm run build   # dev: #32 head (d7f5056 at pre-flight); prod: merged main only
 git rev-parse HEAD > $B/HEAD-new.txt
 # Still on step-744: restart and confirm nothing changed before switching models.
 pm2 restart airp-daemon-dev --update-env && sleep 15
