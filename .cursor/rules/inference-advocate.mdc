@@ -40,19 +40,19 @@ SQLite rows and asserts conversation content is not in the ledger, and
 **Small, message-disciplined commits.** The history is meant to read as a build narrative.
 
 **Refresh the demo this checkout serves when UI or daemon changes are viewable.** This
-checkout is the working tree (`airp-daemon-dev` on 127.0.0.1:8791, run directory
-`.advocate`). Production tryairp.com is a separate checkout
-(`/home/justin/inference-advocate`, `airp-daemon` on 127.0.0.1:8790). Do not restart
-production from this tree unless asked.
+checkout is production tryairp.com (`airp-daemon` on 127.0.0.1:8790, run directory
+`.advocate`). The daemon reads `packages/ui/dist` from disk per request, so a UI-only
+change is live after `npm run build:ui`. Restart the daemon only when `packages/daemon`
+or a core package it loads changed, and only when asked to touch production. Dev
+(dev.tryairp.com) is a separate DigitalOcean droplet (GN-main). Do not treat this box
+as a sandbox.
 
 ```bash
-npm run build:ui          # when packages/ui changed
-# also rebuild/restart if packages/daemon or core packages the daemon loads changed
-pm2 restart airp-daemon-dev
+npm run build:ui          # when packages/ui changed; live on tryairp.com without restart
+# pm2 restart airp-daemon   # only when asked, and only if daemon/core changed
 ```
 
-The daemon serves `packages/ui/dist` from `.advocate` on 127.0.0.1:8791. Do not leave the
-user staring at a stale build.
+Do not leave the user staring at a stale build.
 
 ## Structural boundaries
 
