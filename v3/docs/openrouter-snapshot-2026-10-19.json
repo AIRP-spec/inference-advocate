@@ -1,0 +1,129 @@
+{
+ "fetched_utc": "2026-10-19T03:09:55Z",
+ "source": "https://openrouter.ai/api/v1/models",
+ "source_sha256": "2e72edfce4dd022ad66f333503152100406204d37b4c76100e79be5d8cf45e0e",
+ "unit": "USD per token as listed (multiply by 1e6 for per-1M)",
+ "models": [
+  {
+   "id": "deepseek/deepseek-v4-flash",
+   "name": "DeepSeek: DeepSeek V4 Flash 0423",
+   "hugging_face_id": "deepseek-ai/DeepSeek-V4-Flash",
+   "context_length": 1048576,
+   "pricing": {
+    "prompt": "0.000000091",
+    "completion": "0.000000182"
+   },
+   "endpoints_per_1M_in_out": "OpenInference:0.040/0.136 Relace:0.050/0.450 StreamLake:0.083/0.165 DeepInfra:0.090/0.180 GMICloud:0.091/0.182 Venice:0.097/0.193 DigitalOcean:0.098/0.196 SiliconFlow:0.130/0.280 Baidu:0.140/0.280 AtlasCloud:0.140/0.280 Parasail:0.140/0.280 Alibaba:0.150/0.300 Mancer 2:0.190/0.500 Azure:0.210/0.560 Cloudflare:0.440/1.320 Wafer:0.700/0.170"
+  },
+  {
+   "id": "qwen/qwen3-235b-a22b-2507",
+   "name": "Qwen: Qwen3 235B A22B Instruct 2507",
+   "hugging_face_id": "Qwen/Qwen3-235B-A22B-Instruct-2507",
+   "context_length": 262144,
+   "pricing": {
+    "prompt": "0.00000009",
+    "completion": "0.00000055"
+   },
+   "endpoints_per_1M_in_out": "GMICloud:0.087/0.350 DeepInfra:0.090/0.550 Parasail:0.140/0.800 Venice:0.150/0.750 Nebius:0.200/0.600 Google:0.220/0.880 Google:0.250/1.000"
+  },
+  {
+   "id": "mistralai/mistral-small-3.2-24b-instruct",
+   "name": "Mistral: Mistral Small 3.2 24B",
+   "hugging_face_id": "mistralai/Mistral-Small-3.2-24B-Instruct-2506",
+   "context_length": 256000,
+   "pricing": {
+    "prompt": "0.00000009375",
+    "completion": "0.00000025"
+   },
+   "endpoints_per_1M_in_out": "DeepInfra:0.075/0.200 Parasail:0.090/0.300 Venice:0.094/0.250 Mistral:0.100/0.300"
+  },
+  {
+   "id": "google/gemma-4-31b-it",
+   "name": "Google: Gemma 4 31B",
+   "hugging_face_id": "google/gemma-4-31B-it",
+   "context_length": 262144,
+   "pricing": {
+    "prompt": "0.0000002",
+    "completion": "0.0000004"
+   },
+   "endpoints_per_1M_in_out": "CoreWeave:0.100/0.340 Venice:0.120/0.360 Chutes:0.120/0.370 DeepInfra:0.135/0.510 Crusoe:0.140/0.400 Friendli:0.140/0.400 Novita:0.140/0.400 Parasail:0.150/0.400 DeepInfra:0.160/0.320 DeepInfra:0.200/0.400 DeepInfra:0.300/0.600 Io Net:0.361/1.093 SambaNova:0.380/1.150 ModelRun:0.750/1.000 SiliconFlow:0.750/1.000"
+  },
+  {
+   "id": "z-ai/glm-4.5-air",
+   "name": "Z.ai: GLM 4.5 Air",
+   "hugging_face_id": "zai-org/GLM-4.5-Air",
+   "context_length": 131072,
+   "pricing": {
+    "prompt": "0.00000013",
+    "completion": "0.00000085"
+   },
+   "endpoints_per_1M_in_out": "Novita:0.130/0.850 SiliconFlow:0.140/0.860 Z.AI:0.200/1.100"
+  },
+  {
+   "id": "meta-llama/llama-3.3-70b-instruct",
+   "name": "Meta: Llama 3.3 70B Instruct",
+   "hugging_face_id": "meta-llama/Llama-3.3-70B-Instruct",
+   "context_length": 131072,
+   "pricing": {
+    "prompt": "0.0000001",
+    "completion": "0.00000032"
+   },
+   "endpoints_per_1M_in_out": "DeepInfra:0.100/0.320 Novita:0.135/0.400 AkashML:0.200/0.520 Parasail:0.220/0.500 Cloudflare:0.293/2.253 SambaNova:0.450/0.900 Groq:0.590/0.790 CoreWeave:0.710/0.710 Google:0.720/0.720 Google:0.720/0.720 Together:1.040/1.040"
+  },
+  {
+   "id": "nvidia/nemotron-3-super-120b-a12b",
+   "name": "NVIDIA: Nemotron 3 Super",
+   "hugging_face_id": "nvidia/NVIDIA-Nemotron-3-Super-120B-A12B-FP8",
+   "context_length": 262144,
+   "pricing": {
+    "prompt": "0.00000008",
+    "completion": "0.00000045"
+   },
+   "endpoints_per_1M_in_out": "DekaLLM:0.080/0.450 DeepInfra:0.085/0.400 Crusoe:0.300/2.400"
+  },
+  {
+   "id": "microsoft/phi-4",
+   "name": "Microsoft: Phi 4",
+   "hugging_face_id": "microsoft/phi-4",
+   "context_length": 16384,
+   "pricing": {
+    "prompt": "0.00000007",
+    "completion": "0.00000014"
+   },
+   "endpoints_per_1M_in_out": "DeepInfra:0.056/0.112 DeepInfra:0.070/0.140"
+  },
+  {
+   "id": "xiaomi/mimo-v2.5",
+   "name": "Xiaomi: MiMo-V2.5",
+   "hugging_face_id": "XiaomiMiMo/MiMo-V2.5",
+   "context_length": 1050000,
+   "pricing": {
+    "prompt": "0.00000014",
+    "completion": "0.00000028"
+   },
+   "endpoints_per_1M_in_out": "GMICloud:0.119/0.238 Xiaomi:0.140/0.280 StreamLake:0.168/0.336 Novita:0.168/0.336 Venice:0.400/2.000"
+  },
+  {
+   "id": "ibm-granite/granite-4.2-8b",
+   "name": "IBM: Granite 4.2 8B",
+   "hugging_face_id": "ibm-granite/granite-4.2-8b",
+   "context_length": 131072,
+   "pricing": {
+    "prompt": "0.00000006",
+    "completion": "0.00000025"
+   },
+   "endpoints_per_1M_in_out": "DeepInfra:0.060/0.250 CoreWeave:0.100/0.150"
+  },
+  {
+   "id": "moonshotai/kimi-k2.5",
+   "name": "MoonshotAI: Kimi K2.5",
+   "hugging_face_id": "moonshotai/Kimi-K2.5",
+   "context_length": 262144,
+   "pricing": {
+    "prompt": "0.0000005",
+    "completion": "0.0000025"
+   },
+   "endpoints_per_1M_in_out": "AtlasCloud:0.490/2.500 SiliconFlow:0.500/2.500 Venice:0.532/3.325 Novita:0.570/2.850 Amazon Bedrock:0.600/3.000"
+  }
+ ]
+}

@@ -1,0 +1,6 @@
+18ae5d040cc44360b0b666e967e66fdc2adc2a367cac857fb21d3a5c7ee7a3ad  v3/PRIMITIVES.md
+59ddf1f630ec2dcd81d40dd01f2adb53f1310fe42128d3ccc9b90de61e28ab9e  v3/spec/composition-2a.json
+329171161e510d604fbaa05db53f42fe05a4b075a298684ef5c394b1c2a0342b  tools/evaluator-training/primitives/vocabulary.json (source of spec/primitives.json; branch decide/shared-adopt)
+0de1cacc74cbdf0452e3785b37ccf00bf6f65683e0b448983c2330fb9c1729b1  data/taxonomy/flags.v0.json (source of CLASSES.md / spec/classes.json; main)
+82f8e720fbb1d146a93a09da86484dada04561cffd85293be435c0ed0000ad77  held-out-suite.v2.json (fingerprint source; NOT copied)
+f577129b649a36e1914c74772d023790429cf46a7acb4db58046b9c859ad8014  held-out-suite.v1.json (fingerprint source; NOT copied)
