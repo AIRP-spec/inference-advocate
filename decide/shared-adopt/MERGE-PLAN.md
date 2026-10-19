@@ -18,6 +18,8 @@ Updated 2026-10-19 (NPT, UTC+5:45). Replaces the t161u version.
 
 Ancestry: main ⊂ #28 ⊂ #30 ⊂ #31; #30 ⊂ #32; #29 ⊂ #32. #33 is independent of the stack.
 
+**t165u (17:30 NPT):** main moved to **44e66e9** (Justin's `.cursor/rules` doc commit on top of d0a0dd7). Trial merges of #28, #31, #32 and #33 against 44e66e9 are still clean, and the CI patch still applies.
+
 ## Trial merges (`git merge-tree`, in memory, nothing written to any branch)
 
 All **clean**, in the order below. #33 merges cleanly at any point. Merging #29 after #32 produces a tree identical to #32's (no-op). None of these PRs touches `.github/` or `deploy/`.

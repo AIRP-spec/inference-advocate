@@ -27,14 +27,14 @@ read -rs HF_TOKEN && export HF_TOKEN                                            
 REPO=AIRP-spec/airp-shared-primitives-modernbert-large
 hf upload "$REPO" . . --repo-type model \
   --commit-message "avg-f05-s14-ep2.0-2.5-3.0: tryairp demo default evaluator (not certified for production)" \
-  --commit-description "Selection 4237006; ADR 20ef5c3 + clarification 95d53e5; approved t164u. MANIFEST.sha256 e485d4974d55472952c35d0766b44ad5e59c60ec1ce77b75c6850179ecd449fb; tarball 541ef498e5184c0111387f069cb92ee24604698e3f8cdc4a382414775dce6596."
+  --commit-description "Selection 4237006; ADR 20ef5c3 + clarification 95d53e5; approved t164u. MANIFEST.sha256 89101ed92fdd8e7d3ab03a8b7a303bb3cbd5eda26025827642612c37ff8f6e8c; tarball c126ad6a31de2c954f43ebe2e5a0607c316fb94b338427117a8e69acdfcef119."
 hf upload "$REPO" ../airp-shared-primitives-avg-f05-s14.tar.gz airp-shared-primitives-avg-f05-s14.tar.gz \
   --repo-type model --commit-message "Deterministic bundle tarball (CI + demo deploy)"
 hf repo tag create "$REPO" avg-f05-s14 -m "avg-f05-s14-ep2.0-2.5-3.0, tryairp demo default (not certified)"   # hf >= 1.0: 'hf repos tag create'
 unset HF_TOKEN
 # Verify the public download matches (no token needed):
 curl -fL -o /tmp/check.tgz "https://huggingface.co/$REPO/resolve/avg-f05-s14/airp-shared-primitives-avg-f05-s14.tar.gz" \
-  && echo "541ef498e5184c0111387f069cb92ee24604698e3f8cdc4a382414775dce6596  /tmp/check.tgz" | sha256sum -c -
+  && echo "c126ad6a31de2c954f43ebe2e5a0607c316fb94b338427117a8e69acdfcef119  /tmp/check.tgz" | sha256sum -c -
 ```
 
 Notes:

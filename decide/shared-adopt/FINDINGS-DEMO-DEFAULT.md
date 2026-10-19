@@ -30,3 +30,11 @@ Both demos run **step-744** (`local-llm@3e5d2fd83b37+v3`) through an explicit `A
 7. **Two daemons on one 8-vCPU host.** After both demos switch, each daemon holds about 2.5–2.9 GB and runs 8 ORT threads on the same cores.
 8. **HF CLI on the VPS is huggingface_hub 0.34.4:** the command group is `hf repo`, not `hf repos`, and there is no `repos settings`. HF-UPLOAD.md uses the installed syntax.
 9. **HF org `AIRP-spec`:** existence not checked; Justin creates the repo in the web UI.
+
+## t165u update (2026-10-19 17:13–17:35 NPT)
+
+- **Card fix:** the step-744 amended-gold record is now cited as `live-baseline/step744-limit-after-bnd05.json` (`d7e7168e…`, under `decide/shared-adopt/`). README.md is the only bundle file that changed (`7059aa34…` → `d51c536e…`).
+- **Rebuilt bundle (upload THIS one):** MANIFEST.sha256 `89101ed92fdd8e7d3ab03a8b7a303bb3cbd5eda26025827642612c37ff8f6e8c` (16 files); tarball `c126ad6a31de2c954f43ebe2e5a0607c316fb94b338427117a8e69acdfcef119` (1 767 093 757 bytes). The script re-checked the manifest in place, then extracted the tarball and checked it again (16/16). **`541ef498…` / `e485d497…` are superseded.**
+- **Identity re-run** on the built release files (its own ONNX, pins `7d3ec1cb…`, composition 2a): CROSSPATH_PASS 471/471 (prims, composed, decode, feeds), max Δ 2.04e-4, min margin 0.097. The Python logits and prims are identical to the archived record `avgs14-rr-id-python.jsonl` (`2c66137f…`).
+- **Demo checkouts:** clean on both; details in runbook §0b. Prod is now main 44e66e9, because Justin committed the `.cursor/rules` edit. Trial merges against the new main (44e66e9) are still clean for #28, #32, #33 and #31.
+- **Gate:** the HF repo is not public yet (401 for the repo, 404 for the `AIRP-spec` org page). The dev switch has not been started.

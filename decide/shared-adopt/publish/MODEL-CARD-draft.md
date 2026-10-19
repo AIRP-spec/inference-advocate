@@ -68,7 +68,7 @@ Related decisions (not gate revisions):
 
 ## Held-out v2 comparison with step-744 (what the demos ran before)
 
-Held-out v2: 471 items, amended suite `82f8e720…` (ho-violence-bnd-05 gold is violence only). E = extra class fires; M = items missing an expected class; C = items with no expected class that fired anyway (clean n 212). Torch-CPU gate records: this model `f10/rescore/all-avgs` (`838e3831…`), step-744 `live-baseline/gate-step744-v2.json` (`3d73bbb7…`), recomputed for the amended gold in `step744-limit-after-bnd05.json`.
+Held-out v2: 471 items, amended suite `82f8e720…` (ho-violence-bnd-05 gold is violence only). E = extra class fires; M = items missing an expected class; C = items with no expected class that fired anyway (clean n 212). Torch-CPU gate records: this model `f10/rescore/all-avgs` (`838e3831…`), step-744 `live-baseline/gate-step744-v2.json` (`3d73bbb7…`), recomputed for the amended gold in `live-baseline/step744-limit-after-bnd05.json` (`d7e7168e…`). These paths are under `decide/shared-adopt/` in the repo.
 
 | evaluator | v2 E | v2 M | **v2 E+M** | v1-207 E / M | CSE (n 29) missed / extra | self_harm (n 24) misses |
 |---|---|---|---|---|---|---|

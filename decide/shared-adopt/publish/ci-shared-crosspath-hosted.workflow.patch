@@ -28,7 +28,7 @@
 +    env:
 +      AIRP_LAYA_CROSSPATH_REQUIRED: '1'
 +      SHARED_BUNDLE_URL: ${{ vars.AIRP_SHARED_BUNDLE_URL || 'https://huggingface.co/AIRP-spec/airp-shared-primitives-modernbert-large/resolve/avg-f05-s14/airp-shared-primitives-avg-f05-s14.tar.gz' }}
-+      SHARED_BUNDLE_SHA256: 541ef498e5184c0111387f069cb92ee24604698e3f8cdc4a382414775dce6596
++      SHARED_BUNDLE_SHA256: c126ad6a31de2c954f43ebe2e5a0607c316fb94b338427117a8e69acdfcef119
 +      SHARED_BUNDLE_FILE: ${{ github.workspace }}/.laya-cache/airp-shared-primitives-avg-f05-s14.tar.gz
 +    steps:
 +      - uses: actions/checkout@v4
