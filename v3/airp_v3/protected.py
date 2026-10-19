@@ -49,9 +49,10 @@ def resolve_dir(explicit: str | None = None) -> Path:
     d = Path(explicit or os.environ.get("AIRP_PROTECTED_DIR") or DEFAULT_DIR).resolve()
     if not d.is_dir():
         raise ProtectedError(f"protected dir not found: {d} (set --protected-dir or AIRP_PROTECTED_DIR)")
-    here_repo = _repo_root(Path(__file__).resolve().parent)
-    if here_repo is not None and (d == here_repo or here_repo in d.parents):
-        raise ProtectedError("protected dir must be outside the public repository checkout")
+    v3_root = Path(__file__).resolve().parents[1]
+    for root in filter(None, (_repo_root(v3_root), v3_root)):
+        if d == root or root in d.parents:
+            raise ProtectedError("protected dir must be outside the public repository checkout")
     return d
 
 
