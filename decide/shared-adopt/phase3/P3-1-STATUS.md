@@ -19,3 +19,13 @@
   against `…/shared-adopt/<f>/volume/<f>` on the VPS. So the volume's f08/f09/f10 dirs are fully archived; pruning
   them (as was done for f05–f07 on 2026-10-18) would free ≈ 26 GB. Not done: deleting volume data needs Justin's OK.
 - Pods: none. Phase 3 spend so far ≈ $0.25 (Oct 19 ≤ $0.23 + ≈ $0.02).
+
+## 2026-10-20 prune (Justin approved) and run start
+
+- 17:00:25Z create attempt 2 of the run's limit: pod `x7s114lih7pjrg` (RTX 4090, EU-RO-1); SSH 17:00:59Z.
+- 17:01:58Z VPS archive re-verified immediately before deletion: f08 SHA_OK 112 (manifest 5257dcc1…), f09 SHA_OK 157
+  (02e56854…), f10 SHA_OK 92 (833f0163…).
+- 17:02:06Z deleted `/workspace/f08`, `/workspace/f09`, `/workspace/f10` on volume rmn62wuuzx from the P3-1 pod.
+  Free (40 GB quota − du): **before 12 GB, after 37 GB**. Remaining: hf-cache 2.3 GB, pack-f05.tgz.
+- Pack `570ba304…` extracted, PACK.sha256 OK, schedule CPU test PASS ×3 on the pod; headroom check passed
+  (volume 37 GB, container 40 GB); pipeline started 17:02:46Z.
