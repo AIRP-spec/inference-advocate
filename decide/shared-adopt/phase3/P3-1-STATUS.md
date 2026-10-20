@@ -29,3 +29,4 @@
   Free (40 GB quota − du): **before 12 GB, after 37 GB**. Remaining: hf-cache 2.3 GB, pack-f05.tgz.
 - Pack `570ba304…` extracted, PACK.sha256 OK, schedule CPU test PASS ×3 on the pod; headroom check passed
   (volume 37 GB, container 40 GB); pipeline started 17:02:46Z.
+- 18:41Z status: pipeline alive (pod x7s114lih7pjrg), 7/15 runs done (s40 A0/A1/A2, s41 A0/A1/A2, s42 A0), now p31-A1-s42 avg inference; no errors.
