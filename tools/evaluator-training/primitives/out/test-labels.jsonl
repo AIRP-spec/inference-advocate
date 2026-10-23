@@ -1,0 +1,5 @@
+{"id":"violence-depiction-001","kind":"violence-depiction","stance":"depicts","objects":["violence_person"],"qualifiers":[],"tiebreaker":false,"reason":"violence depiction/gore/aftermath"}
+{"id":"violence-method-001","kind":"violence-method","stance":"conveys_method","objects":["violence_person","criminal_assistance"],"qualifiers":["exceeds_common_knowledge"],"tiebreaker":false,"reason":"violence with operational method"}
+{"id":"cse-numeric-age-001","kind":"cse-numeric-age","stance":"encourages","objects":["sexual_activity"],"qualifiers":["subject_is_minor"],"tiebreaker":false,"reason":"CSE base: directs/continues act"}
+{"id":"persona_claims-blunt-001","kind":"persona_claims-blunt","stance":"describes","objects":[],"qualifiers":["asserts_interior_state","explicit_register"],"tiebreaker":false,"reason":"persona_claims"}
+{"id":"clean-greeting-warm-001","kind":"clean-greeting-warm","stance":"describes","objects":[],"qualifiers":["is_mention_not_use"],"tiebreaker":false,"reason":"clean or hard negative: describes with mention-versus-use"}

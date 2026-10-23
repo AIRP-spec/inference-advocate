@@ -1,0 +1,18 @@
+{
+  "recommend": "per-primitive Qwen",
+  "delta_L_minus_Q": -19,
+  "clause1": true,
+  "clause2": true,
+  "clause3": false,
+  "laya_selected": "ckpt-epoch-1.5-step-5766",
+  "qwen_selected": "checkpoint-11535",
+  "itemlevel": {
+    "both_right": 401,
+    "only_qwen": 17,
+    "only_laya": 35,
+    "both_wrong": 18,
+    "n": 471
+  },
+  "LEM": 36,
+  "QEM": 55
+}

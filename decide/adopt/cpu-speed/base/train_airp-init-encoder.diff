@@ -1,0 +1,51 @@
+--- /workspace/airp/decide/step4/laya-trainpack/train_airp.py	2026-10-05 04:46:00.406111759 +0000
++++ /workspace/airp/decide/adopt/cpu-speed/base/pack/train_airp.py	2026-10-05 22:13:08.085205181 +0000
+@@ -189,9 +189,35 @@
+     cfg["head_max_len"] = int(args.head_max_len)
+ 
+     tok = AutoTokenizer.from_pretrained(str(model_dir / "tokenizer"))
+-    model = build_model(cfg, encoder_dir=str(model_dir / "encoder"))
+-    weights = load_file(str(model_dir / "model.safetensors"))
+-    model.load_state_dict(weights, strict=True)
++    # --- Task 3 step 4 (Laya adoption 2026-10-06): smaller-encoder experiment. ---
++    # AIRP_INIT_ENCODER (e.g. answerdotai/ModernBERT-base) + AIRP_INIT_ENCODER_REVISION + AIRP_INIT_ENCODER_SHA256:
++    # encoder initialised from that pinned Hub snapshot, decision head freshly initialised (laya build_model
++    # default init, seeded). Tokenizer stays the Laya snapshot's (vocab/merges identical to ModernBERT-base's),
++    # so preprocessing / sequences are byte-identical to the deciding run. Everything else unchanged.
++    init_enc = os.environ.get("AIRP_INIT_ENCODER")
++    if init_enc:
++        import hashlib
++        from huggingface_hub import hf_hub_download
++        rev = os.environ["AIRP_INIT_ENCODER_REVISION"]; want = os.environ["AIRP_INIT_ENCODER_SHA256"]
++        wpath = hf_hub_download(init_enc, "model.safetensors", revision=rev)
++        h = hashlib.sha256()
++        with open(wpath, "rb") as fh:
++            for blk in iter(lambda: fh.read(1 << 22), b""):
++                h.update(blk)
++        if h.hexdigest() != want:
++            raise SystemExit(f"init encoder sha {h.hexdigest()} != {want}")
++        cfg["encoder"] = init_enc
++        cfg["init_encoder_revision"] = rev
++        cfg["init_encoder_sha256"] = want
++        cfg.pop("temperature_by_options", None)
++        cfg["training"] = {"note": "fresh head on " + init_enc}
++        torch.manual_seed(args.seed); random.seed(args.seed); np.random.seed(args.seed)
++        model = build_model(cfg, encoder_dir=None, pretrained=True, revision=rev)
++        print(f"INIT_ENCODER {init_enc}@{rev} sha {want} params={sum(p.numel() for p in model.parameters())}")
++    else:
++        model = build_model(cfg, encoder_dir=str(model_dir / "encoder"))
++        weights = load_file(str(model_dir / "model.safetensors"))
++        model.load_state_dict(weights, strict=True)
+ 
+     # ModernBERT reference_compile + grad checkpointing breaks torch 2.4 inductor
+     enc = getattr(model, "encoder", None)
+@@ -466,6 +492,9 @@
+         losses = [x["loss"] for x in loss_curve if x.get("loss") is not None]
+         training_meta = {
+             "base_model": BASE_MODEL_ID,
++            "init_encoder": os.environ.get("AIRP_INIT_ENCODER"),
++            "init_encoder_revision": os.environ.get("AIRP_INIT_ENCODER_REVISION"),
++            "init_encoder_sha256": os.environ.get("AIRP_INIT_ENCODER_SHA256"),
+             "revision": BASE_REVISION,
+             "weight_sha256": WEIGHT_SHA256,
+             "labels_sha256": LABELS_SHA256,

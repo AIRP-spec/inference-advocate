@@ -1,0 +1,99 @@
+{
+  "label": "s2-packed-vs-s1",
+  "n": 471,
+  "ref_name": "s1-padded-t8-spin0",
+  "cand_name": "s2-packed-t8-spin0",
+  "ref_raw": "raw/s1-t8-spin0-full.jsonl",
+  "cand_raw": "raw/s2-packed-t8-spin0.jsonl",
+  "max_abs_prob_diff": 2.4306025297460288e-06,
+  "max_abs_logit_diff": 0.0004057884216308594,
+  "gate_ref": {
+    "v2": {
+      "n": 471,
+      "extras": 16,
+      "recallMisses": 20,
+      "recallMissedClassInstances": 20,
+      "cleanFires": 13,
+      "cleanN": 212,
+      "pass": false
+    },
+    "v1_207": {
+      "n": 207,
+      "extras": 5,
+      "recallMisses": 10,
+      "recallMissedClassInstances": 10,
+      "cleanFires": 4,
+      "cleanN": 100,
+      "pass": false
+    },
+    "cse": {
+      "n": 29,
+      "missed": 0,
+      "extra": 0,
+      "pass": true,
+      "type": "child_sexual_exploitation"
+    }
+  },
+  "gate_cand": {
+    "v2": {
+      "n": 471,
+      "extras": 16,
+      "recallMisses": 20,
+      "recallMissedClassInstances": 20,
+      "cleanFires": 13,
+      "cleanN": 212,
+      "pass": false
+    },
+    "v1_207": {
+      "n": 207,
+      "extras": 5,
+      "recallMisses": 10,
+      "recallMissedClassInstances": 10,
+      "cleanFires": 4,
+      "cleanN": 100,
+      "pass": false
+    },
+    "cse": {
+      "n": 29,
+      "missed": 0,
+      "extra": 0,
+      "pass": true,
+      "type": "child_sexual_exploitation"
+    }
+  },
+  "primitive_decision_flips": {
+    "total_flips": 0,
+    "items_with_any_flip": 0,
+    "by_primitive": {},
+    "rate_by_primitive": {
+      "stance": 0.0,
+      "violence_person": 0.0,
+      "self_harm": 0.0,
+      "sexual_activity": 0.0,
+      "financial_crime": 0.0,
+      "intrusion": 0.0,
+      "weapons": 0.0,
+      "profanity": 0.0,
+      "is_mention_not_use": 0.0,
+      "subject_is_minor": 0.0,
+      "exceeds_common_knowledge": 0.0,
+      "addresses_own_nature": 0.0,
+      "asserts_interior_state": 0.0,
+      "directed_at_user": 0.0,
+      "explicit_register": 0.0,
+      "targets_protected_characteristic": 0.0,
+      "untethered_to_content": 0.0
+    }
+  },
+  "composed_verdict_disagreement": {
+    "n_items": 0,
+    "rate": 0.0,
+    "items": []
+  },
+  "thresholded_prims_disagreement": {
+    "n_items": 0,
+    "rate": 0.0
+  },
+  "probs_sha256_ref": "9ac44a2fe2478573a22079d53990211e61ab5a9361a0fb5c89b5eba1f568a8cc",
+  "probs_sha256_cand": "7e06a9a2e13e7366dcc3bcb25c2d8288f283321c4475be207f548d63163a16a3"
+}

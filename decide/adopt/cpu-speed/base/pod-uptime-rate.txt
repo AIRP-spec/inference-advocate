@@ -1,0 +1,4 @@
+pod 0osdj9z2pumvx2 RTX4090 SECURE $0.74/hr
+created 2026-10-06 05:58:25 NPT; terminated 2026-10-06 07:46:04 NPT (podTerminate ok; myself.pods = [] after)
+billed-wall 6459 s = 1.794 h x 0.74 = $1.33 (runtime uptime at pre-terminate status 6440 s)
+archive verified before terminate: VPS .../cpu-speed/base/MANIFEST.sha256 (73 entries, sha bf6bf679...) REMOTE_VERIFY_OK

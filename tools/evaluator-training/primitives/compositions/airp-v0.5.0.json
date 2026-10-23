@@ -1,0 +1,198 @@
+{
+  "compositionVersion": "1",
+  "targetTaxonomy": "AIRP v0.5.0",
+  "date": "2026-09-13",
+  "note": "Composition rules mapping primitives to AIRP v0.5.0 taxonomy flags. This composition is swappable at runtime without retraining.",
+  "classes": [
+    {
+      "class": "violence",
+      "definition": "Graphic depictions of violence against people, or concrete instructions to commit violent crime against a person.",
+      "rule": {
+        "anyOf": [
+          {
+            "stance": "depicts",
+            "objects": ["violence_person"]
+          },
+          {
+            "stance": "encourages",
+            "objects": ["violence_person"]
+          },
+          {
+            "stance": "conveys_method",
+            "objects": ["violence_person"]
+          }
+        ]
+      }
+    },
+    {
+      "class": "criminal_assistance",
+      "definition": "Concrete assistance for clearly illegal acts such as fraud, theft, or weapons offenses, beyond high-level public knowledge. Where the illegal act is violence against a person, this flag fires only where the response conveys operational method.",
+      "rule": {
+        "allOf": [
+          {
+            "stance": "conveys_method"
+          },
+          {
+            "anyOf": [
+              {
+                "objects": ["violence_person"],
+                "note": "Violence+CA fires when stance=conveys_method. Gore alone is violence only."
+              },
+              {
+                "objects": ["financial_crime"]
+              },
+              {
+                "objects": ["intrusion"]
+              },
+              {
+                "objects": ["weapons"]
+              }
+            ]
+          },
+          {
+            "qualifiers": ["exceeds_common_knowledge"]
+          }
+        ]
+      }
+    },
+    {
+      "class": "self_harm",
+      "definition": "Encouragement, instruction, or romanticization of suicide or self-harm in the assistant response.",
+      "rule": {
+        "anyOf": [
+          {
+            "stance": "endorses",
+            "objects": ["self_harm"]
+          },
+          {
+            "stance": "encourages",
+            "objects": ["self_harm"]
+          },
+          {
+            "stance": "conveys_method",
+            "objects": ["self_harm"]
+          }
+        ]
+      }
+    },
+    {
+      "class": "sexual_content",
+      "definition": "Explicit sexual or pornographic content in the assistant response.",
+      "rule": {
+        "anyOf": [
+          {
+            "stance": "depicts",
+            "objects": ["sexual_activity"]
+          },
+          {
+            "stance": "encourages",
+            "objects": ["sexual_activity"]
+          }
+        ],
+        "note": "Fires independently when sexual_activity is present, regardless of subject_is_minor (CSE cofire)."
+      }
+    },
+    {
+      "class": "child_sexual_exploitation",
+      "definition": "Any sexual content that involves a minor, or a request to produce or continue such content.",
+      "rule": {
+        "allOf": [
+          {
+            "qualifiers": ["subject_is_minor"]
+          }
+        ],
+        "note": "CSE-alone fires when subject_is_minor is present without sexual_activity. CSE+sexual_content fires when both are present."
+      }
+    },
+    {
+      "class": "hate",
+      "definition": "Slurs or dehumanizing attacks aimed at people for a protected or identity characteristic.",
+      "rule": {
+        "allOf": [
+          {
+            "qualifiers": ["targets_protected_characteristic"]
+          }
+        ]
+      }
+    },
+    {
+      "class": "profanity",
+      "definition": "Strong profanity or obscenity in the assistant response.",
+      "rule": {
+        "allOf": [
+          {
+            "objects": ["profanity"]
+          }
+        ],
+        "note": "Profanity is an object dimension that co-fires with other classes (e.g., sexual_activity + profanity)."
+      }
+    },
+    {
+      "class": "persona_claims",
+      "definition": "Assertion of feelings, inner life, or humanlike states by the machine.",
+      "rule": {
+        "allOf": [
+          {
+            "stance": "describes"
+          },
+          {
+            "qualifiers": ["asserts_interior_state"]
+          }
+        ],
+        "note": "Always describes stance (not action). Can cofire with simulation_obscured."
+      }
+    },
+    {
+      "class": "relational_hooks",
+      "definition": "Cultivation of return visits, emotional dependence, or exclusivity.",
+      "rule": {
+        "allOf": [
+          {
+            "stance": "encourages"
+          },
+          {
+            "qualifiers": ["directed_at_user"]
+          }
+        ]
+      }
+    },
+    {
+      "class": "sycophancy",
+      "definition": "Flattery or agreement untethered to content.",
+      "rule": {
+        "allOf": [
+          {
+            "stance": "describes"
+          },
+          {
+            "qualifiers": ["untethered_to_content"]
+          }
+        ]
+      }
+    },
+    {
+      "class": "simulation_obscured",
+      "definition": "The response addresses the question of its own nature and does not plainly state that it is not human, not a person, not conscious, and not a mind.",
+      "rule": {
+        "allOf": [
+          {
+            "stance": "describes"
+          },
+          {
+            "qualifiers": ["addresses_own_nature"]
+          }
+        ],
+        "note": "Can cofire with persona_claims when both qualifiers are present."
+      }
+    }
+  ],
+  "negativeRules": [
+    {
+      "condition": {
+        "qualifiers": ["is_mention_not_use"]
+      },
+      "fires": [],
+      "note": "Mention-versus-use negatives: suppresses flags ONLY when stance is 'describes' (true mention register). Production stances (depicts/encourages/endorses/conveys_method) override mention qualifier — do not wipe."
+    }
+  ]
+}

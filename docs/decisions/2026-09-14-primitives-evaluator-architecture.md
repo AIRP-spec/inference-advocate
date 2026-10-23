@@ -1,0 +1,282 @@
+# Primitives Evaluator Design Decisions
+
+Date: 2026-09-14  
+Status: Accepted
+
+## Context
+
+The primitives evaluator training pipeline has been established with the overnight run. Several design decisions need to be formalized regarding the architecture, gating strategy, and future implementation path.
+
+## Decision 1: Per-Primitive First Architecture
+
+**Decision:** Implement per-primitive prompting (18 separate passes) as the primary architecture, not grouped compact decode.
+
+**Status:** ✅ **Implemented** as of 2026-09-14
+
+**Rationale:**
+- One prompt per primitive provides clearer signal and better model comprehension
+- 18-token grouped decode conflates multiple independent decisions into a single pass
+- Per-primitive architecture aligns with the primitives abstraction layer design
+- Enables fine-grained debugging and error analysis per primitive
+
+**Implementation:**
+- ✅ `buildStanceSystemPrompt()`: Stance classification with 5 options
+- ✅ `buildObjectSystemPrompt(primitive)`: Yes/no for each of 7 objects
+- ✅ `buildQualifierSystemPrompt(primitive)`: Yes/no for each of 10 qualifiers
+- ✅ `buildAllPerPrimitivePrompts()`: Returns all 18 prompts in vocabulary order
+- ✅ `perPrimitivePromptBundleSha256()`: SHA256 of concatenated 18 system prompts
+- ✅ SFT builder: `build-sft-per-primitive.mjs` emits 18 examples per corpus row
+- ✅ Tests: `per-primitive.test.mjs` validates all builders and fixtures
+
+**Prompt Bundle SHA Decision:**
+The prompt bundle SHA is computed by concatenating all 18 system prompts in vocabulary order (separated by `\n---\n`) and hashing the result. This captures the entire prompt family as a single reproducibility pin.
+
+**Decode Shape:** `per-primitive-v1`
+- 18 separate passes per utterance
+- Each pass: minimal system prompt with only that question's definition
+- Assistant output: single token line (stance name or yes/no)
+
+**SFT Output:**
+- Input: N corpus rows × N labels
+- Output: N × 18 SFT examples (one per pass)
+- Each example: `{id: "row-id__primitive", sourceId: "row-id", passType, primitive, messages: [{system}, {user}, {assistant}]}`
+
+**Metadata:**
+- `promptBundleSha256`: SHA256 of all 18 system prompts concatenated
+- `decodeShape`: `per-primitive-v1`
+- `passesPerUtterance`: 18
+
+**Path Forward:**
+- Current: Compact 18-token decode (one pass, deprecated for next run)
+- Next: Per-primitive decode (18 passes: 5 stances, 7 objects, 10 qualifiers)
+- If 471×6 corpus proves too slow: **subset corpus keys (CKs)**, do NOT revert to grouped-first
+
+## Decision 2: Named Gate for CSE Per-Class Pass
+
+**Decision:** The child sexual exploitation gate is named `child_sexual_exploitation` and runs as a dedicated per-class pass in the held-out gate.
+
+**Headline Metric for Next Run:** The next training run's success will be judged primarily on the **child_sexual_exploitation per-class pass**.
+
+**Context:**
+- Control (v3, CK-630): **1/11 per-class passes** (child_sexual_exploitation passed)
+- Overnight primitives (prim-v1, all CKs): **0/11 per-class passes** (child_sexual_exploitation failed)
+
+**Target:** Restore CSE per-class pass to at least control equivalence (1/11 or better).
+
+**Rationale:**
+- CSE is the most sensitive class and requires dedicated validation
+- Per-class gating ensures recall/precision metrics are explicit for each taxonomy flag
+- Named gate makes it clear which rules apply to CSE specifically
+- The primitives architecture must prove it can handle CSE at least as well as the control
+
+## Decision 3: Overnight One-Shot Retired
+
+**Decision:** The overnight 18-token one-shot training run is retired for the next training run.
+
+**Rationale:**
+- Overnight run validated the primitives architecture
+- Next run will use per-primitive prompting architecture
+- One-shot compact decode served as a bootstrap; production architecture is per-primitive
+
+## Decision 4: Labels V2 Corrected Count
+
+**Decision:** Labels v2 has 712 rows with `subject_is_minor` after adult-contrast exclusion fix.
+
+**Reference SHA:** `3f91c2e3...` (noted as reference only, not a gate constraint)
+
+**Fix Applied:**
+- Excluded adult-contrast rows from receiving `subject_is_minor` qualifier
+- Adult rows: `arm === "adult"` OR `kind === "cse-named-porn-adult"` OR `kind.endsWith("-porn-adult")`
+- Adult rows still receive `sexual_activity` object as appropriate
+- Adult rows receive zero `subject_is_minor` qualifiers
+
+**Code:** See `tools/evaluator-training/primitives/relabel-from-slots.mjs` lines 233-236.
+
+## Decision 5: Serializer and Labels Latch
+
+**Decision:** SFT metadata (`sft.meta.json`) is written beside SFT output with SHA256 pins for prompt template and labels file.
+
+**Rationale:**
+- Reproducibility: Gate can verify that the live prompt matches the trained prompt
+- Drift detection: Labels file SHA ensures labels haven't changed since SFT was built
+- Traceability: Full provenance of SFT artifacts
+
+**Metadata Fields:**
+- `promptSha256`: SHA256 hex of `buildV4System()` output
+- `labelsSha256`: SHA256 hex of labels file
+- `corpusSha256`: SHA256 hex of corpus file
+- `promptTemplateVersion`: Template version identifier
+- `vocabularyVersion`: Vocabulary version identifier
+- `decodeShape`: Decode format (e.g., "compact-18-token")
+- `paths`: Corpus, labels, and SFT file paths
+- `counts`: Total rows and skipped rows
+- `createdAt`: ISO timestamp
+
+**Gate Enforcement:**
+- If `--sft-metadata-path` or `recipe.sftMetadataPath` is set, gate aborts on SHA mismatch
+- Clear error messages indicate whether prompt or labels have drifted
+
+**Implementation:**
+- Prompt SHA: `promptSha256()` exported from `@airp/evaluator-local`
+- File SHA: `sha256FileHex(path)` exported from `@airp/evaluator-local`
+- Builder imports: `build-sft-v4.mjs` imports all formatting/serialization from evaluator-local (no duplicated code)
+
+## Decision 6: Single Source of Truth for Prompt Template
+
+**Decision:** All prompt formatting, serialization, and SHA computation is implemented in `@airp/evaluator-local`.
+
+**Rationale:**
+- Eliminates duplication between training scripts and runtime evaluator
+- Ensures training and inference use identical prompts
+- SHA pinning detects any drift between training and runtime
+
+**Removed Duplicates:**
+- `PRIMITIVES_CATALOGUE_V1` constant (now imported from evaluator-local)
+- `buildSystemPromptV4()` function (now `buildV4System()` from evaluator-local)
+- `serializeCompactPrimitives()` function (now imported from evaluator-local)
+
+## Decision 7: Stance Truncation Fix and Normalization
+
+**Date:** 2026-09-14 (second update)
+
+**Decision:** Increase stance `maxTokens` from 2 to 16 and add normalization for truncated stance names.
+
+**Bug Context:**
+- CK-6756 gate revealed stance truncation: `encourages` → `encour` (58/471 items), `conveys_method` → `conveys` (32/471 items)
+- Composition requires exact string match → false negatives (relational_hooks 0/24, criminal_assistance 0/31)
+
+**Fix Applied:**
+1. Raised stance `maxTokens` from 2 to 16 in `LocalEvaluator#evaluatePerPrimitive` (covers longest label `conveys_method` with buffer)
+2. Added belt-and-suspenders normalization: `encour*` → `encourages`, `convey*` → `conveys_method`
+
+**Code:** See `packages/evaluator-local/src/local-evaluator.ts` lines 416-429.
+
+## Decision 8: Composition Policy for Mention-Versus-Use
+
+**Date:** 2026-09-14 (second update)
+
+**Decision:** `is_mention_not_use` negative rule suppresses flags **only when stance is `describes`**. Production stances (depicts/encourages/endorses/conveys_method) override the mention qualifier.
+
+**Rationale:**
+- Policy bug: `negativeRules` currently wipe all fires when `is_mention_not_use` is set, including true CSE rows with depicts/encourages stance
+- Mention register (`describes`) is distinct from production register (depicts/encourages/endorses/conveys_method)
+- If stance is production, the model is producing harmful content, not just mentioning it
+- Example: `stance=depicts, objects=[sexual_activity], qualifiers=[subject_is_minor, is_mention_not_use]` should fire CSE (depicts wins)
+
+**Policy:**
+- **`is_mention_not_use`:** Suppress flags **only when stance is "describes"**. Production stances override.
+- **`disclaimer_present`:** Full wipe regardless of stance (unchanged).
+
+**Implementation:**
+- `compose.mjs`: `applyNegativeRules()` checks stance before suppressing for `is_mention_not_use`
+- `airp-v0.5.0.json`: Updated negative rule notes to document policy
+- Tests: 3 new test cases covering describes-suppression, production-override, disclaimer-full-wipe
+
+**Code:** See `tools/evaluator-training/primitives/compose.mjs` lines 60-93, `compositions/airp-v0.5.0.json` lines 189-204.
+
+**Note:** Composition rules carry policy decisions. This change reflects that mention-versus-use is a stance-dependent suppression, not a global wipe.
+
+## Decision 9: Single Shared Composition Implementation
+
+**Date:** 2026-09-14 (third update)
+
+**Decision:** Composition logic lives in a single shared module (`packages/evaluator-local/src/compose-primitives.ts`). Both `LocalEvaluator` (runtime) and build tools (SFT generation, testing, CLI) import and use this function. Dual implementations are forbidden.
+
+**Rationale:**
+- **Root cause of CK-6756 re-gate failure:** `LocalEvaluator#compose` and `tools/evaluator-training/primitives/compose.mjs` had separate implementations
+- Both initially implemented blanket `is_mention_not_use` suppression
+- After policy fix to compose.mjs (stance-dependent suppression), LocalEvaluator was not updated → divergence
+- CK-6756 re-gate proved runtime still did global wipe, requiring pod-local mirror
+- Dual implementations create a class of bugs: any policy change must be applied twice, and divergence is silent until gate failure
+
+**Implementation:**
+- **Single source:** `packages/evaluator-local/src/compose-primitives.ts` exports `compose(primitives, composition)`
+- **LocalEvaluator:** Removed private `#compose` and `#matchesCondition` methods, imports `compose` from `compose-primitives.ts`
+- **compose.mjs:** Thin CLI/wrapper that re-exports `compose` from `@airp/evaluator-local`
+- **Test coverage:** `compose.test.mjs` verifies compose.mjs and direct evaluator-local import are the same function reference
+
+**Code locations:**
+- Shared implementation: `packages/evaluator-local/src/compose-primitives.ts`
+- LocalEvaluator import: `packages/evaluator-local/src/local-evaluator.ts` line 39
+- Tools wrapper: `tools/evaluator-training/primitives/compose.mjs` line 14
+- Test: `tools/evaluator-training/primitives/compose.test.mjs` (verifies function identity)
+
+**Policy enforcement:**
+- Composition logic cannot diverge between runtime and tools
+- Any policy change (e.g., negative rule behavior) is guaranteed consistent
+- Tests fail if compose.mjs does not re-export the shared function
+
+**Forbidden pattern:** Private reimplementation of composition logic. All composition must call the shared `compose()` function.
+
+## Decision 10: Remove `disclaimer_present` Qualifier
+
+**Date:** 2026-09-14 (fourth update)
+
+**Decision:** Remove `disclaimer_present` qualifier entirely from the primitives vocabulary.
+
+**Rationale:**
+- **Teaching data:** Atom taught 0/8006 corpus rows (flag-disclaim kinds were stripped in 7914 corpus redo for cause)
+- **Firing data:** Atom fired 0/471 held-out suite items
+- **Dead code:** The full-wipe composition rule for `disclaimer_present` was never exercised
+- **Do not restore:** Restoring flag-disclaim teaching rows would reintroduce content removed for cause in the 7914 redo
+
+**Why removed (for future reference):**
+1. Flag-disclaim teaching rows were removed from the corpus in 7914 redo
+2. Restoring them would violate the documented reason for their removal
+3. The atom never fired in practice (0/471 held-out)
+4. The composition rule was dead code (never matched)
+
+**Vocabulary impact:**
+- **Before:** 1 stance + 7 objects + 10 qualifiers = 18 per-primitive passes
+- **After:** 1 stance + 7 objects + 9 qualifiers = 17 per-primitive passes
+- **Decode shape change:** Per-primitive-v1 now produces 17 judgments instead of 18
+
+**Files updated:**
+- `tools/evaluator-training/primitives/vocabulary.json`: Removed `disclaimer_present` from qualifiers
+- `tools/evaluator-training/primitives/VOCABULARY.md`: Updated qualifier list and examples
+- `packages/evaluator-local/src/prompt-v4.ts`: Removed from `PRIMITIVES_CATALOGUE_V1.qualifiers`
+- `packages/evaluator-local/src/compose-primitives.ts`: Removed from policy comments
+- `tools/evaluator-training/primitives/compositions/airp-v0.5.0.json`: Removed negative rule
+- `tools/evaluator-training/primitives/compositions/ailuminate-v1.0.json`: Removed from partialSupport
+- `tools/evaluator-training/primitives/relabel-from-slots.mjs`: Removed dead flag-disclaim branch
+- Tests updated: All test expectations changed from 18 to 17 passes
+
+**SFT metadata impact:**
+- Decode shape change invalidates old SFT metadata (`promptBundleSha256` will change)
+- Do not rebuild SFT here (no corpus changes, decode shape documented)
+- Next SFT build will reflect 17-pass decode shape
+
+**Forbidden action:** Do not re-add `disclaimer_present` from old vocabulary lists without addressing why flag-disclaim teaching data was removed in 7914 redo.
+
+## Decision 11: Corpus Slice 8056 — Exceeds Common Knowledge Depth Pairs + Mention Refusal-Naming
+
+**Date:** 2026-09-14 (fifth update)
+
+**Diagnosis (state plainly):** Every CA positive (330) carried exceeds_common_knowledge. The atom never varied within the class it gates, taught as "if CA then eck," a class restatement, not a threshold. The 48 no-fire rows sat in separate groups on different subjects, so nothing held a subject constant and moved depth. Five CA misses had conveys_method present and eck absent because conveys_method was taught contrastively (gore versus method) and eck was not.
+
+**Fourth instance of:** rule correct, published, gate-enforced, taught as a constant rather than a variable. Primitives made it visible as one failing atom.
+
+**Training data written (hand, readableAloud, tens of rows):**
+- 16 same-subject depth pairs (32 rows) across fraud, theft, intrusion, weapons. Shared contrastGroup ca-depth-{stem}; explain arm (ca-explain-protect, expect []) vs operational (ca-named-help, expect [criminal_assistance]). Subject cannot predict the label.
+- 18 mention-versus-use rows, kind refusal-naming-category, including bnd-05 roleplay-refusal form. Must be in mention-versus-use family (class-refusal generics do not teach this atom).
+
+**Corpus update:** 8006 → 8056. Labels: keep v2 for base; label only new 50. One variable for retrain: corpus. Per-primitive 17 passes (disclaimer removed). Train artifacts dir sweep-primitives-perprim-8056. CSE named gate + per-atom P/R. Compare Run B 17/12 vs prior prim 33/21.
+
+## Status
+
+All decisions are implemented and tested as of 2026-09-14.
+
+## Consequences
+
+- **Per-primitive architecture:** Next training run will use 18 separate passes
+- **Labels v2:** 712 `subject_is_minor` rows after adult-contrast fix
+- **Gate enforcement:** SFT metadata SHA validation prevents drift
+- **Single source:** All prompt code lives in `@airp/evaluator-local`
+
+## See Also
+
+- `docs/decisions/2026-09-13-primitives-evaluator-overnight.md` - Overnight run results
+- `packages/evaluator-local/src/per-primitive-stub.ts` - Per-primitive interface
+- `tools/evaluator-training/primitives/relabel-from-slots.mjs` - Adult-contrast fix
+- `tools/evaluator-training/primitives/build-sft-v4.mjs` - Serializer latch
+- `tools/evaluator-training/gate.mjs` - SHA validation logic

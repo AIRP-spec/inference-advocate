@@ -1,0 +1,21 @@
+{
+ "chosen_max_len": 128,
+ "rule": "smallest multiple of 32 >= max observed row length (124); chosen before any gate",
+ "vs_1024": {
+  "128": {
+   "rows_changed": 0,
+   "items_changed": 0,
+   "tokens_dropped": 0
+  },
+  "112": {
+   "rows_changed": 15,
+   "items_changed": 15,
+   "tokens_dropped": 67
+  },
+  "96": {
+   "rows_changed": 435,
+   "items_changed": 435,
+   "tokens_dropped": 3279
+  }
+ }
+}
