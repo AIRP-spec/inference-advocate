@@ -38,3 +38,14 @@ Both demos run **step-744** (`local-llm@3e5d2fd83b37+v3`) through an explicit `A
 - **Identity re-run** on the built release files (its own ONNX, pins `7d3ec1cb…`, composition 2a): CROSSPATH_PASS 471/471 (prims, composed, decode, feeds), max Δ 2.04e-4, min margin 0.097. The Python logits and prims are identical to the archived record `avgs14-rr-id-python.jsonl` (`2c66137f…`).
 - **Demo checkouts:** clean on both; details in runbook §0b. Prod is now main 44e66e9, because Justin committed the `.cursor/rules` edit. Trial merges against the new main (44e66e9) are still clean for #28, #32, #33 and #31.
 - **Gate:** the HF repo is not public yet (401 for the repo, 404 for the `AIRP-spec` org page). The dev switch has not been started.
+
+## Post-publish card edit (2026-10-23, approved by Justin)
+
+- **What changed:** after publishing, Justin edited the Hugging Face model card's README.md front matter, adding one line: `base_model_relation: finetune`. He then moved tag `avg-f05-s14` from commit `2e5a86254b1579178c6229fd7caad31bed6d26e3` to `d0dbd22e204ddb50afa256471734d855ca90addd`. This is a metadata-only change.
+- **README.md:** `d51c536e66a6b750b769612db4a1c72c74fabda701d46c8d5247fe0bc16a20d0` (as built and first published) → `32b98652f91b0afe350e34476ba15976f37e97ebe3d75dc8e92a6e4b800d5cc6` (d0dbd22).
+- **MANIFEST.sha256:** `89101ed92fdd8e7d3ab03a8b7a303bb3cbd5eda26025827642612c37ff8f6e8c` (rr2 bundle, first published) → `5f94f2d2d9e5c842cfa07a681e3a9c532c867dae90c3de9ebcfa44dd46275c25` (`publish/MANIFEST.sha256.post-card-edit`). The two differ only on the README.md line; order and format are unchanged.
+- **Verification (VPS, 2026-10-23):** downloaded tag avg-f05-s14 at d0dbd22 to a fresh directory. `diff -rq` against the verified 2e5a862 download shows README.md is the only differing file, and its diff is the single added line. `sha256sum -c` with the new manifest passes 16/16. **No weights, ONNX, pins, compositions, tokenizer or configs changed.**
+- **Dev:** dev.tryairp.com was switched and verified (identity 471/471, smoke10 10/10) against the pre-edit files at 2e5a862 on 2026-10-23. The weights and every runtime file are byte-identical at d0dbd22, so that verification stands.
+- **Publish form:** HF holds the unpacked bundle (16 files + MANIFEST.sha256 + .gitattributes), not the tarball. Tarball `c126ad6a…` still describes the pre-edit rr2 bundle on the VPS and is not on HF. Its URL in the CI patch and runbook does not resolve unless a tarball is uploaded later.
+- **Pending (Justin):** upload `MANIFEST.sha256` (5f94f2d2…) from `/root/primitives-evaluator/hf-verify-avg-f05-s14/MANIFEST.sha256`, then re-point tag avg-f05-s14 at the resulting commit. The rr2 bundle on the VPS is left unchanged.
+

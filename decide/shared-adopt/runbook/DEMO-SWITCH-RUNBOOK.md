@@ -28,9 +28,15 @@ Consequence: a config change alone cannot switch the demos. The `laya-shared-onn
 - **Host.** Node v22.23.2; 15 GiB RAM, about 12 GiB available; 267 GB disk free. `/api/state` on both demos names `local-llm@3e5d2fd83b37+v3`.
 - **Gate: STOPPED here.** `https://huggingface.co/AIRP-spec/airp-shared-primitives-modernbert-large` returns 401 to anonymous requests from both the box and the VPS. `https://huggingface.co/AIRP-spec` returns 404, and `api/models?author=AIRP-spec` is empty. So the published tarball cannot be verified (`c126ad6a…`). A3 onward (code switch, config switch, identity, smoke) has not been run.
 
+## 0c. Update 2026-10-23: dev switched; card edited after publish
+
+- **Dev:** switched 2026-10-23 ≈11:34–11:41 NPT, installed from the verified HF download at 2e5a862 (manifest 89101ed9…, 16/16). Dev now runs #32 d7f5056; evaluator.json `2382ebae…`. Identity CROSSPATH_PASS 471/471, smoke10 10/10, 500-token median 684/649 ms. Rollback config: `evaluator.step744.json` (`aff92369…`). Live hashes: `/root/primitives-evaluator/demo-switch/20261023T0549Z-dev/LIVE.txt`.
+- **Card edit:** README.md gained `base_model_relation: finetune` (`d51c536e…` → `32b98652…`). Published manifest: `89101ed9…` → `5f94f2d2…`. No weights or configs changed, so the dev verification stands. See FINDINGS-DEMO-DEFAULT.md "Post-publish card edit". For prod (B), verify against `5f94f2d2…`.
+
 ## Prerequisites (all Justin's)
 
-1. The bundle is uploaded and public at `https://huggingface.co/AIRP-spec/airp-shared-primitives-modernbert-large/resolve/avg-f05-s14/airp-shared-primitives-avg-f05-s14.tar.gz` with sha256 `c126ad6a31de2c954f43ebe2e5a0607c316fb94b338427117a8e69acdfcef119`.
+1. **(Updated 2026-10-23.)** Justin published the bundle **unpacked** (not as a tarball) to `AIRP-spec/airp-shared-primitives-modernbert-large`, tag `avg-f05-s14`. Published MANIFEST.sha256: **`5f94f2d2d9e5c842cfa07a681e3a9c532c867dae90c3de9ebcfa44dd46275c25`** after the card edit (README.md `32b98652…`, tag at d0dbd22 + the manifest upload). It was **`89101ed92fdd8e7d3ab03a8b7a303bb3cbd5eda26025827642612c37ff8f6e8c`** as built and first published (README.md `d51c536e…`, commit 2e5a862). Every other file is identical under both. For A2, use `hf download … --revision avg-f05-s14` + `sha256sum -c MANIFEST.sha256` (expect the manifest sha above) + the ONNX/pins/composition checks below. The original tarball plan follows for reference:
+   The bundle is uploaded and public at `https://huggingface.co/AIRP-spec/airp-shared-primitives-modernbert-large/resolve/avg-f05-s14/airp-shared-primitives-avg-f05-s14.tar.gz` with sha256 `c126ad6a31de2c954f43ebe2e5a0607c316fb94b338427117a8e69acdfcef119`.
 2. A code ref containing #32 is chosen for each demo:
    - **dev:** merge or rebase `feat/local-evaluator` onto a ref containing #32, or deploy #32's head directly. Justin decides which. This is a deploy of unmerged code to dev, which is what dev is for.
    - **prod:** tryairp.com tracks `main`. Either merge the stack first (MERGE-PLAN steps 1–4, then main contains #32), or Justin explicitly approves running prod from a non-main ref. Do not deploy prod from an unmerged branch without that approval.

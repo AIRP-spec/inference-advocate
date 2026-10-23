@@ -42,3 +42,16 @@ Notes:
 - `hf upload` would auto-create the repo, but the fine-grained token cannot create repos, so step 1 comes first.
 - CLI syntax: the VPS has `hf` from huggingface_hub **0.34.4** (`/usr/local/bin/hf`), checked 2026-10-19 with `--help`: `hf upload [repo_id] [local_path] [path_in_repo] --repo-type --commit-message --commit-description`, `hf repo tag create repo_id tag -m`. The current online guide names the group `hf repos`; with 0.34.4 it is `hf repo`. `HF_TOKEN` in the environment is honoured by both.
 - The tarball sha is already pinned in the CI patch and the demo runbook. It changes only if a bundle file is edited and the bundle rebuilt; then re-pin all three.
+
+## 2026-10-23 addendum: manifest refresh after the card edit (Justin runs this)
+
+The card edit (README.md front matter `base_model_relation: finetune`) left the published MANIFEST.sha256 (`89101ed9…`) with a stale README.md line. The refreshed manifest `5f94f2d2d9e5c842cfa07a681e3a9c532c867dae90c3de9ebcfa44dd46275c25` (also committed as `MANIFEST.sha256.post-card-edit`) was checked 16/16 against a fresh download of d0dbd22. On the VPS:
+
+```bash
+REPO=AIRP-spec/airp-shared-primitives-modernbert-large; H=/root/primitives-evaluator/hf-verify-avg-f05-s14
+echo "5f94f2d2d9e5c842cfa07a681e3a9c532c867dae90c3de9ebcfa44dd46275c25  $H/MANIFEST.sha256" | sha256sum -c -
+hf upload "$REPO" $H/MANIFEST.sha256 MANIFEST.sha256 --repo-type model \
+  --commit-message "MANIFEST.sha256: refresh README.md hash after card metadata edit (5f94f2d2)"
+hf repo tag delete "$REPO" avg-f05-s14 -y
+hf repo tag create "$REPO" avg-f05-s14 --revision main -m "avg-f05-s14-ep2.0-2.5-3.0, tryairp demo default (not certified); manifest 5f94f2d2"
+```
