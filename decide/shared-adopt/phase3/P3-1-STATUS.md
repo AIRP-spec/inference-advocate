@@ -34,3 +34,16 @@
 - 19:44Z status: 13/15 runs done (p31-A0-s44 done 19:43:25Z), now training p31-A1-s44; no errors.
 - 20:10Z status: 14/15 runs done (p31-A1-s44 done 19:56:59Z), last run p31-A2-s44 at cavg inference; no errors.
 - 20:17Z pipeline PIPE_EXIT=0 20:10:28Z, 15/15 runs. Volume MANIFEST-volume-p31 (246aadf4…, 619 files) sha -c OK on the volume; box pull 481 OK. GPU pod TERMINATED 20:15:18Z, pods []. Safety phase (E+M masked) + selection: WINNER A2 (P3-1-SELECTION.json 2c2cf547…, 20:17:08Z); candidate avg-p31-A2-s44 (P3-1-CANDIDATE.json). Committed before E+M.
+
+## 2026-10-23 close-out: VPS archive verified, CPU pod gone
+
+- Watcher log `/workspace/airp/p31-finish.log`: tar on CPU pod `m696vzn6yke3m6` exited ≈21:23:56Z (Oct 20); VPS held
+  12,792,316 KB. The finisher then looped on a pgrep parsing bug (`0\nerr`) and never ran its own checksum step. Its
+  final entry (02:07:01Z; log file mtime 2026-10-23 02:03Z box clock) records a manual `sha256sum -c` from the `volume/`
+  dir, SHA_EXIT=0 (619 files), then DELETE of the pod; the RunPod pod list returned `[]`.
+- Re-verified 2026-10-23 05:57:54Z on the VPS: `cd …/shared-adopt/p31/volume && sha256sum -c p31/MANIFEST-volume-p31.sha256`
+  → **SHA_EXIT=0, 619/619 OK** (manifest sha `246aadf4ea9ba83321eb016fbb222c4ff65ce45f7693b4294269dec3c6b1b72e`).
+- CPU pod: SSH to 213.173.111.110:31043 refused at 2026-10-23 ≈05:57Z (pod gone). Last API pod list: `[]`.
+- **RunPod balance: not re-queried.** `RUNPOD_API_KEY` was not present in this session's environment, so the REST/GraphQL
+  queries returned no data. The CPU pod appears to have stayed up from the tar exit (≈21:24Z Oct 20) until the
+  02:07Z deletion, so its cost may be well above the ≈$0.05 estimate; the balance must be read before any P3-2 pod.

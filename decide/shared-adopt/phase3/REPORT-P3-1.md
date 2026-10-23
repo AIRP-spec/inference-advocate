@@ -114,3 +114,13 @@ P3-1 is complete. **P3-2 is not started**; it needs Justin's approval of this re
 confirmed here); (3) RunPod balance $8.66: the plan's remaining base cost is ≈ $2.8 (P3-2 H1 + optional H2) + $2.65–5.1
 (P3-3 N=10, optional N=20), so the balance covers the base but not the 50 % contingency; a top-up is advisable
 before P3-3 (keep ≥ $2 headroom).
+
+## Close-out (2026-10-23)
+
+- **Archive to the VPS: VERIFIED.** `sha256sum -c p31/MANIFEST-volume-p31.sha256` (246aadf4…, 619 files) run from
+  `…/shared-adopt/p31/volume` on the VPS at 2026-10-23 05:57:54Z: SHA_EXIT=0, 619/619 OK. Earlier manual check before
+  the pod's deletion also SHA_EXIT=0 (watcher log, 02:07:01Z entry).
+- **Pods: none.** CPU pod `m696vzn6yke3m6` deleted (API list `[]` after DELETE; its SSH port refuses connections on 2026-10-23).
+- **Final RunPod balance: not yet read** (no `RUNPOD_API_KEY` in the session that wrote this). The CPU pod likely ran
+  past the tar exit until its deletion because the finisher looped on a pgrep bug, so the "≈$0.05 CPU copy pod" figure
+  above is a lower bound. Read the balance before P3-2.
