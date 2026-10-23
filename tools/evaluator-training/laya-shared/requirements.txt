@@ -1,0 +1,9 @@
+# Pod install (PyTorch+CUDA comes from the image)
+laya==0.3.21
+transformers==4.48.3
+safetensors
+huggingface_hub
+numpy
+scipy
+onnx
+onnxruntime-gpu==1.22.0
