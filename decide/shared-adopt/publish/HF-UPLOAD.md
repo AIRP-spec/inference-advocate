@@ -32,16 +32,16 @@ hf upload "$REPO" ../airp-shared-primitives-avg-f05-s14.tar.gz airp-shared-primi
   --repo-type model --commit-message "Deterministic bundle tarball (CI + demo deploy)"
 hf repo tag create "$REPO" avg-f05-s14 -m "avg-f05-s14-ep2.0-2.5-3.0, tryairp demo default (not certified)"   # hf >= 1.0: 'hf repos tag create'
 unset HF_TOKEN
-# Verify the public download matches (no token needed):
-curl -fL -o /tmp/check.tgz "https://huggingface.co/$REPO/resolve/avg-f05-s14/airp-shared-primitives-avg-f05-s14.tar.gz" \
-  && echo "c126ad6a31de2c954f43ebe2e5a0607c316fb94b338427117a8e69acdfcef119  /tmp/check.tgz" | sha256sum -c -
+# (2026-10-23: the bundle was published unpacked; no tarball is on HF. Verify as CI does:)
+#   hf download "$REPO" --revision avg-f05-s14 --local-dir /tmp/check && cd /tmp/check \
+#     && echo "5f94f2d2d9e5c842cfa07a681e3a9c532c867dae90c3de9ebcfa44dd46275c25  MANIFEST.sha256" | sha256sum -c - && sha256sum -c MANIFEST.sha256
 ```
 
 Notes:
 - There is no `--private` anywhere. The repo is created in the web UI as Public. If it ever shows as private, switch it in the repo's Settings page (newer CLIs also have `hf repos settings "$REPO" --private false`; the VPS CLI does not).
 - `hf upload` would auto-create the repo, but the fine-grained token cannot create repos, so step 1 comes first.
 - CLI syntax: the VPS has `hf` from huggingface_hub **0.34.4** (`/usr/local/bin/hf`), checked 2026-10-19 with `--help`: `hf upload [repo_id] [local_path] [path_in_repo] --repo-type --commit-message --commit-description`, `hf repo tag create repo_id tag -m`. The current online guide names the group `hf repos`; with 0.34.4 it is `hf repo`. `HF_TOKEN` in the environment is honoured by both.
-- The tarball sha is already pinned in the CI patch and the demo runbook. It changes only if a bundle file is edited and the bundle rebuilt; then re-pin all three.
+- (Superseded 2026-10-23.) CI and the runbook no longer use the tarball: they pin MANIFEST.sha256 `5f94f2d2…` plus the ONNX and pins shas and fetch with `hf download`. If any bundle file changes, regenerate the manifest and re-pin it in the CI patch, the runbook and here.
 
 ## 2026-10-23 addendum: manifest refresh after the card edit (Justin runs this)
 

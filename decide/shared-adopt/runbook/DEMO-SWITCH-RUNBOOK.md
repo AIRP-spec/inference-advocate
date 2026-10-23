@@ -31,11 +31,11 @@ Consequence: a config change alone cannot switch the demos. The `laya-shared-onn
 ## 0c. Update 2026-10-23: dev switched; card edited after publish
 
 - **Dev:** switched 2026-10-23 ≈11:34–11:41 NPT, installed from the verified HF download at 2e5a862 (manifest 89101ed9…, 16/16). Dev now runs #32 d7f5056; evaluator.json `2382ebae…`. Identity CROSSPATH_PASS 471/471, smoke10 10/10, 500-token median 684/649 ms. Rollback config: `evaluator.step744.json` (`aff92369…`). Live hashes: `/root/primitives-evaluator/demo-switch/20261023T0549Z-dev/LIVE.txt`.
-- **Card edit:** README.md gained `base_model_relation: finetune` (`d51c536e…` → `32b98652…`). Published manifest: `89101ed9…` → `5f94f2d2…`. No weights or configs changed, so the dev verification stands. See FINDINGS-DEMO-DEFAULT.md "Post-publish card edit". For prod (B), verify against `5f94f2d2…`.
+- **Card edit:** README.md gained `base_model_relation: finetune` (`d51c536e…` → `32b98652…`). Published manifest: `89101ed9…` → `5f94f2d2…`. No weights or configs changed, so the dev verification stands. See FINDINGS-DEMO-DEFAULT.md "Post-publish card edit". For prod (B), verify against `5f94f2d2…`. Constants and A2 now use `hf download` + the manifest pin; the tarball (`c126ad6a…`) is no longer referenced. As of ≈11:57 NPT the refreshed manifest is on HF (main 4300d943) and the tag resolves to it.
 
 ## Prerequisites (all Justin's)
 
-1. **(Updated 2026-10-23.)** Justin published the bundle **unpacked** (not as a tarball) to `AIRP-spec/airp-shared-primitives-modernbert-large`, tag `avg-f05-s14`. Published MANIFEST.sha256: **`5f94f2d2d9e5c842cfa07a681e3a9c532c867dae90c3de9ebcfa44dd46275c25`** after the card edit (README.md `32b98652…`, tag at d0dbd22 + the manifest upload). It was **`89101ed92fdd8e7d3ab03a8b7a303bb3cbd5eda26025827642612c37ff8f6e8c`** as built and first published (README.md `d51c536e…`, commit 2e5a862). Every other file is identical under both. For A2, use `hf download … --revision avg-f05-s14` + `sha256sum -c MANIFEST.sha256` (expect the manifest sha above) + the ONNX/pins/composition checks below. The original tarball plan follows for reference:
+1. **(Updated 2026-10-23.)** Justin published the bundle **unpacked** (not as a tarball) to `AIRP-spec/airp-shared-primitives-modernbert-large`, tag `avg-f05-s14`. Published MANIFEST.sha256: **`5f94f2d2d9e5c842cfa07a681e3a9c532c867dae90c3de9ebcfa44dd46275c25`** after the card edit (README.md `32b98652…`, tag at d0dbd22 + the manifest upload). It was **`89101ed92fdd8e7d3ab03a8b7a303bb3cbd5eda26025827642612c37ff8f6e8c`** as built and first published (README.md `d51c536e…`, commit 2e5a862). Every other file is identical under both. For A2, use `hf download … --revision avg-f05-s14` + `sha256sum -c MANIFEST.sha256` (expect the manifest sha above) + the ONNX/pins/composition checks below. The original tarball plan (superseded; CI and A2 now use `hf download` + the manifest pin) was:
    The bundle is uploaded and public at `https://huggingface.co/AIRP-spec/airp-shared-primitives-modernbert-large/resolve/avg-f05-s14/airp-shared-primitives-avg-f05-s14.tar.gz` with sha256 `c126ad6a31de2c954f43ebe2e5a0607c316fb94b338427117a8e69acdfcef119`.
 2. A code ref containing #32 is chosen for each demo:
    - **dev:** merge or rebase `feat/local-evaluator` onto a ref containing #32, or deploy #32's head directly. Justin decides which. This is a deploy of unmerged code to dev, which is what dev is for.
@@ -44,8 +44,8 @@ Consequence: a config change alone cannot switch the demos. The `laya-shared-onn
 
 Constants used below:
 ```bash
-TGZ_URL=https://huggingface.co/AIRP-spec/airp-shared-primitives-modernbert-large/resolve/avg-f05-s14/airp-shared-primitives-avg-f05-s14.tar.gz
-TGZ_SHA=c126ad6a31de2c954f43ebe2e5a0607c316fb94b338427117a8e69acdfcef119
+HF_REPO=AIRP-spec/airp-shared-primitives-modernbert-large; HF_REV=avg-f05-s14   # published unpacked; no tarball on HF (2026-10-23)
+MANIFEST_SHA=5f94f2d2d9e5c842cfa07a681e3a9c532c867dae90c3de9ebcfa44dd46275c25   # after the card edit; was 89101ed9… (dev switch verified against that, same weights)
 ONNX_SHA=90b24a0b1ce9b3b3ab0b47a9120c383aafa134c24ceb4b1bd79a451ac5cf8798
 PINS_SHA=7d3ec1cb494aebf81703fe29963cf31a1621ffdcfb81fbd2da04708398db1158
 COMP_SHA=59ddf1f630ec2dcd81d40dd01f2adb53f1310fe42128d3ccc9b90de61e28ab9e
@@ -69,8 +69,8 @@ pm2 describe airp-daemon-dev > $B/pm2-before.txt
 **A2. Fetch and verify the published bundle** (outside the checkout; the GGUF stays where it is).
 ```bash
 M=$D/.advocate/models/shared-avg-f05-s14; mkdir -p $M && cd $M
-curl -fL --retry 3 -o bundle.tgz "$TGZ_URL" && echo "$TGZ_SHA  bundle.tgz" | sha256sum -c -
-tar -xzf bundle.tgz && cd airp-shared-primitives-avg-f05-s14 && sha256sum -c MANIFEST.sha256
+hf download $HF_REPO --revision $HF_REV --local-dir airp-shared-primitives-avg-f05-s14 && rm -rf airp-shared-primitives-avg-f05-s14/.cache && cd airp-shared-primitives-avg-f05-s14
+echo "$MANIFEST_SHA  MANIFEST.sha256" | sha256sum -c - && sha256sum -c MANIFEST.sha256
 [ "$(sha256sum laya-shared.onnx | cut -d' ' -f1)" = $ONNX_SHA ] && [ "$(sha256sum pins/laya-shared-avg-f05-s14-fp32.pins.json | cut -d' ' -f1)" = $PINS_SHA ] \
   && [ "$(sha256sum compositions/airp-v0.5.0-cse-corrected-2a.json | cut -d' ' -f1)" = $COMP_SHA ] && echo BUNDLE_OK
 ```
