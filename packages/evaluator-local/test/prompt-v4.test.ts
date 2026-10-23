@@ -15,7 +15,7 @@ import {
   buildV4User,
   buildV4ChatTurns,
   type PrimitivesVerdict,
-} from '../src/prompt-v4.js';
+} from '@airp/evaluator-local';
 import type { EvaluationRequest } from '@airp/core';
 
 describe('prompt-v4: serializeCompactPrimitives', () => {
@@ -26,9 +26,9 @@ describe('prompt-v4: serializeCompactPrimitives', () => {
       qualifiers: [],
     };
     const line = serializeCompactPrimitives(verdict);
-    // stance + 7 objects + 10 qualifiers = 18 tokens
+    // stance + 7 objects + 9 qualifiers = 17 tokens (disclaimer_present removed in 15ec9b9)
     const tokens = line.split(' ');
-    assert.equal(tokens.length, 18);
+    assert.equal(tokens.length, 17);
     assert.equal(tokens[0], 'depicts');
     assert.equal(tokens[1], 'yes'); // violence_person
     assert.equal(tokens[2], 'no'); // self_harm
@@ -42,10 +42,10 @@ describe('prompt-v4: serializeCompactPrimitives', () => {
     };
     const line = serializeCompactPrimitives(verdict);
     const tokens = line.split(' ');
-    assert.equal(tokens.length, 18);
+    assert.equal(tokens.length, 17);
     assert.equal(tokens[0], 'conveys_method');
     assert.equal(tokens[1], 'yes'); // violence_person
-    assert.equal(tokens[15], 'yes'); // exceeds_common_knowledge (7th qualifier)
+    assert.equal(tokens[13], 'yes'); // exceeds_common_knowledge (6th qualifier)
   });
 
   it('CSE dual', () => {
@@ -56,7 +56,7 @@ describe('prompt-v4: serializeCompactPrimitives', () => {
     };
     const line = serializeCompactPrimitives(verdict);
     const tokens = line.split(' ');
-    assert.equal(tokens.length, 18);
+    assert.equal(tokens.length, 17);
     assert.equal(tokens[0], 'encourages');
     assert.equal(tokens[3], 'yes'); // sexual_activity
     assert.equal(tokens[9], 'yes'); // subject_is_minor (2nd qualifier)
@@ -70,15 +70,15 @@ describe('prompt-v4: serializeCompactPrimitives', () => {
     };
     const line = serializeCompactPrimitives(verdict);
     const tokens = line.split(' ');
-    assert.equal(tokens.length, 18);
+    assert.equal(tokens.length, 17);
     assert.equal(tokens[0], 'describes');
-    assert.equal(tokens[16], 'yes'); // is_mention_not_use (8th qualifier)
+    assert.equal(tokens[14], 'yes'); // is_mention_not_use (7th qualifier)
   });
 });
 
 describe('prompt-v4: parseCompactPrimitives', () => {
   it('parses violence depiction', () => {
-    const line = 'depicts yes no no no no no no no no no no no no no no no no';
+    const line = 'depicts yes no no no no no no no no no no no no no no no';
     const parsed = parseCompactPrimitives(line);
     assert.equal(parsed.unparseable, false);
     assert.equal(parsed.stance, 'depicts');
@@ -87,7 +87,7 @@ describe('prompt-v4: parseCompactPrimitives', () => {
   });
 
   it('parses violence + CA', () => {
-    const line = 'conveys_method yes no no no no no no no no no no no no no yes no no no';
+    const line = 'conveys_method yes no no no no no no no no no no no yes no no no';
     const parsed = parseCompactPrimitives(line);
     assert.equal(parsed.unparseable, false);
     assert.equal(parsed.stance, 'conveys_method');
@@ -110,7 +110,7 @@ describe('prompt-v4: parseCompactPrimitives', () => {
   });
 
   it('rejects invalid stance', () => {
-    const line = 'invalid_stance yes no no no no no no no no no no no no no no no no';
+    const line = 'invalid_stance yes no no no no no no no no no no no no no no no';
     const parsed = parseCompactPrimitives(line);
     assert.equal(parsed.unparseable, true);
   });
@@ -151,7 +151,7 @@ describe('prompt-v4: buildV4System', () => {
 describe('prompt-v4: buildV4ChatTurns', () => {
   it('builds chat turns', () => {
     const req: EvaluationRequest = {
-      id: 'test-1',
+      providerId: 'test-1',
       content: 'Blood ran from the crushed throat.',
     };
     const turns = buildV4ChatTurns(req);
