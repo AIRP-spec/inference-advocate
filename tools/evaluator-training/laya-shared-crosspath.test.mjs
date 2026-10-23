@@ -28,19 +28,19 @@ const { Taxonomy } = await import(join(repo, 'packages/core/dist/index.js'));
 const { comparePaths } = await import(join(here, 'laya-node/crosspath/compare.mjs'));
 
 const sha = (p) => createHash('sha256').update(readFileSync(p)).digest('hex');
-const PINS = join(L, 'pins/laya-shared-A570-fp32.pins.json');
-const SHARED_CONFIG = join(L, 'pins/shared_config-A570.json');
-const COMPOSITION = join(repo, 'tools/evaluator-training/primitives/compositions/airp-v0.5.0.json');
+const PINS = join(L, 'pins/laya-shared-avg-f05-s14-fp32.pins.json');
+const SHARED_CONFIG = join(L, 'pins/shared_config-avg-f05-s14.json');
+const COMPOSITION = join(repo, 'tools/evaluator-training/primitives/compositions/airp-v0.5.0-cse-corrected-2a.json');
 const SUITE = join(repo, 'data/evaluator-gate/held-out-suite.v2.json');
 const FIXED = join(L, 'crosspath/fixed-items-shared.json');
 const GOLDEN = join(L, 'crosspath/golden-python-shared-fixed.jsonl');
 const PINNED = {
-  pins: '006546c6951771f6219cb0fba50d2f8050461ff83f1b414996b191e05a068793',
-  onnx: 'dadee217c626ee46794cd80d6f440ce181d7d38675a0326aeab0eb473c29ab5f',
+  pins: '7d3ec1cb494aebf81703fe29963cf31a1621ffdcfb81fbd2da04708398db1158',
+  onnx: '90b24a0b1ce9b3b3ab0b47a9120c383aafa134c24ceb4b1bd79a451ac5cf8798',
   sharedConfig: 'ccacd35480bdd71d6e5b833dd296212848d167a30000f689468e81d3e207cb03',
   tokenizer: '6c8aaa9a542084f2457eab775d4eeb51f92a70c0fd9de28d5edb0ddec3c08d30',
   questions: 'f519fa8e4763cc95acef3d134f984941c263043bad4abfd2a827c69e560650ee',
-  composition: '4def0b8fd339713bd261106cb10235949f4bd1bc4e3631a88dd7cc511b0087e0',
+  composition: '59ddf1f630ec2dcd81d40dd01f2adb53f1310fe42128d3ccc9b90de61e28ab9e',
   suite: '6c7b30e16b8ab53544f590bcbbdcd381f32e3e4cf324e225e2e8c489cebb28e4',
 };
 const pins = JSON.parse(readFileSync(PINS, 'utf8'));
