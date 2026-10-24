@@ -1,0 +1,37 @@
+# Bundle layout: public demo-default bundle avg-f05-s14 (built on the VPS, NOT uploaded)
+
+Default evaluator of the tryairp.com and dev.tryairp.com demos after upload and switch (t164u). It **did not pass AIRP certification** and is **not certified for production**. The bundle is built and checksum-verified on the Nepal VPS only. Nothing is uploaded; Justin uploads it.
+
+- Public HF repo: `AIRP-spec/airp-shared-primitives-modernbert-large`, tag `avg-f05-s14` (see HF-UPLOAD.md).
+- VPS directory: `/root/primitives-evaluator/decide-2026-10-13/shared-adopt/rr2/release/airp-shared-primitives-avg-f05-s14/`
+- Deterministic tarball: `…/rr2/release/airp-shared-primitives-avg-f05-s14.tar.gz`, built with `tar --sort=name --mtime=@0 --owner=0 --group=0 --numeric-owner` and `gzip -n -6`; sha256 in the `.sha256` file next to it and in FINDINGS / PROGRESS. After building, the script extracts the tarball to a scratch directory and runs `sha256sum -c MANIFEST.sha256` there.
+- Build script: `decide/shared-adopt/rr2/bundle-src/build_bundle_vps.sh`. It supersedes the t161u research bundle (`rr/release/airp-shared-primitives-research-avg-f05-s14`, tarball `23474ee7…`), which must not be uploaded.
+
+```
+airp-shared-primitives-avg-f05-s14/
+  README.md                                   # model card (MODEL-CARD-draft.md): demo default, NOT certified
+  LICENSE                                     # Apache-2.0 (repo LICENSE)
+  NOTICE                                      # demo default / not certified; Convai Innovations (Laya), Answer.AI / LightOn (ModernBERT-large)
+  laya-shared.onnx                            # fp32, opset 17, input_ids [1,L] -> logits [1,17,5]; 90b24a0b…
+  laya-shared.onnx.meta.json                  # export metadata (max |Δ| vs torch 6.24e-5)
+  shared_config.json                          # ccacd354…, head order = graph rows, widths, max_len 1024
+  tokenizer/tokenizer.json                    # 6c8aaa9a…
+  tokenizer/tokenizer_config.json             # 2966a59b…
+  tokenizer/special_tokens_map.json           # ea97ecdb…
+  torch/model.safetensors                     # 0b09a470… (uniform average of f05-s14 ep2.0/2.5/3.0)
+  torch/encoder/config.json                   # ModernBERT config
+  torch/average-meta.json                     # the 3 source checkpoint shas
+  pins/laya-shared-avg-f05-s14-fp32.pins.json # 7d3ec1cb…; T=1, 0.5 x 16, argmax, composition 2a sha, bundle file shas
+  compositions/airp-v0.5.0-cse-corrected-2a.json    # 59ddf1f6… (shipped composition)
+  compositions/ailuminate-v1.0.json                 # 508084b6… (demonstration only; not validated)
+  reports/RELEASE.md                          # decisions t161u + t164u, selection, ADRs, safety, identity, latency, step-744 comparison
+  MANIFEST.sha256                             # every file above; `sha256sum -c MANIFEST.sha256` from the root
+```
+
+Rules:
+- `laya-shared.onnx`, `shared_config.json` and `tokenizer/` sit at the root. The Node evaluator (`engine: 'laya-shared-onnx'`) and the cross-path test take the root as `--bundle` / `AIRP_LAYA_SHARED_BUNDLE_DIR`.
+- The pins file holds the ONNX, shared_config, tokenizer and composition shas. The Node evaluator refuses to load on any mismatch.
+- The pins were re-issued for t164u (`8ef0b322…` → `7d3ec1cb…`): only the `name` and `note` strings changed (the old text said "never the default"). The build asserted every other field is identical, and the 471-item Python-vs-Node identity check was re-run on the new pins: PASS.
+- `temperature.json` is omitted: T=1, and no fitted temperature is used.
+- **If anything in the bundle is edited before upload** (README license line, wording), rebuild with the script, re-pin the tarball sha in HF-UPLOAD.md, the runbook and the CI patch, and re-run `sha256sum -c`.
+- The model loads only through an explicit evaluator config (`engine: 'laya-shared-onnx'`). The `@airp/core` package default stays `{ kind: 'rule' }`; the demos select this model through their own `.advocate/evaluator.json`.

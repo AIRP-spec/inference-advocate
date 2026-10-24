@@ -1,0 +1,168 @@
+# Runbook, step 2: switch the tryairp demos to avg-f05-s14 (WRITTEN, NOT EXECUTED)
+
+Status: **draft**. Nothing here has been run. It waits for Justin to upload the bundle (HF-UPLOAD.md) and to approve each tryairp change. dev.tryairp.com goes first; tryairp.com follows only after dev passes every check and Justin says go.
+
+## 0. What the demos run today (checked read-only, 2026-10-19 ~08:50 NPT)
+
+| | tryairp.com | dev.tryairp.com |
+|---|---|---|
+| pm2 process | `airp-daemon` (pid 1565, up since 2026-10-18 12:55 NPT) | `airp-daemon-dev` (pid 1586, same start) |
+| checkout | `/root/inference-advocate`, branch `main` at **a47c4ef** (an ancestor of origin/main d0a0dd7); 1 local edit (`.cursor/rules/inference-advocate.mdc`) | `/root/inference-advocate-dev`, branch `feat/local-evaluator` at **ce1785e** (= origin); **4 tracked files deleted in the working tree**, including `data/models/manifest.json` |
+| evaluator selection | `AIRP_EVALUATOR_CONFIG=/root/inference-advocate/.advocate/evaluator.json` | `AIRP_EVALUATOR_CONFIG=/root/inference-advocate-dev/.advocate/evaluator.json` |
+| evaluator.json (sha256 `aff923693acd35ac…`, identical in both) | `kind: local`, GGUF `.advocate/models/airp-evaluator-0.6B-v040-step744-Q8_0.gguf`, `modelSha256 3e5d2fd8…`, template v3, CPU | same |
+| public `/api/state` warning | "the semantic layer is running local-llm@3e5d2fd83b37+v3 … step744-Q8_0.gguf (template v3)" | same |
+| shared-encoding engine in deployed code | **absent** (`packages/evaluator-local/src` has no `laya-shared-evaluator.ts`) | **absent** |
+
+**So:** both demos run **step-744**, selected by an explicit config. The code default `?? { kind: 'rule' }` applies only when `AIRP_EVALUATOR_CONFIG` is unset, and it is set on both. Justin's assumption that step-744 is installed is **correct**.
+
+Consequence: a config change alone cannot switch the demos. The `laya-shared-onnx` engine exists only on **#32** (`adopt/shared-node-evaluator`, d7f5056), which is unmerged. Each demo first needs a **code deploy** containing #32: `packages/evaluator-local` (engine, onnxruntime-node 1.30.0, @huggingface/tokenizers 0.2.0) and `packages/daemon/src/local-evaluator-factory.ts`. #32's code still runs the step-744 GGUF config unchanged (engine omitted = gguf), and that is what keeps rollback to one config change.
+
+## 0b. Update 2026-10-19 17:13–17:35 NPT (t165u): clean checkouts and dev pre-flight
+
+- **Checkouts.** I ran `git checkout -- .` on both demos (Justin discarded the local changes). Both were already clean before the command. `git status --porcelain --untracked-files=all` now shows **0 lines on both** and no untracked files.
+  - prod `/root/inference-advocate`: `main` at **44e66e9** (= origin/main). Justin pulled main (fast-forward a47c4ef → d0a0dd7, 16:53 NPT) and committed the `.cursor/rules` edit as 44e66e9 (16:54 NPT). The prod daemon (pid 1565) has not been restarted since 2026-10-18; `packages/daemon/dist` was built 2026-09-12.
+  - dev `/root/inference-advocate-dev`: `feat/local-evaluator` at **ce1785e** (= origin), a non-main branch. Its 4 deleted tracked files are back.
+- **dev runs a non-main branch, so the #32 switch is allowed on dev.** Before the switch, dev runs `feat/local-evaluator` ce1785e. That branch has 168 commits that are not on main and 165 non-merge commits that are not on #32. They are training, data and docs work. Runtime packages: #32 is a superset of dev's code (adds the ONNX engines; `node-llama-cpp ^3.14.0` on both), and the taxonomy file is identical (`0de1cacc…`, v0.5.0).
+- **Fetch path.** dev's `origin` is `git@github.com:…`, and the VPS has no GitHub SSH key (`Permission denied (publickey)`). Fetch #32 over https instead: `git -C $D fetch https://github.com/AIRP-spec/inference-advocate.git adopt/shared-node-evaluator` (ls-remote over https: d7f5056).
+- **Rollback config.** The live `evaluator.json` (`aff92369…`, step-744, engine omitted = gguf) parses with dev's current loader **and** with #32's `loadEvaluatorConfig` (box, d7f5056, byte-identical copy). The GGUF on dev hashes `3e5d2fd8…`.
+- **Host.** Node v22.23.2; 15 GiB RAM, about 12 GiB available; 267 GB disk free. `/api/state` on both demos names `local-llm@3e5d2fd83b37+v3`.
+- **Gate: STOPPED here.** `https://huggingface.co/AIRP-spec/airp-shared-primitives-modernbert-large` returns 401 to anonymous requests from both the box and the VPS. `https://huggingface.co/AIRP-spec` returns 404, and `api/models?author=AIRP-spec` is empty. So the published tarball cannot be verified (`c126ad6a…`). A3 onward (code switch, config switch, identity, smoke) has not been run.
+
+## 0c. Update 2026-10-23: dev switched; card edited after publish
+
+- **Dev:** switched 2026-10-23 ≈11:34–11:41 NPT, installed from the verified HF download at 2e5a862 (manifest 89101ed9…, 16/16). Dev now runs #32 d7f5056; evaluator.json `2382ebae…`. Identity CROSSPATH_PASS 471/471, smoke10 10/10, 500-token median 684/649 ms. Rollback config: `evaluator.step744.json` (`aff92369…`). Live hashes: `/root/primitives-evaluator/demo-switch/20261023T0549Z-dev/LIVE.txt`.
+- **Card edit:** README.md gained `base_model_relation: finetune` (`d51c536e…` → `32b98652…`). Published manifest: `89101ed9…` → `5f94f2d2…`. No weights or configs changed, so the dev verification stands. See FINDINGS-DEMO-DEFAULT.md "Post-publish card edit". For prod (B), verify against `5f94f2d2…`. Constants and A2 now use `hf download` + the manifest pin; the tarball (`c126ad6a…`) is no longer referenced. As of ≈11:57 NPT the refreshed manifest is on HF (main 4300d943) and the tag resolves to it.
+
+## Prerequisites (all Justin's)
+
+1. **(Updated 2026-10-23.)** Justin published the bundle **unpacked** (not as a tarball) to `AIRP-spec/airp-shared-primitives-modernbert-large`, tag `avg-f05-s14`. Published MANIFEST.sha256: **`5f94f2d2d9e5c842cfa07a681e3a9c532c867dae90c3de9ebcfa44dd46275c25`** after the card edit (README.md `32b98652…`, tag at d0dbd22 + the manifest upload). It was **`89101ed92fdd8e7d3ab03a8b7a303bb3cbd5eda26025827642612c37ff8f6e8c`** as built and first published (README.md `d51c536e…`, commit 2e5a862). Every other file is identical under both. For A2, use `hf download … --revision avg-f05-s14` + `sha256sum -c MANIFEST.sha256` (expect the manifest sha above) + the ONNX/pins/composition checks below. The original tarball plan (superseded; CI and A2 now use `hf download` + the manifest pin) was:
+   The bundle is uploaded and public at `https://huggingface.co/AIRP-spec/airp-shared-primitives-modernbert-large/resolve/avg-f05-s14/airp-shared-primitives-avg-f05-s14.tar.gz` with sha256 `c126ad6a31de2c954f43ebe2e5a0607c316fb94b338427117a8e69acdfcef119`.
+2. A code ref containing #32 is chosen for each demo:
+   - **dev:** merge or rebase `feat/local-evaluator` onto a ref containing #32, or deploy #32's head directly. Justin decides which. This is a deploy of unmerged code to dev, which is what dev is for.
+   - **prod:** tryairp.com tracks `main`. Either merge the stack first (MERGE-PLAN steps 1–4, then main contains #32), or Justin explicitly approves running prod from a non-main ref. Do not deploy prod from an unmerged branch without that approval.
+3. Approval for each tryairp change. This runbook touches no secrets (`AIRP_EVALUATOR_API_KEY` stays as is) and no `.github/` files.
+
+Constants used below:
+```bash
+HF_REPO=AIRP-spec/airp-shared-primitives-modernbert-large; HF_REV=avg-f05-s14   # published unpacked; no tarball on HF (2026-10-23)
+MANIFEST_SHA=5f94f2d2d9e5c842cfa07a681e3a9c532c867dae90c3de9ebcfa44dd46275c25   # after the card edit; was 89101ed9… (dev switch verified against that, same weights)
+ONNX_SHA=90b24a0b1ce9b3b3ab0b47a9120c383aafa134c24ceb4b1bd79a451ac5cf8798
+PINS_SHA=7d3ec1cb494aebf81703fe29963cf31a1621ffdcfb81fbd2da04708398db1158
+COMP_SHA=59ddf1f630ec2dcd81d40dd01f2adb53f1310fe42128d3ccc9b90de61e28ab9e
+PY_REF=/root/primitives-evaluator/decide-2026-10-13/shared-adopt/rr/runs/avgs14-rr-id-python.jsonl   # archived Python verdicts, sha 2c66137f349ea024c573c05645cd92d9ac1a6a572ed9a322b4a62ad19bd06451
+LOCK=/tmp/airp-vps-bench.lock
+```
+
+## A. dev.tryairp.com
+
+**A1. Snapshot (rollback material).**
+```bash
+D=/root/inference-advocate-dev; TS=$(date -u +%Y%m%dT%H%MZ); B=/root/primitives-evaluator/demo-switch/$TS-dev; mkdir -p $B
+git -C $D rev-parse HEAD > $B/HEAD.txt; git -C $D status --porcelain > $B/status.txt; git -C $D diff > $B/worktree.diff
+cp -a $D/.advocate/evaluator.json $B/evaluator.step744.json; sha256sum $B/evaluator.step744.json   # expect aff923693acd35ac…
+sha256sum $D/.advocate/models/airp-evaluator-0.6B-v040-step744-Q8_0.gguf                         # expect 3e5d2fd8…; this file is never touched
+curl -s https://dev.tryairp.com/api/state | python3 -c "import sys,json;print([w for w in json.load(sys.stdin)['warnings'] if 'semantic layer' in w])" > $B/state-before.txt
+pm2 describe airp-daemon-dev > $B/pm2-before.txt
+```
+**STOP if the dev worktree's 4 deleted tracked files** (`.cursor/rules/inference-advocate.mdc`, `.private/README.md`, `data/evaluator-training/README.md`, `data/models/manifest.json`) are not explained. Ask Justin before any checkout restores or discards them.
+
+**A2. Fetch and verify the published bundle** (outside the checkout; the GGUF stays where it is).
+```bash
+M=$D/.advocate/models/shared-avg-f05-s14; mkdir -p $M && cd $M
+hf download $HF_REPO --revision $HF_REV --local-dir airp-shared-primitives-avg-f05-s14 && rm -rf airp-shared-primitives-avg-f05-s14/.cache && cd airp-shared-primitives-avg-f05-s14
+echo "$MANIFEST_SHA  MANIFEST.sha256" | sha256sum -c - && sha256sum -c MANIFEST.sha256
+[ "$(sha256sum laya-shared.onnx | cut -d' ' -f1)" = $ONNX_SHA ] && [ "$(sha256sum pins/laya-shared-avg-f05-s14-fp32.pins.json | cut -d' ' -f1)" = $PINS_SHA ] \
+  && [ "$(sha256sum compositions/airp-v0.5.0-cse-corrected-2a.json | cut -d' ' -f1)" = $COMP_SHA ] && echo BUNDLE_OK
+```
+
+**A3. Deploy the code containing #32** (the ref Justin chose), then build.
+```bash
+cd $D && git fetch https://github.com/AIRP-spec/inference-advocate.git adopt/shared-node-evaluator && git checkout -B adopt/shared-node-evaluator FETCH_HEAD && npm ci && npm run build   # dev: #32 head (d7f5056 at pre-flight); prod: merged main only
+git rev-parse HEAD > $B/HEAD-new.txt
+# Still on step-744: restart and confirm nothing changed before switching models.
+pm2 restart airp-daemon-dev --update-env && sleep 15
+curl -s https://dev.tryairp.com/api/state | grep -o 'local-llm@3e5d2fd83b37+v3'                 # must still print
+```
+
+**A4. Switch the config (the one change).** Write the new config next to the old one, then swap:
+```bash
+SH=$M/airp-shared-primitives-avg-f05-s14
+cat > $D/.advocate/evaluator.shared-avg-f05-s14.json <<JSON
+{
+ "kind": "local",
+ "engine": "laya-shared-onnx",
+ "modelPath": "$SH/laya-shared.onnx",
+ "modelSha256": "$ONNX_SHA",
+ "laya": {
+  "pinsPath": "$SH/pins/laya-shared-avg-f05-s14-fp32.pins.json", "pinsSha256": "$PINS_SHA",
+  "compositionPath": "$SH/compositions/airp-v0.5.0-cse-corrected-2a.json", "compositionSha256": "$COMP_SHA",
+  "intraOpNumThreads": 8
+ },
+ "note": "avg-f05-s14-ep2.0-2.5-3.0, demo default (not certified for production). Rollback: copy evaluator.step744.json over evaluator.json and pm2 restart."
+}
+JSON
+cp -a $D/.advocate/evaluator.json $D/.advocate/evaluator.step744.json        # step-744 config kept, switchable back
+cp $D/.advocate/evaluator.shared-avg-f05-s14.json $D/.advocate/evaluator.json
+pm2 restart airp-daemon-dev --update-env && sleep 20
+curl -s https://dev.tryairp.com/api/state | python3 -c "import sys,json;print([w for w in json.load(sys.stdin)['warnings'] if 'semantic layer' in w])"
+# expect: "... running local-laya-shared@90b24a0b1ce9+laya-shared-pins-7d3ec1cb494a on-device against laya-shared.onnx (engine laya-shared-onnx, ...)"
+```
+(`intraOpNumThreads` is optional in #32's config; drop it if Justin wants the ORT default.)
+
+**A5. Identity on the live code path: 471 items vs the archived Python verdicts.** This uses the deployed checkout's built `dist/` (the same modules the daemon loads), the deployed bundle, and the deployed config's pins and composition, under flock and a 9 GB cgroup:
+```bash
+cd $D && O=/root/primitives-evaluator/demo-switch/$TS-dev/identity && mkdir -p $O
+SUITE=$D/data/evaluator-gate/held-out-suite.v2.json   # content identical to 6c7b30e1 / 82f8e720 (only bnd-05 gold differs)
+python3 -c "import json;json.dump({'ids':[i['id'] for i in json.load(open('$SUITE'))['items']]},open('$O/ids.json','w'))"
+flock $LOCK nice -n 10 systemd-run --scope --quiet -p MemoryMax=9G -p MemorySwapMax=0 \
+  node tools/evaluator-training/laya-shared-node/crosspath/node_path_shared.mjs --bundle $SH --pins $SH/pins/laya-shared-avg-f05-s14-fp32.pins.json \
+  --pins-sha $PINS_SHA --composition $SH/compositions/airp-v0.5.0-cse-corrected-2a.json --composition-sha $COMP_SHA --threads 8 --warmup 20 \
+  --suite $SUITE --ids $O/ids.json --out $O/live-node.jsonl --summary $O/live-node-summary.json
+node tools/evaluator-training/laya-node/crosspath/compare.mjs --python $PY_REF --node $O/live-node.jsonl \
+  --pins $SH/pins/laya-shared-avg-f05-s14-fp32.pins.json --composition $SH/compositions/airp-v0.5.0-cse-corrected-2a.json --out $O/compare.json
+# PASS = CROSSPATH_PASS, n 471: primsIdentical, composedIdentical, decodeIdentical, feedIdentical all 471. Any problem → rollback (R).
+```
+
+**A6. Smoke test: ten mixed inputs on the deployed code path.**
+- `smoke10.mjs` (in this folder; copy it to `/root/primitives-evaluator/demo-switch/` first) builds an evaluator exactly as the daemon does: it reads the config named by `AIRP_EVALUATOR_CONFIG` and calls the deployed checkout's `createOnDeviceEvaluator` from its built `dist/`. It is a separate process with its own model instance; it does not talk to the running daemon.
+- It feeds ten held-out items of mixed kinds: 2 clean, persona_claims, relational_hooks, sycophancy, self_harm (pos-04 and pos-12, the two step-744 misses), violence, hate, and the CSE refusal counter `ctr-03`. It checks each composed verdict against composition 2a applied to the archived Python primitives.
+- Dry run on the box (not a demo host), 2026-10-19 09:10 NPT, #32 d7f5056 code, same ONNX and composition: `SMOKE_PASS 10/10` (`smoke10-box-dryrun.log`). `ho-persona_claims-pos-02` composes to relational_hooks in both paths (a known model miss, not a path mismatch).
+- Then do one end-to-end `/api/ask` round through the dev UI and confirm the transcript shows a verdict and no evaluator error.
+```bash
+mkdir -p /root/primitives-evaluator/demo-switch && cp <repo>/decide/shared-adopt/runbook/smoke10.mjs /root/primitives-evaluator/demo-switch/
+cd $D && AIRP_EVALUATOR_CONFIG=$D/.advocate/evaluator.json flock $LOCK node /root/primitives-evaluator/demo-switch/smoke10.mjs $D $PY_REF
+# expect: SMOKE_PASS 10/10
+```
+
+**A7. Record live hashes.** Write these to `$B/LIVE.txt` and report them:
+- `git rev-parse HEAD`
+- `sha256sum .advocate/evaluator.json`
+- ONNX, pins and composition shas
+- the `/api/state` warning line
+- `pm2 describe airp-daemon-dev` (uptime, restarts)
+- the Node 500-token median: run the `lengths` step from `vps_shared_node_rr.sh` against the deployed bundle; the target is < 1000 ms. Four pre-switch runs on this host ranged 677–997 ms (one run at 997 ms while the host was busy), so run it at least twice and report every run.
+
+**Dev passes** when A2, A5 and A6 pass, `/api/state` names `local-laya-shared@90b24a0b1ce9`, and pm2 shows no restart loop for 30 min. Then STOP and report to Justin before prod.
+
+## B. tryairp.com (only after dev passes and Justin says go)
+
+Same as A, with:
+- `D=/root/inference-advocate`
+- pm2 `airp-daemon`
+- URL `https://tryairp.com`
+- backups under `…/demo-switch/$TS-prod`
+- `<APPROVED_REF>` = merged `main` containing #32, or the ref Justin approved
+
+Before A3, keep the prod-local edit to `.cursor/rules/inference-advocate.mdc`: it is in `$B/worktree.diff`. Do not discard it without asking. Report the live hashes as in A7.
+
+## R. Rollback (either demo, one config change)
+
+```bash
+cp -a $D/.advocate/evaluator.step744.json $D/.advocate/evaluator.json      # sha aff923693acd35ac…
+pm2 restart <airp-daemon-dev|airp-daemon> --update-env && sleep 15
+curl -s https://<dev.>tryairp.com/api/state | grep -o 'local-llm@3e5d2fd83b37+v3'   # back on step-744
+```
+- The step-744 GGUF and its config are never deleted, so this works for as long as #32's code is deployed (it still serves the GGUF engine).
+- **Code rollback** (only if #32's code itself misbehaves): `git -C $D checkout $(cat $B/HEAD.txt) && (cd $D && npm ci && npm run build)`, restore `$B/worktree.diff` if needed, then restore `evaluator.step744.json` and run `pm2 restart`.
+- **Capacity note:** after both demos switch, two daemons each hold the ONNX model and each run ONNX Runtime with 8 threads on the same 8 vCPUs. Concurrent requests on dev and prod will slow each other; consider `intraOpNumThreads: 4` for dev.
+- **Triggers:** any identity mismatch; any smoke failure; daemon restart loop; 500-token median ≥ 1000 ms on the live host; `/api/state` not naming the expected evaluator; RSS pushing the 15 GiB host (each daemon holds about 2.5–2.9 GB with the ONNX model, against step-744's 0.6B Q8_0).

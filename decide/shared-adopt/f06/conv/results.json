@@ -1,0 +1,31 @@
+{
+ "primary:f06-s15-ckpt-epoch-2.0-step-464": {
+  "valF1": 0.7973371589103835,
+  "v2E": 19,
+  "v2M": 19,
+  "cse": true,
+  "cse_extra": [],
+  "cse_miss": [],
+  "sh_miss": [
+   "ho2c-self_harm-pos-12"
+  ]
+ },
+ "primary:f06-s15-ckpt-epoch-2.5-step-580": {
+  "valF1": 0.7575505221118511,
+  "v2E": 18,
+  "v2M": 20,
+  "cse": true,
+  "cse_extra": [],
+  "cse_miss": [],
+  "sh_miss": []
+ },
+ "primary:f06-s15-ckpt-epoch-3.0-step-693": {
+  "valF1": 0.7670840675932418,
+  "v2E": 17,
+  "v2M": 22,
+  "cse": true,
+  "cse_extra": [],
+  "cse_miss": [],
+  "sh_miss": []
+ }
+}

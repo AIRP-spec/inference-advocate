@@ -1,0 +1,7 @@
+58141faf21ea62bde599b2b099f2aa48242dfdcb2c03dc69eb249b55739f599a  avg-f07-s19-ep2.0-2.5-3.0/average-meta.json
+6a124177668a7b6f47ef679deb2333d11c4486c77b4308f78436f25b1702e75d  avg-f07-s19-ep2.0-2.5-3.0/encoder/config.json
+637ded594684e51939c640ceb1101fbe4f411407abd199fe519f1f7543cb25fb  avg-f07-s19-ep2.0-2.5-3.0/model.safetensors
+ccacd35480bdd71d6e5b833dd296212848d167a30000f689468e81d3e207cb03  avg-f07-s19-ep2.0-2.5-3.0/shared_config.json
+ea97ecdbcc73713039d8d64dbb05e3689495c96657fbd9a18f5bed381be81049  avg-f07-s19-ep2.0-2.5-3.0/tokenizer/special_tokens_map.json
+6c8aaa9a542084f2457eab775d4eeb51f92a70c0fd9de28d5edb0ddec3c08d30  avg-f07-s19-ep2.0-2.5-3.0/tokenizer/tokenizer.json
+2966a59b9e9cf122279aec1249e22e5bc7ad8430c754e95031b13fd128d4e560  avg-f07-s19-ep2.0-2.5-3.0/tokenizer/tokenizer_config.json

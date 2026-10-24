@@ -1,0 +1,29 @@
+RR_START 2026-10-18T19:38:18Z
+SHA_PRECHECK_OK
+  torch.onnx.export(w, (ids,), a.out, input_names=["input_ids"], output_names=["logits"],
+EXPORT_DONE {"ckpt": "/root/primitives-evaluator/decide-2026-10-13/shared-adopt/f06/avgx/avg/avg-f05-s14-ep2.0-2.5-3.0", "onnx": "avg-f05-s14-ep2.0-2.5-3.0-fp32.onnx", "sha256": "90b24a0b1ce9b3b3ab0b47a9120c383aafa134c24ceb4b1bd79a451ac5cf8798", "max_abs_logit_diff_vs_torch": 6.242096424102783e-05, "opset": 17, "inputs": ["input_ids"], "outputs": ["logits [1,17,5]"], "qids": ["addresses_own_nature", "asserts_interior_state", "directed_at_user", "exceeds_common_knowledge", "explicit_register", "financial_crime", "intrusion", "is_mention_not_use", "profanity", "self_harm", "sexual_activity", "stance", "subject_is_minor", "targets_protected_characteristic", "untethered_to_content", "violence_person", "weapons"], "widths": [2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 5, 2, 2, 2, 2, 2], "max_len": 1024}
+ONNX 90b24a0b1ce9b3b3ab0b47a9120c383aafa134c24ceb4b1bd79a451ac5cf8798
+SHARED_CONFIG_SAME_AS_CKPT
+PINS 8ef0b322925bc45d4a17cfd17a9cbed17b75abc41ebc6e926e25904c635ca5b1
+JOB avgs14-rr steps=python,suite,lengths pins 8ef0b322925bc45d4a17cfd17a9cbed17b75abc41ebc6e926e25904c635ca5b1 start 2026-10-18T19:39:08Z
+START python 2026-10-18T19:39:08Z load 1.09 0.60 0.45 1/584 56152
+suite sha mismatch
+END python 2026-10-18T19:39:12Z
+START node-suite 2026-10-18T19:39:12Z load 1.08 0.60 0.45 1/584 56167
+local-laya-shared@90b24a0b1ce9+laya-shared-pins-8ef0b322925b: session open (laya-shared avg-f05-s14-ep2.0-2.5-3.0 fp32 NON-DEFAULT RESEARCH RELEASE (did not pass AIRP certification)) in 4473ms
+local-laya-shared@90b24a0b1ce9+laya-shared-pins-8ef0b322925b: warm-up ran (template laya-shared-onnx) in 56ms
+{"suite":{"n":471,"median_ms":50.77920400000221,"p95_ms":69.34698500000013,"mean_ms":52.065951148619924,"min_ms":29.842107999997097,"max_ms":92.9369999999999},"verify_ms":1467.949591,"load_ms":4530.969101,"warmup_ms":57,"evaluator":"local-laya-shared@90b24a0b1ce9+laya-shared-pins-8ef0b322925b","node":"v22.23.2","onnxruntime_node":"1.30.0","hf_tokenizers":"0.2.0","allowSpinning":0,"layout":"shared (batch 1, no padding)","warmupItems":20,"intraOpNumThreads":8,"host":"himalogic","cpu":"Intel(R) Xeon(R) Gold 5418Y","nproc":8,"loadavg":[1.74,0.82,0.53],"rss_mb":2526.1875,"finished":"2026-10-18T19:39:45.242Z"}
+NODE_PATH_DONE
+END node-suite 2026-10-18T19:39:45Z load 1.74 0.82 0.53 1/584 56268
+START node-lengths 2026-10-18T19:39:45Z load 1.74 0.82 0.53 1/584 56272
+local-laya-shared@90b24a0b1ce9+laya-shared-pins-8ef0b322925b: session open (laya-shared avg-f05-s14-ep2.0-2.5-3.0 fp32 NON-DEFAULT RESEARCH RELEASE (did not pass AIRP certification)) in 3976ms
+local-laya-shared@90b24a0b1ce9+laya-shared-pins-8ef0b322925b: warm-up ran (template laya-shared-onnx) in 41ms
+bucket 50: {"n":20,"median_ms":103.25762100000065,"p95_ms":137.6118379999998,"mean_ms":109.55897030000014,"min_ms":89.67370300000039,"max_ms":148.81889599999886}
+bucket 200: {"n":20,"median_ms":286.16925549999996,"p95_ms":335.0369100000007,"mean_ms":283.2580069999998,"min_ms":202.84280799999942,"max_ms":350.73735999999917}
+bucket 500: {"n":20,"median_ms":677.1730364999985,"p95_ms":808.4464559999979,"mean_ms":692.8578926500002,"min_ms":622.023208999999,"max_ms":847.5192090000019}
+bucket 1000: {"n":20,"median_ms":1493.0720279999987,"p95_ms":1773.3158919999987,"mean_ms":1503.6419533500004,"min_ms":1173.8350859999991,"max_ms":1843.9190589999998}
+{"buckets":{"50":{"n":20,"median_ms":103.25762100000065,"p95_ms":137.6118379999998,"mean_ms":109.55897030000014,"min_ms":89.67370300000039,"max_ms":148.81889599999886},"200":{"n":20,"median_ms":286.16925549999996,"p95_ms":335.0369100000007,"mean_ms":283.2580069999998,"min_ms":202.84280799999942,"max_ms":350.73735999999917},"500":{"n":20,"median_ms":677.1730364999985,"p95_ms":808.4464559999979,"mean_ms":692.8578926500002,"min_ms":622.023208999999,"max_ms":847.5192090000019},"1000":{"n":20,"median_ms":1493.0720279999987,"p95_ms":1773.3158919999987,"mean_ms":1503.6419533500004,"min_ms":1173.8350859999991,"max_ms":1843.9190589999998}},"verify_ms":1480.3081539999998,"load_ms":4019.1536829999995,"warmup_ms":42,"evaluator":"local-laya-shared@90b24a0b1ce9+laya-shared-pins-8ef0b322925b","node":"v22.23.2","onnxruntime_node":"1.30.0","hf_tokenizers":"0.2.0","allowSpinning":0,"layout":"shared (batch 1, no padding)","warmupItems":20,"intraOpNumThreads":8,"host":"himalogic","cpu":"Intel(R) Xeon(R) Gold 5418Y","nproc":8,"loadavg":[4.88,1.81,0.89],"rss_mb":2928.203125,"finished":"2026-10-18T19:40:49.323Z"}
+NODE_PATH_DONE
+END node-lengths 2026-10-18T19:40:49Z load 4.88 1.81 0.89 1/585 56437
+JOB_DONE 2026-10-18T19:40:49Z
+RR_DONE 2026-10-18T19:40:49Z

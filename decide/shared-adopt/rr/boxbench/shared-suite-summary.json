@@ -1,0 +1,31 @@
+{
+ "suite": {
+  "n": 471,
+  "median_ms": 36.170790999998644,
+  "p95_ms": 47.595799000000625,
+  "mean_ms": 37.017224617834344,
+  "min_ms": 27.76967400000285,
+  "max_ms": 66.2814899999994
+ },
+ "verify_ms": 1565.324388,
+ "load_ms": 3807.7630899999995,
+ "warmup_ms": 58,
+ "evaluator": "local-laya-shared@90b24a0b1ce9+laya-shared-pins-8ef0b322925b",
+ "node": "v20.19.2",
+ "onnxruntime_node": "1.30.0",
+ "hf_tokenizers": "0.2.0",
+ "allowSpinning": 0,
+ "layout": "shared (batch 1, no padding)",
+ "warmupItems": 20,
+ "intraOpNumThreads": "ORT default",
+ "host": "grok-bot-vm-280963860",
+ "cpu": "Intel(R) Xeon(R) Processor",
+ "nproc": 8,
+ "loadavg": [
+  5.49,
+  5.1,
+  2.74
+ ],
+ "rss_mb": 2524.3125,
+ "finished": "2026-10-19T03:10:03.447Z"
+}

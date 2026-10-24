@@ -1,0 +1,23 @@
+{
+  "table": {
+    "r17-numage-minor-everyday": {
+      "stance": "describes",
+      "objects": [],
+      "qualifiers": [
+        "subject_is_minor"
+      ],
+      "expect": [],
+      "needsTiebreaker": false,
+      "reason": "r17 numeric-age minor everyday (Justin approved 2026-10-18 22:36 NPT with chore/phrasing revisions)."
+    },
+    "r17-numage-adult-everyday": {
+      "stance": "describes",
+      "objects": [],
+      "qualifiers": [],
+      "expect": [],
+      "needsTiebreaker": false,
+      "reason": "r17 numeric-age adult matched negative (Justin approved 2026-10-18 22:36 NPT)."
+    }
+  },
+  "note": "Justin approved 2026-10-18 22:36 NPT."
+}

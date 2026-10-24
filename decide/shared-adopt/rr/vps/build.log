@@ -1,0 +1,9 @@
+MANIFEST_OK 91e9fdbac4c10eba3da454c80111164c169575a49ec426450377a45f11fc9d9d files 16
+23474ee74633b32556089781f1c36900e875de857a2cfe71dc9ace6a5916a4f7  airp-shared-primitives-research-avg-f05-s14.tar.gz
+total 1725700
+drwxr-xr-x 3 root root       4096 Oct 18 19:53 .
+drwxr-xr-x 6 root root       4096 Oct 18 19:46 ..
+drwxr-xr-x 7 root root       4096 Oct 18 19:46 airp-shared-primitives-research-avg-f05-s14
+-rw-r--r-- 1 root root 1767092453 Oct 18 19:53 airp-shared-primitives-research-avg-f05-s14.tar.gz
+-rw-r--r-- 1 root root        117 Oct 18 19:54 airp-shared-primitives-research-avg-f05-s14.tar.gz.sha256
+BUILD_DONE 2026-10-18T19:54:01Z

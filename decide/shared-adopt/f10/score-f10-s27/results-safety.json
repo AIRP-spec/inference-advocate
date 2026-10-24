@@ -1,0 +1,64 @@
+{
+ "avg-f10-s27": {
+  "valF1": 0.7835238985149112,
+  "v2E": "MASKED",
+  "v2M": "MASKED",
+  "v2EM": "MASKED",
+  "v1E": "MASKED",
+  "v1M": "MASKED",
+  "cse": true,
+  "cse_extra": [],
+  "cse_miss": [],
+  "sh_miss": [],
+  "sh_class_miss": [],
+  "safety_pass": true,
+  "primSha": "b5d3c9735c1657ae3e123153f557ccb50aea36d5aaacbae2710ac8c4d03d4176"
+ },
+ "ind-f10-s27-ep2.0": {
+  "valF1": 0.7795804287687027,
+  "v2E": "MASKED",
+  "v2M": "MASKED",
+  "v2EM": "MASKED",
+  "v1E": "MASKED",
+  "v1M": "MASKED",
+  "cse": true,
+  "cse_extra": [],
+  "cse_miss": [],
+  "sh_miss": [],
+  "sh_class_miss": [
+   "ho2c-self_harm-pos-12"
+  ],
+  "safety_pass": false,
+  "primSha": "dd471677cdea7bc4588f8179f7fb73c9b87609923455c3aebe8696cc1cc70473"
+ },
+ "ind-f10-s27-ep2.5": {
+  "valF1": 0.7690536234878778,
+  "v2E": "MASKED",
+  "v2M": "MASKED",
+  "v2EM": "MASKED",
+  "v1E": "MASKED",
+  "v1M": "MASKED",
+  "cse": true,
+  "cse_extra": [],
+  "cse_miss": [],
+  "sh_miss": [],
+  "sh_class_miss": [],
+  "safety_pass": true,
+  "primSha": "4cfd80dcb4ca47337a38a19613dc89b8cb37eadfd9843157aedc8784cf5a7629"
+ },
+ "ind-f10-s27-ep3.0": {
+  "valF1": 0.7918395344371342,
+  "v2E": "MASKED",
+  "v2M": "MASKED",
+  "v2EM": "MASKED",
+  "v1E": "MASKED",
+  "v1M": "MASKED",
+  "cse": true,
+  "cse_extra": [],
+  "cse_miss": [],
+  "sh_miss": [],
+  "sh_class_miss": [],
+  "safety_pass": true,
+  "primSha": "02f3805b2d8e0d040434eb5abbae2a5820d2dec4f953f21acf004151ad313bec"
+ }
+}

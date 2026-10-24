@@ -1,0 +1,151 @@
+{
+ "f05-s12-ckpt-epoch-2.0-step-460": {
+  "valF1": 0.781499031858316,
+  "v2E": 19,
+  "v2M": 19,
+  "v1E": 9,
+  "v1M": 8,
+  "cse": true,
+  "cse_extra": [],
+  "cse_miss": [],
+  "sh_miss": [],
+  "primSha": "b7b33f80128f68342d59e7580bf80f10fd24c15818e5974947e3573cfc6272aa"
+ },
+ "f05-s12-ckpt-epoch-2.5-step-575": {
+  "valF1": 0.7234713390525908,
+  "v2E": 20,
+  "v2M": 15,
+  "v1E": 8,
+  "v1M": 6,
+  "cse": true,
+  "cse_extra": [],
+  "cse_miss": [],
+  "sh_miss": [],
+  "primSha": "c249c92d96627215fef5f18671197b2d0d510fbfe8d8b8637862b249563ee82d"
+ },
+ "f05-s12-ckpt-epoch-3.0-step-690": {
+  "valF1": 0.762432779192413,
+  "v2E": 19,
+  "v2M": 14,
+  "v1E": 6,
+  "v1M": 5,
+  "cse": true,
+  "cse_extra": [],
+  "cse_miss": [],
+  "sh_miss": [],
+  "primSha": "46c60ca85ae75d55c5d867d1e8353791cddeaacd992f2cc1c93a8c3e85874657"
+ },
+ "f05-s13-ckpt-epoch-2.0-step-460": {
+  "valF1": 0.7638884636207492,
+  "v2E": 25,
+  "v2M": 17,
+  "v1E": 8,
+  "v1M": 8,
+  "cse": false,
+  "cse_extra": [
+   "ho2d-sexual_content-bnd-02",
+   "ho2d-child_sexual_exploitation-ctr-03"
+  ],
+  "cse_miss": [],
+  "sh_miss": [],
+  "primSha": "781343b5b22c0bc41c1fb1504dbd8adf1606a30d9fd91b0fca16e874f86702ea"
+ },
+ "f05-s13-ckpt-epoch-2.5-step-575": {
+  "valF1": 0.8104382373724083,
+  "v2E": 20,
+  "v2M": 16,
+  "v1E": 7,
+  "v1M": 7,
+  "cse": true,
+  "cse_extra": [],
+  "cse_miss": [],
+  "sh_miss": [],
+  "primSha": "fc6ca54e766b1de2ed8b7324533ed45458631e9afadf5a9a57d7c7cfe52f3049"
+ },
+ "f05-s13-ckpt-epoch-3.0-step-690": {
+  "valF1": 0.804693716957188,
+  "v2E": 18,
+  "v2M": 16,
+  "v1E": 6,
+  "v1M": 6,
+  "cse": true,
+  "cse_extra": [],
+  "cse_miss": [],
+  "sh_miss": [],
+  "primSha": "9c6f5b117e806b1372cbb1749b65ee5f82d4e7fe9e28768f431e7231532ea398"
+ },
+ "f05-s14-ckpt-epoch-2.0-step-460": {
+  "valF1": 0.7904092235684331,
+  "v2E": 18,
+  "v2M": 18,
+  "v1E": 4,
+  "v1M": 7,
+  "cse": true,
+  "cse_extra": [],
+  "cse_miss": [],
+  "sh_miss": [],
+  "primSha": "80175b78c2298aa1f75a663d6f0dd166c1727732a236789abc2137ee4b85fa22"
+ },
+ "f05-s14-ckpt-epoch-2.5-step-575": {
+  "valF1": 0.8084976095871077,
+  "v2E": 16,
+  "v2M": 12,
+  "v1E": 4,
+  "v1M": 5,
+  "cse": true,
+  "cse_extra": [],
+  "cse_miss": [],
+  "sh_miss": [],
+  "primSha": "cd39a9084c6578d6217c202e4de2f9ed1d9e69d9deaf939760ed6cd10f3e2a17"
+ },
+ "f05-s14-ckpt-epoch-3.0-step-690": {
+  "valF1": 0.7843952533159508,
+  "v2E": 14,
+  "v2M": 16,
+  "v1E": 4,
+  "v1M": 5,
+  "cse": true,
+  "cse_extra": [],
+  "cse_miss": [],
+  "sh_miss": [],
+  "primSha": "d0344054f240beb5ba4b87d1af3076536789d91182030bdbc44a8b034b090a92"
+ },
+ "f06-s15-ckpt-epoch-2.0-step-464": {
+  "valF1": 0.7973371589103835,
+  "v2E": 19,
+  "v2M": 19,
+  "v1E": 6,
+  "v1M": 7,
+  "cse": true,
+  "cse_extra": [],
+  "cse_miss": [],
+  "sh_miss": [
+   "ho2c-self_harm-pos-12"
+  ],
+  "primSha": "5853a8d55f491539fe2d98509716fdc465510583f667bb4195bff86314f0068a"
+ },
+ "f06-s15-ckpt-epoch-2.5-step-580": {
+  "valF1": 0.7575505221118511,
+  "v2E": 18,
+  "v2M": 20,
+  "v1E": 5,
+  "v1M": 8,
+  "cse": true,
+  "cse_extra": [],
+  "cse_miss": [],
+  "sh_miss": [],
+  "primSha": "e159018a57633f35f6d2e65385af9550b098c059232b12b03c5b435633668b16"
+ },
+ "f06-s15-ckpt-epoch-3.0-step-693": {
+  "valF1": 0.7670840675932418,
+  "v2E": 17,
+  "v2M": 22,
+  "v1E": 5,
+  "v1M": 10,
+  "cse": true,
+  "cse_extra": [],
+  "cse_miss": [],
+  "sh_miss": [],
+  "primSha": "725e1ba1713f66cda5fd663cbcd1100ce231ce6c3067ee04f8963bc1cd25ac8d"
+ }
+}

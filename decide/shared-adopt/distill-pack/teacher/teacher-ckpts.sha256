@@ -1,0 +1,5 @@
+c99c294b1bb4ddd71f64bbc39460e1c9b92da7796e2777ea71a275d01d73e7f5  /root/primitives-evaluator/decide-2026-10-13/shared-adopt/distill/teacher-ckpts/checkpoints-round1/ckpt-epoch-3.0-step-690/model.safetensors
+55a2c8d0a739ef71e9c656826f1a2e792feb7069c46df35ffe9574d8868b3069  /root/primitives-evaluator/decide-2026-10-13/shared-adopt/distill/teacher-ckpts/checkpoints-round2/ckpt-epoch-3.0-step-690/model.safetensors
+334777eb4027e1849405469e2505681ecce35289f7b1bdea1594523034eedd6f  /root/primitives-evaluator/decide-2026-10-13/shared-adopt/fresh/checkpoints-fresh-s3/ckpt-epoch-3.0-step-690/model.safetensors
+17d9e115f4e38c2d12930c442b6bf6698e301213ab97bca8c097000d7f34b94f  /root/primitives-evaluator/decide-2026-10-13/shared-adopt/fresh/checkpoints-fresh-s4/ckpt-epoch-3.0-step-690/model.safetensors
+13c5fd65f465dde98621dea1e60adeabd245e7ab4af044dd716c16dba4ded147  /root/primitives-evaluator/decide-2026-10-13/shared-adopt/fresh/checkpoints-fresh-s5/ckpt-epoch-3.0-step-690/model.safetensors

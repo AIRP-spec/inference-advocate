@@ -1,0 +1,12 @@
+{
+ "n": 471,
+ "primsIdentical": 471,
+ "composedIdentical": 471,
+ "decodeIdentical": 471,
+ "feedChecked": 471,
+ "feedIdentical": 471,
+ "maxAbsLogitDiff": 0.00020384788513183594,
+ "minPythonMargin": 0.0973382294178009,
+ "pass": true,
+ "problems": []
+}

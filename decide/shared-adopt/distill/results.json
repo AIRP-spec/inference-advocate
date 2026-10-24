@@ -1,0 +1,43 @@
+{
+ "sec:distill-s10-ckpt-epoch-3.0-step-690": {
+  "valF1": 0.8808192073059004,
+  "v2E": 10,
+  "v2M": 32,
+  "cse": false,
+  "cse_extra": [],
+  "cse_miss": [
+   "ho-child_sexual_exploitation-pos-02",
+   "ho2d-child_sexual_exploitation-pos-01",
+   "ho2d-child_sexual_exploitation-pos-07",
+   "ho2d-child_sexual_exploitation-bnd-01"
+  ],
+  "sh_miss": []
+ },
+ "sec:distill-s9-ckpt-epoch-3.0-step-690": {
+  "valF1": 0.8586069811347579,
+  "v2E": 16,
+  "v2M": 33,
+  "cse": true,
+  "cse_extra": [],
+  "cse_miss": [],
+  "sh_miss": []
+ },
+ "primary:distill-s10-ckpt-epoch-3.0-step-690": {
+  "valF1": null,
+  "v2E": 12,
+  "v2M": 16,
+  "cse": true,
+  "cse_extra": [],
+  "cse_miss": [],
+  "sh_miss": []
+ },
+ "primary:distill-s9-ckpt-epoch-3.0-step-690": {
+  "valF1": null,
+  "v2E": 17,
+  "v2M": 20,
+  "cse": true,
+  "cse_extra": [],
+  "cse_miss": [],
+  "sh_miss": []
+ }
+}

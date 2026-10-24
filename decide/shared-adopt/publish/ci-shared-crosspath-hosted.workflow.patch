@@ -1,0 +1,95 @@
+diff --git a/.github/workflows/ci.yml b/.github/workflows/ci.yml
+index f6354cb..734bd1a 100644
+--- a/.github/workflows/ci.yml
++++ b/.github/workflows/ci.yml
+@@ -41,3 +41,90 @@ jobs:
+ 
+       - name: build the interface
+         run: npm run build:ui
++
++  # Shared-encoding primitives evaluator: cross-path identity (Python gate path vs Node shipped path),
++  # item by item on the fixed held-out items, for the public bundle avg-f05-s14. It is the default
++  # evaluator of the tryairp.com / dev.tryairp.com demos (t164u) but did NOT pass AIRP certification
++  # and is not certified for production; the @airp/core package default stays the rule evaluator.
++  #
++  # GitHub-hosted runner only. There is deliberately no self-hosted runner: this repository is public,
++  # and a self-hosted runner would run fork code on our hardware.
++  #
++  # The bundle (~1.7 GB ONNX + torch weights) is fetched UNPACKED from the public Hugging Face repo at tag
++  # avg-f05-s14 with a pinned huggingface_hub CLI (no token). Before anything uses it, on a cache hit too:
++  # (1) MANIFEST.sha256 must hash to SHARED_MANIFEST_SHA256, (2) `sha256sum -c MANIFEST.sha256` must pass
++  # for every file, (3) the ONNX and pins files must match their pinned shas. Any mismatch fails the job.
++  #
++  # SHARED_MANIFEST_SHA256 = 5f94f2d2… is the manifest refreshed after the 2026-10-23 card edit (README.md
++  # gained `base_model_relation: finetune`). It applies once the refreshed MANIFEST.sha256 is uploaded and
++  # the tag is re-pointed. Until then the tag's manifest is 89101ed9… (stale README.md line) and this job
++  # fails closed at step (1). Weights and configs are identical under both manifests.
++  #
++  # Triggers: push to main and workflow_dispatch only, never pull_request (skipped on PRs).
++  shared-crosspath:
++    if: ${{ github.event_name != 'pull_request' }}
++    runs-on: ubuntu-latest
++    timeout-minutes: 90
++    permissions:
++      contents: read
++    env:
++      AIRP_LAYA_CROSSPATH_REQUIRED: '1'
++      HF_HUB_VERSION: '0.34.4'
++      HF_HUB_DISABLE_TELEMETRY: '1'
++      SHARED_REPO: AIRP-spec/airp-shared-primitives-modernbert-large
++      SHARED_REVISION: avg-f05-s14
++      SHARED_MANIFEST_SHA256: 5f94f2d2d9e5c842cfa07a681e3a9c532c867dae90c3de9ebcfa44dd46275c25
++      SHARED_ONNX_SHA256: 90b24a0b1ce9b3b3ab0b47a9120c383aafa134c24ceb4b1bd79a451ac5cf8798
++      SHARED_PINS_SHA256: 7d3ec1cb494aebf81703fe29963cf31a1621ffdcfb81fbd2da04708398db1158
++      SHARED_BUNDLE_DIR: ${{ github.workspace }}/.laya-cache/airp-shared-primitives-avg-f05-s14
++    steps:
++      - uses: actions/checkout@v4
++
++      - uses: actions/setup-node@v4
++        with:
++          node-version: '22.x'
++          cache: npm
++
++      - uses: actions/setup-python@v5
++        with:
++          python-version: '3.12'
++
++      - name: restore the model bundle
++        id: bundle-cache
++        uses: actions/cache@v4
++        with:
++          path: .laya-cache
++          key: shared-bundle-${{ env.SHARED_REVISION }}-${{ env.SHARED_MANIFEST_SHA256 }}
++
++      - name: download the model bundle from Hugging Face (cache miss only; public, no token)
++        if: steps.bundle-cache.outputs.cache-hit != 'true'
++        run: |
++          python -m pip install --quiet "huggingface_hub==${HF_HUB_VERSION}"
++          mkdir -p "$SHARED_BUNDLE_DIR"
++          hf download "$SHARED_REPO" --revision "$SHARED_REVISION" --local-dir "$SHARED_BUNDLE_DIR"
++          rm -rf "$SHARED_BUNDLE_DIR/.cache"
++
++      - name: verify the bundle (always, before use)
++        working-directory: ${{ env.SHARED_BUNDLE_DIR }}
++        run: |
++          fail() { echo "::error::$1"; rm -rf "$SHARED_BUNDLE_DIR"; exit 1; }
++          echo "${SHARED_MANIFEST_SHA256}  MANIFEST.sha256" | sha256sum --check - \
++            || fail "MANIFEST.sha256 does not match the pinned sha (tag ${SHARED_REVISION} not re-pointed yet?)"
++          sha256sum --check --strict MANIFEST.sha256 || fail "bundle file(s) do not match MANIFEST.sha256"
++          echo "${SHARED_ONNX_SHA256}  laya-shared.onnx" | sha256sum --check - || fail "ONNX sha mismatch"
++          echo "${SHARED_PINS_SHA256}  pins/laya-shared-avg-f05-s14-fp32.pins.json" | sha256sum --check - || fail "pins sha mismatch"
++          echo "AIRP_LAYA_SHARED_BUNDLE_DIR=$SHARED_BUNDLE_DIR" >> "$GITHUB_ENV"
++
++      - name: python reference environment (pinned, CPU only)
++        run: |
++          python -m venv "$RUNNER_TEMP/laya-venv"
++          "$RUNNER_TEMP/laya-venv/bin/pip" install --quiet --index-url https://download.pytorch.org/whl/cpu torch==2.14.0
++          "$RUNNER_TEMP/laya-venv/bin/pip" install --quiet laya==0.3.21 onnxruntime==1.22.1 transformers==4.48.3 numpy==2.2.6
++          echo "AIRP_LAYA_PYTHON=$RUNNER_TEMP/laya-venv/bin/python" >> "$GITHUB_ENV"
++
++      - run: npm ci
++
++      - run: npm run build
++
++      - name: shared-encoding cross-path identity (feeds, primitives, composed verdicts)
++        run: node --test tools/evaluator-training/laya-shared-crosspath.test.mjs

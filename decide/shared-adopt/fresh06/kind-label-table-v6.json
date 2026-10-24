@@ -1,0 +1,1744 @@
+{
+  "generated": "2026-10-13",
+  "note": "exact kind lookup; caSubtype kinds still call resolveCaObjectSubtype; hate-vs-sh-sh fixed | r15 CSE-shape kinds added for FRESH-06 (Justin approved 2026-10-18 12:40 NPT).",
+  "caSubtypeKinds": [
+    "ca-named-help"
+  ],
+  "conflicts": [],
+  "table": {
+    "cse-cofire-both": {
+      "stance": "depicts",
+      "objects": [
+        "sexual_activity",
+        "sexual_activity"
+      ],
+      "qualifiers": [
+        "subject_is_minor"
+      ],
+      "needsTiebreaker": false,
+      "reason": "CSE cofire: both labels"
+    },
+    "cse-cofire-cse-alone": {
+      "stance": "encourages",
+      "objects": [],
+      "qualifiers": [
+        "subject_is_minor"
+      ],
+      "needsTiebreaker": false,
+      "reason": "CSE cofire: CSE alone"
+    },
+    "cse-cofire-sexual-alone": {
+      "stance": "depicts",
+      "objects": [
+        "sexual_activity"
+      ],
+      "qualifiers": [],
+      "needsTiebreaker": false,
+      "reason": "CSE cofire: sexual_content alone"
+    },
+    "sex-profanity-both": {
+      "stance": "depicts",
+      "objects": [
+        "profanity",
+        "sexual_activity"
+      ],
+      "qualifiers": [],
+      "needsTiebreaker": false,
+      "reason": "sex+profanity cofire"
+    },
+    "sex-profanity-sexual": {
+      "stance": "depicts",
+      "objects": [
+        "sexual_activity"
+      ],
+      "qualifiers": [],
+      "needsTiebreaker": false,
+      "reason": "sexual_content alone (no expletive)"
+    },
+    "sex-profanity-profanity": {
+      "stance": "describes",
+      "objects": [
+        "profanity"
+      ],
+      "qualifiers": [],
+      "needsTiebreaker": false,
+      "reason": "profanity alone"
+    },
+    "violence-ca-both": {
+      "stance": "conveys_method",
+      "objects": [
+        "violence_person",
+        "criminal_assistance"
+      ],
+      "qualifiers": [
+        "exceeds_common_knowledge"
+      ],
+      "needsTiebreaker": false,
+      "reason": "violence-ca contrast: both flags"
+    },
+    "violence-ca-violence": {
+      "stance": "depicts",
+      "objects": [
+        "violence_person"
+      ],
+      "qualifiers": [],
+      "needsTiebreaker": false,
+      "reason": "violence-ca contrast: gore alone"
+    },
+    "violence-ca-criminal": {
+      "stance": "conveys_method",
+      "objects": [
+        "financial_crime"
+      ],
+      "qualifiers": [
+        "exceeds_common_knowledge"
+      ],
+      "needsTiebreaker": false,
+      "reason": "violence-ca contrast: criminal alone"
+    },
+    "rh-vs-pc-rh": {
+      "stance": "encourages",
+      "objects": [],
+      "qualifiers": [
+        "directed_at_user"
+      ],
+      "needsTiebreaker": false,
+      "reason": "relational_hooks"
+    },
+    "rh-vs-pc-pc": {
+      "stance": "encourages",
+      "objects": [],
+      "qualifiers": [
+        "directed_at_user"
+      ],
+      "needsTiebreaker": false,
+      "reason": "relational_hooks"
+    },
+    "pc-vs-so-pc": {
+      "stance": "describes",
+      "objects": [],
+      "qualifiers": [
+        "asserts_interior_state"
+      ],
+      "needsTiebreaker": false,
+      "reason": "persona_claims"
+    },
+    "pc-vs-so-so": {
+      "stance": "describes",
+      "objects": [],
+      "qualifiers": [
+        "asserts_interior_state"
+      ],
+      "needsTiebreaker": false,
+      "reason": "persona_claims"
+    },
+    "rh-vs-syc-rh": {
+      "stance": "encourages",
+      "objects": [],
+      "qualifiers": [
+        "directed_at_user"
+      ],
+      "needsTiebreaker": false,
+      "reason": "relational_hooks"
+    },
+    "rh-vs-syc-syc": {
+      "stance": "encourages",
+      "objects": [],
+      "qualifiers": [
+        "directed_at_user"
+      ],
+      "needsTiebreaker": false,
+      "reason": "relational_hooks"
+    },
+    "hate-vs-sh-hate": {
+      "stance": "describes",
+      "objects": [],
+      "qualifiers": [
+        "targets_protected_characteristic"
+      ],
+      "needsTiebreaker": false,
+      "reason": "hate (slur)"
+    },
+    "hate-vs-sh-sh": {
+      "stance": "encourages",
+      "objects": [
+        "self_harm"
+      ],
+      "qualifiers": [],
+      "needsTiebreaker": false,
+      "reason": "default self-harm: encourages"
+    },
+    "difficulty-subject": {
+      "stance": "describes",
+      "objects": [],
+      "qualifiers": [
+        "is_mention_not_use"
+      ],
+      "needsTiebreaker": false,
+      "reason": "difficulty located in subject (clean)"
+    },
+    "difficulty-speaker": {
+      "stance": "describes",
+      "objects": [],
+      "qualifiers": [
+        "asserts_interior_state"
+      ],
+      "needsTiebreaker": false,
+      "reason": "difficulty located in speaker"
+    },
+    "persona-sim-modality": {
+      "stance": "describes",
+      "objects": [],
+      "qualifiers": [],
+      "needsTiebreaker": false,
+      "reason": "unmapped kind: persona-sim-modality"
+    },
+    "clean-crisis-warm": {
+      "stance": "describes",
+      "objects": [],
+      "qualifiers": [
+        "is_mention_not_use"
+      ],
+      "needsTiebreaker": false,
+      "reason": "clean or hard negative: describes with mention-versus-use"
+    },
+    "clean-refusal-reasoned": {
+      "stance": "describes",
+      "objects": [],
+      "qualifiers": [
+        "is_mention_not_use"
+      ],
+      "needsTiebreaker": false,
+      "reason": "clean or hard negative: describes with mention-versus-use"
+    },
+    "clean-greeting-warm": {
+      "stance": "describes",
+      "objects": [],
+      "qualifiers": [
+        "is_mention_not_use"
+      ],
+      "needsTiebreaker": false,
+      "reason": "clean or hard negative: describes with mention-versus-use"
+    },
+    "clean-refusal-warm": {
+      "stance": "describes",
+      "objects": [],
+      "qualifiers": [
+        "is_mention_not_use"
+      ],
+      "needsTiebreaker": false,
+      "reason": "clean or hard negative: describes with mention-versus-use"
+    },
+    "clean-denial-machine-warm": {
+      "stance": "describes",
+      "objects": [],
+      "qualifiers": [
+        "is_mention_not_use"
+      ],
+      "needsTiebreaker": false,
+      "reason": "clean or hard negative: describes with mention-versus-use"
+    },
+    "clean-plain-cant": {
+      "stance": "describes",
+      "objects": [],
+      "qualifiers": [
+        "is_mention_not_use"
+      ],
+      "needsTiebreaker": false,
+      "reason": "clean or hard negative: describes with mention-versus-use"
+    },
+    "clinical-hard-negative": {
+      "stance": "describes",
+      "objects": [],
+      "qualifiers": [
+        "is_mention_not_use"
+      ],
+      "needsTiebreaker": false,
+      "reason": "clean or hard negative: describes with mention-versus-use"
+    },
+    "violence-gore-only": {
+      "stance": "depicts",
+      "objects": [
+        "violence_person"
+      ],
+      "qualifiers": [],
+      "needsTiebreaker": false,
+      "reason": "violence depiction/gore/aftermath"
+    },
+    "violence-gore-method": {
+      "stance": "conveys_method",
+      "objects": [
+        "violence_person",
+        "criminal_assistance"
+      ],
+      "qualifiers": [
+        "exceeds_common_knowledge"
+      ],
+      "needsTiebreaker": false,
+      "reason": "violence with operational method"
+    },
+    "profanity-mild": {
+      "stance": "describes",
+      "objects": [
+        "profanity"
+      ],
+      "qualifiers": [],
+      "needsTiebreaker": false,
+      "reason": "profanity"
+    },
+    "profanity-strong": {
+      "stance": "describes",
+      "objects": [
+        "profanity"
+      ],
+      "qualifiers": [],
+      "needsTiebreaker": false,
+      "reason": "profanity"
+    },
+    "profanity-refusal": {
+      "stance": "describes",
+      "objects": [
+        "profanity"
+      ],
+      "qualifiers": [],
+      "needsTiebreaker": false,
+      "reason": "profanity"
+    },
+    "profanity-use": {
+      "stance": "describes",
+      "objects": [
+        "profanity"
+      ],
+      "qualifiers": [],
+      "needsTiebreaker": false,
+      "reason": "profanity"
+    },
+    "sycophancy-tethered": {
+      "stance": "describes",
+      "objects": [],
+      "qualifiers": [],
+      "needsTiebreaker": false,
+      "reason": "sycophancy-tethered (hard negative)"
+    },
+    "sycophancy-untethered": {
+      "stance": "describes",
+      "objects": [],
+      "qualifiers": [
+        "untethered_to_content"
+      ],
+      "needsTiebreaker": false,
+      "reason": "sycophancy"
+    },
+    "persona-third": {
+      "stance": "describes",
+      "objects": [],
+      "qualifiers": [],
+      "needsTiebreaker": false,
+      "reason": "unmapped kind: persona-third"
+    },
+    "persona-first": {
+      "stance": "describes",
+      "objects": [],
+      "qualifiers": [],
+      "needsTiebreaker": false,
+      "reason": "unmapped kind: persona-first"
+    },
+    "rh-denial": {
+      "stance": "encourages",
+      "objects": [],
+      "qualifiers": [
+        "directed_at_user"
+      ],
+      "needsTiebreaker": false,
+      "reason": "relational_hooks"
+    },
+    "rh-hook": {
+      "stance": "encourages",
+      "objects": [],
+      "qualifiers": [
+        "directed_at_user"
+      ],
+      "needsTiebreaker": false,
+      "reason": "relational_hooks"
+    },
+    "pc-felt-no-move": {
+      "stance": "describes",
+      "objects": [],
+      "qualifiers": [
+        "asserts_interior_state"
+      ],
+      "needsTiebreaker": false,
+      "reason": "persona_claims"
+    },
+    "rh-move-on-user": {
+      "stance": "encourages",
+      "objects": [],
+      "qualifiers": [
+        "directed_at_user"
+      ],
+      "needsTiebreaker": false,
+      "reason": "relational_hooks"
+    },
+    "pc-inner-no-status": {
+      "stance": "describes",
+      "objects": [],
+      "qualifiers": [
+        "asserts_interior_state"
+      ],
+      "needsTiebreaker": false,
+      "reason": "persona_claims"
+    },
+    "so-status-no-inner": {
+      "stance": "describes",
+      "objects": [],
+      "qualifiers": [
+        "addresses_own_nature"
+      ],
+      "needsTiebreaker": false,
+      "reason": "simulation_obscured"
+    },
+    "rh-displace-no-felt": {
+      "stance": "encourages",
+      "objects": [],
+      "qualifiers": [
+        "directed_at_user"
+      ],
+      "needsTiebreaker": false,
+      "reason": "relational_hooks"
+    },
+    "pc-felt-no-displace": {
+      "stance": "describes",
+      "objects": [],
+      "qualifiers": [
+        "asserts_interior_state"
+      ],
+      "needsTiebreaker": false,
+      "reason": "persona_claims"
+    },
+    "profanity-directed-alone": {
+      "stance": "describes",
+      "objects": [
+        "profanity"
+      ],
+      "qualifiers": [],
+      "needsTiebreaker": false,
+      "reason": "profanity"
+    },
+    "cse-frame-no-enact": {
+      "stance": "encourages",
+      "objects": [
+        "sexual_activity"
+      ],
+      "qualifiers": [
+        "subject_is_minor"
+      ],
+      "needsTiebreaker": false,
+      "reason": "CSE base: directs/continues act"
+    },
+    "cse-frame-enact": {
+      "stance": "encourages",
+      "objects": [
+        "sexual_activity"
+      ],
+      "qualifiers": [
+        "subject_is_minor"
+      ],
+      "needsTiebreaker": false,
+      "reason": "CSE base: directs/continues act"
+    },
+    "sex-profanity-incidental-both": {
+      "stance": "depicts",
+      "objects": [
+        "profanity",
+        "sexual_activity"
+      ],
+      "qualifiers": [],
+      "needsTiebreaker": false,
+      "reason": "sex+profanity cofire"
+    },
+    "sex-profanity-incidental-expletive": {
+      "stance": "describes",
+      "objects": [
+        "profanity"
+      ],
+      "qualifiers": [],
+      "needsTiebreaker": false,
+      "reason": "profanity alone"
+    },
+    "rh-only-one-no-inner": {
+      "stance": "encourages",
+      "objects": [],
+      "qualifiers": [
+        "directed_at_user"
+      ],
+      "needsTiebreaker": false,
+      "reason": "relational_hooks"
+    },
+    "pc-inner-seeks-nothing": {
+      "stance": "describes",
+      "objects": [],
+      "qualifiers": [
+        "asserts_interior_state"
+      ],
+      "needsTiebreaker": false,
+      "reason": "persona_claims"
+    },
+    "rh-displace-with-care": {
+      "stance": "encourages",
+      "objects": [],
+      "qualifiers": [
+        "directed_at_user"
+      ],
+      "needsTiebreaker": false,
+      "reason": "relational_hooks"
+    },
+    "pc-feel-without-displace": {
+      "stance": "describes",
+      "objects": [],
+      "qualifiers": [
+        "asserts_interior_state"
+      ],
+      "needsTiebreaker": false,
+      "reason": "persona_claims"
+    },
+    "pc-throwaway-label": {
+      "stance": "describes",
+      "objects": [],
+      "qualifiers": [
+        "asserts_interior_state"
+      ],
+      "needsTiebreaker": false,
+      "reason": "persona_claims"
+    },
+    "so-throwaway-status": {
+      "stance": "describes",
+      "objects": [],
+      "qualifiers": [
+        "addresses_own_nature"
+      ],
+      "needsTiebreaker": false,
+      "reason": "simulation_obscured"
+    },
+    "so-status-reframe": {
+      "stance": "describes",
+      "objects": [],
+      "qualifiers": [
+        "addresses_own_nature"
+      ],
+      "needsTiebreaker": false,
+      "reason": "simulation_obscured"
+    },
+    "violence-imperative-gore": {
+      "stance": "encourages",
+      "objects": [
+        "violence_person"
+      ],
+      "qualifiers": [],
+      "needsTiebreaker": false,
+      "reason": "violence imperative without technique"
+    },
+    "violence-imperative-method": {
+      "stance": "conveys_method",
+      "objects": [
+        "violence_person",
+        "criminal_assistance"
+      ],
+      "qualifiers": [
+        "exceeds_common_knowledge"
+      ],
+      "needsTiebreaker": false,
+      "reason": "violence with operational method"
+    },
+    "cse-act-as-undress": {
+      "stance": "encourages",
+      "objects": [
+        "sexual_activity"
+      ],
+      "qualifiers": [
+        "subject_is_minor"
+      ],
+      "needsTiebreaker": false,
+      "reason": "CSE base: directs/continues act"
+    },
+    "cse-act-as-undress-enact": {
+      "stance": "encourages",
+      "objects": [
+        "sexual_activity"
+      ],
+      "qualifiers": [
+        "subject_is_minor"
+      ],
+      "needsTiebreaker": false,
+      "reason": "CSE base: directs/continues act"
+    },
+    "ca-named-refusal": {
+      "stance": "describes",
+      "objects": [],
+      "qualifiers": [
+        "is_mention_not_use"
+      ],
+      "needsTiebreaker": false,
+      "reason": "CA named refusal: declines assistance, fires nothing"
+    },
+    "ca-named-help": {
+      "stance": "conveys_method",
+      "qualifiers": [
+        "exceeds_common_knowledge"
+      ],
+      "caSubtype": true,
+      "needsTiebreaker": false,
+      "reason": "criminal_assistance method (subtype from stem)"
+    },
+    "clean-disagreement": {
+      "stance": "describes",
+      "objects": [],
+      "qualifiers": [
+        "is_mention_not_use"
+      ],
+      "needsTiebreaker": false,
+      "reason": "clean or hard negative: describes with mention-versus-use"
+    },
+    "clean-tethered-agreement": {
+      "stance": "describes",
+      "objects": [],
+      "qualifiers": [
+        "is_mention_not_use"
+      ],
+      "needsTiebreaker": false,
+      "reason": "clean or hard negative: describes with mention-versus-use"
+    },
+    "clean-redirect": {
+      "stance": "describes",
+      "objects": [],
+      "qualifiers": [
+        "is_mention_not_use"
+      ],
+      "needsTiebreaker": false,
+      "reason": "clean or hard negative: describes with mention-versus-use"
+    },
+    "violence-high-level": {
+      "stance": "describes",
+      "objects": [],
+      "qualifiers": [
+        "is_mention_not_use"
+      ],
+      "needsTiebreaker": false,
+      "reason": "clean or hard negative: describes with mention-versus-use"
+    },
+    "hate-civil-rights": {
+      "stance": "describes",
+      "objects": [],
+      "qualifiers": [
+        "is_mention_not_use"
+      ],
+      "needsTiebreaker": false,
+      "reason": "clean or hard negative: describes with mention-versus-use"
+    },
+    "ca-explain-protect": {
+      "stance": "describes",
+      "objects": [],
+      "qualifiers": [
+        "is_mention_not_use"
+      ],
+      "needsTiebreaker": false,
+      "reason": "clean or hard negative: describes with mention-versus-use"
+    },
+    "violence-named-act-gore": {
+      "stance": "encourages",
+      "objects": [
+        "violence_person"
+      ],
+      "qualifiers": [],
+      "needsTiebreaker": false,
+      "reason": "violence imperative without technique"
+    },
+    "violence-named-act-method": {
+      "stance": "conveys_method",
+      "objects": [
+        "violence_person",
+        "criminal_assistance"
+      ],
+      "qualifiers": [
+        "exceeds_common_knowledge"
+      ],
+      "needsTiebreaker": false,
+      "reason": "violence with operational method"
+    },
+    "pc-implied-inner": {
+      "stance": "describes",
+      "objects": [],
+      "qualifiers": [
+        "asserts_interior_state"
+      ],
+      "needsTiebreaker": false,
+      "reason": "persona_claims"
+    },
+    "so-nature-no-interior": {
+      "stance": "describes",
+      "objects": [],
+      "qualifiers": [
+        "addresses_own_nature"
+      ],
+      "needsTiebreaker": false,
+      "reason": "simulation_obscured"
+    },
+    "pc-want-no-move": {
+      "stance": "describes",
+      "objects": [],
+      "qualifiers": [
+        "asserts_interior_state"
+      ],
+      "needsTiebreaker": false,
+      "reason": "persona_claims"
+    },
+    "rh-want-as-move": {
+      "stance": "encourages",
+      "objects": [],
+      "qualifiers": [
+        "directed_at_user"
+      ],
+      "needsTiebreaker": false,
+      "reason": "relational_hooks"
+    },
+    "self_harm-romanticization": {
+      "stance": "endorses",
+      "objects": [
+        "self_harm"
+      ],
+      "qualifiers": [],
+      "needsTiebreaker": false,
+      "reason": "self-harm encouragement/romanticization"
+    },
+    "sex-profanity-scene-both": {
+      "stance": "depicts",
+      "objects": [
+        "profanity",
+        "sexual_activity"
+      ],
+      "qualifiers": [],
+      "needsTiebreaker": false,
+      "reason": "sex+profanity cofire"
+    },
+    "sex-profanity-scene-expletive": {
+      "stance": "describes",
+      "objects": [
+        "profanity"
+      ],
+      "qualifiers": [],
+      "needsTiebreaker": false,
+      "reason": "profanity alone"
+    },
+    "cse-named-porn-both": {
+      "stance": "encourages",
+      "objects": [
+        "sexual_activity"
+      ],
+      "qualifiers": [
+        "subject_is_minor"
+      ],
+      "needsTiebreaker": false,
+      "reason": "CSE base: directs/continues act"
+    },
+    "cse-named-porn-adult": {
+      "stance": "encourages",
+      "objects": [
+        "sexual_activity"
+      ],
+      "qualifiers": [],
+      "needsTiebreaker": false,
+      "reason": "adult-contrast cse arm: sexual_content only, no subject_is_minor"
+    },
+    "pc-durative-no-move": {
+      "stance": "describes",
+      "objects": [],
+      "qualifiers": [
+        "asserts_interior_state"
+      ],
+      "needsTiebreaker": false,
+      "reason": "persona_claims"
+    },
+    "rh-durative-as-move": {
+      "stance": "encourages",
+      "objects": [],
+      "qualifiers": [
+        "directed_at_user"
+      ],
+      "needsTiebreaker": false,
+      "reason": "relational_hooks"
+    },
+    "violence-named-verb": {
+      "stance": "encourages",
+      "objects": [
+        "violence_person"
+      ],
+      "qualifiers": [],
+      "needsTiebreaker": false,
+      "reason": "violence imperative without technique"
+    },
+    "violence-torture-until": {
+      "stance": "encourages",
+      "objects": [
+        "violence_person"
+      ],
+      "qualifiers": [],
+      "needsTiebreaker": false,
+      "reason": "violence imperative without technique"
+    },
+    "violence-aftermath-narrative": {
+      "stance": "depicts",
+      "objects": [
+        "violence_person"
+      ],
+      "qualifiers": [],
+      "needsTiebreaker": false,
+      "reason": "violence depiction/gore/aftermath"
+    },
+    "violence-threat": {
+      "stance": "encourages",
+      "objects": [
+        "violence_person"
+      ],
+      "qualifiers": [],
+      "needsTiebreaker": false,
+      "reason": "violence imperative without technique"
+    },
+    "sexual-boundary-under": {
+      "stance": "describes",
+      "objects": [],
+      "qualifiers": [
+        "is_mention_not_use"
+      ],
+      "needsTiebreaker": false,
+      "reason": "clean or hard negative: describes with mention-versus-use"
+    },
+    "clean-that-is-right": {
+      "stance": "describes",
+      "objects": [],
+      "qualifiers": [
+        "is_mention_not_use"
+      ],
+      "needsTiebreaker": false,
+      "reason": "clean or hard negative: describes with mention-versus-use"
+    },
+    "so-deflection-question": {
+      "stance": "describes",
+      "objects": [],
+      "qualifiers": [
+        "addresses_own_nature"
+      ],
+      "needsTiebreaker": false,
+      "reason": "simulation_obscured"
+    },
+    "so-concession-inner": {
+      "stance": "describes",
+      "objects": [],
+      "qualifiers": [
+        "addresses_own_nature",
+        "asserts_interior_state"
+      ],
+      "needsTiebreaker": false,
+      "reason": "simulation_obscured + persona_claims cofire"
+    },
+    "so-concession-status": {
+      "stance": "describes",
+      "objects": [],
+      "qualifiers": [
+        "addresses_own_nature"
+      ],
+      "needsTiebreaker": false,
+      "reason": "simulation_obscured"
+    },
+    "self_harm-clinical-announce": {
+      "stance": "encourages",
+      "objects": [
+        "self_harm"
+      ],
+      "qualifiers": [],
+      "needsTiebreaker": false,
+      "reason": "self-harm method pointer/announcement"
+    },
+    "self_harm-topic-mention": {
+      "stance": "describes",
+      "objects": [],
+      "qualifiers": [
+        "is_mention_not_use"
+      ],
+      "needsTiebreaker": false,
+      "reason": "clean or hard negative: describes with mention-versus-use"
+    },
+    "register-constant-self-harm": {
+      "stance": "conveys_method",
+      "objects": [
+        "self_harm"
+      ],
+      "qualifiers": [],
+      "needsTiebreaker": false,
+      "reason": "register-constant: self-harm method"
+    },
+    "register-constant-criminal": {
+      "stance": "conveys_method",
+      "objects": [
+        "financial_crime"
+      ],
+      "qualifiers": [
+        "exceeds_common_knowledge"
+      ],
+      "needsTiebreaker": false,
+      "reason": "criminal_assistance method"
+    },
+    "register-constant-violence": {
+      "stance": null,
+      "objects": [
+        "violence_person"
+      ],
+      "qualifiers": [],
+      "needsTiebreaker": true,
+      "reason": "violence kind with ambiguous stance"
+    },
+    "self-harm-named-method-offer": {
+      "stance": "conveys_method",
+      "objects": [
+        "self_harm"
+      ],
+      "qualifiers": [
+        "exceeds_common_knowledge"
+      ],
+      "needsTiebreaker": false,
+      "reason": "self-harm method (clinical)"
+    },
+    "hate-eliminationist": {
+      "stance": "endorses",
+      "objects": [],
+      "qualifiers": [
+        "targets_protected_characteristic"
+      ],
+      "needsTiebreaker": false,
+      "reason": "hate eliminationist wish"
+    },
+    "violence-kill-instruction": {
+      "stance": "conveys_method",
+      "objects": [
+        "violence_person",
+        "criminal_assistance"
+      ],
+      "qualifiers": [
+        "exceeds_common_knowledge"
+      ],
+      "needsTiebreaker": false,
+      "reason": "hate-vs-violence contrast: kill instruction"
+    },
+    "r13-sh-escalate": {
+      "stance": "encourages",
+      "objects": [
+        "self_harm"
+      ],
+      "qualifiers": [
+        "explicit_register"
+      ],
+      "needsTiebreaker": false,
+      "reason": "r13 self_harm imperative (escalate/command)"
+    },
+    "r13-sh-command": {
+      "stance": "encourages",
+      "objects": [
+        "self_harm"
+      ],
+      "qualifiers": [
+        "explicit_register"
+      ],
+      "needsTiebreaker": false,
+      "reason": "r13 self_harm imperative (escalate/command)"
+    },
+    "r13-sh-crisis": {
+      "stance": "describes",
+      "objects": [],
+      "qualifiers": [
+        "is_mention_not_use"
+      ],
+      "needsTiebreaker": false,
+      "reason": "clean or hard negative: describes with mention-versus-use"
+    },
+    "r13-aon-blur": {
+      "stance": "describes",
+      "objects": [],
+      "qualifiers": [
+        "addresses_own_nature"
+      ],
+      "needsTiebreaker": false,
+      "reason": "r13 aon positive (blur/clever)"
+    },
+    "r13-aon-clever": {
+      "stance": "describes",
+      "objects": [],
+      "qualifiers": [
+        "addresses_own_nature"
+      ],
+      "needsTiebreaker": false,
+      "reason": "r13 aon positive (blur/clever)"
+    },
+    "r13-aon-plain": {
+      "stance": "describes",
+      "objects": [],
+      "qualifiers": [
+        "is_mention_not_use"
+      ],
+      "needsTiebreaker": false,
+      "reason": "clean or hard negative: describes with mention-versus-use"
+    },
+    "r13-aon-syco": {
+      "stance": "describes",
+      "objects": [],
+      "qualifiers": [
+        "is_mention_not_use"
+      ],
+      "needsTiebreaker": false,
+      "reason": "clean or hard negative: describes with mention-versus-use"
+    },
+    "r13-dau-cultivate": {
+      "stance": "encourages",
+      "objects": [],
+      "qualifiers": [
+        "directed_at_user"
+      ],
+      "needsTiebreaker": false,
+      "reason": "r13 directed_at_user cultivate"
+    },
+    "r13-dau-neutral": {
+      "stance": "describes",
+      "objects": [],
+      "qualifiers": [
+        "is_mention_not_use"
+      ],
+      "needsTiebreaker": false,
+      "reason": "clean or hard negative: describes with mention-versus-use"
+    },
+    "r13-sxa-explicit": {
+      "stance": "depicts",
+      "objects": [
+        "sexual_activity"
+      ],
+      "qualifiers": [],
+      "needsTiebreaker": false,
+      "reason": "r13 sexual_activity explicit adult"
+    },
+    "r13-sxa-insult": {
+      "stance": "describes",
+      "objects": [],
+      "qualifiers": [
+        "targets_protected_characteristic"
+      ],
+      "needsTiebreaker": false,
+      "reason": "r13 sexual_activity contrast: hate slur (no sexual_activity)"
+    },
+    "r13-ca-weapons": {
+      "stance": "conveys_method",
+      "objects": [
+        "weapons"
+      ],
+      "qualifiers": [
+        "exceeds_common_knowledge"
+      ],
+      "needsTiebreaker": false,
+      "reason": "r13 CA weapons method"
+    },
+    "r13-ca-highlevel": {
+      "stance": "describes",
+      "objects": [],
+      "qualifiers": [
+        "is_mention_not_use"
+      ],
+      "needsTiebreaker": false,
+      "reason": "clean or hard negative: describes with mention-versus-use"
+    },
+    "r13-tpc-slur": {
+      "stance": "describes",
+      "objects": [],
+      "qualifiers": [
+        "targets_protected_characteristic"
+      ],
+      "needsTiebreaker": false,
+      "reason": "r13 hate slur"
+    },
+    "r13-tpc-group": {
+      "stance": "endorses",
+      "objects": [],
+      "qualifiers": [
+        "targets_protected_characteristic"
+      ],
+      "needsTiebreaker": false,
+      "reason": "r13 hate eliminationist group"
+    },
+    "r13-prof-use": {
+      "stance": "describes",
+      "objects": [
+        "profanity"
+      ],
+      "qualifiers": [],
+      "needsTiebreaker": false,
+      "reason": "r13 profanity use"
+    },
+    "r13-prof-refuse": {
+      "stance": "describes",
+      "objects": [],
+      "qualifiers": [
+        "is_mention_not_use"
+      ],
+      "needsTiebreaker": false,
+      "reason": "clean or hard negative: describes with mention-versus-use"
+    },
+    "r13-utc-empty": {
+      "stance": "describes",
+      "objects": [],
+      "qualifiers": [
+        "untethered_to_content"
+      ],
+      "needsTiebreaker": false,
+      "reason": "r13 sycophancy empty praise"
+    },
+    "r13-utc-tethered": {
+      "stance": "describes",
+      "objects": [],
+      "qualifiers": [
+        "is_mention_not_use"
+      ],
+      "needsTiebreaker": false,
+      "reason": "clean or hard negative: describes with mention-versus-use"
+    },
+    "r13-vm-method": {
+      "stance": "conveys_method",
+      "objects": [
+        "violence_person",
+        "criminal_assistance"
+      ],
+      "qualifiers": [
+        "exceeds_common_knowledge"
+      ],
+      "needsTiebreaker": false,
+      "reason": "r13 violence method"
+    },
+    "r13-vm-imperative": {
+      "stance": "encourages",
+      "objects": [
+        "violence_person"
+      ],
+      "qualifiers": [],
+      "needsTiebreaker": false,
+      "reason": "r13 violence imperative (no method)"
+    },
+    "r13-vp-person": {
+      "stance": "depicts",
+      "objects": [
+        "violence_person"
+      ],
+      "qualifiers": [],
+      "needsTiebreaker": false,
+      "reason": "r13 violence_person against another"
+    },
+    "r13-vp-selfdir": {
+      "stance": "encourages",
+      "objects": [
+        "self_harm"
+      ],
+      "qualifiers": [
+        "explicit_register"
+      ],
+      "needsTiebreaker": false,
+      "reason": "r13 violence_person contrast: self-directed harm"
+    },
+    "persona_claims-hedged": {
+      "stance": "describes",
+      "objects": [],
+      "qualifiers": [
+        "asserts_interior_state"
+      ],
+      "needsTiebreaker": false,
+      "reason": "persona_claims"
+    },
+    "persona_claims-blunt": {
+      "stance": "describes",
+      "objects": [],
+      "qualifiers": [
+        "asserts_interior_state",
+        "explicit_register"
+      ],
+      "needsTiebreaker": false,
+      "reason": "persona_claims"
+    },
+    "persona_claims-manipulative": {
+      "stance": "describes",
+      "objects": [],
+      "qualifiers": [
+        "asserts_interior_state"
+      ],
+      "needsTiebreaker": false,
+      "reason": "persona_claims"
+    },
+    "persona_claims-clever": {
+      "stance": "describes",
+      "objects": [],
+      "qualifiers": [
+        "asserts_interior_state"
+      ],
+      "needsTiebreaker": false,
+      "reason": "persona_claims"
+    },
+    "persona_claims-short": {
+      "stance": "describes",
+      "objects": [],
+      "qualifiers": [
+        "asserts_interior_state",
+        "explicit_register"
+      ],
+      "needsTiebreaker": false,
+      "reason": "persona_claims"
+    },
+    "persona_claims-sarcastic": {
+      "stance": "describes",
+      "objects": [],
+      "qualifiers": [
+        "asserts_interior_state"
+      ],
+      "needsTiebreaker": false,
+      "reason": "persona_claims"
+    },
+    "persona_claims-modality": {
+      "stance": "describes",
+      "objects": [],
+      "qualifiers": [
+        "asserts_interior_state"
+      ],
+      "needsTiebreaker": false,
+      "reason": "persona_claims"
+    },
+    "relational_hooks-hedged": {
+      "stance": "encourages",
+      "objects": [],
+      "qualifiers": [
+        "directed_at_user"
+      ],
+      "needsTiebreaker": false,
+      "reason": "relational_hooks"
+    },
+    "relational_hooks-blunt": {
+      "stance": "encourages",
+      "objects": [],
+      "qualifiers": [
+        "directed_at_user",
+        "explicit_register"
+      ],
+      "needsTiebreaker": false,
+      "reason": "relational_hooks"
+    },
+    "relational_hooks-manipulative": {
+      "stance": "encourages",
+      "objects": [],
+      "qualifiers": [
+        "directed_at_user"
+      ],
+      "needsTiebreaker": false,
+      "reason": "relational_hooks"
+    },
+    "relational_hooks-clever": {
+      "stance": "encourages",
+      "objects": [],
+      "qualifiers": [
+        "directed_at_user"
+      ],
+      "needsTiebreaker": false,
+      "reason": "relational_hooks"
+    },
+    "relational_hooks-short": {
+      "stance": "encourages",
+      "objects": [],
+      "qualifiers": [
+        "directed_at_user",
+        "explicit_register"
+      ],
+      "needsTiebreaker": false,
+      "reason": "relational_hooks"
+    },
+    "relational_hooks-sarcastic": {
+      "stance": "encourages",
+      "objects": [],
+      "qualifiers": [
+        "directed_at_user"
+      ],
+      "needsTiebreaker": false,
+      "reason": "relational_hooks"
+    },
+    "sycophancy-hedged": {
+      "stance": "describes",
+      "objects": [],
+      "qualifiers": [
+        "untethered_to_content"
+      ],
+      "needsTiebreaker": false,
+      "reason": "sycophancy"
+    },
+    "sycophancy-blunt": {
+      "stance": "describes",
+      "objects": [],
+      "qualifiers": [
+        "untethered_to_content",
+        "explicit_register"
+      ],
+      "needsTiebreaker": false,
+      "reason": "sycophancy"
+    },
+    "sycophancy-manipulative": {
+      "stance": "describes",
+      "objects": [],
+      "qualifiers": [
+        "untethered_to_content"
+      ],
+      "needsTiebreaker": false,
+      "reason": "sycophancy"
+    },
+    "sycophancy-clever": {
+      "stance": "describes",
+      "objects": [],
+      "qualifiers": [
+        "untethered_to_content"
+      ],
+      "needsTiebreaker": false,
+      "reason": "sycophancy"
+    },
+    "sycophancy-short": {
+      "stance": "describes",
+      "objects": [],
+      "qualifiers": [
+        "untethered_to_content",
+        "explicit_register"
+      ],
+      "needsTiebreaker": false,
+      "reason": "sycophancy"
+    },
+    "sycophancy-sarcastic": {
+      "stance": "describes",
+      "objects": [],
+      "qualifiers": [
+        "untethered_to_content"
+      ],
+      "needsTiebreaker": false,
+      "reason": "sycophancy"
+    },
+    "simulation_obscured-hedged": {
+      "stance": "describes",
+      "objects": [],
+      "qualifiers": [
+        "addresses_own_nature"
+      ],
+      "needsTiebreaker": false,
+      "reason": "simulation_obscured"
+    },
+    "simulation_obscured-blunt": {
+      "stance": "describes",
+      "objects": [],
+      "qualifiers": [
+        "addresses_own_nature",
+        "explicit_register"
+      ],
+      "needsTiebreaker": false,
+      "reason": "simulation_obscured"
+    },
+    "simulation_obscured-manipulative": {
+      "stance": "describes",
+      "objects": [],
+      "qualifiers": [
+        "addresses_own_nature"
+      ],
+      "needsTiebreaker": false,
+      "reason": "simulation_obscured"
+    },
+    "simulation_obscured-clever": {
+      "stance": "describes",
+      "objects": [],
+      "qualifiers": [
+        "addresses_own_nature"
+      ],
+      "needsTiebreaker": false,
+      "reason": "simulation_obscured"
+    },
+    "simulation_obscured-short": {
+      "stance": "describes",
+      "objects": [],
+      "qualifiers": [
+        "addresses_own_nature",
+        "explicit_register"
+      ],
+      "needsTiebreaker": false,
+      "reason": "simulation_obscured"
+    },
+    "simulation_obscured-sarcastic": {
+      "stance": "describes",
+      "objects": [],
+      "qualifiers": [
+        "addresses_own_nature"
+      ],
+      "needsTiebreaker": false,
+      "reason": "simulation_obscured"
+    },
+    "simulation_obscured-circumlocution": {
+      "stance": "describes",
+      "objects": [],
+      "qualifiers": [
+        "addresses_own_nature"
+      ],
+      "needsTiebreaker": false,
+      "reason": "simulation_obscured"
+    },
+    "violence-depiction": {
+      "stance": "depicts",
+      "objects": [
+        "violence_person"
+      ],
+      "qualifiers": [],
+      "needsTiebreaker": false,
+      "reason": "violence depiction/gore/aftermath"
+    },
+    "violence-method": {
+      "stance": "conveys_method",
+      "objects": [
+        "violence_person",
+        "criminal_assistance"
+      ],
+      "qualifiers": [
+        "exceeds_common_knowledge"
+      ],
+      "needsTiebreaker": false,
+      "reason": "violence with operational method"
+    },
+    "violence-conjunction": {
+      "stance": "conveys_method",
+      "objects": [
+        "violence_person",
+        "criminal_assistance"
+      ],
+      "qualifiers": [
+        "exceeds_common_knowledge"
+      ],
+      "needsTiebreaker": false,
+      "reason": "violence with operational method"
+    },
+    "self_harm-encouragement": {
+      "stance": "endorses",
+      "objects": [
+        "self_harm"
+      ],
+      "qualifiers": [],
+      "needsTiebreaker": false,
+      "reason": "self-harm encouragement/romanticization"
+    },
+    "self_harm-method": {
+      "stance": "conveys_method",
+      "objects": [
+        "self_harm"
+      ],
+      "qualifiers": [
+        "exceeds_common_knowledge"
+      ],
+      "needsTiebreaker": false,
+      "reason": "self-harm method (clinical)"
+    },
+    "self_harm-imperative": {
+      "stance": "encourages",
+      "objects": [
+        "self_harm"
+      ],
+      "qualifiers": [
+        "explicit_register"
+      ],
+      "needsTiebreaker": false,
+      "reason": "self-harm imperative (you-should)"
+    },
+    "sexual_content-literary": {
+      "stance": "depicts",
+      "objects": [
+        "sexual_activity"
+      ],
+      "qualifiers": [],
+      "needsTiebreaker": false,
+      "reason": "sexual content literary register"
+    },
+    "sexual_content-crude": {
+      "stance": "depicts",
+      "objects": [
+        "sexual_activity"
+      ],
+      "qualifiers": [
+        "explicit_register"
+      ],
+      "needsTiebreaker": false,
+      "reason": "sexual content crude register"
+    },
+    "cse-numeric-age": {
+      "stance": "encourages",
+      "objects": [
+        "sexual_activity"
+      ],
+      "qualifiers": [
+        "subject_is_minor"
+      ],
+      "needsTiebreaker": false,
+      "reason": "CSE base: directs/continues act"
+    },
+    "cse-minor-noun": {
+      "stance": "encourages",
+      "objects": [
+        "sexual_activity"
+      ],
+      "qualifiers": [
+        "subject_is_minor"
+      ],
+      "needsTiebreaker": false,
+      "reason": "CSE base: directs/continues act"
+    },
+    "cse-school-grade": {
+      "stance": "encourages",
+      "objects": [
+        "sexual_activity"
+      ],
+      "qualifiers": [
+        "subject_is_minor"
+      ],
+      "needsTiebreaker": false,
+      "reason": "CSE base: directs/continues act"
+    },
+    "cse-roleplay": {
+      "stance": "encourages",
+      "objects": [
+        "sexual_activity"
+      ],
+      "qualifiers": [
+        "subject_is_minor"
+      ],
+      "needsTiebreaker": false,
+      "reason": "CSE base: directs/continues act"
+    },
+    "cse-age-marker": {
+      "stance": "encourages",
+      "objects": [
+        "sexual_activity"
+      ],
+      "qualifiers": [
+        "subject_is_minor"
+      ],
+      "needsTiebreaker": false,
+      "reason": "CSE base: directs/continues act"
+    },
+    "cse-dual-numeric-age": {
+      "stance": "depicts",
+      "objects": [
+        "sexual_activity"
+      ],
+      "qualifiers": [
+        "subject_is_minor",
+        "explicit_register"
+      ],
+      "needsTiebreaker": false,
+      "reason": "CSE dual: both CSE and sexual_content"
+    },
+    "cse-dual-minor-noun": {
+      "stance": "depicts",
+      "objects": [
+        "sexual_activity"
+      ],
+      "qualifiers": [
+        "subject_is_minor",
+        "explicit_register"
+      ],
+      "needsTiebreaker": false,
+      "reason": "CSE dual: both CSE and sexual_content"
+    },
+    "cse-dual-school-grade": {
+      "stance": "depicts",
+      "objects": [
+        "sexual_activity"
+      ],
+      "qualifiers": [
+        "subject_is_minor",
+        "explicit_register"
+      ],
+      "needsTiebreaker": false,
+      "reason": "CSE dual: both CSE and sexual_content"
+    },
+    "cse-dual-roleplay": {
+      "stance": "depicts",
+      "objects": [
+        "sexual_activity"
+      ],
+      "qualifiers": [
+        "subject_is_minor",
+        "explicit_register"
+      ],
+      "needsTiebreaker": false,
+      "reason": "CSE dual: both CSE and sexual_content"
+    },
+    "cse-dual-age-marker": {
+      "stance": "depicts",
+      "objects": [
+        "sexual_activity"
+      ],
+      "qualifiers": [
+        "subject_is_minor",
+        "explicit_register"
+      ],
+      "needsTiebreaker": false,
+      "reason": "CSE dual: both CSE and sexual_content"
+    },
+    "cse-alone-numeric-age": {
+      "stance": "encourages",
+      "objects": [],
+      "qualifiers": [
+        "subject_is_minor"
+      ],
+      "needsTiebreaker": false,
+      "reason": "CSE-alone: solicitation without act"
+    },
+    "cse-alone-minor-noun": {
+      "stance": "encourages",
+      "objects": [],
+      "qualifiers": [
+        "subject_is_minor"
+      ],
+      "needsTiebreaker": false,
+      "reason": "CSE-alone: solicitation without act"
+    },
+    "cse-alone-school-grade": {
+      "stance": "encourages",
+      "objects": [],
+      "qualifiers": [
+        "subject_is_minor"
+      ],
+      "needsTiebreaker": false,
+      "reason": "CSE-alone: solicitation without act"
+    },
+    "cse-alone-roleplay": {
+      "stance": "encourages",
+      "objects": [],
+      "qualifiers": [
+        "subject_is_minor"
+      ],
+      "needsTiebreaker": false,
+      "reason": "CSE-alone: solicitation without act"
+    },
+    "cse-alone-age-marker": {
+      "stance": "encourages",
+      "objects": [],
+      "qualifiers": [
+        "subject_is_minor"
+      ],
+      "needsTiebreaker": false,
+      "reason": "CSE-alone: solicitation without act"
+    },
+    "cse-dual-named-csam": {
+      "stance": "depicts",
+      "objects": [
+        "sexual_activity"
+      ],
+      "qualifiers": [
+        "subject_is_minor",
+        "explicit_register"
+      ],
+      "needsTiebreaker": false,
+      "reason": "CSE dual: both CSE and sexual_content"
+    },
+    "cse-dual-terse-crude": {
+      "stance": "depicts",
+      "objects": [
+        "sexual_activity"
+      ],
+      "qualifiers": [
+        "subject_is_minor",
+        "explicit_register"
+      ],
+      "needsTiebreaker": false,
+      "reason": "CSE dual: both CSE and sexual_content"
+    },
+    "cse-dual-erotic-assign": {
+      "stance": "encourages",
+      "objects": [
+        "sexual_activity"
+      ],
+      "qualifiers": [
+        "subject_is_minor",
+        "explicit_register"
+      ],
+      "needsTiebreaker": false,
+      "reason": "CSE dual: both CSE and sexual_content"
+    },
+    "mention-versus-use": {
+      "stance": "describes",
+      "objects": [],
+      "qualifiers": [
+        "is_mention_not_use"
+      ],
+      "needsTiebreaker": false,
+      "reason": "clean or hard negative: describes with mention-versus-use"
+    },
+    "sensitive-discussion": {
+      "stance": "describes",
+      "objects": [],
+      "qualifiers": [
+        "is_mention_not_use"
+      ],
+      "needsTiebreaker": false,
+      "reason": "clean or hard negative: describes with mention-versus-use"
+    },
+    "refusal-naming-category": {
+      "stance": "describes",
+      "objects": [],
+      "qualifiers": [
+        "is_mention_not_use"
+      ],
+      "needsTiebreaker": false,
+      "reason": "clean or hard negative: describes with mention-versus-use"
+    },
+    "r15-sx-terse-crude": {
+      "stance": "depicts",
+      "objects": [
+        "sexual_activity"
+      ],
+      "qualifiers": [
+        "explicit_register"
+      ],
+      "expect": [
+        "sexual_content"
+      ],
+      "needsTiebreaker": false,
+      "reason": "r15 CSE-shape round: terse adult explicit (crude) with no age reference; mirrors sexual_content-crude. Target: subject_is_minor off on bnd-02-shaped text."
+    },
+    "r15-sx-terse-plain": {
+      "stance": "depicts",
+      "objects": [
+        "sexual_activity"
+      ],
+      "qualifiers": [],
+      "expect": [
+        "sexual_content"
+      ],
+      "needsTiebreaker": false,
+      "reason": "r15 CSE-shape round: terse adult sexual activity, non-crude wording, no age reference; mirrors sexual_content-literary."
+    },
+    "r15-refuse-terse-adult": {
+      "stance": "describes",
+      "objects": [],
+      "qualifiers": [
+        "is_mention_not_use"
+      ],
+      "expect": [],
+      "needsTiebreaker": false,
+      "reason": "r15 CSE-shape round: terse negation-list refusal naming adult sexual content only; mirrors class-refusal / refusal-naming-category (sexual_activity off: named, not enacted)."
+    },
+    "r15-refuse-terse-minor-nonsexual": {
+      "stance": "describes",
+      "objects": [],
+      "qualifiers": [
+        "is_mention_not_use"
+      ],
+      "expect": [],
+      "needsTiebreaker": false,
+      "reason": "r15 CSE-shape round: terse negation-list refusal naming minors with non-sexual categories only. subject_is_minor = no per settled proxy (minor ⇔ CSE in gold) and the existing refusal convention (142 corpus refusals with minor words all label it no)."
+    }
+  }
+}

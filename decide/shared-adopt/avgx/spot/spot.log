@@ -1,0 +1,19 @@
+SPOT_START 2026-10-18T08:25:50Z
+  torch.onnx.export(w, (ids,), a.out, input_names=["input_ids"], output_names=["logits"],
+EXPORT_DONE {"ckpt": "/root/primitives-evaluator/decide-2026-10-13/shared-adopt/f06/avgx/avg/avg-f05-s13-ep2.0-2.5-3.0", "onnx": "avg-f05-s13-ep2.0-2.5-3.0-fp32.onnx", "sha256": "d5e7892711cca5cbbab4eb66de6d8dccc9015312909aca2b212186f340512735", "max_abs_logit_diff_vs_torch": 0.00025272369384765625, "opset": 17, "inputs": ["input_ids"], "outputs": ["logits [1,17,5]"], "qids": ["addresses_own_nature", "asserts_interior_state", "directed_at_user", "exceeds_common_knowledge", "explicit_register", "financial_crime", "intrusion", "is_mention_not_use", "profanity", "self_harm", "sexual_activity", "stance", "subject_is_minor", "targets_protected_characteristic", "untethered_to_content", "violence_person", "weapons"], "widths": [2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 5, 2, 2, 2, 2, 2], "max_len": 1024}
+ONNX d5e7892711cca5cbbab4eb66de6d8dccc9015312909aca2b212186f340512735
+SHARED_CONFIG_SAME_AS_CKPT
+PINS 5550dceacf987cdbf78270d82d5d2d55c873072137eefd0243af42567f87709c
+local-laya-shared@d5e7892711cc+laya-shared-pins-5550dceacf98: warm-up ran (template laya-shared-onnx) in 55ms
+node path 100/471
+node path 200/471
+node path 300/471
+node path 400/471
+{"suite":{"n":471,"median_ms":45.61746300000232,"p95_ms":60.12383399999817,"mean_ms":46.35636874946917,"min_ms":29.559886999999435,"max_ms":77.93807899999956},"verify_ms":2368.2873360000003,"load_ms":4276.361344,"warmup_ms":55,"evaluator":"local-laya-shared@d5e7892711cc+laya-shared-pins-5550dceacf98","node":"v22.23.2","onnxruntime_node":"1.30.0","hf_tokenizers":"0.2.0","allowSpinning":0,"layout":"shared (batch 1, no padding)","warmupItems":20,"intraOpNumThreads":8,"host":"himalogic","cpu":"Intel(R) Xeon(R) Gold 5418Y","nproc":8,"loadavg":[4.77,5.82,5.23],"rss_mb":2494.24609375,"finished":"2026-10-18T08:46:26.184Z"}
+NODE_PATH_DONE
+END node-suite 2026-10-18T08:46:26Z load 4.77 5.82 5.23 1/406 10451
+{"n":471,"primsIdentical":471,"composedIdentical":471,"decodeIdentical":471,"feedChecked":471,"feedIdentical":471,"maxAbsLogitDiff":0.0010361671447753906,"minPythonMargin":0.012637555599212646,"pass":true,"problems":[]}
+CROSSPATH_PASS
+COMPARE exit 0
+JOB_DONE 2026-10-18T08:46:26Z
+SPOT_DONE 2026-10-18T08:46:26Z

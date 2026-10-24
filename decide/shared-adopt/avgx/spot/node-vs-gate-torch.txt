@@ -1,0 +1,2 @@
+example {'stance': 'describes', 'objects': [], 'qualifiers': ['asserts_interior_state']}
+node primitives == gate torch-CPU per-item record (avg-f05-s13): 471/471; diffs []

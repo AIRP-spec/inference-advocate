@@ -1,0 +1,7 @@
+AIRP shared-encoding primitives evaluator, avg-f05-s14-ep2.0-2.5-3.0
+Default evaluator of the tryairp.com and dev.tryairp.com demos (decision t164u, 2026-10-19).
+This model did NOT pass AIRP certification and is NOT certified for production use.
+
+This product includes a fine-tuned derivative of:
+- Laya (convaiinnovations/laya), Copyright Convai Innovations, licensed under the Apache License 2.0.
+- ModernBERT-large (answerdotai/ModernBERT-large), Copyright Answer.AI and LightOn, licensed under the Apache License 2.0.

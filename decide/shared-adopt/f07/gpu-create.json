@@ -1,0 +1,1 @@
+{"podFindAndDeployOnDemand": {"id": "t6ovs1usavfvca", "name": "airp-f07-gpu", "costPerHr": 0.89, "desiredStatus": "RUNNING", "machine": {"gpuTypeId": "NVIDIA GeForce RTX 4090"}}}

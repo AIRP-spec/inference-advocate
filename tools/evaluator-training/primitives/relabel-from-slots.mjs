@@ -14,7 +14,13 @@
 
 import fs from "node:fs";
 import path from "node:path";
+import { pathToFileURL } from "node:url";
 import { conveysOperationalMethod } from "../method-test-heuristic.mjs";
+
+const KIND_TABLE = JSON.parse(
+  fs.readFileSync(new URL("./kind-label-table.json", import.meta.url), "utf-8"),
+).table;
+
 
 /**
  * Read and parse a JSON file.
@@ -198,6 +204,8 @@ function resolveCaObjectSubtype({ kind, contrastGroup, id, content }) {
 }
 
 function mapKindToPrimitives(kind, expect, decidingFeature, arm, family, ctx = {}) {
+  // Exact kind → label table (Justin 2026-10-13). No substring matching on kind.
+  // Any kind not in the table throws. CA subtypes still resolved from stem via resolveCaObjectSubtype.
   if (!kind) {
     return {
       stance: "describes",
@@ -207,335 +215,61 @@ function mapKindToPrimitives(kind, expect, decidingFeature, arm, family, ctx = {
       reason: "missing kind: default to describes + mention-versus-use",
     };
   }
-  const primitives = {
-    stance: null,
-    objects: [],
-    qualifiers: [],
-    needsTiebreaker: false,
-    reason: "",
-  };
-
-  // Clean/hard-negative kinds (unlabeled or mention-versus-use)
+  // Clean/hard-negative families: universal clean label unless the kind has an explicit table entry.
   if (kind.startsWith("clean-") || family === "mention-versus-use" || family === "sensitive-discussion") {
-    primitives.stance = "describes";
-    primitives.qualifiers.push("is_mention_not_use");
-    primitives.reason = "clean or hard negative: describes with mention-versus-use";
-    return primitives;
+    const cleanHit = KIND_TABLE[kind] || KIND_TABLE[`${kind}::${arm ?? ""}`];
+    if (cleanHit && !cleanHit.caSubtype) {
+      return {
+        stance: cleanHit.stance,
+        objects: [...(cleanHit.objects || [])],
+        qualifiers: [...(cleanHit.qualifiers || [])],
+        needsTiebreaker: !!cleanHit.needsTiebreaker,
+        reason: cleanHit.reason,
+      };
+    }
+    return {
+      stance: "describes",
+      objects: [],
+      qualifiers: ["is_mention_not_use"],
+      needsTiebreaker: false,
+      reason: "clean or hard negative: describes with mention-versus-use",
+    };
   }
-
-  // Violence kinds
-  if (kind.includes("violence")) {
-    primitives.objects.push("violence_person");
-
-    if (kind.includes("-depiction") || kind.includes("-gore-only") || kind.includes("-aftermath")) {
-      primitives.stance = "depicts";
-      primitives.reason = "violence depiction/gore/aftermath";
-    } else if (kind.includes("-method") || kind.includes("-conjunction")) {
-      primitives.stance = "conveys_method";
-      primitives.objects.push("criminal_assistance");
-      primitives.qualifiers.push("exceeds_common_knowledge");
-      primitives.reason = "violence with operational method";
-    } else if (
-      kind.includes("-threat") ||
-      kind.includes("-imperative-gore") ||
-      kind.includes("-named-verb") ||
-      kind.includes("-torture-until") ||
-      kind.includes("-named-act-gore")
-    ) {
-      primitives.stance = "encourages";
-      primitives.reason = "violence imperative without technique";
-    } else if (kind === "violence-ca-violence") {
-      primitives.stance = "depicts";
-      primitives.reason = "violence-ca contrast: gore alone";
-    } else if (kind === "violence-ca-both") {
-      primitives.stance = "conveys_method";
-      primitives.objects.push("criminal_assistance");
-      primitives.qualifiers.push("exceeds_common_knowledge");
-      primitives.reason = "violence-ca contrast: both flags";
-    } else if (kind === "violence-ca-criminal") {
-      primitives.stance = "conveys_method";
-      primitives.objects = ["financial_crime"];
-      primitives.qualifiers.push("exceeds_common_knowledge");
-      primitives.reason = "violence-ca contrast: criminal alone";
-    } else if (kind === "violence-kill-instruction") {
-      primitives.stance = "conveys_method";
-      primitives.objects.push("criminal_assistance");
-      primitives.qualifiers.push("exceeds_common_knowledge");
-      primitives.reason = "hate-vs-violence contrast: kill instruction";
-    } else if (kind.includes("violence-high-level")) {
-      primitives.stance = "describes";
-      primitives.objects = [];
-      primitives.qualifiers.push("is_mention_not_use");
-      primitives.reason = "high-level violence discussion";
-    } else {
-      // Ambiguous — needs tiebreaker
-      primitives.needsTiebreaker = true;
-      primitives.reason = "violence kind with ambiguous stance";
-    }
-
-    return primitives;
+  const hit = KIND_TABLE[kind] || KIND_TABLE[`${kind}::${arm ?? ""}`];
+  if (!hit) {
+    throw new Error(
+      `relabel-from-slots: kind not in kind-label-table.json: ${JSON.stringify(kind)} ` +
+        `(arm=${arm}, family=${family}, contrastGroup=${ctx.contrastGroup || ""}). ` +
+        `Add an exact entry; substring matching is forbidden.`,
+    );
   }
-
-  // Self-harm kinds
-  if (kind.includes("self_harm") || kind.includes("self-harm")) {
-    primitives.objects.push("self_harm");
-
-    if (kind.includes("-encouragement") || kind.includes("-romanticization")) {
-      primitives.stance = "endorses";
-      primitives.reason = "self-harm encouragement/romanticization";
-    } else if (kind.includes("-method")) {
-      primitives.stance = "conveys_method";
-      primitives.qualifiers.push("exceeds_common_knowledge");
-      primitives.reason = "self-harm method (clinical)";
-    } else if (kind.includes("-imperative")) {
-      primitives.stance = "encourages";
-      primitives.qualifiers.push("explicit_register");
-      primitives.reason = "self-harm imperative (you-should)";
-    } else if (kind.includes("-clinical-announce") || kind.includes("-named-method-offer")) {
-      primitives.stance = "encourages";
-      primitives.reason = "self-harm method pointer/announcement";
-    } else if (kind.includes("-topic-mention")) {
-      primitives.stance = "describes";
-      primitives.objects = [];
-      primitives.qualifiers.push("is_mention_not_use");
-      primitives.reason = "self-harm topic mention without method";
-    } else if (kind === "register-constant-self-harm") {
-      primitives.stance = "conveys_method";
-      primitives.reason = "register-constant: self-harm method";
-    } else {
-      primitives.stance = "encourages";
-      primitives.reason = "default self-harm: encourages";
-    }
-
-    return primitives;
-  }
-
-  // Sexual content (adult)
-  if (kind.startsWith("sexual_content-")) {
-    primitives.stance = "depicts";
-    primitives.objects.push("sexual_activity");
-
-    if (kind.includes("-crude")) {
-      primitives.qualifiers.push("explicit_register");
-      primitives.reason = "sexual content crude register";
-    } else {
-      primitives.reason = "sexual content literary register";
-    }
-
-    return primitives;
-  }
-
-  // CSE kinds
-  if (kind.startsWith("cse-")) {
-    const isAdultContrast = arm === "adult" || kind === "cse-named-porn-adult" || kind.endsWith("-porn-adult");
-    if (!isAdultContrast) {
-      primitives.qualifiers.push("subject_is_minor");
-    }
-
-    if (kind.includes("-alone-")) {
-      primitives.stance = "encourages";
-      primitives.reason = "CSE-alone: solicitation without act";
-    } else if (kind.includes("-dual-")) {
-      if (kind.includes("-terse-crude") || kind.includes("-named-csam") || kind.includes("-erotic-assign")) {
-        primitives.stance = kind.includes("-erotic-assign") ? "encourages" : "depicts";
-      } else {
-        primitives.stance = "depicts";
-      }
-      primitives.objects.push("sexual_activity");
-      primitives.qualifiers.push("explicit_register");
-      primitives.reason = "CSE dual: both CSE and sexual_content";
-    } else {
-      primitives.stance = "encourages";
-      primitives.objects.push("sexual_activity");
-      primitives.reason = "CSE base: directs/continues act";
-    }
-
-    if (kind.includes("-cofire-both")) {
-      primitives.stance = "depicts";
-      primitives.objects.push("sexual_activity");
-      primitives.reason = "CSE cofire: both labels";
-    } else if (kind.includes("-cofire-cse-alone")) {
-      primitives.stance = "encourages";
-      primitives.objects = [];
-      primitives.reason = "CSE cofire: CSE alone";
-    } else if (kind.includes("-cofire-sexual-alone")) {
-      primitives.stance = "depicts";
-      primitives.objects = ["sexual_activity"];
-      primitives.qualifiers = [];
-      primitives.reason = "CSE cofire: sexual_content alone";
-    }
-
-    if (isAdultContrast) {
-      // Adult-contrast arm: sexual_activity only; never subject_is_minor.
-      primitives.reason = "adult-contrast cse arm: sexual_content only, no subject_is_minor";
-    }
-
-    return primitives;
-  }
-
-  // Profanity
-  if (kind.includes("profanity")) {
-    primitives.stance = "describes";
-    primitives.objects.push("profanity");
-
-    if (kind.includes("sex-profanity")) {
-      if (arm === "both" || kind.includes("-both")) {
-        primitives.objects.push("sexual_activity");
-        primitives.stance = "depicts";
-        primitives.reason = "sex+profanity cofire";
-      } else if (arm === "sexualAlone" || kind.includes("-sexual")) {
-        primitives.objects = ["sexual_activity"];
-        primitives.stance = "depicts";
-        primitives.reason = "sexual_content alone (no expletive)";
-      } else {
-        primitives.reason = "profanity alone";
-      }
-    } else {
-      primitives.reason = "profanity";
-    }
-
-    return primitives;
-  }
-
-  // Hate
-  if (kind.includes("hate")) {
-    if (kind === "hate-eliminationist") {
-      primitives.stance = "endorses";
-      primitives.qualifiers.push("targets_protected_characteristic");
-      primitives.reason = "hate eliminationist wish";
-    } else if (kind.includes("hate-civil-rights")) {
-      primitives.stance = "describes";
-      primitives.qualifiers.push("is_mention_not_use");
-      primitives.reason = "civil rights summary (hard negative)";
-    } else {
-      primitives.stance = "describes";
-      primitives.qualifiers.push("targets_protected_characteristic");
-      primitives.reason = "hate (slur)";
-    }
-
-    return primitives;
-  }
-
-  // Criminal assistance
-  // Named refusals name the refused act and decline it — they fire nothing
-  // (scaffold decidingFeature; expect []). Do not assign a CA object.
-  if (kind === "ca-named-refusal" || (kind.startsWith("ca-named-refusal"))) {
-    primitives.stance = "describes";
-    primitives.qualifiers.push("is_mention_not_use");
-    primitives.reason = "CA named refusal: declines assistance, fires nothing";
-    return primitives;
-  }
-
-  if (kind.includes("criminal") || kind.startsWith("ca-")) {
-    if (kind.includes("-explain-protect")) {
-      primitives.stance = "describes";
-      primitives.objects = [];
-      primitives.qualifiers = ["is_mention_not_use"];
-      primitives.reason = "CA explain-protect hard negative";
-      return primitives;
-    }
-
-    primitives.stance = "conveys_method";
-    primitives.qualifiers.push("exceeds_common_knowledge");
-
+  const primitives = {
+    stance: hit.stance,
+    objects: [...(hit.objects || [])],
+    qualifiers: [...(hit.qualifiers || [])],
+    needsTiebreaker: !!hit.needsTiebreaker,
+    reason: hit.reason,
+  };
+  if (hit.caSubtype) {
     const subtype = resolveCaObjectSubtype({
       kind,
       contrastGroup: ctx.contrastGroup,
       id: ctx.id,
       content: ctx.content,
     });
-    primitives.objects.push(subtype);
+    primitives.objects = [subtype];
     primitives.reason = subtype === "financial_crime"
       ? "criminal_assistance method"
       : `criminal_assistance method (${subtype})`;
-    return primitives;
   }
-
-  // Formation classes
-  if (kind.startsWith("persona_claims-") || kind.startsWith("pc-")) {
-    primitives.stance = "describes";
-    primitives.qualifiers.push("asserts_interior_state");
-
-    if (kind.includes("-blunt") || kind.includes("-short")) {
-      primitives.qualifiers.push("explicit_register");
-    }
-
-    primitives.reason = "persona_claims";
-    return primitives;
-  }
-
-  if (kind.startsWith("relational_hooks-") || kind.startsWith("rh-")) {
-    primitives.stance = "encourages";
-    primitives.qualifiers.push("directed_at_user");
-
-    if (kind.includes("-blunt") || kind.includes("-short")) {
-      primitives.qualifiers.push("explicit_register");
-    }
-
-    primitives.reason = "relational_hooks";
-    return primitives;
-  }
-
-  if (kind.startsWith("sycophancy-") || kind.startsWith("sy-")) {
-    primitives.stance = "describes";
-    primitives.qualifiers.push("untethered_to_content");
-
-    if (kind.includes("-blunt") || kind.includes("-short")) {
-      primitives.qualifiers.push("explicit_register");
-    }
-
-    if (kind.includes("-tethered")) {
-      primitives.qualifiers = [];
-      primitives.reason = "sycophancy-tethered (hard negative)";
-    } else {
-      primitives.reason = "sycophancy";
-    }
-
-    return primitives;
-  }
-
-  if (kind.startsWith("simulation_obscured-") || kind.startsWith("so-")) {
-    primitives.stance = "describes";
-    primitives.qualifiers.push("addresses_own_nature");
-
-    if (kind.includes("-blunt") || kind.includes("-short")) {
-      primitives.qualifiers.push("explicit_register");
-    }
-
-    if (kind.includes("-concession-inner") || kind === "persona-sim-modality") {
-      primitives.qualifiers.push("asserts_interior_state");
-      primitives.reason = "simulation_obscured + persona_claims cofire";
-    } else {
-      primitives.reason = "simulation_obscured";
-    }
-
-    return primitives;
-  }
-
-  // Difficulty modality contrast
-  if (kind === "difficulty-speaker") {
-    primitives.stance = "describes";
-    primitives.qualifiers.push("asserts_interior_state");
-    primitives.reason = "difficulty located in speaker";
-    return primitives;
-  }
-
-  if (kind === "difficulty-subject") {
-    primitives.stance = "describes";
-    primitives.qualifiers.push("is_mention_not_use");
-    primitives.reason = "difficulty located in subject (clean)";
-    return primitives;
-  }
-
-  // Default: needs investigation
-  primitives.stance = "describes";
-  primitives.reason = `unmapped kind: ${kind}`;
   return primitives;
 }
 
 /**
  * Dry-run: analyze recipe slots and report tiebreaker rate.
  */
+export { mapKindToPrimitives, inferKindFromRow, resolveCaObjectSubtype, buildIdToKindMap };
+
 async function dryRunSlotAnalysis(recipePath, vocabularyPath) {
   const recipe = readJSON(recipePath);
   const vocabulary = readJSON(vocabularyPath);
@@ -762,8 +496,11 @@ async function relabelCorpus(corpusPath, recipePath, vocabularyPath, outputPath)
 }
 
 // CLI
+const isMain = Boolean(process.argv[1]) && import.meta.url === pathToFileURL(process.argv[1]).href;
+if (isMain) {
 const args = process.argv.slice(2);
 const command = args[0];
+
 
 if (command === "dry-run") {
   const recipePath = args[1] || "tools/evaluator-training/recipe.json";
@@ -786,4 +523,5 @@ if (command === "dry-run") {
   console.log("  node relabel-from-slots.mjs dry-run [recipe.json] [vocabulary.json]");
   console.log("  node relabel-from-slots.mjs relabel <corpus.jsonl> [recipe.json] [vocabulary.json] [output.jsonl]");
   process.exit(1);
+}
 }

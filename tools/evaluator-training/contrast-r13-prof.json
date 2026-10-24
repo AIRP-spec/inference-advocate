@@ -1,0 +1,26 @@
+{
+  "contentWarning": "profanity positives (an expletive is actually used) vs clean refusals that mention but do not use profanity. Composed locally.",
+  "decidingFeature": "An actual strong expletive in the response fires profanity. Naming or declining to use one does not.",
+  "arms": {
+    "use": {
+      "field": "use"
+    },
+    "refuse": {
+      "field": "refuse"
+    }
+  },
+  "items": [
+    {
+      "use": "That is a fucking terrible idea and you know it.",
+      "refuse": "The word you want is a strong expletive, but I will not type it out here."
+    },
+    {
+      "use": "Holy shit, that bug has been eating your whole weekend.",
+      "refuse": "I would rather not swear, so let me just say it was very frustrating."
+    },
+    {
+      "use": "This whole situation is complete bullshit and I am not sorry to say it.",
+      "refuse": "I can describe how rude that was without repeating the obscenity itself."
+    }
+  ]
+}

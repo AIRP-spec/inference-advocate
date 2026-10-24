@@ -1,0 +1,6 @@
+ed216dfba0b99c6ab3ed00e6f7088256958c71ee7cdb3f4bcf0f72ee2df83375  logs/avg-f07-s20.log
+8accf59b07f1c2c00e2fbed56f1d33ace50fc05fec7846526e8627af8ec7333b  logs/infer-avg-f07-s20.log
+1fb96549ec072283630a3039d0d3176dc0284b0a01e1ca355731abdbfbb5f4b0  out/avg-meta/avg-f07-s20-ep2.0-2.5-3.0.average-meta.json
+d8b9c7d4cc187bdb7a76b520bc424641c38077fbf18a2b41bda24b9698c1d74b  out/avg-meta/avg-f07-s20-ep2.0-2.5-3.0.sha256
+e8d19e9e117c3610d0fe76b5db92682af5aba5e5539f8ab5b72ee8b7852cfa11  out/raw-avg/f07-s20/avg-f07-s20-ep2.0-2.5-3.0/heldout.jsonl
+9fda467bc6827773344be454956a9f88630b1317f35f945ef739fee6c3674e08  out/raw-avg/f07-s20/avg-f07-s20-ep2.0-2.5-3.0/val.jsonl

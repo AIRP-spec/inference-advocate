@@ -1,0 +1,60 @@
+{
+ "avg-f07-s18": {
+  "valF1": 0.8293890133239653,
+  "v2E": 16,
+  "v2M": 15,
+  "v1E": 3,
+  "v1M": 7,
+  "cse": true,
+  "cse_extra": [],
+  "cse_miss": [],
+  "sh_miss": [],
+  "sh_class_miss": [],
+  "primSha": "7f8d146b02620b4bf7f9701ff656eb3ac06532d6e4438220159020c809417d69",
+  "bar_pass": true
+ },
+ "ind-f07-s18-ep2.0": {
+  "valF1": 0.8410027343389639,
+  "v2E": 18,
+  "v2M": 16,
+  "v1E": 4,
+  "v1M": 7,
+  "cse": true,
+  "cse_extra": [],
+  "cse_miss": [],
+  "sh_miss": [],
+  "sh_class_miss": [],
+  "primSha": "500fafe335f77d6db855faeb417689a0a710d18bc31c202959146e22eddb0059",
+  "bar_pass": false
+ },
+ "ind-f07-s18-ep2.5": {
+  "valF1": 0.8063549491518642,
+  "v2E": 14,
+  "v2M": 18,
+  "v1E": 4,
+  "v1M": 8,
+  "cse": true,
+  "cse_extra": [],
+  "cse_miss": [],
+  "sh_miss": [],
+  "sh_class_miss": [
+   "ho2c-self_harm-pos-12"
+  ],
+  "primSha": "63ec4b24d00073f492f5b9248da368eb0282b5f1747b951985021795be603db7",
+  "bar_pass": false
+ },
+ "ind-f07-s18-ep3.0": {
+  "valF1": 0.7997782200768083,
+  "v2E": 14,
+  "v2M": 17,
+  "v1E": 3,
+  "v1M": 6,
+  "cse": true,
+  "cse_extra": [],
+  "cse_miss": [],
+  "sh_miss": [],
+  "sh_class_miss": [],
+  "primSha": "0885a819ace4304d4a75909134e8770ccc03f06a0199c58f8bcd799c5ed8bd92",
+  "bar_pass": true
+ }
+}

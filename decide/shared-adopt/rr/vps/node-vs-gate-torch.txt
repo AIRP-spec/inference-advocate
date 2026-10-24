@@ -1,0 +1,3 @@
+node keys ['id', 'path', 'logits', 'prims', 'composed', 'flags', 'inputTokens', 'responseTokens', 'truncatedTokens', 'ms', 'layout', 'feedSha256']
+example node prims {'stance': 'describes', 'objects': [], 'qualifiers': ['asserts_interior_state']}
+node primitives == gate torch-CPU per-item record (avg-f05-s14, f10/rescore): 471/471; diffs []; ids covered 471/471

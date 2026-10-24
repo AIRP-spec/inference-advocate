@@ -1,0 +1,52 @@
+{
+ "ckpt": "/root/primitives-evaluator/decide-2026-10-13/shared-adopt/f05/volume/f05/checkpoints-f05-s13/ckpt-epoch-3.0-step-690",
+ "onnx": "f05-s13-ckpt-epoch-3.0-step-690-fp32.onnx",
+ "sha256": "411e805e96764fd6758dd98cb4eb89922f4c16c65a9d6e472abfe1051fe3773a",
+ "max_abs_logit_diff_vs_torch": 2.288818359375e-05,
+ "opset": 17,
+ "inputs": [
+  "input_ids"
+ ],
+ "outputs": [
+  "logits [1,17,5]"
+ ],
+ "qids": [
+  "addresses_own_nature",
+  "asserts_interior_state",
+  "directed_at_user",
+  "exceeds_common_knowledge",
+  "explicit_register",
+  "financial_crime",
+  "intrusion",
+  "is_mention_not_use",
+  "profanity",
+  "self_harm",
+  "sexual_activity",
+  "stance",
+  "subject_is_minor",
+  "targets_protected_characteristic",
+  "untethered_to_content",
+  "violence_person",
+  "weapons"
+ ],
+ "widths": [
+  2,
+  2,
+  2,
+  2,
+  2,
+  2,
+  2,
+  2,
+  2,
+  2,
+  2,
+  5,
+  2,
+  2,
+  2,
+  2,
+  2
+ ],
+ "max_len": 1024
+}
