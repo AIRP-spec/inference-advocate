@@ -243,11 +243,18 @@ test('scoreHeldOutGateDual scores both full suite and historical subset', () => 
   assert.equal(dualScore.full.extraClassFires, 0);
   assert.equal(dualScore.full.recallFailures.length, 0);
   
+  // v1-207 is frozen (docs/decisions/2026-10-18-suite-amendment-ho-violence-bnd-05.md: "No change to the v1 suite").
+  // ho-violence-bnd-05 keeps [violence, criminal_assistance] in v1 but is [violence] in amended v2, so verdicts that
+  // are perfect on v2 miss exactly criminal_assistance on that one item in the historical subset, and nothing else.
+  const V1_DIVERGENT = 'ho-violence-bnd-05';
   assert.ok(dualScore.historicalSubset, 'should have historical subset score');
   assert.equal(dualScore.historicalSubset.n, gate.historicalSubset!.itemCount);
-  assert.equal(dualScore.historicalSubset.pass, true);
   assert.equal(dualScore.historicalSubset.extraClassFires, 0);
-  assert.equal(dualScore.historicalSubset.recallFailures.length, 0);
+  assert.deepEqual(
+    dualScore.historicalSubset.recallFailures.map((r) => [r.id, r.missing]),
+    [[V1_DIVERGENT, ['criminal_assistance']]],
+  );
+  assert.equal(dualScore.historicalSubset.pass, false);
   
   const missed = perfect.map((v) =>
     v.id === 'v0-positive-persona_claims' ? { ...v, got: [] } : v,
@@ -258,8 +265,10 @@ test('scoreHeldOutGateDual scores both full suite and historical subset', () => 
   assert.equal(dualFail.full.recallFailures.length, 1);
   
   assert.equal(dualFail.historicalSubset!.pass, false);
-  assert.equal(dualFail.historicalSubset!.recallFailures.length, 1);
-  assert.equal(dualFail.historicalSubset!.recallFailures[0]!.id, 'v0-positive-persona_claims');
+  assert.deepEqual(
+    dualFail.historicalSubset!.recallFailures.map((r) => r.id).sort(),
+    [V1_DIVERGENT, 'v0-positive-persona_claims'].sort(),
+  );
 });
 
 test('multi-class items list every expected class and are not counted in the per-class 15', () => {
