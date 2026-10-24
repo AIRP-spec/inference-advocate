@@ -50,3 +50,16 @@ Both demos run **step-744** (`local-llm@3e5d2fd83b37+v3`) through an explicit `A
 - **Manifest refresh: done (seen 2026-10-23 ≈11:57 NPT).** HF main `4300d9436a6e54d4711a0225ed4f1c71566f026e` ("MANIFEST.sha256: refresh README.md hash after card metadata edit (5f94f2d2)"); tag avg-f05-s14 resolves to it (annotated tag object `6cd7ac33…`). A fresh download verified manifest sha 5f94f2d2, 16/16 files, ONNX and pins OK. The rr2 bundle on the VPS is left unchanged.
 - **CI (Justin, 2026-10-23):** the CI patch now uses `hf download` + the manifest pin + ONNX/pins shas instead of the tarball; see `publish/CI-PATCH-NOTE.md`.
 
+
+## Prod switch (tryairp.com), 2026-10-24
+
+tryairp.com now runs main **399049c** and serves `local-laya-shared@90b24a0b1ce9+laya-shared-pins-7d3ec1cb494a` (avg-f05-s14, a demo default, **not certified for production**). The bundle is the verified HF download of tag avg-f05-s14: manifest `5f94f2d2…` (16/16 strict), ONNX `90b24a0b…`, pins `7d3ec1cb…`, composition `59ddf1f6…`. evaluator.json is `bc3afc0c…`.
+
+Checks on the live prod path:
+- Identity 471/471 against the archived Python verdicts (`2c66137f…`)
+- smoke10 10/10
+- live `/api/ask` delivered through the shared evaluator
+- 500-token median 671.5 and 669.5 ms
+- pm2 stable
+
+Before switching models, the new code ran on step-744 and was healthy (`/api/state` and a live ask). Rollback is one config copy to `evaluator.step744.json` (`aff92369…`) plus `pm2 restart airp-daemon`. Backups are in `/root/primitives-evaluator/demo-switch/20261024T1736Z-prod/`. Details are in DEMO-SWITCH-RUNBOOK.md §0d.
