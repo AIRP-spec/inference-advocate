@@ -41,7 +41,7 @@ const PINNED = {
   tokenizer: '6c8aaa9a542084f2457eab775d4eeb51f92a70c0fd9de28d5edb0ddec3c08d30',
   questions: 'f519fa8e4763cc95acef3d134f984941c263043bad4abfd2a827c69e560650ee',
   composition: '59ddf1f630ec2dcd81d40dd01f2adb53f1310fe42128d3ccc9b90de61e28ab9e',
-  suite: '6c7b30e16b8ab53544f590bcbbdcd381f32e3e4cf324e225e2e8c489cebb28e4',
+  suite: '82f8e720fbb1d146a93a09da86484dada04561cffd85293be435c0ed0000ad77',
 };
 const pins = JSON.parse(readFileSync(PINS, 'utf8'));
 const composition = JSON.parse(readFileSync(COMPOSITION, 'utf8'));

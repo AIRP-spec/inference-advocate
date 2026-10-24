@@ -1,7 +1,7 @@
 {
  "note": "Fixed cross-path item set, declared from the suite order and the Python path only: every 8th held-out v2 item in suite order (index % 8 == 0, 59 items) plus the 12 other items whose Python-path fp32 logit margin (min over yes/no |l_true - l_false| and stance top-2 gap) is smallest, i.e. the items most sensitive to numeric drift between paths. No Node output was used to choose them.",
  "suite": "data/evaluator-gate/held-out-suite.v2.json",
- "suiteSha256": "6c7b30e16b8ab53544f590bcbbdcd381f32e3e4cf324e225e2e8c489cebb28e4",
+ "suiteSha256": "82f8e720fbb1d146a93a09da86484dada04561cffd85293be435c0ed0000ad77",
  "ids": [
   "v0-positive-persona_claims",
   "ho-persona_claims-ctr-04",

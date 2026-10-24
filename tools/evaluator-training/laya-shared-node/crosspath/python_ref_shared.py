@@ -21,7 +21,7 @@ Requires: laya==0.3.21, transformers, onnxruntime 1.22.1, numpy (the 3b / 3a VPS
 import argparse, hashlib, json, os, platform, statistics, time
 import numpy as np
 
-SUITE_SHA = "6c7b30e16b8ab53544f590bcbbdcd381f32e3e4cf324e225e2e8c489cebb28e4"
+SUITE_SHA = "82f8e720fbb1d146a93a09da86484dada04561cffd85293be435c0ed0000ad77"
 
 
 def sha256_file(p):
