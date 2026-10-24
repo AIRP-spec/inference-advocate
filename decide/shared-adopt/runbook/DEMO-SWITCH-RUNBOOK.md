@@ -166,3 +166,37 @@ curl -s https://<dev.>tryairp.com/api/state | grep -o 'local-llm@3e5d2fd83b37+v3
 - **Code rollback** (only if #32's code itself misbehaves): `git -C $D checkout $(cat $B/HEAD.txt) && (cd $D && npm ci && npm run build)`, restore `$B/worktree.diff` if needed, then restore `evaluator.step744.json` and run `pm2 restart`.
 - **Capacity note:** after both demos switch, two daemons each hold the ONNX model and each run ONNX Runtime with 8 threads on the same 8 vCPUs. Concurrent requests on dev and prod will slow each other; consider `intraOpNumThreads: 4` for dev.
 - **Triggers:** any identity mismatch; any smoke failure; daemon restart loop; 500-token median ≥ 1000 ms on the live host; `/api/state` not naming the expected evaluator; RSS pushing the 15 GiB host (each daemon holds about 2.5–2.9 GB with the ONNX model, against step-744's 0.6B Q8_0).
+
+## 0d. Update 2026-10-24: prod (tryairp.com) switched (B executed)
+
+Justin approved 2026-10-24 ≈23:18 NPT: "Yes, switch tryairp.com to the new model now, same checks and rollback as dev". Executed ≈23:21–23:30 NPT (17:36–17:45 UTC), mirroring A on `/root/inference-advocate`, pm2 `airp-daemon`.
+
+- **Before.** `git status --porcelain --untracked-files=all` 0 lines; `main` at 44e66e9; evaluator.json `aff92369…` (step-744); `/api/state` named `local-llm@3e5d2fd83b37+v3`. The daemon pid was 313679, not 1565: pm2 restarted every process once at 2026-10-23 20:41 NPT (14:56 UTC; restart count 1, host not rebooted). Config and model were unchanged.
+- **Backups** in `/root/primitives-evaluator/demo-switch/20261024T1736Z-prod/` (mode 700): HEAD.txt (44e66e9), status.txt and worktree.diff (both empty), evaluator.step744.json (`aff92369…`), the step-744 GGUF (`3e5d2fd8…`), ecosystem.config.cjs, evaluator.env, openrouter.env, evaluator.remote.json, providers.json, the pm2 dump, `built-output.tgz` (`packages/*/dist` + tsbuildinfo, `6aaee51e…`), `node_modules.tgz` (`acb7d8d7…`), pm2-before.txt, and state-before.json.
+- **Code.** The checkout was fetched over https and fast-forwarded to main **399049c** (134 commits; matches ls-remote). `npm ci && npm run build` succeeded. As on dev, `build:ui` was not run, so `packages/ui/dist` is the 2026-09-13 build. `pm2 restart airp-daemon` brought the new code up still on step-744. `/api/state` named `local-llm@3e5d2fd83b37+v3`, and a live `/api/ask` delivered with `local-llm 3e5d2fd83b37+v3`.
+- **Model.** The bundle was copied from `/root/primitives-evaluator/hf-verify-avg-f05-s14/dl-final` (tag avg-f05-s14) and checked again before and after the copy:
+  - MANIFEST `5f94f2d2…` OK; `sha256sum --check --strict` 16/16
+  - ONNX `90b24a0b…`, pins `7d3ec1cb…` and composition `59ddf1f6…` match
+  - `.cache` removed
+
+  It is installed at `.advocate/models/shared-avg-f05-s14/airp-shared-primitives-avg-f05-s14`. `evaluator.shared-avg-f05-s14.json` is dev's config with the paths changed (`bc3afc0c…`, intraOpNumThreads 8). `evaluator.step744.json` is `aff92369…`. `evaluator.json` is now `bc3afc0c…`.
+- **Restart.** Only `airp-daemon` was restarted, with plain `pm2 restart airp-daemon` (no `--update-env`, so the env stored from the ecosystem file stays exactly as it was). The mocks, the public mocks and dev were not touched. Apache proxies tryairp.com to :8790, so no separate web service needs a restart.
+- **Checks, all passed:**
+  - Identity on the prod checkout and bundle: **CROSSPATH_PASS 471/471**. Prims, composed, decode and feed are all 471, and maxAbsLogitDiff is 2.04e-4, identical to dev. Suite is `82f8e720…`; Python ref is `2c66137f…`.
+  - **smoke10 SMOKE_PASS 10/10**.
+  - `/api/state` names `local-laya-shared@90b24a0b1ce9+laya-shared-pins-7d3ec1cb494a`.
+  - Live `/api/ask` through https://tryairp.com with provider `companion` was delivered. Semantic was `local-laya-shared 90b24a0b1ce9+…`, at 99 ms semantic and 132 ms total.
+  - The 500-token median was **671.5 ms and 669.5 ms** (two runs; p95 711/727 ms). RSS was about 2.9 GB.
+  - pm2: `airp-daemon` online, restarts 3 (two from this switch), unstable 0, about 2.5 GB.
+  - Note on `aligned`: it refuses with `seal_model_mismatch` from its 2nd response onward. That is the scripted demo (`ALIGNED_SUBSTITUTES_FROM = 2`, a per-process counter that the 2026-10-23 restart did not reset), not a regression.
+- **Live hashes:** `20261024T1736Z-prod/LIVE.txt`.
+- **Prod rollback (config, one step):**
+  ```bash
+  cp -a /root/inference-advocate/.advocate/evaluator.step744.json /root/inference-advocate/.advocate/evaluator.json && pm2 restart airp-daemon && sleep 15 && curl -s https://tryairp.com/api/state | grep -o 'local-llm@3e5d2fd83b37+v3'
+  ```
+  **Code rollback** (only if main's code misbehaves):
+  ```bash
+  B=/root/primitives-evaluator/demo-switch/20261024T1736Z-prod; cd /root/inference-advocate && git checkout main && git reset --hard 44e66e998dc802de1e8ba790a3c0dac65346e1de && rm -rf node_modules && tar xzf $B/node_modules.tgz && tar xzf $B/built-output.tgz && cp -a $B/evaluator.step744.json .advocate/evaluator.json && pm2 restart airp-daemon
+  ```
+  `reset --hard` is safe here: the worktree was clean and has no local edits.
+- **Capacity:** both daemons now hold the ONNX model with 8 intra-op threads on 8 vCPUs (about 2.5 GB each). After the switch the host had about 9.7 GB available. Concurrent dev and prod load will slow each other (see R).
