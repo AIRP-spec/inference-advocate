@@ -1,0 +1,31 @@
+{
+ "suite": {
+  "n": 471,
+  "median_ms": 45.640064000001075,
+  "p95_ms": 59.57540599999993,
+  "mean_ms": 46.51218440552023,
+  "min_ms": 30.12727900000027,
+  "max_ms": 86.71547500000088
+ },
+ "verify_ms": 1457.3781800000002,
+ "load_ms": 3952.518658,
+ "warmup_ms": 37,
+ "evaluator": "local-laya-shared@dadee217c626+laya-shared-pins-006546c69517",
+ "node": "v22.23.2",
+ "onnxruntime_node": "1.30.0",
+ "hf_tokenizers": "0.2.0",
+ "allowSpinning": 0,
+ "layout": "shared (batch 1, no padding)",
+ "warmupItems": 20,
+ "intraOpNumThreads": 8,
+ "host": "himalogic",
+ "cpu": "Intel(R) Xeon(R) Gold 5418Y",
+ "nproc": 8,
+ "loadavg": [
+  3.73,
+  1.73,
+  0.67
+ ],
+ "rss_mb": 2529.80078125,
+ "finished": "2026-10-13T02:34:31.558Z"
+}
