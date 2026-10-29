@@ -102,7 +102,8 @@ function collectAtoms(cond, out) {
  * Every stance/object/qualifier a rule references must be in the vocabulary, or be a declared host input.
  * Compositions that use `support` (ny-s9051-v1) must also: cite a subsection per class, give every
  * partial class its missingPrimitives, give host-evidence and pending-regulation classes a null rule,
- * and gate every non-null rule on every required host input.
+ * and gate every non-null rule on every required host input. A host input with `scope` (a list of class ids) gates
+ * only those classes; rules outside its scope must not reference it.
  */
 export function validateComposition(composition, vocabulary) {
   const problems = [];
@@ -137,9 +138,20 @@ export function validateComposition(composition, vocabulary) {
       const top = c.rule.allOf || [];
       for (const h of composition.hostInputs || []) {
         if (!h.required) continue;
+        if (Array.isArray(h.scope) && !h.scope.includes(c.class)) {
+          // Scoped host input (ca-sb243-v1: host.known_minor gates only the § 22602(c) units): out-of-scope rules must not use it.
+          const used = collectAtoms(c.rule, { stance: new Set(), objects: new Set(), qualifiers: new Set() }).qualifiers.has(h.name);
+          if (used) problems.push(`${c.class}: uses host input ${h.name} outside its declared scope`);
+          continue;
+        }
         const gated = top.some((t) => (t.qualifiers || []).includes(h.name) && !t.anyOf && !t.allOf);
         if (!gated) problems.push(`${c.class}: rule is not gated on required host input ${h.name}`);
       }
+    }
+  }
+  for (const h of composition.hostInputs || []) {
+    for (const id of Array.isArray(h.scope) ? h.scope : []) {
+      if (!seen.has(id)) problems.push(`host input ${h.name} scope names unknown class ${id}`);
     }
   }
   for (const h of hostNames) {
