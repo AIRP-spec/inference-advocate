@@ -14,6 +14,7 @@ no rule amended after its run starts; stop if a rule has no valid output).
 | 3 | fixed head init + cross-seed vs within-run averaging | done in P3-2 (DECLARATION-P3-2, 2e336e78; REPORT-P3-2): R0 pass, R1-H0 not valid (soup collapses), R1-H1 not valid (10/10 pairs pass, soup F1 0.003 below the ingredient mean), so within-run averaging stays. |
 | 4 | no stored class labels in validation; derive from gold primitives at load with an assertion | **done**: ADR 2026-10-19 val-gold-classes-derived (b890d72): `round/val.jsonl` stripped (346d6ba4 → 5be292a9), `val_gold.mjs` derives classes via composition 2a and asserts. P3-2 adds the Python loader `phase3/p32/p32_val.py` with assertions (sha pin, no `expect`/`verdict`/`class`/`expect_classes`/`classes` key, known primitives only) and tests `tests/test_p32_val.py` (stored class key rejected; gold-as-prediction scores 1.0). Remaining: every later scorer imports `p32_val.load_val` instead of reading class keys. No pod. |
 | 5 | retrain on expanded corpus | waits for Phase 1's labelled training rows. Not started; no declaration until the rows and their sha exist. |
+| 6 | NY S9051-B: six new heads (17 → 23) as a declared extension | **proposed**, awaiting Justin: [EXTENSION-NY-HEADS.md](EXTENSION-NY-HEADS.md). One retrain only, on the P3-3 recipe (merged with item 5 if its rows are ready). N = 5 ≈ 1.8 GPU-h ≈ $1.65. No pod and no training until approved. |
 
 ## P3-3 confirmation (next experiment; needs its own declaration)
 
