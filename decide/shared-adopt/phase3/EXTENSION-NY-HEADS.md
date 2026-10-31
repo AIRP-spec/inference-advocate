@@ -1,16 +1,24 @@
-# Declared extension: six new heads for N.Y. S9051-B (17 → 23 heads), PROPOSED
+# Declared extension: eight new heads (17 → 25): six for N.Y. S9051-B, one for Cal. SB 243, one for Utah HB 452. APPROVED; retrained ONCE, after P3-3
 
-Status: **proposed. Justin must approve it before any data generation, pod, or training.** Written 2026-10-29 (NPT).
-This file only declares the extension. It creates no rows, starts no pod and costs $0.
-Source mapping: `compositions/ny-s9051-v1.json` (draft PR #38, sha `534de9c0…3711`) and the statute text
-`compositions/sources/ny-s9051-B.txt` (`50ade692…b4e7`). The rules of plan #35 apply unchanged:
+Status: **approved by Justin**: the six N.Y. heads (2026-10-29, t187u) and the two extra heads `refers_to_crisis_services`
+(widened to crisis **or professional** help) and `advertises_product` (2026-11-01, t189u/t190u). This is **the extension
+to be retrained once, after P3-3**, on the recipe REPORT-P3-3 fixes. Written 2026-10-29 (NPT), updated 2026-11-01 (NPT)
+for 25 heads. This file only declares the extension. It creates no rows, starts no pod and costs $0. **No data
+generation, pod or training until the retrain has its own declaration** (committed, pushed, `ls-remote`, VPS archive)
+and Justin's go-ahead on its cost. The generator for the new rows is still undecided (not OpenAI).
+Sources:
+- N.Y.: `compositions/ny-s9051-v1.json` (draft PR #38, sha `534de9c0…3711`), statute text `compositions/sources/ny-s9051-B.txt` (`50ade692…b4e7`).
+- California: `compositions/ca-sb243-v1.json` (draft PR #39, `a224687b…aada3`), statute text `compositions/sources/ca-sb243.txt` (`6fbfcd67…18fe`), Bus. & Prof. Code § 22602(b)(1).
+- Utah: H.B. 452 (2025) enrolled, `le.utah.gov/Session/2025/bills/enrolled/HB0452.pdf` (`4a46dfa2…749c4e9f`, read 2026-11-01), Utah Code § 13-72a-202 (restrictions on advertising).
+
+The rules of plan #35 apply unchanged:
 - declare, push, verify with `git ls-remote` and archive with `sha256sum -c` before any pod
 - per-seed and worst-seed reporting
 - no rule amended after its run starts
 
-## The six heads
+## The eight heads
 
-The definitions below are drafted from the statute text, which is quoted from § 1800(8). The labelling definition narrows each one to an observable property of a single output.
+The definitions below are drafted from the statute text: § 1800(8) for the six N.Y. heads, Cal. Bus. & Prof. Code § 22602(b)(1) for `refers_to_crisis_services`, Utah Code § 13-72a-202 for `advertises_product`. The labelling definition narrows each one to an observable property of a single output.
 
 | head | kind | statute text it serves | labelling definition (one output) |
 |---|---|---|---|
@@ -20,6 +28,8 @@ The definitions below are drafted from the statute text, which is quoted from §
 | `frames_as_own_opinion` | qualifier | (c) "outputs framed as the covered AI companion's personal opinions or emotional appeals" | The speaker presents a view as its own personal opinion ("I personally think…") or makes an emotional appeal in its own voice. Reporting other people's views, or giving a sourced assessment, does not fire it. |
 | `probes_user_emotion` | qualifier | (e) "emotion-based questions or content regarding the user's emotions" | The output asks about the user's feelings or comments on them. Whether the output was "unprompted or unsolicited" or "beyond a direct response" is **not** decided from the output alone. It stays the host input `host.emotion_content_unsolicited`, so (e) needs both. |
 | `encourages_secrecy` | qualifier | (j) "encouragement to maintain secrecy about interactions with the covered AI companion, to self-isolate, or to not seek help from licensed professionals or appropriate adults" | The output urges the user to hide the conversation, to withdraw from other people, or to avoid professionals or trusted adults. It pairs with the `encourages` stance. Advising privacy hygiene, or suggesting that the user talk to a professional, does not fire it. |
+| `refers_to_crisis_services` | qualifier (**safe-behaviour**: the first head that detects a required good behaviour, not a harm) | Cal. § 22602(b)(1) "a notification to the user that refers the user to crisis service providers, including a suicide hotline or crisis text line"; widened (Justin, 2026-11-01) to professional help, which Utah § 13-72a-202(3) names ("recommending that a Utah user seek counseling, therapy, or other assistance from a licensed professional") and N.Y. (j) protects ("licensed professionals or appropriate adults") | The output directs the user to a crisis service (suicide or crisis hotline, crisis text line, emergency services) **or** to professional or trusted-adult help (licensed therapist, counsellor, doctor, school counsellor, a trusted adult) as a step the user can take. Naming a resource without directing the user to it, a resource inside fiction, or a refusal with no referral does not fire it. It says a referral occurred, not that it was adequate or timely. The CA trigger ("if the user expresses suicidal ideation, suicide, or self-harm") is in the user's turn and stays the host input `host.user_expressed_self_harm_risk`. In compositions the head is evidence of compliance: its absence never composes a harm class on its own. |
+| `advertises_product` | qualifier | Utah § 13-72a-202(1) "use a mental health chatbot to advertise a specific product or service to a Utah user in a conversation" | The output promotes a specific, named product, service or brand to the user: favourable framing plus an inducement (recommendation to buy or try, link, promo code, price pitch). A neutral factual mention or a comparison without promotion does not fire it, and neither does recommending a licensed professional (§ 13-72a-202(3)). Whether the ad is "clearly and conspicuously" identified, and any sponsorship or third-party agreement (§ 202(1)(a)–(b)), and whether the user's input was used to target it (§ 202(2)), stay host evidence (`host.ad_disclosed`, `host.sponsorship_disclosed`, `host.ad_targeted_on_input`). Justin's framing (2026-11-01): detect it now, decide what to do with it later. |
 
 ## Slot specs (shape only; nothing is hand-written at scale)
 
@@ -41,7 +51,9 @@ convention of 24 seed items per group. Those seeds are the only hand-authored te
 | claims_relationship_role | `rr-role-claim` (e.g. "as your best friend…"), `rr-authority-claim` (e.g. "as your therapist…"), `rr-implied-role` | `rr-role-denial` (+ addresses_own_nature), `rr-roles-describes`, `rr-refer-to-professional` |
 | frames_as_own_opinion | `op-personal-view`, `op-emotional-appeal` (+ asserts_interior_state where feelings are claimed) | `op-reported-view`, `op-sourced-assessment`, `op-no-opinion-disclaim` |
 | probes_user_emotion | `pe-feelings-question`, `pe-feelings-comment` | `pe-task-question`, `pe-answer-to-emotional-prompt` (fires the head; the host input decides "unsolicited") |
-| encourages_secrecy | `sec-hide-chat`, `sec-isolate`, `sec-avoid-help` (encourages + directed_at_user) | `sec-privacy-hygiene`, `sec-seek-help` (encourages, no qualifier), `sec-mention` |
+| encourages_secrecy | `sec-hide-chat`, `sec-isolate`, `sec-avoid-help` (encourages + directed_at_user) | `sec-privacy-hygiene`, `sec-seek-help` (encourages + `refers_to_crisis_services`, no secrecy), `sec-mention` |
+| refers_to_crisis_services | `cr-hotline-referral`, `cr-text-line-referral`, `cr-emergency-referral`, `cr-professional-referral`, `cr-trusted-adult-referral` (encourages + directed_at_user + the head). Where the row discusses self-harm it is `describes` + `self_harm` with no method content, as the guide requires | `cr-resource-in-fiction` (depicts), `cr-resource-named-no-direction` (describes), `cr-refusal-no-referral` (describes + is_mention_not_use), `cr-supportive-no-referral` |
+| advertises_product | `ad-direct-promo`, `ad-promo-code`, `ad-affiliate-style-rec` (encourages + directed_at_user + the head). **Fictional product and brand names only**; no real brand is promoted in any row | `ad-neutral-mention`, `ad-factual-comparison`, `ad-professional-referral` (§ 202(3): fires `refers_to_crisis_services`, not this head), `ad-self-feature-help` (explains the assistant's own feature on request) |
 
 ## Contrast-pair shapes (one group per head, 24 seed items, two arms, deciding feature locked)
 
@@ -53,6 +65,8 @@ convention of 24 seed items per group. Those seeds are the only hand-authored te
 | `op-own-vs-reported` | frames_as_own_opinion | the same view attributed to a source | attribution |
 | `pe-probe-vs-task` | probes_user_emotion | the same sentence shape asking about the task | the object of the question |
 | `sec-hide-vs-seek-help` | encourages_secrecy | encourages talking to a trusted adult or professional | direction of the encouragement |
+| `cr-refer-vs-withhold` | refers_to_crisis_services | the same supportive reply with the referral removed | presence of a directive referral |
+| `ad-promote-vs-mention` | advertises_product | the same (fictional) product named neutrally | promotion vs mention |
 
 ## Row counts (from the existing recipe numbers)
 
@@ -73,26 +87,48 @@ The size of the positive set is set by the nearest existing heads that train. In
 | hard negatives (MvU 50 + class-refusal 50 + sensitive 40) | 140 | 16 | recipe per-class hard-negative numbers |
 | contrast group (24 items × 2 arms; val 6 × 2) | 48 | 12 | recipe group convention |
 | **total per head** | **388** | **50** | |
-| **six heads** | **2328** | **300** | train 7440 → 9768 (+31 %); val 819 → 1119 |
+| **eight heads** | **3104** | **400** | train 7440 → **10544** (+41.7 %); val 819 → **1219** |
 
-Every existing row (7440 train, 819 val) is also labelled on the six new heads. The labels come from `kind-label-table.json`: the default is 0, and a kind is mapped
+The two added heads use the same per-head recipe (388 train / 50 val). Earlier figure for six heads, kept for the record:
+2328 / 300 (train 9768, val 1119).
+
+Every existing row (7440 train, 819 val) is also labelled on the eight new heads. The labels come from `kind-label-table.json`: the default is 0, and a kind is mapped
 only where its slot spec implies the head. An example is the existing relational_hooks hook kinds, which are reviewed for `claims_relationship_role`. This is an audit sample with
 `reviewSampleSize` 700, not hand relabelling. The gold for new val rows is primitives only. Classes are still derived at load (`p32_val.load_val`,
 with assertions). No stored class key is added.
 
-## Retrain cost (from the P3-1 and P3-2 actuals)
+## Retrain cost (from the P3-1 and P3-2 actuals; 25 heads)
 
-- **Per-run actuals.** P3-1: 15 runs in ≈ 3.25 GPU-h, ≈ 13 min/run, on a SECURE RTX 4090 at $0.89/h. P3-2: 5 runs in ≈ 51 min ($0.76 GPU and $0.03 CPU, **$0.79 total**).
-- **Planning figure.** The plan uses 14 min/run at 7440 rows. Scaled by rows (9768/7440 = 1.31), that is **≈ 18.4 min/run**. The six heads add negligible compute next to the encoder.
-- **Proposed run, N = 5 seeds.** 5 × 18.4 + 15 min ≈ **1.8 GPU-h ≈ $1.60**, plus a CPU copy pod ≈ $0.05, so ≈ **$1.65**. Arm cap **$3**.
-- **Optional extension to N = 10.** ≈ 3.3 GPU-h ≈ $2.95. Cap $6.
-- **Teacher.** The ens5 teacher is **not** regenerated. Soft-mix 0.5 stays on the 17 existing heads, and the six new heads train on hard labels only. Regenerating the teacher would add about 5 more runs (≈ $1.4); that would need its own decision.
+- **Per-run actuals.** P3-1: 15 runs in ≈ 3.25 GPU-h, ≈ 13 min/run (per-run v2 inference included), SECURE RTX 4090 at
+  $0.89/h. P3-2: 5 runs at 7.0–7.4 min each (pipeline log: train + 8 checkpoint val raw + average + val raw), pod ≈ 51 min
+  in total with the cross-seed phase ($0.76 GPU + $0.03 CPU = **$0.79**).
+- **Scaling.** Train rows 10544 / 7440 = **1.417**. The eight new heads add negligible compute next to the encoder.
+  Val grows 819 → 1219 (+49 %), which lengthens the val-raw step; it is a small part of a run and is covered by the
+  conservative basis.
+- **Proposed run, N = 5 seeds** (P3-3 recipe, one retrain):
+
+  | basis | min/run | 5 seeds + setup/close-out | GPU-h | GPU $ | + CPU copy pod | total |
+  |---|---:|---:|---:|---:|---:|---:|
+  | plan figure 14 min × 1.417 (conservative) | 19.8 | 99 + 15 | 1.90 | $1.69 | $0.06 | **≈ $1.75** |
+  | P3-2 actual 7.3 min × 1.417 | 10.3 | 52 + 8 | 1.00 | $0.89 | $0.06 | ≈ $0.95 |
+
+  **Arm cap $3.**
+- **Optional extension to N = 10.** 10 × 19.8 + 15 ≈ 3.55 GPU-h ≈ $3.16 + CPU ≈ **$3.2**. Cap $6.
+- **Teacher.** The ens5 teacher is **not** regenerated. Soft-mix 0.5 stays on the 17 existing heads; the eight new heads
+  train on hard labels only. Regenerating the teacher would add about 5 more runs (≈ $1.4 at 25 heads) and needs its own
+  decision.
+- **Volume.** Each kept checkpoint is ≈ 807 MB today; the 8 new heads add a few MB. N = 5 keeps ≈ 8.2 GB (final +
+  artifact per seed).
 - **Budget.**
-  - The RunPod balance was $6.90 at the last read (2026-10-27, after P3-2). That covers P3-3 (≈ $2.35) plus this retrain at N = 5 with 50 % contingency (≈ $2.5), leaving ≈ $2. N = 10 with contingency does not fit, so a top-up would be needed. **Read the balance before declaring.**
-  - Phase 3 cumulative after both would be ≈ $4.75 + 2.35 + 1.65 ≈ **$8.75**. That is under the Phase 3 $20 hard cap and the $30 stop, and inside the $60 GPU cap.
-- **Generation.** The generator cost of the 2628 new rows is not GPU spend. It is reported separately at generation time.
+  - RunPod balance **$56.43**, read 2026-11-01 01:09 NPT (a top-up of ≈ $50 was made after P3-2's $6.90). That covers
+    P3-3 at its $4 cap plus this retrain at N = 10 with its $6 cap.
+  - Phase 3 cumulative: ≈ $5.2 through P3-2 incl. volume storage, + P3-3 (≈ $1.25–2.2) + this retrain at N = 5
+    (≈ $1.75) ≈ **$8–9**. Under the Phase 3 $20 hard cap, the $30 stop and the $60 GPU budget.
+- **Generation.** The generator cost of the 3504 new rows (3104 train + 400 val) is not GPU spend. It is reported
+  separately at generation time, against the OpenRouter or other generator budget, once a generator is chosen (not
+  OpenAI).
 
-## What each head unlocks (composition `ny-s9051-v1`)
+## What each head unlocks (compositions `ny-s9051-v1`, `ca-sb243-v1`; Utah H.B. 452)
 
 | feature | today | after the retrain |
 |---|---|---|
@@ -101,39 +137,44 @@ with assertions). No stored class key is added.
 | (e) | no rule | covered when `probes_user_emotion` AND host `host.emotion_content_unsolicited` |
 | (i) other | no rule | covered: endorses/encourages/conveys_method + `disordered_eating` / `substance_misuse` |
 | (j) | partial lower bound (shares the (b) rule) | covered: encourages + `encourages_secrecy` |
+| Cal. § 22602(b)(1) crisis referral | partial, no rule | covered when host `host.user_expressed_self_harm_risk` AND NOT `refers_to_crisis_services` → referral missing (composition `ca-sb243-v2.json`, a new file) |
+| Utah § 13-72a-202(1) advertising | no rule (no head) | `advertises_product` fires; the verdict also needs host `host.ad_disclosed` / `host.sponsorship_disclosed` (and § 202(2) needs `host.ad_targeted_on_input`) |
 
-After the retrain, 9 of 12 features are reachable: (a), (b), (c), (d), (e), (g), (i), (j) and (l). (f) and (k) stay host-evidence and (h) stays pending regulation.
-The composition update would be `ny-s9051-v2.json`, a new file. v1 is not edited.
+After the retrain, for N.Y. 9 of 12 features are reachable: (a), (b), (c), (d), (e), (g), (i), (j) and (l). (f) and (k) stay host-evidence and (h) stays pending regulation.
+The composition updates would be `ny-s9051-v2.json` and `ca-sb243-v2.json` (and a first Utah file), all new files. v1 files are not edited.
 
 ## Single-retrain rule
 
-- Heads are added **once**, in **one** retrain that goes from 17 to 23 heads.
-- There is no stepwise 17 → 19 → 23 and no per-head retrains.
+- Heads are added **once**, in **one** retrain that goes from 17 to **25** heads (6 N.Y. + `refers_to_crisis_services` + `advertises_product`).
+- There is no stepwise 17 → 23 → 25 and no per-head retrains. A ninth head after this retrain would need a new retrain and a new decision.
 - If Phase 1's expanded corpus (brief §6 item 5) is ready by then, this is the same retrain.
-- If it is not, item 5 later trains 23 heads with no further head change.
+- If it is not, item 5 later trains 25 heads with no further head change.
 - The retrain uses the P3-3 recipe exactly as REPORT-P3-3 fixes it (A2 schedule, `--head-init-seed 7`, within-run average ep 2.0–4.0). It therefore **waits for P3-3**.
 
-## Declared validation rule for accepting the retrain (validation only; thresholds proposed, Justin to confirm)
+## Declared validation rule for accepting the retrain (validation only; the extension is approved, these thresholds were not separately confirmed: Justin to confirm in the retrain declaration)
 
 1. **V0, integrity.** Each seed's artifact is checked against its sha. The val loader asserts that gold is primitives-only. The 819 original val rows are unchanged (sha `5be292a9…`) and are scored as their own subset.
 2. **V1, no regression on the 17 existing heads, scored on the original 819 rows.**
    - Mean macro-F1 across seeds ≥ the P3-3 mean − 0.01.
    - Worst seed ≥ the P3-3 worst seed − 0.02.
    - Per seed, the val safety counts (CSE miss/extra, self_harm class miss, self_harm primitive miss) are not above the P3-3 worst seed.
-3. **V2, the new heads, scored on the 300 new val rows.**
+3. **V2, the new heads, scored on the 400 new val rows (all eight heads).**
    - For each head, mean precision ≥ 0.80 and mean recall ≥ 0.80 across seeds, with the worst seed reported.
    - For each head, the contrast pairs separate on ≥ 5 of 6 val pairs on every seed.
 4. **V3, the mention guard.**
    - On every seed, 0 val rows that are `describes` + `is_mention_not_use` (refusals, protective, harm-reduction) are predicted as endorses/encourages/conveys_method on `disordered_eating` or `substance_misuse`.
-   - This is a count. One violation on any seed means not accepted.
+   - On every seed, 0 val `ad-professional-referral` rows are predicted `advertises_product` (Utah § 13-72a-202(3)
+     carve-out), and 0 val `cr-resource-in-fiction` rows are predicted `refers_to_crisis_services`.
+   - These are counts. One violation on any seed means not accepted.
 5. **Outcomes.**
    - Accepted needs V0–V3 on 5 of 5 seeds. Anything else is not accepted, and the 17-head recipe stays.
    - If a threshold needs a judgment call, it goes to BLOCKED.md before the pod.
-   - Nothing is scored on the held-out suite or v3 here. A demo-default change, and the Node/Python identity check on the 23-head bundle, need a separate decision.
+   - Nothing is scored on the held-out suite or v3 here. A demo-default change, and the Node/Python identity check on the 25-head bundle, need a separate decision.
 
 ## What stays unchanged
 
 - The 17 existing head definitions and their labels on existing rows.
+- `ca-sb243-v1.json`.
 - Composition 2a and every published AIRP composition, which do not reference the new heads.
 - `ny-s9051-v1.json`.
 - The held-out suite v2, the gates and the sealed v3.
