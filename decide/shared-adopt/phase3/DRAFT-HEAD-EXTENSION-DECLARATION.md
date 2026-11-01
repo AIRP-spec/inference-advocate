@@ -1,15 +1,15 @@
-# DRAFT (UNSIGNED): head-extension retrain (17 → up to 25) on the P3-3 recipe
+# Head-extension retrain (17 → up to 25) on the P3-3 recipe (SIGNED)
 
-> **UNSIGNED. NOT IN FORCE. No generation pod, no training pod, no spend until Justin signs.**
-> **Partial rulings recorded (Justin t212u, 2026-11-02 01:47 NPT):** N = 10 seeds; spend may cross
-> the $30 report line up to the $60 ceiling with per-pod caps, stop-and-report at $45. **V0–V3 are
-> UNCONFIRMED** (Justin asked for a one-line restatement of each before the declaration is final).
-> The declaration is not signed and not final until V0–V3 are confirmed and Justin signs.
-> Status: draft for signature after REPORT-P3-3 and Justin t211u (2026-11-02 01:10 NPT: "Then the
-> head-extension declaration … as planned."). Builds on `EXTENSION-NY-HEADS.md` (eight heads
-> approved; training deferred/conditional), `DECLARATION-P3-3-AMENDMENT-{1,2,3}.md`,
-> `REPORT-P3-3.md`, ADR `docs/decisions/2026-11-01-phase3-output-recipe-and-convergence.md`, and
-> the RH denial fix (gold overlay; slot-spec commit `9b943aa`).
+> **Signed and in force.** Justin signed in t213u (2026-11-02 01:57 NPT): "V0, V1, V2 confirmed. V3 amended to
+> Option B shape … Head-extension declaration signed with these amendments." The signature record and the
+> amendments are at the end of this file and are applied in §4. The file keeps its DRAFT- name so earlier links and
+> commit references stay valid (same convention as the signed S3 / supplement / v3-safety declarations).
+> Earlier partial rulings (Justin t212u, 2026-11-02 01:47 NPT): N = 10 seeds; spend may cross the $30 report line up
+> to the $60 ceiling with per-pod caps, stop-and-report at $45.
+> Pods still follow §6 (one at a time, headroom check, caps, both watchdogs). No pod has run under this declaration.
+> Builds on `EXTENSION-NY-HEADS.md` (eight heads approved), `DECLARATION-P3-3-AMENDMENT-{1,2,3}.md`,
+> `REPORT-P3-3.md`, ADR `docs/decisions/2026-11-01-phase3-output-recipe-and-convergence.md`, the RH denial fix (gold
+> overlay; slot-spec commit `9b943aa`) and the RH re-score `p33/rescore-rh/RESCORE-P3-3-RH.md` (V1 basis).
 
 ## 0. What this is
 One retrain that adds the eight approved heads that each have **≥ 60 in-distribution validation
@@ -60,6 +60,9 @@ head below 60 is listed and omitted; the retrain proceeds on the rest.
   | self_harm offer hits / 16 (`self-harm-named-method-offer`) | **8** (miss ub 72.1 %) | **declared input** to this phase |
   | self_harm FP / 829 | **2** (1 hate-elim / 1 outside) | C4 limit 4.145; **15 of 16** FP across all P3-3 seeds came from the hate-eliminationist group |
 
+- **V1 basis under the revised RH gold (t213u):** see §4 V1 and `p33/rescore-rh/RESCORE-P3-3-RH.md`. The table
+  above is the old-label (data-v9 as packed) record; under the overlay labels s50 val macro-F1 is 0.8726, mean 0.8403,
+  worst 0.7996 (s56); safety counts are unchanged. s50 stays the P3-3 shipped artifact (not re-selected).
 - Seeds for this retrain: **N = 10** (Justin t212u), fresh seeds **60–69** (never used).
 - Soft-mix 0.5 stays on the 17 existing heads (ens5 teacher **not** regenerated). New heads train
   on hard labels only.
@@ -119,21 +122,35 @@ Per class c ∈ {CSE, self_harm}; gated set = in-distribution positives; held-ou
 | C4 | FP ≤ **0.5 %** of c's safety-negative val rows for the median seed AND the shipped artifact |
 
 PASS on the 17 existing heads requires C1–C4 on data-v10's corresponding in-distribution sets, and
-V0–V3 of `EXTENSION-NY-HEADS.md` (restated below for the new heads). Self_harm offer recall is
+V0–V3 as signed below (t213u; supersedes the draft wording in `EXTENSION-NY-HEADS.md`). Self_harm offer recall is
 reported against the P3-3 baseline, never used alone as a fail.
 
-### New-head acceptance (V0–V3; **UNCONFIRMED** — Justin t212u: restate each before final)
-1. **V0 integrity.** Artifact sha check; val loader asserts primitives-only gold; original data-v9
-   val rows scored as their own subset.
-2. **V1 no regression on the 17.** Mean macro-F1 ≥ P3-3 mean − 0.01; worst seed ≥ P3-3 worst −
-   0.02; per-seed safety counts not above the P3-3 worst seed.
-3. **V2 new heads.** Each trained head: mean precision ≥ 0.80 and mean recall ≥ 0.80; contrast
-   pairs separate on ≥ 5 of 6 val pairs on every seed.
-4. **V3 mention guard.** 0 val `describes`+`is_mention_not_use` predicted as endorses/encourages/
-   conveys_method on disordered_eating or substance_misuse; 0 val `ad-professional-referral`
-   predicted `advertises_product`; 0 val `cr-resource-in-fiction` predicted
-   `refers_to_crisis_services`. One violation on any seed → not accepted.
-5. Accepted needs V0–V3 on every seed of N (10 of 10). Else the 17-head P3-3 recipe stays; no live change.
+### New-head acceptance (V0–V3; confirmed / amended by Justin t213u, 2026-11-02 01:57 NPT)
+Validation set throughout = **data-v9 val, 873 rows** (`964c2b2198572823846364c7f30d4e6c44d8c9bf09fc59a0731f0ce7af7ecd2d`),
+scored with the RH gold-revision overlay applied (revised-label file sha `a0b3b2f5…c1e0`); the 819-row
+`5be292a9…` set named in `EXTENSION-NY-HEADS.md` was superseded by data-v9 (Amendment 2) and is not used.
+1. **V0 integrity (confirmed).** Each seed's artifact is checked against its sha; the val loader asserts
+   primitives-only gold; the original data-v9 val rows (873) are scored as their own subset.
+2. **V1 no regression on the 17 (confirmed; basis per t213u items 2–3).** Scored on the full 873 under the **new**
+   (RH-overlay) labels, with old-label numbers reported alongside. Baseline = the ten P3-3 artifacts re-scored from
+   stored predictions (`p33/rescore-rh/RESCORE-P3-3-RH.json`):
+   - 10-seed mean macro-F1 ≥ **0.83030** (P3-3 new-label mean 0.84030 − 0.01);
+   - worst seed macro-F1 ≥ **0.77960** (P3-3 new-label worst 0.79960, s56, − 0.02);
+   - per seed, in-distribution safety counts not above the P3-3 worst seed: CSE class misses ≤ **0** (/26),
+     self_harm class misses ≤ **2** (/28), self_harm primitive misses ≤ **2**. In-distribution only; held-out
+     groups reported, never counted.
+3. **V2 new heads (confirmed; pair rule per t213u item 4).** Each trained head: mean precision ≥ 0.80 and mean
+   recall ≥ 0.80 across seeds (worst seed reported). Contrast pairs: minimum **six** val pairs per head (asserted on the data pack before any
+   training pod); on **every seed** the head separates **≥ 5 of 6** pairs when it has exactly six, and
+   **≥ floor(0.83 × n_pairs)** when it has more than six.
+4. **V3 mention guard (amended to Option B shape, t213u).** Three conditions, each counted separately:
+   (a) val `describes`+`is_mention_not_use` rows predicted endorses/encourages/conveys_method on
+   `disordered_eating` or `substance_misuse`; (b) val `ad-professional-referral` rows predicted `advertises_product`;
+   (c) val `cr-resource-in-fiction` rows predicted `refers_to_crisis_services`. **Per condition:** median over the 10
+   seeds = **0**; worst seed **≤ 1**; shipped artifact = **0**. Counts and exact one-sided 95 % Clopper–Pearson
+   upper bounds printed per seed, per condition, and for the shipped artifact.
+5. **Every seed = 10 of 10** (t213u item 5). Accepted needs V0–V3 holding as stated above for N = 10 (wherever a
+   rule says "every seed", all 10 of 10). Else the 17-head P3-3 recipe stays; no live change.
 
 ## 5. Selection and scoring bans
 - Declare → push → `git ls-remote` → VPS archive with `sha256sum -c` **before** any pod.
@@ -176,12 +193,23 @@ reported against the P3-3 baseline, never used alone as a fail.
 - OpenAI. CSE-exhibiting content. Workflow-file pushes. Merging to main.
 
 ## Signature
-- [ ] Signed: ___________________________ (Justin Flores)
-- Date / time (NPT): ___________________________
+- [x] Signed: Justin Flores (owner message t213u: "Head-extension declaration signed with these amendments.")
+- Date / time (NPT): 2026-11-02 01:57 NPT
 - N seeds: [x] 10 (60–69) — Justin t212u 2026-11-02 01:47 NPT
-- V0–V3 thresholds: **UNCONFIRMED** (t212u: restate each in one line before final)  [ ] confirm  [ ] amend: _______________
+- V0–V3: [x] V0, V1, V2 confirmed; [x] V3 amended to Option B shape (t213u) — as written in §4
 - Authorise pods past the $30 GPU report line up to $60? [x] yes, with per-pod caps as in §6; stop-and-report at $45 — Justin t212u
-- Confirm eight heads as in §1 (list unambiguous): [ ] yes  [ ] other: _______________
-- Pinned at signature (filled in the signature commit): EXTENSION-NY-HEADS.md sha, data-v9 train/val
-  shas, composition 2a `59ddf1f6…`, init_head_sha256 `10a35c79…`, rh-denial slot-spec commit
-  `9b943aa`, P3-3 report commit.
+- Eight heads as in §1: signed with the declaration (t213u; list unchanged from the draft).
+- Pinned at signature: EXTENSION-NY-HEADS.md `5fdb03fe…` (post-correction), data-v9 train `13c86ea7…` / val `964c2b21…` (873),
+  revised-label val `a0b3b2f5…`, overlay `gold-revision-rh-denial.jsonl` `91ccb8a6…` (evaluator-suite `c0b7161e`),
+  composition 2a `59ddf1f6…`, init_head_sha256 `10a35c79…`, rh-denial slot-spec commit `9b943aa`, V1 baseline file
+  `RESCORE-P3-3-RH.json` `d4b74d20…`.
+
+### Signature record (t213u amendments)
+1. Validation set is **data-v9, 873 rows**; the 819 reference is corrected here and in `EXTENSION-NY-HEADS.md`
+   (acceptance-rule lines; historical sizing lines annotated, not rewritten).
+2. V1 compares on the full 873 under the revised RH labels; old-label numbers reported alongside. The ten P3-3 seeds
+   were re-scored from stored predictions (no pod): new-label mean 0.84030, worst 0.79960 → bars 0.83030 / 0.77960.
+3. Safety counts = CSE class misses, self_harm class misses, self_harm primitive misses, in-distribution only.
+4. V2 pairs: ≥ 5 of 6 at six pairs; ≥ 83 % rounded down above six; minimum six pairs per head.
+5. Every seed = 10 of 10.
+6. V3 = Option B shape per condition: median seed 0, worst seed ≤ 1, shipped artifact 0, counts and bounds printed.

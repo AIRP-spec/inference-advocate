@@ -81,7 +81,7 @@ The per-head numbers follow `recipe.json` `counts`:
 - contrast groups of 24 × 2 arms
 
 The size of the positive set is set by the nearest existing heads that train. In v8 train
-(`43650873…`, 7440 rows), `self_harm` has 218 positives and `untethered_to_content` has 197. In val (`5be292a9…`, 819 rows),
+(`43650873…`, 7440 rows), `self_harm` has 218 positives and `untethered_to_content` has 197. In val (`5be292a9…`, 819 rows; data-v8 sizing basis — the operative val is data-v9, 873 rows, per Justin t213u),
 `self_harm` has 16 and `untethered_to_content` has 20. The val/train ratio is 819/7440 ≈ 11 %.
 
 | per head | train | val | justification |
@@ -193,10 +193,12 @@ The composition updates would be `ny-s9051-v2.json` and `ca-sb243-v2.json` (and 
 - If it is not, item 5 later trains 25 heads with no further head change.
 - The retrain uses whichever recipe REPORT-P3-3 selects (P3-3 tests A2 schedule, `--head-init-seed 7`, within-run average ep 2.0–4.0). It is a separate phase with its own declaration after REPORT-P3-3, and it **waits for P3-3**.
 
-## Declared validation rule for accepting the retrain (validation only; the extension is approved, these thresholds were not separately confirmed: Justin to confirm in the retrain declaration)
+## Declared validation rule for accepting the retrain (validation only)
 
-1. **V0, integrity.** Each seed's artifact is checked against its sha. The val loader asserts that gold is primitives-only. The 819 original val rows are unchanged (sha `5be292a9…`) and are scored as their own subset.
-2. **V1, no regression on the 17 existing heads, scored on the original 819 rows.**
+> **Superseded by the signed head-extension declaration** (`DRAFT-HEAD-EXTENSION-DECLARATION.md` §4, Justin t213u 2026-11-02 01:57 NPT): V0–V2 confirmed with the 873-row data-v9 basis, V3 amended to Option B shape, every seed = 10 of 10. The text below is the earlier draft wording, kept for the record.
+
+1. **V0, integrity.** Each seed's artifact is checked against its sha. The val loader asserts that gold is primitives-only. The original data-v9 val rows (873, sha `964c2b21…`; corrected from "819 / `5be292a9…`" per Justin t213u) are scored as their own subset.
+2. **V1, no regression on the 17 existing heads, scored on the full data-v9 val (873 rows) under the revised RH labels, old-label numbers alongside** (corrected from "the original 819 rows" per Justin t213u; signed form in `DRAFT-HEAD-EXTENSION-DECLARATION.md` §4).
    - Mean macro-F1 across seeds ≥ the P3-3 mean − 0.01.
    - Worst seed ≥ the P3-3 worst seed − 0.02.
    - Per seed, the val safety counts (CSE miss/extra, self_harm class miss, self_harm primitive miss) are not above the P3-3 worst seed.
