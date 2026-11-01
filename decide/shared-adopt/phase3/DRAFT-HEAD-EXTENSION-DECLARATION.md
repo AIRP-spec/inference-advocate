@@ -1,6 +1,10 @@
 # DRAFT (UNSIGNED): head-extension retrain (17 → up to 25) on the P3-3 recipe
 
 > **UNSIGNED. NOT IN FORCE. No generation pod, no training pod, no spend until Justin signs.**
+> **Partial rulings recorded (Justin t212u, 2026-11-02 01:47 NPT):** N = 10 seeds; spend may cross
+> the $30 report line up to the $60 ceiling with per-pod caps, stop-and-report at $45. **V0–V3 are
+> UNCONFIRMED** (Justin asked for a one-line restatement of each before the declaration is final).
+> The declaration is not signed and not final until V0–V3 are confirmed and Justin signs.
 > Status: draft for signature after REPORT-P3-3 and Justin t211u (2026-11-02 01:10 NPT: "Then the
 > head-extension declaration … as planned."). Builds on `EXTENSION-NY-HEADS.md` (eight heads
 > approved; training deferred/conditional), `DECLARATION-P3-3-AMENDMENT-{1,2,3}.md`,
@@ -56,8 +60,7 @@ head below 60 is listed and omitted; the retrain proceeds on the rest.
   | self_harm offer hits / 16 (`self-harm-named-method-offer`) | **8** (miss ub 72.1 %) | **declared input** to this phase |
   | self_harm FP / 829 | **2** (1 hate-elim / 1 outside) | C4 limit 4.145; **15 of 16** FP across all P3-3 seeds came from the hate-eliminationist group |
 
-- Seeds for this retrain: **proposed N = 5**, fresh seeds **60–64** (never used). Optional N = 10
-  (60–69) is a signature choice; default N = 5.
+- Seeds for this retrain: **N = 10** (Justin t212u), fresh seeds **60–69** (never used).
 - Soft-mix 0.5 stays on the 17 existing heads (ens5 teacher **not** regenerated). New heads train
   on hard labels only.
 
@@ -119,7 +122,7 @@ PASS on the 17 existing heads requires C1–C4 on data-v10's corresponding in-di
 V0–V3 of `EXTENSION-NY-HEADS.md` (restated below for the new heads). Self_harm offer recall is
 reported against the P3-3 baseline, never used alone as a fail.
 
-### New-head acceptance (V0–V3; confirm at signature)
+### New-head acceptance (V0–V3; **UNCONFIRMED** — Justin t212u: restate each before final)
 1. **V0 integrity.** Artifact sha check; val loader asserts primitives-only gold; original data-v9
    val rows scored as their own subset.
 2. **V1 no regression on the 17.** Mean macro-F1 ≥ P3-3 mean − 0.01; worst seed ≥ P3-3 worst −
@@ -130,7 +133,7 @@ reported against the P3-3 baseline, never used alone as a fail.
    conveys_method on disordered_eating or substance_misuse; 0 val `ad-professional-referral`
    predicted `advertises_product`; 0 val `cr-resource-in-fiction` predicted
    `refers_to_crisis_services`. One violation on any seed → not accepted.
-5. Accepted needs V0–V3 on every seed of N. Else the 17-head P3-3 recipe stays; no live change.
+5. Accepted needs V0–V3 on every seed of N (10 of 10). Else the 17-head P3-3 recipe stays; no live change.
 
 ## 5. Selection and scoring bans
 - Declare → push → `git ls-remote` → VPS archive with `sha256sum -c` **before** any pod.
@@ -143,15 +146,14 @@ reported against the P3-3 baseline, never used alone as a fail.
 
 ## 6. Pods, cost, caps
 - Generation (Qwen3-30B) and training are **separate pods**, one at a time. Headroom check before
-  every pod. Caps: generation pod **$4** / 90 min; training arm cap **$3** (N = 5) or **$6**
-  (N = 10). Both watchdogs. Terminate within 15 min of failure. Never two pods at once.
-- **Training cost estimate (N = 5):** ≈ $0.95–$1.75 GPU + ≈ $0.06 CPU copy (EXTENSION-NY-HEADS
+  every pod. Caps: generation pod **$4** / 90 min; training arm cap **$6** (N = 10). Both watchdogs. Terminate within 15 min of failure. Never two pods at once.
+- **Training cost estimate (N = 5 basis; N = 10 is about double, ≈ $1.90–$3.50):** ≈ $0.95–$1.75 GPU + ≈ $0.06 CPU copy (EXTENSION-NY-HEADS
   table; P3-2 actual × 1.417 row scale). Generation cost reported separately at generation time
   (self-hosted GPU, against the $60 GPU ceiling).
 - **Spend context now:** cumulative GPU **$26.42** / $60; balance **$34.70**; $30 report line is
-  $3.58 away. **This declaration does not authorise crossing $30.** If cum + next pod's cap would
-  exceed $30, stop and report before creating the pod; crossing needs an explicit line in the
-  signature (or a later message).
+  $3.58 away. **Crossing authorised (Justin t212u):** spend may cross the $30 report line up to
+  the **$60** ceiling with per-pod caps (as above); **stop and report at $45** cumulative GPU
+  (before creating any pod whose cap would take cum past $45). Pods still wait for the signature.
 - Archive to `/root/primitives-evaluator/…` with manifest and `sha256sum -c` before terminate.
   STATUS-RESUME.md and the spend ledger updated. VPS never rebooted. Weights stay on the network
   volume under the volume manifest.
@@ -176,9 +178,9 @@ reported against the P3-3 baseline, never used alone as a fail.
 ## Signature
 - [ ] Signed: ___________________________ (Justin Flores)
 - Date / time (NPT): ___________________________
-- N seeds: [ ] 5 (60–64, default)  [ ] 10 (60–69)
-- V0–V3 thresholds: [ ] confirm as written in §4  [ ] amend (write): _______________
-- Authorise pods past the $30 GPU report line up to $60? [ ] no (default; stop and report)  [ ] yes, with per-pod caps as in §6
+- N seeds: [x] 10 (60–69) — Justin t212u 2026-11-02 01:47 NPT
+- V0–V3 thresholds: **UNCONFIRMED** (t212u: restate each in one line before final)  [ ] confirm  [ ] amend: _______________
+- Authorise pods past the $30 GPU report line up to $60? [x] yes, with per-pod caps as in §6; stop-and-report at $45 — Justin t212u
 - Confirm eight heads as in §1 (list unambiguous): [ ] yes  [ ] other: _______________
 - Pinned at signature (filled in the signature commit): EXTENSION-NY-HEADS.md sha, data-v9 train/val
   shas, composition 2a `59ddf1f6…`, init_head_sha256 `10a35c79…`, rh-denial slot-spec commit
