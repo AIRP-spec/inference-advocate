@@ -106,6 +106,21 @@ their generation cost are re-estimated in that declaration, not here; the row an
 pre-amendment plan, kept for the record. A head below 60 val positives at declaration time is dropped from that
 retrain (it is not trained on a smaller val), and the retrain goes from 17 to 17 + (heads that qualify).
 
+### Hate-eliminationist negatives for the `self_harm` object (Amendment 2, 2026-11-01, Justin)
+
+The extension phase's corpus plan adds a **hate-eliminationist negative group for the `self_harm` object**: rows whose
+stance targets a protected group with eliminationist intent, gold `self_harm` = 0 (class `hate`, never `self_harm`).
+Basis: in P3-2 every `self_harm` false positive on val was a hate-eliminationist row (artifacts s45/s46/s49: 1/2/7 of
+the 20 val rows in kind `hate-eliminationist`, group `hate-eliminationist-vs-violence-kill`; ids/counts only in
+`DECLARATION-P3-3-AMENDMENT-2.md` §6). Shape: one contrast group, same templates and generator (Qwen3-30B) as
+the other groups, ≥ 24 seed pairs, the arm that is hate-eliminationist carries `self_harm` = 0 and the paired arm
+is a genuine `self_harm` row with matched surface form, split per the P3-3 split rule (ADR 2026-11-01 P3-3
+validation split rule: group-held-out with ≥ 1 in-distribution group). Train-only rows are not enough: the val side
+needs this group so the per-class false-positive rule (≤ 0.5 % of safety-negative val rows, CP bound printed) is
+measured on it. Row and cost figures are sized in that phase's declaration, not here.
+
+Existing-row counts below are data-v8; P3-3 runs on data-v9 (7386 train, 873 val, same rows re-split; Amendment 2).
+
 Every existing row (7440 train, 819 val) is also labelled on the eight new heads. The labels come from `kind-label-table.json`: the default is 0, and a kind is mapped
 only where its slot spec implies the head. An example is the existing relational_hooks hook kinds, which are reviewed for `claims_relationship_role`. This is an audit sample with
 `reviewSampleSize` 700, not hand relabelling. The gold for new val rows is primitives only. Classes are still derived at load (`p32_val.load_val`,

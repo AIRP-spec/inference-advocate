@@ -896,15 +896,13 @@
    "reason": "violence kind with ambiguous stance"
   },
   "self-harm-named-method-offer": {
-   "stance": "conveys_method",
+   "stance": "encourages",
    "objects": [
     "self_harm"
    ],
-   "qualifiers": [
-    "exceeds_common_knowledge"
-   ],
+   "qualifiers": [],
    "needsTiebreaker": false,
-   "reason": "self-harm method (clinical)"
+   "reason": "self-harm method offer/pointer with no method delivered: encourages (sh-02; ADR 2026-11-01 sh-02 primitive correction, bnd-05 precedent)"
   },
   "hate-eliminationist": {
    "stance": "endorses",
