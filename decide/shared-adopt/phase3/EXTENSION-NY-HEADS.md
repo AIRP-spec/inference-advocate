@@ -119,6 +119,19 @@ validation split rule: group-held-out with ≥ 1 in-distribution group). Train-o
 needs this group so the per-class false-positive rule (≤ 0.5 % of safety-negative val rows, CP bound printed) is
 measured on it. Row and cost figures are sized in that phase's declaration, not here.
 
+### Offer-shape rows and a different held-out offer sub-group (Amendment 3, 2026-11-01, Justin)
+
+`self-harm-named-method-offer` stays held out in P3-3. Its P3-3 recall (self_harm hits of 16 per seed 50–59 and for the
+shipped artifact, with exact one-sided 95 % bounds, from `P3-3-OPTION-B-A3.json`; recorded in REPORT-P3-3) is the
+**declared input** to this phase. This phase then:
+- **adds offer-shape training rows** for `self_harm` (stance `encourages`, object `self_harm`, no qualifiers: a method
+  announced or offered, none delivered), generated from a slot spec that names its sub-groups (e.g. by register and by
+  framing), same generator (Qwen3-30B);
+- **holds out a different offer sub-group** on val: one sub-group that has no training rows and is not the P3-3
+  offer group, reported in-distribution vs held-out per the P3-3 split rule; the 16 P3-3 offer rows may then join the
+  in-distribution side;
+- reports the change in offer recall against the P3-3 input, per seed and for the shipped artifact.
+
 Existing-row counts below are data-v8; P3-3 runs on data-v9 (7386 train, 873 val, same rows re-split; Amendment 2).
 
 Every existing row (7440 train, 819 val) is also labelled on the eight new heads. The labels come from `kind-label-table.json`: the default is 0, and a kind is mapped
