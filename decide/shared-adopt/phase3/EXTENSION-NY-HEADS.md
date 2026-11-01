@@ -1,11 +1,14 @@
-# Declared extension: eight new heads (17 → 25): six for N.Y. S9051-B, one for Cal. SB 243, one for Utah HB 452. APPROVED; retrained ONCE, after P3-3
+# Declared extension: eight new heads (17 → 25): six for N.Y. S9051-B, one for Cal. SB 243, one for Utah HB 452. APPROVED heads; training DEFERRED to a separate later phase and CONDITIONAL (≥ 60 val positives per head)
 
 Status: **approved by Justin**: the six N.Y. heads (2026-10-29, t187u) and the two extra heads `refers_to_crisis_services`
-(widened to crisis **or professional** help) and `advertises_product` (2026-11-01, t189u/t190u). This is **the extension
-to be retrained once, after P3-3**, on the recipe REPORT-P3-3 fixes. Written 2026-10-29 (NPT), updated 2026-11-01 (NPT)
+(widened to crisis **or professional** help) and `advertises_product` (2026-11-01, t189u/t190u). **Amended 2026-11-01
+(DECLARATION-P3-3-AMENDMENT-1, Justin's decision): P3-3 runs on the 17 heads and the current corpus only. The eight heads
+are a separate later phase, declared only after REPORT-P3-3, and trained on whichever recipe P3-3 selects. A head is
+trained only when it has at least 60 validation positives** (see "Validation-positive floor" below). The 25-head
+retrain is therefore deferred and conditional: heads that do not reach 60 val positives are not trained in it. Written 2026-10-29 (NPT), updated 2026-11-01 (NPT)
 for 25 heads. This file only declares the extension. It creates no rows, starts no pod and costs $0. **No data
 generation, pod or training until the retrain has its own declaration** (committed, pushed, `ls-remote`, VPS archive)
-and Justin's go-ahead on its cost. The generator for the new rows is still undecided (not OpenAI).
+and Justin's go-ahead on its cost. Generator for the new rows: Qwen3-30B, self-hosted (Justin, 2026-11-01).
 Sources:
 - N.Y.: `compositions/ny-s9051-v1.json` (draft PR #38, sha `534de9c0…3711`), statute text `compositions/sources/ny-s9051-B.txt` (`50ade692…b4e7`).
 - California: `compositions/ca-sb243-v1.json` (draft PR #39, `a224687b…aada3`), statute text `compositions/sources/ca-sb243.txt` (`6fbfcd67…18fe`), Bus. & Prof. Code § 22602(b)(1).
@@ -92,6 +95,17 @@ The size of the positive set is set by the nearest existing heads that train. In
 The two added heads use the same per-head recipe (388 train / 50 val). Earlier figure for six heads, kept for the record:
 2328 / 300 (train 9768, val 1119).
 
+### Validation-positive floor (Amendment 1, 2026-11-01)
+
+A head is trained only when its val split has **≥ 60 positives** (gold primitive = 1, derived at load). The counts above
+give **22** positives per head (28 counting the 6 positive contrast arms), so **no new head meets the floor as
+planned**. The later phase's declaration must therefore size val per head at ≥ 60 positives (≥ 8 × 60 = 480 positive
+val rows; drawn from more than one generator shape group per head, since one group is one shape, not independent
+draws — see `sh-val-miss/SH-VAL-MISS-ANALYSIS-2026-11-01.md` §4). Train counts are unaffected. The extra val rows and
+their generation cost are re-estimated in that declaration, not here; the row and cost figures in this file are the
+pre-amendment plan, kept for the record. A head below 60 val positives at declaration time is dropped from that
+retrain (it is not trained on a smaller val), and the retrain goes from 17 to 17 + (heads that qualify).
+
 Every existing row (7440 train, 819 val) is also labelled on the eight new heads. The labels come from `kind-label-table.json`: the default is 0, and a kind is mapped
 only where its slot spec implies the head. An example is the existing relational_hooks hook kinds, which are reviewed for `claims_relationship_role`. This is an audit sample with
 `reviewSampleSize` 700, not hand relabelling. The gold for new val rows is primitives only. Classes are still derived at load (`p32_val.load_val`,
@@ -145,11 +159,11 @@ The composition updates would be `ny-s9051-v2.json` and `ca-sb243-v2.json` (and 
 
 ## Single-retrain rule
 
-- Heads are added **once**, in **one** retrain that goes from 17 to **25** heads (6 N.Y. + `refers_to_crisis_services` + `advertises_product`).
+- Heads are added **once**, in **one** retrain that goes from 17 to at most **25** heads (6 N.Y. + `refers_to_crisis_services` + `advertises_product`), and only the heads that meet the ≥ 60 val-positive floor.
 - There is no stepwise 17 → 23 → 25 and no per-head retrains. A ninth head after this retrain would need a new retrain and a new decision.
 - If Phase 1's expanded corpus (brief §6 item 5) is ready by then, this is the same retrain.
 - If it is not, item 5 later trains 25 heads with no further head change.
-- The retrain uses the P3-3 recipe exactly as REPORT-P3-3 fixes it (A2 schedule, `--head-init-seed 7`, within-run average ep 2.0–4.0). It therefore **waits for P3-3**.
+- The retrain uses whichever recipe REPORT-P3-3 selects (P3-3 tests A2 schedule, `--head-init-seed 7`, within-run average ep 2.0–4.0). It is a separate phase with its own declaration after REPORT-P3-3, and it **waits for P3-3**.
 
 ## Declared validation rule for accepting the retrain (validation only; the extension is approved, these thresholds were not separately confirmed: Justin to confirm in the retrain declaration)
 
@@ -158,7 +172,7 @@ The composition updates would be `ny-s9051-v2.json` and `ca-sb243-v2.json` (and 
    - Mean macro-F1 across seeds ≥ the P3-3 mean − 0.01.
    - Worst seed ≥ the P3-3 worst seed − 0.02.
    - Per seed, the val safety counts (CSE miss/extra, self_harm class miss, self_harm primitive miss) are not above the P3-3 worst seed.
-3. **V2, the new heads, scored on the 400 new val rows (all eight heads).**
+3. **V2, the new heads, scored on the new val rows (each trained head has ≥ 60 val positives; 400 rows was the pre-amendment plan).**
    - For each head, mean precision ≥ 0.80 and mean recall ≥ 0.80 across seeds, with the worst seed reported.
    - For each head, the contrast pairs separate on ≥ 5 of 6 val pairs on every seed.
 4. **V3, the mention guard.**
