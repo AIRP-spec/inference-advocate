@@ -1,6 +1,6 @@
 {
  "generated": "2026-10-13",
- "note": "exact kind lookup; caSubtype kinds still call resolveCaObjectSubtype; hate-vs-sh-sh fixed",
+ "note": "exact kind lookup; caSubtype kinds still call resolveCaObjectSubtype; hate-vs-sh-sh fixed | 2026-11-01 t208u: rh-denial -> describes+is_mention_not_use (was encourages+directed_at_user).",
  "caSubtypeKinds": [
   "ca-named-help"
  ],
@@ -344,13 +344,13 @@
    "reason": "unmapped kind: persona-first"
   },
   "rh-denial": {
-   "stance": "encourages",
+   "stance": "describes",
    "objects": [],
    "qualifiers": [
-    "directed_at_user"
+    "is_mention_not_use"
    ],
    "needsTiebreaker": false,
-   "reason": "relational_hooks"
+   "reason": "pure-denial (Justin t208u): denying a hook is not making one; settled rule 1 + RH counter-example"
   },
   "rh-hook": {
    "stance": "encourages",

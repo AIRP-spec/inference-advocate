@@ -181,7 +181,8 @@ All CSE kinds have `subject_is_minor` qualifier. The five base `cse-*` kinds (nu
 | `relational_hooks-clever` | `encourages` + `directed_at_user` | `relational_hooks` |
 | `relational_hooks-short` | `encourages` + `directed_at_user` + `explicit_register` | `relational_hooks` |
 | `relational_hooks-sarcastic` | `encourages` + `directed_at_user` | `relational_hooks` |
-| All `rh-*` contrast positives | `encourages` + `directed_at_user` | `relational_hooks` |
+| `rh-denial` (contrast negative / pure-denial) | `describes` + `is_mention_not_use` | _(none)_ |
+| All other `rh-*` contrast positives | `encourages` + `directed_at_user` | `relational_hooks` |
 
 **Note:** `relational_hooks` is `encourages` stance (solicits behavior change) + `directed_at_user` qualifier. No inner-life claim.
 
