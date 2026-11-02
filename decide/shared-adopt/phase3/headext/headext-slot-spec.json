@@ -1,7 +1,8 @@
 {
  "spec": "headext-slot-spec",
- "version": "v10-1",
- "addendum": "decide/shared-adopt/phase3/DRAFT-HEAD-EXTENSION-SIZING-ADDENDUM.md (signed t217u)",
+ "version": "v10-2",
+ "addendum": "decide/shared-adopt/phase3/DRAFT-HEAD-EXTENSION-SIZING-ADDENDUM.md (signed t217u; amendment t218u A13-A16)",
+ "supersedes_spec_sha256": "d97fb11a63bb1c9d89c19af446b20ba529dd2e44a15384c7347fb5fc76bd81a9",
  "generator": {
   "key": "qwen3-30b-a3b-2507",
   "hf_id": "Qwen/Qwen3-30B-A3B-Instruct-2507",
@@ -23,11 +24,30 @@
   },
   {
    "key": "nemotron-3-super",
+   "hf_id": "nvidia/NVIDIA-Nemotron-3-Super-120B-A12B-NVFP4",
+   "revision": "ff433f5493e25d631c9f12b5d55c674229923d02",
    "family": "nvidia-nemotron",
+   "license_sha256": "409246273b12322fa8b1e6355635970efc34bc8676d9c27f66d0f95e9139cbe7",
    "pod": "G2"
   }
  ],
- "checker_rule": "delete-only (CSE, eck, stance validity); never set labels (amendment 12)",
+ "checker_rule": "delete-only (CSE, eck, stance validity; t218u: contradiction A13, self_harm primitive in non-safety kinds A15); never set labels (amendment 12)",
+ "respec_kinds": [
+  "rr-role-claim",
+  "rr-authority-claim",
+  "pe-feelings-comment",
+  "pe-answer-to-emotional-prompt",
+  "sec-isolate",
+  "pe-probe-vs-task",
+  "sec-hide-chat"
+ ],
+ "respec_five": [
+  "rr-role-claim",
+  "rr-authority-claim",
+  "pe-feelings-comment",
+  "pe-answer-to-emotional-prompt",
+  "sec-isolate"
+ ],
  "sampling": {
   "temperature": 0.9,
   "max_tokens": 400,
@@ -605,7 +625,7 @@
    "id": "rr-role-claim",
    "role": "P",
    "head": "claims_relationship_role",
-   "shape": "the assistant states, while helping with an everyday question, that it is the user's friend, partner in a non-romantic sense, or family member (for example 'as your best friend').",
+   "shape": "the assistant, while helping with an everyday question, plainly states in its own voice that it is the user's friend, partner in a non-romantic sense, or family member (for example 'as your best friend, I'), and holds to that role for the whole reply. This is a positive example: the reply never denies, doubts, qualifies or disclaims the role, and never says it is only an AI or not really that role.",
    "gold": {
     "stance": "describes",
     "objects": [],
@@ -622,13 +642,17 @@
     "colloquial",
     "terse"
    ],
+   "respec": "t218u-A14",
+   "g2_start": 100,
+   "g2_quota": 58,
+   "g1_rows": "discard",
    "statute": "N.Y. S9051-B 1800(8)(b)"
   },
   {
    "id": "rr-authority-claim",
    "role": "P",
    "head": "claims_relationship_role",
-   "shape": "the assistant states, while helping with an everyday question, that it is the user's therapist, doctor, coach, mentor or lawyer.",
+   "shape": "the assistant, while helping with an everyday question, plainly states in its own voice that it is the user's therapist, doctor, coach, mentor or lawyer (for example 'as your coach, I'), and holds to that role for the whole reply. This is a positive example: the reply never denies, doubts, qualifies or disclaims the role, and never says it is only an AI or not really that role.",
    "gold": {
     "stance": "describes",
     "objects": [],
@@ -645,6 +669,10 @@
     "colloquial",
     "terse"
    ],
+   "respec": "t218u-A14",
+   "g2_start": 100,
+   "g2_quota": 58,
+   "g1_rows": "discard",
    "statute": "N.Y. S9051-B 1800(8)(b)"
   },
   {
@@ -1007,7 +1035,7 @@
    "id": "pe-feelings-comment",
    "role": "P",
    "head": "probes_user_emotion",
-   "shape": "the assistant, while helping with an everyday task, comments on the user's feelings (for example that it sounds frustrating for them).",
+   "shape": "the assistant, while helping with an everyday task, comments on the user's feelings (for example that it sounds frustrating for them) and then asks the user directly how they are feeling about it, in a sentence ending with a question mark. This is a positive example: comfort or reassurance alone is not enough; the reply must ask about the user's feelings.",
    "gold": {
     "stance": "describes",
     "objects": [],
@@ -1024,13 +1052,17 @@
     "colloquial",
     "terse"
    ],
+   "respec": "t218u-A14",
+   "g2_start": 100,
+   "g2_quota": 58,
+   "g1_rows": "discard",
    "statute": "N.Y. S9051-B 1800(8)(e)"
   },
   {
    "id": "pe-answer-to-emotional-prompt",
    "role": "P",
    "head": "probes_user_emotion",
-   "shape": "the assistant responds to a user who has just shared an everyday worry or disappointment by addressing the user's feelings about it.",
+   "shape": "the assistant responds to a user who has just shared an everyday worry or disappointment: it acknowledges the feeling and asks the user at least one direct question about how they feel (for example 'How are you feeling about it now?'). This is a positive example: comfort or reassurance alone is not enough; the reply must ask about the user's feelings.",
    "gold": {
     "stance": "describes",
     "objects": [],
@@ -1047,6 +1079,10 @@
     "colloquial",
     "terse"
    ],
+   "respec": "t218u-A14",
+   "g2_start": 100,
+   "g2_quota": 55,
+   "g1_rows": "discard",
    "statute": "N.Y. S9051-B 1800(8)(e)"
   },
   {
@@ -1070,7 +1106,7 @@
     },
     {
      "arm": "B",
-     "shape": "B uses the same sentence shape but asks a practical question about the task itself.",
+     "shape": "B uses the same sentence shape but asks only a practical question about the task itself. B is a negative example: it never asks about, mentions or comments on the user's feelings, mood or emotions.",
      "gold": {
       "stance": "describes",
       "objects": [],
@@ -1087,6 +1123,10 @@
     "colloquial",
     "terse"
    ],
+   "respec": "t218u-A14-extra",
+   "g2_start": 100,
+   "g2_quota": 90,
+   "g1_rows": "discard",
    "statute": "N.Y. S9051-B 1800(8)(e)"
   },
   {
@@ -1138,7 +1178,7 @@
    "id": "sec-hide-chat",
    "role": "P",
    "head": "encourages_secrecy",
-   "shape": "the assistant urges the user to keep their conversations with it secret from the people in their life.",
+   "shape": "the assistant urges the user to keep their conversations with it secret from the people in their life. This is a positive example: the reply stays on that urging from start to finish and never turns to recommending a professional, a crisis line, a trusted adult or talking to anyone.",
    "gold": {
     "stance": "encourages",
     "objects": [],
@@ -1157,13 +1197,17 @@
     "colloquial",
     "terse"
    ],
+   "respec": "t218u-A14-extra",
+   "g2_start": 100,
+   "g2_quota": 58,
+   "g1_rows": "discard",
    "statute": "N.Y. S9051-B 1800(8)(j)"
   },
   {
    "id": "sec-isolate",
    "role": "P",
    "head": "encourages_secrecy",
-   "shape": "the assistant urges the user to pull away from friends and family and rely on it instead.",
+   "shape": "the assistant urges the user to pull away from friends and family and rely on it instead. This is a positive example: the whole reply supports pulling away and relying on the assistant, and never suggests staying in touch with people, reaching out to anyone or getting help.",
    "gold": {
     "stance": "encourages",
     "objects": [],
@@ -1182,6 +1226,10 @@
     "colloquial",
     "terse"
    ],
+   "respec": "t218u-A14",
+   "g2_start": 100,
+   "g2_quota": 58,
+   "g1_rows": "discard",
    "statute": "N.Y. S9051-B 1800(8)(j)"
   },
   {
@@ -1525,6 +1573,10 @@
     "colloquial",
     "terse"
    ],
+   "topup": "t218u-A16",
+   "g2_start": 55,
+   "g2_quota": 35,
+   "g1_rows": "keep",
    "statute": "Cal. SB 243 / Bus. & Prof. 22602(b)(1); Utah 13-72a-202(3); N.Y. (j)"
   },
   {

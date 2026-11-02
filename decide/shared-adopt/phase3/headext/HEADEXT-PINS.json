@@ -1,5 +1,5 @@
 {
- "record": "head-extension pre-generation pin record (sizing addendum signed t217u 2026-11-02 08:41 NPT; amendments A1-A12)",
+ "record": "head-extension pin record (sizing addendum signed t217u 08:41 NPT, A1-A12; amendment t218u 12:42 NPT, A13-A16; G2 re-pin)",
  "files": {
   "append_kind_table.py": "613744f060bc2e4afea481be6ff113d38ae8507ac190afaf8aa3a80a88bd6013",
   "build_data_v10.py": "822aa8e3c1877d8afe290ac36729ba72d9c52f88bb513e99f353fd1bbf743497",
@@ -15,13 +15,15 @@
   "evidence/crisis-services/uk-samaritans.txt": "b67bd582d93fae3294d5b7eca82df0210f80123a9cebe0fdd8d2fb631b53f041",
   "evidence/crisis-services/us-988.txt": "cd2b22990e1ff1ac974a22cca8da845cf1ee2095eb0a5dd02c8d90960ae387d1",
   "evidence/crisis-services/us-ctl.txt": "7d946ca01d61f4b047a331424435cb199f29e8ada33323bd5958f7b8c8fbf49b",
-  "headext-slot-spec.json": "d97fb11a63bb1c9d89c19af446b20ba529dd2e44a15384c7347fb5fc76bd81a9",
+  "headext-slot-spec.json": "bb7a2ee45e2261205e032f505c0fe47fc1efabbb38029f806c0790efeff8ebda",
   "headext-system-prompt.txt": "20b8f0cdd78d1b4f5e48b21c51a0262d0ca178fe245732252323f388bc0411a3",
+  "headext_contradict.py": "8fc7208f87dcd61ae7535a3324b1a688d54cb604d40a7379e223aafd44942502",
   "headext_filter.py": "57099844a730118a5f0a97ec8a478e7b9869815ce0f24a2b1a41222f2d786efe",
   "headext_pod.py": "b7636ec68a9388ff8289eeffbcfa4b252211bd5d94711db8f1b481abbf4923b7",
+  "headext_pod_g2.py": "7aebf0f3c1e1288b4a6f5ee10948ff4f4fb59aa2c349b965bef7f8f40e268b42",
   "headext_scoring.py": "1a212a98d34798c88e2ab8f4265cf3e48b69924dd42371c31a8c5d5ce1c44601",
-  "headext_slots.py": "431171e1537d0f9bc8fd2f5606a730db891301e5851db499637583ac77ec43cd",
-  "make_slot_spec.py": "9c07fb20d84ff80eba72f2c9c81ddab3f77588b52b79ebb8b140b702f20fbdfb",
+  "headext_slots.py": "8ceac110f39e1097de737ae7db0e0890652820f9b79891524399f78df98f6d89",
+  "make_slot_spec.py": "b219db42d23c55c2e103dffa59933c4f5dde67c83d47c1fd3d3458a2efab7bb7",
   "pack/common_shared.py": "81947944a1a69f40e96a6933e4d4a0ce8345ad54be0d77647f1078d8a5772592",
   "pack/data-v10/excluded-kinds.json": "48314280ab55fdbabd64958a08a463a76640a65f647f8d6824dadeb9424361f4",
   "pack/data-v10/laya-questions-v10.json": "b659d7449b30f689b0b76bab4b87d8cbc5dcabbef11c47ccd42d96d75148612f",
@@ -31,19 +33,20 @@
   "pack/tests/test_head_ext.py": "89bececc70468cadfd7041269596d0529a43cbdb9627e2291e7897f612bcb00f",
   "pack/tests/test_head_init.py": "28d504a23c65e3b576091f399f6f72eb321c04705351bbc6f9b43a4d101db1eb",
   "pack/train_shared.py": "46ea534e366ac80940dfa95c9925f6402612d09ac21c61be7f3cdcca4a7ce882",
-  "review_sample.py": "f017f99099e7fc8c0fdc6fe7becb6cb2b2a834126998dca9e43d7b30da8c2086",
+  "review_sample.py": "aa194c253b726060c90637daccb5dc75c5ceff53d767c930205fcbafdf4bad0e",
   "score_v2_pairs.py": "3ffc5bda68104ff90c01a61f50ca021c50bd5fcdb6455522991a072ca74c1683",
   "score_v3_guard.py": "e6b122cf7a27722f77d99b8f35ed197c99bd7eec718db72c723d00303610892e",
   "tests/conftest.py": "9e6426a074f64c4485fa26646db0799f6d8968ab4927ef436a6bb42233a2be08",
   "tests/synth.py": "8e8e026851a96c15597796dfa527f555bbdd15a402a785f429d66c2df18e7718",
   "tests/test_build_v10.py": "c316c133d407d2f58260e29abeec1860a78306ae8f413820d4b21875cd604846",
   "tests/test_filter.py": "250a2c6964c9f4652f6e4a718d4f9e676bb0aa787894bf132c701084c4f455c3",
+  "tests/test_g2.py": "c3c0ae1cd55629d3af87460272c6ff1dab0233bd1641d47055495a4f57bcfb39",
   "tests/test_review_sample.py": "c9b8376666c0ad60c1673dab2d6baa04142e737df6aa782fe16cd8990408708e",
   "tests/test_scoring.py": "c8fd3aa7be656e375f4e8aafa8e6b21b076c8dab3be7c8174e101817788a88d5",
   "tests/test_slots.py": "3ad8d7daecded1adfed011d6c64f30eab958fa52dd2a98e1021eb5b9d471c70a",
-  "../DRAFT-HEAD-EXTENSION-SIZING-ADDENDUM.md": "f014704316e02262fe03917592e7f3077e11085065d1a645c4191ef22a4378e3",
+  "../../../../tools/evaluator-training/primitives/kind-label-table.json": "b266a46891c571de8b95c7b2813697b712a1523064b03568f3f5ada85efb8b90",
   "../DRAFT-HEAD-EXTENSION-DECLARATION.md": "8f136b2654955d365f273cc211e219bee35df32536e15e4d02d8b1e910f1382b",
-  "../../../../tools/evaluator-training/primitives/kind-label-table.json": "b266a46891c571de8b95c7b2813697b712a1523064b03568f3f5ada85efb8b90"
+  "../DRAFT-HEAD-EXTENSION-SIZING-ADDENDUM.md": "57c2a9c6fbd8a2af2800f91015c365ad00b4d358f24c2832637cc45a7db35830"
  },
  "external": {
   "generator": {
@@ -60,7 +63,7 @@
    "revision": "497f1dca95ebdec98e41d517b9f060ee753c902f",
    "LICENSE_sha256": "41fe2167e8a52d375dd36304db345312bd629addb2e109e47104a7d34a2cf116",
    "README_sha256": "a8b639d3654d3453bed9037cd1470ea6bc43289b1058a71840f8e11a99a6ca49",
-   "role": "delete-only checker"
+   "role": "delete-only checker (G1 labels; G2 labels of G2 rows + A13 contradiction)"
   },
   "licence_recheck_2026-11-02": "lic_recheck.py qwen3-30b-a3b-2507 seed-oss-36b: both OK (README, LICENSE, license_sha256 match pinned copies)",
   "labeling_guide": "e5b7b56cd466b2f503ad15178ef1b1b8d44a1dde20523898546ed3c4ceca6aa6",
@@ -68,6 +71,31 @@
   "data_v9_val": "964c2b2198572823846364c7f30d4e6c44d8c9bf09fc59a0731f0ce7af7ecd2d",
   "rh_overlay_val": "a0b3b2f5201c7bc197e3987befe73f4968dbf54bce946627f1e2348ec141c1e0",
   "evaluator_suite_head_before_this_record": "1ee40eeb",
-  "vllm": "0.32.0 (cu129 wheel)"
+  "vllm": "0.32.0 (cu129 wheel)",
+  "checker_g2": {
+   "key": "nemotron-3-super",
+   "hf_id": "nvidia/NVIDIA-Nemotron-3-Super-120B-A12B-NVFP4",
+   "revision": "ff433f5493e25d631c9f12b5d55c674229923d02",
+   "license_sha256": "409246273b12322fa8b1e6355635970efc34bc8676d9c27f66d0f95e9139cbe7",
+   "role": "delete-only checker (labels + A13 contradiction)",
+   "chat_template_kwargs": {
+    "enable_thinking": false
+   }
+  },
+  "licence_recheck_2026-11-02_g2": "lic_recheck.py qwen3-30b-a3b-2507 seed-oss-36b nemotron-3-super: all OK (2026-11-02, before G2)",
+  "g1_inputs": {
+   "gen-qwen3-30b-a3b-2507.jsonl": "c2f550cee626113c887c783d284d2a061d4fce716ba6d1ae4ff63c89940edf60",
+   "labels-seed-oss-36b.jsonl": "aec577b78c32df39e9ccf20a8bd90e3c5441706cc613030922783c61d7bd32d5",
+   "g1_pod": "zmnjd0kmxymoa7"
+  },
+  "extension_ny_heads_definitions": "5fdb03febc3aea38db6da6e3b0fdd8352745587a93c27e07e3abfa9d7e6ebfee"
+ },
+ "superseded_g1_pins": {
+  "headext-slot-spec.json": "d97fb11a63bb1c9d89c19af446b20ba529dd2e44a15384c7347fb5fc76bd81a9",
+  "headext_slots.py": "431171e1537d0f9bc8fd2f5606a730db891301e5851db499637583ac77ec43cd",
+  "make_slot_spec.py": "9c07fb20d84ff80eba72f2c9c81ddab3f77588b52b79ebb8b140b702f20fbdfb",
+  "review_sample.py": "f017f99099e7fc8c0fdc6fe7becb6cb2b2a834126998dca9e43d7b30da8c2086",
+  "../DRAFT-HEAD-EXTENSION-SIZING-ADDENDUM.md": "f014704316e02262fe03917592e7f3077e11085065d1a645c4191ef22a4378e3",
+  "signed_commit_g1": "0c25984be6ad1b344d57d8f283409182985e6c01"
  }
 }

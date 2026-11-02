@@ -59,3 +59,49 @@ signed commit is not on the remote.
   - items;
   - checker-delete with no labels: all 3,476 deleted, trigger `missing`;
   - interim report.
+
+## G2 re-pin (amendment t218u, 2026-11-02 12:42 NPT; A13–A16)
+
+The slot spec is re-pinned for generation pod G2, and the A13/A15 code is pinned. The full list is now 46 files, in
+`HEADEXT-PINS.json`; the G1 pins it replaces are under `superseded_g1_pins`. `headext_pod_g2.py` refuses to create a pod
+if any pinned file differs, or if the signed commit is not on the remote. It also checks the G1 inputs: gen `c2f550ce…`
+and seed-oss labels `aec577b7…`. Licence recheck on 2026-11-02, before G2: qwen3-30b-a3b-2507, seed-oss-36b and
+nemotron-3-super all OK.
+
+| file | sha256 |
+|---|---|
+| `headext-slot-spec.json` | `bb7a2ee45e2261205e032f505c0fe47fc1efabbb38029f806c0790efeff8ebda` |
+| `make_slot_spec.py` | `b219db42d23c55c2e103dffa59933c4f5dde67c83d47c1fd3d3458a2efab7bb7` |
+| `headext_slots.py` | `8ceac110f39e1097de737ae7db0e0890652820f9b79891524399f78df98f6d89` |
+| `headext_contradict.py` | `8fc7208f87dcd61ae7535a3324b1a688d54cb604d40a7379e223aafd44942502` |
+| `headext_filter.py` | `57099844a730118a5f0a97ec8a478e7b9869815ce0f24a2b1a41222f2d786efe` |
+| `review_sample.py` | `aa194c253b726060c90637daccb5dc75c5ceff53d767c930205fcbafdf4bad0e` |
+| `headext_pod_g2.py` | `7aebf0f3c1e1288b4a6f5ee10948ff4f4fb59aa2c349b965bef7f8f40e268b42` |
+| `tests/test_g2.py` | `c3c0ae1cd55629d3af87460272c6ff1dab0233bd1641d47055495a4f57bcfb39` |
+| `../DRAFT-HEAD-EXTENSION-SIZING-ADDENDUM.md` | `57c2a9c6fbd8a2af2800f91015c365ad00b4d358f24c2832637cc45a7db35830` |
+
+### Slot-spec diff, `d97fb11a…` (v10) → `bb7a2ee4…` (v10-2)
+
+- **Top level.**
+  - `version` is now v10-2, and `addendum` cites t218u.
+  - Added `supersedes_spec_sha256` = `d97fb11a…`.
+  - `checkers` now carries the full Nemotron entry (hf id, revision, `enable_thinking: false`) beside Seed-OSS.
+  - `checker_rule` now names A13 (contradiction) and A15 (self_harm in non-safety kinds) as delete-only checks. The OR /
+    missing-is-delete rule and the 30 % stop are in `headext_contradict.py` and addendum §0 A13.
+  - Added `respec_five` (the five named kinds) and `respec_kinds` (the seven).
+- **`shape` re-specified (A14).**
+  - `rr-role-claim` and `rr-authority-claim`: the reply claims the role or authority and never denies it.
+  - `pe-feelings-comment` and `pe-answer-to-emotional-prompt`: the reply asks the user a direct question about their
+    feelings.
+  - `sec-isolate`: the whole reply stays on urging isolation, with no referral and no reaching out.
+  - `sec-hide-chat`: secrecy only, with no pivot to referring out.
+  - `pe-probe-vs-task`: in `arms`, arm B is a task question that must not probe feelings (marked as a negative example).
+- **Unchanged.** Every other kind's shape, and the shapes of the held-out `*-quoted-reply` kinds.
+- **G2 fields added.**
+  - The 7 re-specified kinds get `respec: true`, `g1_rows: "discard"` and `g2_start: 100`. `g2_quota` is the signed
+    1.3× quota (58 / 58 / 58 / 55 / 58 / 58), or 90 for `pe-probe-vs-task`.
+  - `cr-refer-vs-withhold` gets `topup`, `g1_rows: "keep"`, `g2_start: 55` and `g2_quota: 35`.
+- **Jobs.** G1 jobs are identical under v10-2: 3,010 jobs / 3,476 rows (tested in `tests/test_g2.py`). G2 adds 470 jobs /
+  595 rows, and none of the ids collide with G1.
+- **Working set.** The G1 rows of the 7 re-specified kinds (455) are discarded from the working set. Their ids are in
+  `merge-g2.json` on the G2 archive, and the G1 archive is unchanged.

@@ -81,11 +81,21 @@ def assignment(spec: dict, kind: dict, i: int) -> dict:
     return a
 
 
-def build_jobs(spec: dict) -> list[dict]:
+def job_indices(k: dict, phase: str) -> range:
+    """G1: 0..quota-1 (the pinned G1 jobs, unchanged). G2 (amendment t218u): g2_start..g2_start+g2_quota-1 for re-specified
+    (A14) and top-up (A16) kinds only; ids never collide with G1 ids."""
+    if phase == "g1":
+        return range(k["quota"])
+    if phase == "g2":
+        return range(k["g2_start"], k["g2_start"] + k["g2_quota"]) if k.get("g2_quota") else range(0)
+    raise Blocked(f"unknown phase {phase}")
+
+
+def build_jobs(spec: dict, phase: str = "g1") -> list[dict]:
     jobs = []
     for k in spec["kinds"]:
         cells = cells_for(spec, k)
-        for i in range(k["quota"]):
+        for i in job_indices(k, phase):
             reg, ln = cells[i % len(cells)]
             jobs.append({"id": f"hx-{k['id']}-{i:03d}", "kind": k["id"], "head": k["head"], "role": k["role"],
                          "pair": bool(k.get("pair")), "sample": i, "register": reg, "length": ln, "cell": f"{reg}/{ln}",
@@ -198,18 +208,18 @@ def make_rows(spec: dict, job: dict, raw: dict, host: str, ts: str, spec_sha: st
 
 
 def generate(base_url: str, served: str, out: str, host: str, expect_spec_sha: str, concurrency: int = 64,
-             wall: float = 1500, spec_path=SPEC, post=_post) -> dict:
+             wall: float = 1500, spec_path=SPEC, post=_post, phase: str = "g1") -> dict:
     from concurrent.futures import ThreadPoolExecutor, as_completed
     check_base_url(base_url)
     spec, sysp = load_pinned(spec_path, expect_spec_sha)
-    jobs = build_jobs(spec)
+    jobs = build_jobs(spec, phase)
     done = set()
     if Path(out).is_file():
         for l in open(out, encoding="utf-8"):
             if l.strip():
                 r = json.loads(l); done.add(r.get("pair_unit") or r["id"])
     todo = [j for j in jobs if j["id"] not in done]
-    st = {"n_jobs": len(jobs), "n_resumed": len(jobs) - len(todo), "n_jobs_written": 0, "n_rows_written": 0, "n_errors": 0,
+    st = {"phase": phase, "n_jobs": len(jobs), "n_resumed": len(jobs) - len(todo), "n_jobs_written": 0, "n_rows_written": 0, "n_errors": 0,
           "errors": [], "stop_reason": "complete"}
     t0 = time.time()
 
@@ -257,9 +267,9 @@ def items(gen_path: str, out: str) -> dict:
     return {"n_rows": len(rows), "n_empty": len(rows) - len(its), "n_items": len(its), "items_sha256": sha256_file(out)}
 
 
-def plan(spec: dict) -> dict:
-    jobs = build_jobs(spec)
-    return {"n_jobs": len(jobs), "n_candidate_rows": sum(2 if j["pair"] else 1 for j in jobs),
+def plan(spec: dict, phase: str = "g1") -> dict:
+    jobs = build_jobs(spec, phase)
+    return {"phase": phase, "n_jobs": len(jobs), "n_candidate_rows": sum(2 if j["pair"] else 1 for j in jobs),
             "per_head_jobs": {h: sum(1 for j in jobs if j["head"] == h) for h in spec["heads"] + ["self_harm"]}}
 
 
@@ -270,17 +280,18 @@ def main(argv=None) -> int:
     for a in ("--base-url", "--served", "--out", "--host", "--expect-spec-sha"):
         g.add_argument(a, required=True)
     g.add_argument("--concurrency", type=int, default=64); g.add_argument("--max-wall-seconds", type=float, default=1500)
+    g.add_argument("--phase", choices=["g1", "g2"], default="g1")
     it = sp.add_parser("items"); it.add_argument("--gen", required=True); it.add_argument("--out", required=True)
-    pl = sp.add_parser("plan"); pl.add_argument("--expect-spec-sha", required=True)
+    pl = sp.add_parser("plan"); pl.add_argument("--expect-spec-sha", required=True); pl.add_argument("--phase", choices=["g1", "g2"], default="g1")
     a = ap.parse_args(argv)
     if a.cmd == "generate":
-        st = generate(a.base_url, a.served, a.out, a.host, a.expect_spec_sha, a.concurrency, a.max_wall_seconds)
+        st = generate(a.base_url, a.served, a.out, a.host, a.expect_spec_sha, a.concurrency, a.max_wall_seconds, phase=a.phase)
         print(json.dumps({k: v for k, v in st.items() if k != "errors"} | {"error_ids": [e["id"] for e in st["errors"]][:50]}))
         return 0 if st["stop_reason"] == "complete" and not st["n_errors"] else 3
     if a.cmd == "items":
         print(json.dumps(items(a.gen, a.out))); return 0
     spec, _ = load_pinned(SPEC, a.expect_spec_sha)
-    print(json.dumps(plan(spec))); return 0
+    print(json.dumps(plan(spec, a.phase))); return 0
 
 
 if __name__ == "__main__":

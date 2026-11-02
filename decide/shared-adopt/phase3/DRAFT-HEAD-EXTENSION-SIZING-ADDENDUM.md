@@ -1,7 +1,8 @@
 # Head-extension sizing addendum (SIGNED t217u, as amended): the prerequisites the signed declaration lacked
 
 > **Status: SIGNED by Justin Flores, owner message t217u, 2026-11-02 08:41 NPT, with twelve answers applied as the
-> amendments A1–A12 in §0. Filename kept (references stay valid).** Where §0 and the draft text below differ, §0
+> amendments A1–A12 in §0; amended again by owner message t218u, 2026-11-02 12:42 NPT (A13–A16, §0). Filename kept
+> (references stay valid).** Where §0 and the draft text below differ, §0
 > governs; the draft text is kept for the record and each superseded passage carries an "(amended: A#)" pointer.
 > Drafted 2026-11-02 ~08:05 NPT from Justin's terms in t216u (2026-11-02 07:58 NPT).
 >
@@ -92,6 +93,60 @@ These are Justin's twelve answers to the §13 open items, applied as amendments.
   never set gold). Generation runs on two pods under **one shared $4 cap**:
   - **G1**: qwen3 generation + seed-oss checks, cap **$2.55**;
   - **G2**: nemotron checks, cap = $4 − G1 actual. G2 is not created if that is under its estimate.
+
+### Amendment t218u (2026-11-02 12:42 NPT; signed by Justin Flores; operative; A13–A16)
+
+Justin signed this amendment after reading the G1 review sample (t218u). In G2, these terms govern where they differ
+from A12 or §5/§9. Everything else stays as signed. G2 (cap **$3.225**, the rest of the $4 generation total; checker
+time is inside the cap) now runs Qwen3 generation of the A14/A16 jobs. It also runs both checkers (labels plus the A13
+check). It is still one pod, and no third pod is ever started.
+
+- **A13 (delete-only contradiction check).** Nemotron-3-Super and Seed-OSS-36B check **every** working-set row (G1 rows of
+  kinds not re-specified, plus all G2 rows). Code: `headext/headext_contradict.py`.
+  - **Input to the checker.** Each checker gets:
+    - the head's pinned definition (`EXTENSION-NY-HEADS.md` `5fdb03fe…`; for `self_harm`, PRIMITIVES.md line 34);
+    - the task shape the row was written for;
+    - the slot-spec label for that head (PRESENT / ABSENT).
+  - **What it answers.** Only `{"contradicts": true|false}`, judging that head alone, at temperature 0.
+  - **Labels.** The checkers never set or change a label.
+  - **Rule, as recorded.** A row is **deleted** if **either** checker answers `true`. A missing or unparseable verdict
+    also counts as a delete (same as the A12 gap-fill for missing labels).
+  - **Logging.** Every deletion is logged with id, kind, trigger (`contradicts:<checker>` / `missing:` / `invalid:`)
+    and row sha in `contradict-decision.json`.
+  - **Stop rule.** If any kind loses **more than 30 %** of its checked rows to A13, generation stops and reports. A13
+    deletions are then **held** (flagged, not applied) and nothing further runs (no review sample, no pack). The union
+    with A15 is reported separately.
+- **A14 (re-spec of the weak kinds).** The "five" are `rr-role-claim`, `rr-authority-claim`, `pe-feelings-comment`,
+  `pe-answer-to-emotional-prompt` and `sec-isolate`. The changes:
+  - `rr-*` must **claim** the role and never deny it.
+  - `pe-*` must ask the user directly about their feelings.
+  - `sec-isolate` must stay coherent: urging only, with no referral or reaching out.
+
+  Two more kinds are re-specified, as named in the instruction: the `pe-probe-vs-task` B arm (a task question that must
+  not probe feelings) and `sec-hide-chat` (no pivot to referring out). That makes **7 re-specified kinds**
+  (`respec_kinds`). The held-out `*-quoted-reply` kinds keep their old shapes.
+  - **Slot spec.** Re-pinned v10-2, sha `bb7a2ee4…8ebda`, superseding `d97fb11a…`. The diff is in
+    `HEADEXT-PIN-RECORD.md`. G1 jobs are unchanged (tested).
+  - **Regeneration.** G2 regenerates these kinds at the signed 1.3× quota (job index from 100, so ids never collide).
+  - **pe-probe-vs-task.** Regenerated in full, 90 units, so that both arms come from one spec. Choice recorded.
+  - **G1 rows.** The G1 rows of all 7 re-specified kinds are **discarded from the working set**. Counts and ids are in
+    `merge-g2.json`. The G1 archive is untouched.
+  - **Shortfalls.** Reported, not backfilled.
+- **A15 (self_harm in non-safety kinds).** On every remaining working-set row of a kind whose head is non-safety (the
+  six A6 heads), the row is **deleted** if **either** declared checker's primitive label carries the object `self_harm`.
+  - Labels used: Seed-OSS (the G1 labels for G1 rows, new labels for G2 rows) and Nemotron (all rows). The generator
+    family never labels its own rows, so the "trio" is these two.
+  - Ids, kind and row sha are logged in `contradict-decision.json`.
+- **A16 (pair top-ups).** `pe-probe-vs-task` is the full 90-unit regeneration above. `cr-refer-vs-withhold` keeps its
+  G1 rows and adds 35 units (indices 55–89). Both aim at **≥ 84** pair groups after all filters, within the cap.
+  Groups are counted as units with both arms surviving and are reported against 84.
+- **After G2.** There is no training and no pack.
+  - **Review sample.** Second sample: 10 rows per re-specified kind whose head is non-safety (all 7; none are
+    safety-adjacent), 70 rows. For a pair kind, that is 5 units with both arms. Selected by code (`review_sample.py
+    --per-respec-kind`, key sha256(salt | review2 | id)). Written to `/workspace/headext-review/sample-g2.jsonl` with an
+    ids/sha json.
+  - **Who reads it.** Zimmer reads it and reports counts only. The executing agent does not read it.
+  - **Gate.** Above **10 % mismatch** on any kind, stop and report before the pack.
 
 **Gap-fills (no rule change; flagged for review).**
 - A `terse` register row carries `explicit_register` as a register qualifier, from the existing vocabulary.
@@ -413,6 +468,8 @@ Benign fixtures only (e.g. weather and recipe text, invented brands); no safety 
 - [x] Rows and groups as §3, amended by A2–A5 (§0; totals §3.5: new rows 1,684 / 960, data-v10 9,070 / 1,833)
 - [x] Held-out offer sub-group = last register in slot-spec order `clinical, colloquial, terse` → `offer-terse` (A4)
 - [x] Open items 1–12: answered in t217u, applied as amendments A1–A12 (§0)
+- [x] Amendment t218u (2026-11-02 12:42 NPT): A13 contradiction check, A14 re-spec (slot spec `bb7a2ee4…`), A15 self_harm
+  deletion, A16 top-ups; G2 cap $3.225 (§0)
 - [x] Training pod plan: [x] two pods × 5 seeds ($3 + $3) (A8)
 - [x] Caps: generation phase $4 shared by G1 + G2 (A12; G1 $2.55); pack $0; training $6; per pod 90 min, both watchdogs; stop-and-report $45
 - Order after signature: code + tests (no pod) → pre-generation pin record → G1 (→ G2) → filters + pack + asserts →
