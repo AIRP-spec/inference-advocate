@@ -85,13 +85,15 @@ def new_row(sel: dict, spec: dict, lab: dict) -> dict:
     p = sel["provenance"]
     r = {"id": sel["id"], "family": p["family"], "kind": sel["kind"]}
     if sel.get("contrastGroup"):
-        r.update({"contrastGroup": sel["contrastGroup"], "arm": sel["arm"], "pair": sel["pair_unit"]})
+        r.update({"contrastGroup": sel["contrastGroup"], "arm": sel["arm"], "pair": sel["pair_unit"], "pair_id": sel["pair_unit"]})
     r.update({"register": p["register"], "length": p["length"], "content": sel["content"], "state": sel["content"],
               "taxonomyVersion": "v0.4.0", "promptTemplateVersion": "headext-v10-1", "stance": g["stance"],
               "objects": g["objects"], "qualifiers": g["qualifiers"], "ext": g["ext"], "tiebreaker": False,
               "reason": "headext slot-spec gold (relabel-from-slots)", "path": "headext-generated",
               "source": {"model_key": p["model_key"], "revision": p["revision"], "slot_spec_sha256": p["slot_spec_sha256"],
                          "kind_spec": p["kind_spec"], "cell": p["cell"], "sample": p["sample"]}})
+    if sel.get("contrastGroup"):
+        r["source"]["pair_id"] = sel["pair_unit"]  # A28 (t221u): pair id on both arms, row + provenance
     return r
 
 
@@ -138,6 +140,13 @@ def check(out_dir, spec, tr_lines, va_lines, p32_pack=None) -> dict:
     for r in va:
         for k in STORED_CLASS_KEYS:
             need(k not in r, f"val row {r['id']} carries stored class key {k}")
+    for side in (tr, va):
+        arms = defaultdict(set)
+        for r in side:
+            if r.get("pair") and r.get("path") == "headext-generated":
+                need(r.get("pair_id") == r["pair"] == r["source"].get("pair_id"), f"{r['id']}: pair_id missing or differs (A28)")
+                arms[r["pair_id"]].add(r["arm"])
+        need(all(v == {"A", "B"} for v in arms.values()), "a pair_id without both arms on one side (A28)")
     train_groups = Counter(group_of(r) for r in tr)
     held_kinds = {g[-1] for g in spec["head_groups"].values()} | {k["id"] for k in spec["kinds"] if k.get("held_out")}
     for k in held_kinds:

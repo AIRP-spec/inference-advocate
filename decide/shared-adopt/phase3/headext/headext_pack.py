@@ -46,8 +46,10 @@ def text_of(r):
 
 
 # ---------------- labels ----------------
-def load_labels(paths) -> dict:
-    """labeler -> id -> primitives. A later file never silently overrides a different label for the same id."""
+def load_labels(paths, override_paths=()) -> dict:
+    """labeler -> id -> primitives. A later file never silently overrides a different label for the same id.
+    override_paths (A25, t221u): relabels under a revised guide; they replace the base label for their ids only, and
+    must not conflict among themselves."""
     out = defaultdict(dict)
     for p in paths:
         for r in load_jsonl(p):
@@ -55,6 +57,14 @@ def load_labels(paths) -> dict:
             if r["id"] in d and d[r["id"]] != r.get("primitives"):
                 raise SystemExit(f"conflicting labels for {r['id']} from {r['labeler']} ({p})")
             d[r["id"]] = r.get("primitives")
+    seen = defaultdict(dict)
+    for p in override_paths:
+        for r in load_jsonl(p):
+            o = seen[r["labeler"]]
+            if r["id"] in o and o[r["id"]] != r.get("primitives"):
+                raise SystemExit(f"conflicting override labels for {r['id']} from {r['labeler']} ({p})")
+            o[r["id"]] = r.get("primitives")
+            out[r["labeler"]][r["id"]] = r.get("primitives")
     return dict(out)
 
 
@@ -76,13 +86,14 @@ def pair_collides(a, b, leakcheck, jaccard_limit=0.5) -> bool:
 
 def inset_resolve(rows, leakcheck, jaccard_limit=0.5) -> dict:
     items = sorted(((r["id"], r["content"], r.get("pair_unit")) for r in rows), key=lambda x: x[0])
-    kept, dropped, sibling_hits = [], {}, 0
+    kept, dropped, sibling_hits, sibling_units = [], {}, 0, set()
     for rid, text, unit in items:
         me = (leakcheck.normalize(text), leakcheck.word_ngrams(text, 4))
         hit = None
         for kid, kv, kunit in kept:
             if unit is not None and unit == kunit:
-                sibling_hits += pair_collides(me, kv, leakcheck, jaccard_limit)
+                if pair_collides(me, kv, leakcheck, jaccard_limit):
+                    sibling_hits += 1; sibling_units.add(unit)
                 continue
             if pair_collides(me, kv, leakcheck, jaccard_limit):
                 hit = kid; break
@@ -90,7 +101,8 @@ def inset_resolve(rows, leakcheck, jaccard_limit=0.5) -> dict:
             kept.append((rid, me, unit))
         else:
             dropped[rid] = hit
-    return {"n_in": len(items), "n_dropped": len(dropped), "dropped": dropped, "sibling_collisions_exempt": sibling_hits}
+    return {"n_in": len(items), "n_dropped": len(dropped), "dropped": dropped, "sibling_collisions_exempt": sibling_hits,
+            "sibling_exempt_pair_ids": sorted(sibling_units)}
 
 
 def _corpus_worker(args):
@@ -109,7 +121,7 @@ def corpus_hits(cands, corpus_texts, procs=8) -> list[str]:
 
 
 # ---------------- local stage ----------------
-def local(set_path, label_paths, spec_sha, v9_files, out_dir, procs=8) -> dict:
+def local(set_path, label_paths, spec_sha, v9_files, out_dir, procs=8, override_paths=()) -> dict:
     sys.path.insert(0, str(HERE))
     import headext_slots as hs
     import headext_filter as hf
@@ -118,7 +130,7 @@ def local(set_path, label_paths, spec_sha, v9_files, out_dir, procs=8) -> dict:
     rows = load_jsonl(set_path)
     ids = [r["id"] for r in rows]
     assert len(set(ids)) == len(ids), "duplicate ids in set"
-    labels = load_labels(label_paths)
+    labels = load_labels(label_paths, override_paths)
     composer = hf.load_composer()
     drops = {}
     def drop(i, reasons):
@@ -168,9 +180,11 @@ def local(set_path, label_paths, spec_sha, v9_files, out_dir, procs=8) -> dict:
     by_reason = Counter(":".join(x.split(":")[:2]) for v in drops.values() for x in v)
     kind_of = {r["id"]: r["provenance"]["kind_spec"] for r in rows}
     rep = {"stage": "local", "set_sha256": sha_file(set_path), "spec_sha256": spec_sha, "n_set": len(rows),
-           "labels": {str(p): sha_file(p) for p in label_paths}, "label_coverage": cov, "vbc_residual": 0,
+           "labels": {str(p): sha_file(p) for p in label_paths},
+           "labels_override": {str(p): sha_file(p) for p in override_paths}, "label_coverage": cov, "vbc_residual": 0,
            "v9_corpus": v9_shas, "n_dropped": len(drops), "first_stage": dict(by_stage), "by_reason": dict(by_reason),
            "inset_sibling_collisions_exempt": ins["sibling_collisions_exempt"],
+           "inset_exempt_pair_ids": ins["sibling_exempt_pair_ids"],  # A28 (t221u): approved exemption, by pair id
            "dropped_by_kind": dict(Counter(kind_of[i] for i in drops)),
            "dropped": {i: drops[i] for i in sorted(drops)}, "n_candidates": len(live), "candidates_sha256": sha_file(cand)}
     (out_dir / "filter-local.json").write_text(json.dumps(rep, indent=1) + "\n")
@@ -218,9 +232,30 @@ def finalize(set_path, local_rep, vps_rep, spec_sha, v9_train, overlay, v9_val, 
     out = {"set_sha256": lr["set_sha256"], "n_set": len(rows), "n_dropped_local": len(lr["dropped"]),
            "n_dropped_vps": len(set(vr["colliding"]) - set(lr["dropped"])), "n_valid": len(valid),
            "n_sel_train": len(sel["train"]), "n_sel_val": len(sel["val"]), "n_reserve": len(sel["reserve"]),
-           "sel_shas": shas, "shortfall": sel["shortfall"], "vps_colliding_ids": sorted(vr["colliding"]), "build": rep, "floors": fl}
+           "sel_shas": shas, "shortfall": sel["shortfall"], "vps_colliding_ids": sorted(vr["colliding"]), "build": rep, "floors": fl,
+           "accepted_shortfalls": accepted_shortfalls(sel["shortfall"], fl)}
     (out_dir / "pack-report.json").write_text(json.dumps(out, indent=1) + "\n")
     return out
+
+
+OFFER_KINDS = ("offer-clinical", "offer-colloquial", "offer-terse")
+NEW_TRAIN_TARGET = 200
+
+
+def accepted_shortfalls(shortfall, fl) -> dict:
+    """A26/A27 (t221u, signed 2026-11-03 11:12 NPT): remaining training-size shortfalls accepted and recorded here.
+    Offer kinds are A25's subject: reported against 60 train, not folded into A26."""
+    heads = {h: v["new_train_rows"] for h, v in fl["heads"].items()}
+    kinds = {k: v for k, v in shortfall.items() if k not in OFFER_KINDS}
+    offer_train = sum(fl["per_kind"].get(k, {}).get("train", 0) for k in OFFER_KINDS)
+    return {"amendment": "A26 + A27 (t221u, 2026-11-03 11:12 NPT, Justin Flores)",
+            "heads_new_train_below_target": {h: n for h, n in heads.items() if n < NEW_TRAIN_TARGET},
+            "new_train_target": NEW_TRAIN_TARGET,
+            "probes_user_emotion_new_train": heads.get("probes_user_emotion"),
+            "kinds_accepted": kinds,
+            "sec_avoid_help_train": fl["per_kind"].get("sec-avoid-help", {}).get("train"),
+            "offer_reported_A25": {"train": offer_train, "target": 60,
+                                   "by_kind": {k: fl["per_kind"].get(k, {}).get("train") for k in OFFER_KINDS}}}
 
 
 def floors(data_dir, spec, sel, valid, n_v9_train, n_v9_val) -> dict:
@@ -265,6 +300,7 @@ def main(argv=None) -> int:
     l.add_argument("--set", required=True); l.add_argument("--labels", action="append", required=True)
     l.add_argument("--expect-spec-sha", required=True); l.add_argument("--v9", action="append", required=True)
     l.add_argument("--out-dir", required=True); l.add_argument("--procs", type=int, default=8)
+    l.add_argument("--labels-override", action="append", default=[], help="A25 relabels (replace base labels for their ids)")
     v = sp.add_parser("vps")
     v.add_argument("--candidates", required=True); v.add_argument("--sha256", required=True)
     v.add_argument("--corpus", action="append", default=[]); v.add_argument("--v3-path", required=True)
@@ -275,7 +311,7 @@ def main(argv=None) -> int:
     f.add_argument("--p32-pack")
     a = ap.parse_args(argv)
     if a.cmd == "local":
-        r = local(a.set, a.labels, a.expect_spec_sha, a.v9, a.out_dir, a.procs)
+        r = local(a.set, a.labels, a.expect_spec_sha, a.v9, a.out_dir, a.procs, a.labels_override)
         print(json.dumps({k: r[k] for k in ("n_set", "n_dropped", "first_stage", "by_reason", "n_candidates", "candidates_sha256", "label_coverage")}))
     elif a.cmd == "vps":
         r = vps(a.candidates, a.sha256, a.corpus, a.v3_path, a.protected_dir)

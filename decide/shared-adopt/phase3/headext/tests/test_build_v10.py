@@ -99,3 +99,17 @@ def test_kind_table_zero_by_default_and_excluded():
             assert k not in t or "ext" not in t[k], k    # and is never mapped to 1
         for p in spec.get("prefixes", []):
             assert any(str(k).startswith(p) for k in v9_kinds), p
+
+
+def test_a28_pair_id_on_both_arms(built):
+    d, _ = built
+    for side in ("train.jsonl", "val.jsonl"):
+        rows = [json.loads(l) for l in (d / "out" / side).read_text().splitlines()]
+        new = [r for r in rows if r.get("path") == "headext-generated" and r.get("contrastGroup")]
+        assert new
+        by = {}
+        for r in new:
+            assert r["pair_id"] == r["pair"] == r["source"]["pair_id"]
+            by.setdefault(r["pair_id"], set()).add(r["arm"])
+        assert all(v == {"A", "B"} for v in by.values())
+        assert all("pair_id" not in r for r in rows if r.get("path") != "headext-generated")

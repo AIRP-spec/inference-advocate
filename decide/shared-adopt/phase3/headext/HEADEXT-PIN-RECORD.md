@@ -164,3 +164,18 @@ nemotron-3-super all OK.
   report) and `tests/test_pack.py` (5 tests, incl. equivalence of the in-set test with `airp_v3.inset.resolve`).
 - `../DRAFT-HEAD-EXTENSION-SIZING-ADDENDUM.md` re-pinned (Record t221 in §0, checklist line).
 - Pack archive: VPS `/root/primitives-evaluator/headext-20261102/pack-v10` (shas in its `MANIFEST.json` / `SHA256SUMS`).
+
+## t221u re-pin (2026-11-03; amendment t221u, A25–A29; addendum §0)
+No new rule beyond the amendment. 56 files in `HEADEXT-PINS.json`.
+- A25: labeling guide `v3/LABELING-GUIDE.md` `e5b7b56c…` → `79e29da97cc1e37aad6768955d9e9d62416e465c006f0e4e4f25d5097c23c573`
+  (settled rule 9; evaluator-suite commit `13c7256c`, ADR `v3/docs/ADR-2026-11-03-offer-rule.md`). Checker prompt `v3` in
+  `headext_contradict.py` (= v2 + `OFFER_RULE`; v1/v2 unchanged). `headext_a25.py` (`inputs`: 121 offer rows, rows
+  `79606013…`, items `78059225…`; `decide`: in-pod checker-delete + A23 on v3 verdicts). Pod driver `headext_pod_a25.py`
+  (Seed-OSS + Nemotron relabel + v3 check; cap min(90 min, $1.55)).
+- `headext_pack.py`: `--labels-override` (A25 relabels replace the base label for their ids only), `accepted_shortfalls`
+  in the pack report (A26/A27), `inset_exempt_pair_ids` (A28).
+- `build_data_v10.py`: `pair_id` on both arms of every new pair row and in its `source` (A28), with an assert.
+- Pre-checker rebuild (A26 + A28, set `fb5fa37f…`), two independent builds, byte-identical: train
+  `9a37787825c4c74add9bca0b3bb7d1268654a24e6091c8bbb247205614968e9d`, val
+  `080e8c4b8cb52f9a8b88752738fde62a1006e207ebefbfa17df347a40a97cb13` (sel files unchanged from t221). Superseded by the
+  post-A25 rebuild before training.

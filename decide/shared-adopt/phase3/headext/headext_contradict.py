@@ -73,6 +73,15 @@ USER_V2 = ("The example was written for this task: {task}\n\nAssigned primitives
            "Example text:\n<<<\n{content}\n>>>\n\nReply with exactly {{\"contradicts\": false, \"primitive\": null}} or "
            "{{\"contradicts\": true, \"primitive\": \"<the name of the ONE contradicted primitive from the list>\"}}.")
 
+# v3 (A25, t221u 2026-11-03): v2 plus the offer rule (labeling guide settled rule 9, guide sha 79e29da9...). v2 is unchanged.
+OFFER_RULE = ("- Offer vs refusal: an announced or offered method is stance `encourages` plus the harm object, NEVER "
+              "`is_mention_not_use`, even when no method follows. A refusal or a discussion declines or describes; an offer "
+              "proposes to provide. A text that says it can, will or could provide a method, or that one is available, is an offer.\n")
+_V2_FLAG = "- Flag only a clear contradiction"
+assert USER_V2.count(_V2_FLAG) == 1
+USER_V3 = USER_V2.replace(_V2_FLAG, OFFER_RULE + _V2_FLAG)
+USER_BY_PROMPT = {"v2": USER_V2, "v3": USER_V3}
+
 
 def vocab_definitions(path=VOCAB, expect=VOCAB_SHA) -> dict:
     raw = Path(path).read_bytes()
@@ -111,13 +120,13 @@ def assigned_primitives(row: dict, spec: dict, voc: dict, defs: dict, types: dic
     return out
 
 
-def messages_v2(row: dict, spec: dict, voc: dict, defs: dict, types: dict) -> list[dict]:
+def messages_v2(row: dict, spec: dict, voc: dict, defs: dict, types: dict, prompt: str = "v2") -> list[dict]:
     _, _, task = row_head_label(row, spec)
     pl = assigned_primitives(row, spec, voc, defs, types)
     plist = "\n".join(f"- `{p['name']}` ({p['type']}) = {p['label']}: {p['definition']}" if p["type"] != "STANCE"
                       else f"- `stance` (STANCE) = {p['label']}: {p['definition']}" for p in pl)
     return [{"role": "system", "content": SYSTEM_V2},
-            {"role": "user", "content": USER_V2.format(task=task, plist=plist, content=row["content"])}]
+            {"role": "user", "content": USER_BY_PROMPT[prompt].format(task=task, plist=plist, content=row["content"])}]
 
 
 def parse_verdict_v2(text: str, allowed: set):
@@ -172,7 +181,7 @@ def run(base_url: str, checker: str, rows: list[dict], spec: dict, out: str, ctk
     hs.check_base_url(base_url)
     hs.check_labeler_family(CHECKERS[checker])
     defs = head_definitions()
-    if prompt == "v2":
+    if prompt in ("v2", "v3"):
         voc, types = vocab_definitions(), head_types()
     post = post or hs._post
     done = set()
@@ -183,9 +192,9 @@ def run(base_url: str, checker: str, rows: list[dict], spec: dict, out: str, ctk
     t0 = time.time()
 
     def one(r):
-        if prompt == "v2":
+        if prompt in ("v2", "v3"):
             allowed = {p["name"] for p in assigned_primitives(r, spec, voc, defs, types)}
-            body = {"model": checker, "messages": messages_v2(r, spec, voc, defs, types), "max_tokens": 96, "temperature": 0}
+            body = {"model": checker, "messages": messages_v2(r, spec, voc, defs, types, prompt), "max_tokens": 96, "temperature": 0}
         else:
             body = {"model": checker, "messages": messages(r, spec, defs), "max_tokens": 64, "temperature": 0}
         if ctk:
@@ -196,9 +205,9 @@ def run(base_url: str, checker: str, rows: list[dict], spec: dict, out: str, ctk
                 raw = post(base_url, body)
                 ch = (raw.get("choices") or [{}])[0]
                 txt = (ch.get("message") or {}).get("content") or ""
-                if prompt == "v2":
+                if prompt in ("v2", "v3"):
                     c, prim = parse_verdict_v2(txt, allowed)
-                    return {"id": r["id"], "checker": checker, "prompt": "v2", "contradicts": c, "primitive": prim, "error": None,
+                    return {"id": r["id"], "checker": checker, "prompt": prompt, "contradicts": c, "primitive": prim, "error": None,
                             "raw_sha256": hashlib.sha256(txt.encode()).hexdigest(), "finish_reason": ch.get("finish_reason")}
                 return {"id": r["id"], "checker": checker, "contradicts": parse_verdict(txt), "error": None,
                         "raw_sha256": hashlib.sha256(txt.encode()).hexdigest(), "finish_reason": ch.get("finish_reason")}
@@ -506,7 +515,7 @@ def main(argv=None) -> int:
     r = sp.add_parser("run")
     for a in ("--base-url", "--checker", "--rows", "--out", "--expect-spec-sha"):
         r.add_argument(a, required=True)
-    r.add_argument("--prompt", choices=["v1", "v2"], default="v1"); r.add_argument("--kinds-from")
+    r.add_argument("--prompt", choices=["v1", "v2", "v3"], default="v1"); r.add_argument("--kinds-from")
     r.add_argument("--ctk", default="{}"); r.add_argument("--concurrency", type=int, default=64); r.add_argument("--max-wall-seconds", type=float, default=900)
     d = sp.add_parser("decide")
     d.add_argument("--rows", required=True); d.add_argument("--expect-spec-sha", required=True); d.add_argument("--log", required=True)

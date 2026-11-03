@@ -138,3 +138,23 @@ def test_a19_flagged_nonsafety_excludes_safety_kinds():
     assert fl == hc.flagged_nonsafety(d, rows, SPEC)                 # deterministic
     gone = fl["rows"][0]["id"]; d["a18"] = {gone: ["x"]}                 # an A18-deleted row is never picked
     assert gone not in [r["id"] for r in hc.flagged_nonsafety(d, rows, SPEC)["rows"]]
+
+
+def test_prompt_v3_is_v2_plus_offer_rule_only():
+    r = first("sec-avoid-help")
+    u2 = hc.messages_v2(r, SPEC, VOC, DEFS, TYPES)[1]["content"]
+    u3 = hc.messages_v2(r, SPEC, VOC, DEFS, TYPES, "v3")[1]["content"]
+    assert u3 == u2.replace("- Flag only a clear contradiction", hc.OFFER_RULE + "- Flag only a clear contradiction")
+    assert "NEVER `is_mention_not_use`" in u3 and "proposes to provide" in u3 and "proposes to provide" not in u2
+
+
+def test_run_v3_logs_prompt(tmp_path):
+    rows = [r for r in rows_all() if r["provenance"]["kind_spec"] == "sec-avoid-help"][:3]
+    seen = []
+
+    def post(url, body):
+        seen.append(body["messages"][1]["content"])
+        return {"choices": [{"message": {"content": '{"contradicts": false, "primitive": null}'}, "finish_reason": "stop"}]}
+    st = hc.run("http://127.0.0.1:1", "seed-oss-36b", rows, SPEC, str(tmp_path / "v.jsonl"), {}, concurrency=1, post=post, prompt="v3")
+    assert st["prompt"] == "v3" and all(hc.OFFER_RULE in u for u in seen)
+    assert all(v["prompt"] == "v3" for v in hf.load_jsonl(tmp_path / "v.jsonl"))

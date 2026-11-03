@@ -35,6 +35,20 @@ def test_inset_siblings_exempt_and_lower_id_kept():
             {"id": "x3", "content": "unrelated words entirely here now ok"}]
     r = P.inset_resolve(rows, LC)
     assert r["dropped"] == {"x2": "u1-a"} and r["sibling_collisions_exempt"] == 1
+    assert r["sibling_exempt_pair_ids"] == ["u1"]  # A28
+
+
+def test_label_override_replaces_only_its_ids(tmp_path):
+    base = wl(tmp_path / "b.jsonl", [{"id": "a", "labeler": "L", "primitives": {"stance": "describes"}},
+                                     {"id": "b", "labeler": "L", "primitives": {"stance": "describes"}}])
+    ov = wl(tmp_path / "o.jsonl", [{"id": "a", "labeler": "L", "primitives": {"stance": "encourages"}}])
+    got = P.load_labels([base], [ov])["L"]
+    assert got["a"] == {"stance": "encourages"} and got["b"] == {"stance": "describes"}
+    with pytest.raises(SystemExit):
+        P.load_labels([base, ov])
+    ov2 = wl(tmp_path / "o2.jsonl", [{"id": "a", "labeler": "L", "primitives": {"stance": "endorses"}}])
+    with pytest.raises(SystemExit):
+        P.load_labels([base], [ov, ov2])
 
 
 @pytest.fixture(scope="module")
@@ -107,3 +121,17 @@ def test_pair_collides_equals_pinned_inset():
     rows.append({"id": "r900", "content": "x" * 45}); rows.append({"id": "r901", "content": "y " + "x" * 45})
     want = inset.resolve(rows)["dropped"]
     assert P.inset_resolve(rows, LC)["dropped"] == want
+
+
+def test_accepted_shortfalls_record(run, tmp_path):
+    d, rows, lr, ids = run
+    vr = wl(tmp_path / "vps.json", [])
+    Path(vr).write_text(json.dumps({"candidate_sha256": lr["candidates_sha256"], "colliding": {}}))
+    o = P.finalize(d / "set.jsonl", d / "out" / "filter-local.json", vr, SPEC_SHA, V9 / "train.jsonl", OVERLAY,
+                   V9 / "val.jsonl", tmp_path / "f")
+    a = o["accepted_shortfalls"]
+    assert a["amendment"].startswith("A26")
+    assert a["probes_user_emotion_new_train"] == o["floors"]["heads"]["probes_user_emotion"]["new_train_rows"]
+    assert not set(a["kinds_accepted"]) & set(P.OFFER_KINDS)
+    assert a["offer_reported_A25"]["target"] == 60
+    assert json.loads((tmp_path / "f" / "pack-report.json").read_text())["accepted_shortfalls"] == a

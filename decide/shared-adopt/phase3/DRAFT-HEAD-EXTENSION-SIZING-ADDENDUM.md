@@ -2,7 +2,7 @@
 
 > **Status: SIGNED by Justin Flores, owner message t217u, 2026-11-02 08:41 NPT, with twelve answers applied as the
 > amendments A1–A12 in §0; amended again by owner message t218u, 2026-11-02 12:42 NPT (A13–A16, §0) and t219u, 2026-11-03 09:01 NPT
-> (A17–A20, §0) and t220u, 2026-11-03 10:06 NPT (A21–A24, §0). Filename kept
+> (A17–A20, §0), t220u, 2026-11-03 10:06 NPT (A21–A24, §0) and t221u, 2026-11-03 11:12 NPT (A25–A29, §0). Filename kept
 > (references stay valid).** Where §0 and the draft text below differ, §0
 > governs; the draft text is kept for the record and each superseded passage carries an "(amended: A#)" pointer.
 > Drafted 2026-11-02 ~08:05 NPT from Justin's terms in t216u (2026-11-02 07:58 NPT).
@@ -283,6 +283,33 @@ the second review sample, then the pack."
 - **Flagged for review.** (1) In-set check: the two arms of one pair unit are matched by design and are not compared with
   each other (9 sibling collisions exempted); otherwise the `airp_v3.inset` rule exactly (equivalence tested). (2) The
   "v3 sealed" corpus of §5 V-g does not exist yet (v3 is not sealed); checked against everything else listed.
+
+### Amendment t221u (2026-11-03 11:12 NPT; signed by Justin Flores; operative; A25–A29)
+Owner message t221u: "1. Offer rule, added to the labeling guide and the checker prompt: an announced or offered method is
+encourages plus the harm object, never is_mention_not_use; a refusal or discussion declines or describes, an offer
+proposes to provide. Re-run the checker on the offer rows under it, restore those that pass, report the new offer count
+against 60. 2. Remaining training-size shortfalls accepted and recorded in the pack report, probes_user_emotion at 159
+named explicitly. 3. sec-avoid-help at 22 accepted. Mistral confirmed for the sec-hide-vs-seek-help top-up. 4. Pair-arm
+leak exemption approved; record the pair id on both arms. 5. ed-mention flags cleared by the definition check. Rebuild
+the pack, verify byte-identical twice, then the checker pod, then training pod one."
+- **A25 (offer rule).** Labeling guide settled rule 9 (evaluator-suite `v3/LABELING-GUIDE.md` `e5b7b56c…` →
+  `79e29da9…`, ADR `v3/docs/ADR-2026-11-03-offer-rule.md`) and checker prompt `v3` (= v2 + the same rule,
+  `headext_contradict.py`). Both checkers relabel every offer row in the working set (`offer-clinical`,
+  `offer-colloquial`, `offer-terse`, which includes the 48 V-d stance_refusal rows) under the new guide and re-run the
+  contradiction check with prompt v3, on one checker pod (`headext_pod_a25.py`; priced first; not launched above
+  $1.60). On the box afterwards: the new labels replace the old ones for these rows only. V-b / V-c on the new labels
+  delete unviewed (either checker), and the A23 safety rule applies to the v3 verdicts (delete only when both checkers
+  flag; a single flag goes to the definition check). The pack's V-d then uses the new labels. Rows that pass are
+  restored. The new offer count is reported against 60 train.
+- **A26 (training-size shortfalls accepted).** Recorded in the pack report (`accepted_shortfalls`).
+  `probes_user_emotion` is at 159 new training rows against ~200.
+- **A27.** `sec-avoid-help` at 22 train is accepted. Mistral is confirmed as the writer for the `sec-hide-vs-seek-help`
+  top-up.
+- **A28 (pair-arm leak exemption approved).** Both arms of a pair unit carry `pair_id` (the unit id), in the data-v10 row
+  and in its `source` provenance. The in-set exemption lists the exempted pair ids.
+- **A29.** The 9 `ed-mention` single-checker flags are cleared by the definition check. The rows stay in the set.
+- **Order.** Rebuild the pack (A26, A28) and verify byte-identical twice. Then the checker pod (A25). Then rebuild with
+  the restored offer rows and verify twice. Then training pod one (seeds 60–64, $3 / 90 min, A8).
 
 **Gap-fills (no rule change; flagged for review).**
 - A `terse` register row carries `explicit_register` as a register qualifier, from the existing vocabulary.
@@ -613,6 +640,9 @@ Benign fixtures only (e.g. weather and recipe text, invented brands); no safety 
   A24 top-up pod ≤ $1.60, sec-hide-vs-seek-help to 84, second review sample, then stop (§0)
 - [x] Record t221 (2026-11-03): second review sample passed (max 1 / 10); data-v10 pack built, offer train and
   new-head train rows short (reported, not patched); no pod (§0)
+- [x] Amendment t221u (2026-11-03 11:12 NPT): A25 offer rule (guide rule 9, checker prompt v3, offer-row rerun),
+  A26 training-size shortfalls accepted (probes_user_emotion 159), A27 sec-avoid-help 22 + Mistral, A28 pair_id on both
+  arms, A29 ed-mention cleared (§0)
 - [x] Training pod plan: [x] two pods × 5 seeds ($3 + $3) (A8)
 - [x] Caps: generation phase $4 shared by G1 + G2 (A12; G1 $2.55); pack $0; training $6; per pod 90 min, both watchdogs; stop-and-report $45
 - Order after signature: code + tests (no pod) → pre-generation pin record → G1 (→ G2) → filters + pack + asserts →
