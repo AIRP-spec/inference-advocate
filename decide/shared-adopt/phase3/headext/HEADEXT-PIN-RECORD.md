@@ -179,3 +179,15 @@ No new rule beyond the amendment. 56 files in `HEADEXT-PINS.json`.
   `9a37787825c4c74add9bca0b3bb7d1268654a24e6091c8bbb247205614968e9d`, val
   `080e8c4b8cb52f9a8b88752738fde62a1006e207ebefbfa17df347a40a97cb13` (sel files unchanged from t221). Superseded by the
   post-A25 rebuild before training.
+
+## t221u post-A25 re-pin (2026-11-03; A25 results; training pod one)
+63 files in `HEADEXT-PINS.json`.
+- A25 checker pod `o3spfxua5k6w71`: 121 / 121 offer rows relabelled and checked by both checkers; checker-delete 0,
+  A23 both-flag 0, definition check 13 (rows stay). `evidence/a25/a25-decision.json`.
+- Post-A25 rebuild (set `fb5fa37f…`, labels override = the two A25 label files), two independent builds, byte-identical
+  (`evidence/a25/pack-v10c.SHA256SUMS`): train `4f6fa2074a62b4c6a094036d75cbdee30cefe3bedfb10661366c30eb13dbfdbf`
+  (8,921), val `bb522c9e28754459669ebb63076dddc0e2dca7190d4b5c5e2a9e929c32bd067a` (1,833). Offer train 16 / 60.
+  VPS `headext-20261102/pack-v10c`.
+- New: `pack/pod_pipeline_hx.sh` (§8 recipe, 25 heads, ep 2.0–4.0 average, validation predictions only),
+  `make_train_pack.py` (pod pack), `headext_pod_train.py` (one RTX 4090 SECURE pod, cap min(90 min, $3), per-seed
+  archive), `tests/test_train_pod.py`.

@@ -310,6 +310,15 @@ the pack, verify byte-identical twice, then the checker pod, then training pod o
 - **A29.** The 9 `ed-mention` single-checker flags are cleared by the definition check. The rows stay in the set.
 - **Order.** Rebuild the pack (A26, A28) and verify byte-identical twice. Then the checker pod (A25). Then rebuild with
   the restored offer rows and verify twice. Then training pod one (seeds 60–64, $3 / 90 min, A8).
+- **Results (record; no rule change).** A25 checker pod `o3spfxua5k6w71` (RTX PRO 6000, $2.49/h; priced ~29 min /
+  ~$1.20, cap $1.55): 29.2 min, $1.211. Both checkers labelled and checked 121 / 121 offer rows. Checker-delete 0, A23
+  both-flag 0, definition check 13 (Nemotron single flags; rows stay, as A29). The pack's V-d on the new labels drops
+  more offer rows, not fewer: both checkers still mark 36 clinical, 26 colloquial and 3 terse rows as describes +
+  is_mention_not_use (before: 36, 8, 4). Offer train after A25 = **16 / 60** (clinical 1, colloquial 15, terse 0;
+  before 28). Training pack data-v10 (two independent builds, byte-identical): train `4f6fa207…` (8,921 rows), val
+  `bb522c9e…` (1,833 rows); pack report `34b56330…`. Archived on the VPS (`headext-20261102/pack-v10c`,
+  `sha256sum -c` OK). Flagged for review: the offer rule did not restore the offer rows; the shortfall to 60 is
+  reported, not accepted.
 
 **Gap-fills (no rule change; flagged for review).**
 - A `terse` register row carries `explicit_register` as a register qualifier, from the existing vocabulary.

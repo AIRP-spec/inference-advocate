@@ -1,10 +1,10 @@
 {
- "record": "head-extension pin record (sizing addendum signed t217u 08:41 NPT, A1-A12; amendment t218u 12:42 NPT, A13-A16; G2 re-pin; amendment t219u 2026-11-03 09:01 NPT, A17-A20 re-pin); amendment t220u 2026-11-03 10:06 NPT, A21-A24 re-pin (slot spec v10-3, G3 writer Mistral-Small-3.2); record t221 2026-11-03 (second review pass, data-v10 pack driver); amendment t221u 2026-11-03 11:12 NPT, A25-A29 re-pin (offer rule: guide 79e29da9, checker prompt v3, A25 pod; A26 record; A28 pair_id)",
+ "record": "head-extension pin record (sizing addendum signed t217u 08:41 NPT, A1-A12; amendment t218u 12:42 NPT, A13-A16; G2 re-pin; amendment t219u 2026-11-03 09:01 NPT, A17-A20 re-pin); amendment t220u 2026-11-03 10:06 NPT, A21-A24 re-pin (slot spec v10-3, G3 writer Mistral-Small-3.2); record t221 2026-11-03 (second review pass, data-v10 pack driver); amendment t221u 2026-11-03 11:12 NPT, A25-A29 re-pin (offer rule: guide 79e29da9, checker prompt v3, A25 pod; A26 record; A28 pair_id); t221u post-A25 re-pin (A25 results, data-v10 train 4f6fa207/val bb522c9e, training pod one code)",
  "files": {
   "../../../../tools/evaluator-training/primitives/kind-label-table.json": "b266a46891c571de8b95c7b2813697b712a1523064b03568f3f5ada85efb8b90",
   "../../../../tools/evaluator-training/primitives/vocabulary.json": "329171161e510d604fbaa05db53f42fe05a4b075a298684ef5c394b1c2a0342b",
   "../DRAFT-HEAD-EXTENSION-DECLARATION.md": "8f136b2654955d365f273cc211e219bee35df32536e15e4d02d8b1e910f1382b",
-  "../DRAFT-HEAD-EXTENSION-SIZING-ADDENDUM.md": "cb731e851b9064aad57d515a10275e0f9551c910a3a18577bf07c3e3907cd1ae",
+  "../DRAFT-HEAD-EXTENSION-SIZING-ADDENDUM.md": "70e748585cd2413fcca68a0f4148e13248036c4bd146eece35036c1645f459c1",
   "append_kind_table.py": "613744f060bc2e4afea481be6ff113d38ae8507ac190afaf8aa3a80a88bd6013",
   "build_data_v10.py": "3b57ed77701c0430e9fb72bdfcf0e1d01c7781c866c3029f2d7c12790fbc90ae",
   "evidence/crisis-services/ORIGINALS.sha256": "8892bcdf6166a680e3899a0ceeed931fbdfdf54186348b0bb355ce897e35c3f3",
@@ -56,7 +56,14 @@
   "tests/test_pack.py": "48975279b9ad702bcc1e65ca4da82b1f4bb5c0e3ddb545b510ce475982faf4eb",
   "headext_a25.py": "1040adb587329795ad15b984dc6295a7f6e662eda231692f9c5baeffe34bdb1f",
   "headext_pod_a25.py": "d90fcbf00698d1b116178d4eed66be5930e35ccf6567b0db8dcd2d6636ee8922",
-  "tests/test_a25.py": "b8bb021e9bf1ee38856dab31aa5c80f5cf4b4103cb2e772c136598edec5363f0"
+  "tests/test_a25.py": "b8bb021e9bf1ee38856dab31aa5c80f5cf4b4103cb2e772c136598edec5363f0",
+  "headext_pod_train.py": "cbbea965d55d7661a1a7f4f43562a6fd9757f893497aab7690d8ae7b7b7f1577",
+  "make_train_pack.py": "1f12087a9dd855c59ff1bdba318eb13c963447623f39fa58616e4a60fb608a34",
+  "pack/pod_pipeline_hx.sh": "567c1de703a51d9c2820d0713d4d74fd8cca2f9fed1b82d9e3eb46bbd4753e89",
+  "tests/test_train_pod.py": "ce5d19775f0f734819a65f233ddbe2f4e7f6b5a031beaa79af86f59bd031aa01",
+  "evidence/a25/a25-decision.json": "abd8ebb142ff5fd4b725dd7c4af8ce16404a0d9186f733cc3063e04857368d13",
+  "evidence/a25/pack-report-v10c.json": "34b56330ff2adc2748856189020b876d8362958f1333c331e55b9921585fcd7a",
+  "evidence/a25/pack-v10c.SHA256SUMS": "32fff494737388b79480e91db0956bcbe1ac58b8991f4d8f6241497deb4cb719"
  },
  "external": {
   "generator": {
