@@ -157,3 +157,10 @@ nemotron-3-super all OK.
   rows; checker-delete; cap min(90 min, $1.60)).
 - **Tests.** headext 78 pass (10 new in `tests/test_t220.py`; two `test_g2.py` expectations updated for G3), pack/tests 10
   pass, evaluator-suite v3 138 pass + 5 skipped.
+
+## t221 record (2026-11-03; second review pass; data-v10 pack; no pod)
+- New: `headext_pack.py` (pack driver: `local` V-a, V-b/V-c recheck, V-d, V-e, V-f, V-g in-set + data-v9; `vps` blind
+  V-g against v2 + v1-207 + v3-safety seal / reserve, ids out; `finalize` select → seal → `build_data_v10.build` → floor
+  report) and `tests/test_pack.py` (5 tests, incl. equivalence of the in-set test with `airp_v3.inset.resolve`).
+- `../DRAFT-HEAD-EXTENSION-SIZING-ADDENDUM.md` re-pinned (Record t221 in §0, checklist line).
+- Pack archive: VPS `/root/primitives-evaluator/headext-20261102/pack-v10` (shas in its `MANIFEST.json` / `SHA256SUMS`).

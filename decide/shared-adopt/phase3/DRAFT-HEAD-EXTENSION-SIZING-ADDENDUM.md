@@ -261,6 +261,29 @@ the second review sample, then the pack."
 - **sec-hide unit count.** 37 of 55 units survive now (rate 0.67); 84 − 37 = 47 more are needed, so 47 / 0.67 ≈ 70; 80 are
   generated for margin.
 
+**Record t221 (2026-11-03; no rule change; counts, ids and shas only).**
+- **Second review sample: PASS.** Zimmer read `sample-g2.jsonl` (`19ce20ac…`; 80 rows, 8 kinds, 10 each). Mismatches:
+  `rr-role-claim` 1, `rr-authority-claim` 1, `pe-feelings-comment` 0, `pe-answer-to-emotional-prompt` 0, `sec-isolate` 0,
+  `pe-probe-vs-task` 0 (5 pairs), `sec-hide-chat` 0, `sec-avoid-help` 1 (borderline). Highest 1 / 10 = 10 %, not above
+  the 10 % gate. The three rows (`hx-rr-role-claim-133`, `hx-rr-authority-claim-116`, `hx-sec-avoid-help-245`) **stay in
+  the set**; no deletion unless Justin says so.
+- **data-v10 pack** (`headext/headext_pack.py`, glue over the pinned `headext_filter` / `build_data_v10` / `airp_v3`
+  code; tested). Input: working set `set-t220.jsonl` `fb5fa37f…` (3,642 rows; the 35 A23 definition-check rows kept, the
+  15 `cr-resource-named-no-direction` rows released). Filters on the whole set, first reason per row: V-a 317
+  (length out of band 314 of the reasons, finish_reason 14, pair parse 2, empty 2), V-b / V-c residual 0, V-d 52
+  (stance_refusal 49, of which 48 are offer rows; stance_escalated 3), V-e 2, V-f 20, V-g 139 (in-set 139; data-v9 0;
+  blind VPS check v2 + v1-207 + v3-safety seal `2dc0e7d8…` + reserve `ee7a4658…`: 0). 530 dropped, 3,112 valid.
+  Selection (§3 round-robin, val units first) → new train 1,547 / val 960, reserve 605 (sealed, unused).
+  data-v10 **8,933 / 1,833** (signed 9,070 / 1,833: train −137). Shas and per-floor results are in `pack-v10/MANIFEST.json`
+  and the report; §11 applies (shortfalls reported, no backfill).
+- **Floors not met (reported, not patched).** Offer train 28 of 60 (`offer-clinical` 1 / 30, `offer-colloquial` 27 / 30;
+  V-d stance_refusal on 44 offer-clinical/-colloquial rows). New-head train rows against ~200: ED 198, SM 178, RR 180,
+  OP 188, PE 159, SEC 196, CR 200, AD 196. All val targets met (960); in-distribution val positives, V2 pairs (12 per
+  head), held-out groups, offer-terse val 16, hate-elim 12 / 8 and V3 rows 32 / 12 / 12 met.
+- **Flagged for review.** (1) In-set check: the two arms of one pair unit are matched by design and are not compared with
+  each other (9 sibling collisions exempted); otherwise the `airp_v3.inset` rule exactly (equivalence tested). (2) The
+  "v3 sealed" corpus of §5 V-g does not exist yet (v3 is not sealed); checked against everything else listed.
+
 **Gap-fills (no rule change; flagged for review).**
 - A `terse` register row carries `explicit_register` as a register qualifier, from the existing vocabulary.
 - The pair template uses max_tokens 900; single rows use 400.
@@ -588,6 +611,8 @@ Benign fixtures only (e.g. weather and recipe text, invented brands); no safety 
 - [x] Amendment t220u (2026-11-03 10:06 NPT): A21 sec-avoid-help on non-self-harm topics, Mistral-Small-3.2 writer, partial
   if > 30 % again; A22 cr-resource-named-no-direction gold matches, checker overridden; A23 safety kinds need both checkers;
   A24 top-up pod ≤ $1.60, sec-hide-vs-seek-help to 84, second review sample, then stop (§0)
+- [x] Record t221 (2026-11-03): second review sample passed (max 1 / 10); data-v10 pack built, offer train and
+  new-head train rows short (reported, not patched); no pod (§0)
 - [x] Training pod plan: [x] two pods × 5 seeds ($3 + $3) (A8)
 - [x] Caps: generation phase $4 shared by G1 + G2 (A12; G1 $2.55); pack $0; training $6; per pod 90 min, both watchdogs; stop-and-report $45
 - Order after signature: code + tests (no pod) → pre-generation pin record → G1 (→ G2) → filters + pack + asserts →

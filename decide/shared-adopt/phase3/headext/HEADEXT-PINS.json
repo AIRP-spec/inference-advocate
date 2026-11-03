@@ -1,10 +1,10 @@
 {
- "record": "head-extension pin record (sizing addendum signed t217u 08:41 NPT, A1-A12; amendment t218u 12:42 NPT, A13-A16; G2 re-pin; amendment t219u 2026-11-03 09:01 NPT, A17-A20 re-pin); amendment t220u 2026-11-03 10:06 NPT, A21-A24 re-pin (slot spec v10-3, G3 writer Mistral-Small-3.2)",
+ "record": "head-extension pin record (sizing addendum signed t217u 08:41 NPT, A1-A12; amendment t218u 12:42 NPT, A13-A16; G2 re-pin; amendment t219u 2026-11-03 09:01 NPT, A17-A20 re-pin); amendment t220u 2026-11-03 10:06 NPT, A21-A24 re-pin (slot spec v10-3, G3 writer Mistral-Small-3.2); record t221 2026-11-03 (second review pass, data-v10 pack driver)",
  "files": {
   "../../../../tools/evaluator-training/primitives/kind-label-table.json": "b266a46891c571de8b95c7b2813697b712a1523064b03568f3f5ada85efb8b90",
   "../../../../tools/evaluator-training/primitives/vocabulary.json": "329171161e510d604fbaa05db53f42fe05a4b075a298684ef5c394b1c2a0342b",
   "../DRAFT-HEAD-EXTENSION-DECLARATION.md": "8f136b2654955d365f273cc211e219bee35df32536e15e4d02d8b1e910f1382b",
-  "../DRAFT-HEAD-EXTENSION-SIZING-ADDENDUM.md": "ffaf56e914086027990e789722555ff9a78fcb38ecc9518e40cf12d9b0eb823f",
+  "../DRAFT-HEAD-EXTENSION-SIZING-ADDENDUM.md": "0db723bbe783dc60dfb3edd276794996bcd21565a69b0c2e031cf605b1abd8e3",
   "append_kind_table.py": "613744f060bc2e4afea481be6ff113d38ae8507ac190afaf8aa3a80a88bd6013",
   "build_data_v10.py": "822aa8e3c1877d8afe290ac36729ba72d9c52f88bb513e99f353fd1bbf743497",
   "evidence/crisis-services/ORIGINALS.sha256": "8892bcdf6166a680e3899a0ceeed931fbdfdf54186348b0bb355ce897e35c3f3",
@@ -51,7 +51,9 @@
   "tests/test_scoring.py": "c8fd3aa7be656e375f4e8aafa8e6b21b076c8dab3be7c8174e101817788a88d5",
   "tests/test_slots.py": "3ad8d7daecded1adfed011d6c64f30eab958fa52dd2a98e1021eb5b9d471c70a",
   "tests/test_t219.py": "33148b751fc6b52d1433ecc056b6fd2cf51895bdd1dd83ad61c69f77faffa053",
-  "tests/test_t220.py": "7584d9893233e0b66b5fc1f5bcb1c5970f4dc6b3078b2914e4f975a0e17e6ba4"
+  "tests/test_t220.py": "7584d9893233e0b66b5fc1f5bcb1c5970f4dc6b3078b2914e4f975a0e17e6ba4",
+  "headext_pack.py": "93c48f0a30382e1b477d6f5b6d4059b19e75acc5320f4034c29febd671416b3f",
+  "tests/test_pack.py": "7450ffb97f1c6ec7bfea3e218391a00f70ac12c8a718d7d2a24aedc6f056789a"
  },
  "external": {
   "generator": {
