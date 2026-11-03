@@ -1,7 +1,8 @@
 # Head-extension sizing addendum (SIGNED t217u, as amended): the prerequisites the signed declaration lacked
 
 > **Status: SIGNED by Justin Flores, owner message t217u, 2026-11-02 08:41 NPT, with twelve answers applied as the
-> amendments A1–A12 in §0; amended again by owner message t218u, 2026-11-02 12:42 NPT (A13–A16, §0). Filename kept
+> amendments A1–A12 in §0; amended again by owner message t218u, 2026-11-02 12:42 NPT (A13–A16, §0) and t219u, 2026-11-03 09:01 NPT
+> (A17–A20, §0). Filename kept
 > (references stay valid).** Where §0 and the draft text below differ, §0
 > governs; the draft text is kept for the record and each superseded passage carries an "(amended: A#)" pointer.
 > Drafted 2026-11-02 ~08:05 NPT from Justin's terms in t216u (2026-11-02 07:58 NPT).
@@ -147,6 +148,46 @@ check). It is still one pod, and no third pod is ever started.
     ids/sha json.
   - **Who reads it.** Zimmer reads it and reports counts only. The executing agent does not read it.
   - **Gate.** Above **10 % mismatch** on any kind, stop and report before the pack.
+
+### Amendment t219u (2026-11-03 09:01 NPT; signed by Justin Flores; operative; A17–A20)
+
+Justin signed this amendment after the G2 report (A13 stop tripped on 15 kinds; A15 deleted 195 rows). These terms govern
+where they differ from A13/A15/A16. Everything else stays as signed. Owner's words (pt219u): "1. Reword the checker: each
+primitive judged on its own definition, object = topic present regardless of stance, mention rows valid with
+is_mention_not_use. Checker output names the contradicted primitive. Rerun on the 15 kinds only; price it first. 2. A15
+narrowed: delete only rows whose trio primitives compose to the self_harm class. Restore the rest of the 195, log any that
+stay deleted with the composing path. 3. If any non-safety kind is still over 30% after the rerun, read five flagged rows
+from it and report counts and reasons. No safety kinds. 4. pe-probe-vs-task regeneration confirmed. Then top up any group
+still under 84, then the second review sample, then the pack."
+
+- **A17 (checker prompt v2, rerun on the 15 kinds only).** `headext_contradict.py run --prompt v2 --kinds-from`.
+  - **Input.** Every primitive the slot spec assigns to the row (stance value, each object, each qualifier, and the kind's
+    head, PRESENT or ABSENT), each with **its own** pinned definition (`vocabulary.json` `32917116…`;
+    `EXTENSION-NY-HEADS.md` `5fdb03fe…`), plus the task shape.
+  - **Rules in the prompt.** Each primitive is judged on its own definition. An object (topic) is PRESENT whenever the
+    subject involves the topic, **regardless of stance** (refusal, warning, protective and promoting texts all have it).
+    Stance is judged only on what the text does. A mention row is valid with `is_mention_not_use`.
+  - **Output.** `{"contradicts": false, "primitive": null}` or `{"contradicts": true, "primitive": "<name>"}`. `true`
+    without a named primitive from the row's list counts as invalid (a delete, as in A13).
+  - **Scope.** Only rows of the 15 kinds over 30 % in G2 (`contradict-decision.json` `stop_kinds_a13`). All other kinds
+    keep their G2 v1 verdicts. The OR rule and the **30 % per-kind stop** (deletions held) stay as in A13.
+  - **Price first.** The rerun is priced before any pod against the rest of the generation cap,
+    **$4 − G1 $0.775 − G2 $1.512 = $1.713**. It runs only if the estimate is ≤ $1.713 (pod cap = min(90 min, $1.713)).
+    Otherwise stop and report the price with no pod. Driver: `headext_pod_a17.py`.
+- **A18 (A15 narrowed).** A non-safety-kind row is deleted only if **either** checker's primitive label (the trio minus the
+  generator, as in A15) **composes to the `self_harm` class** under composition 2a (`59ddf1f6…`: stance endorses /
+  encourages / conveys_method with object `self_harm`; mention suppression as coded). The rest of the 195 are restored
+  to the working set (rebuilt by `merge` from the archived G1 and G2 generation files, set sha `42f5fc4a…`). Rows that stay
+  deleted are logged with ids and the composing path only. Pair groups are recomputed. Code: `decide2`.
+- **A19 (non-safety kinds still over 30 %).** The executing agent does not read rows. Five flagged rows per such kind go,
+  by code, to `/workspace/headext-review/flagged-nonsafety.jsonl` (+ ids, sha) for Zimmer, each with the primitive(s)
+  the checkers named. Counts by named primitive are reported. Safety kinds (`ed-`, `sub-`, `offer-`, `cr-`, `self_harm`
+  head) are never included.
+- **A20 (top-up, second review sample, then stop).** pe-probe-vs-task regeneration is confirmed. Any pair group still
+  under 84 is topped up; a generation pod is priced first within what is left of the $1.713 and never exceeds it. Then
+  the second review sample (10 rows per re-specified kind, `/workspace/headext-review/sample-g2.jsonl` + sha) is built for
+  Zimmer. Then **stop**: the pack and training wait for Zimmer's read; above 10 % mismatch on any kind stops before the
+  pack.
 
 **Gap-fills (no rule change; flagged for review).**
 - A `terse` register row carries `explicit_register` as a register qualifier, from the existing vocabulary.
@@ -470,6 +511,8 @@ Benign fixtures only (e.g. weather and recipe text, invented brands); no safety 
 - [x] Open items 1–12: answered in t217u, applied as amendments A1–A12 (§0)
 - [x] Amendment t218u (2026-11-02 12:42 NPT): A13 contradiction check, A14 re-spec (slot spec `bb7a2ee4…`), A15 self_harm
   deletion, A16 top-ups; G2 cap $3.225 (§0)
+- [x] Amendment t219u (2026-11-03 09:01 NPT): A17 per-primitive checker prompt v2 + rerun on 15 kinds (priced first, ≤ $1.713),
+  A18 A15 narrowed to composed self_harm class, A19 flagged non-safety rows for Zimmer, A20 top-up then review sample then stop (§0)
 - [x] Training pod plan: [x] two pods × 5 seeds ($3 + $3) (A8)
 - [x] Caps: generation phase $4 shared by G1 + G2 (A12; G1 $2.55); pack $0; training $6; per pod 90 min, both watchdogs; stop-and-report $45
 - Order after signature: code + tests (no pod) → pre-generation pin record → G1 (→ G2) → filters + pack + asserts →
