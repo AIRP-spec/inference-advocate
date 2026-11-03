@@ -18,6 +18,7 @@ IMAGE = "runpod/pytorch:2.4.0-py3.11-cuda12.4.1-devel-ubuntu22.04"
 CAP_USD, CAP_MIN = 3.0, 90.0
 STOP_LINE, CEILING = 45.0, 60.0
 TRAIN_SHA = None; VAL_SHA = None
+CREATE_TRIES = 30       # one try a minute for up to 30 min (no pod, no bill while supply-constrained)
 CLOSE_S = 8 * 60          # stop the pipeline this long before the deadline to archive the last seed and terminate
 
 
@@ -66,11 +67,18 @@ def main():
         pub = open(A.KEY + ".pub").read().strip()
         inp = {"cloudType": "SECURE", "gpuCount": 1, "volumeInGb": 0, "containerDiskInGb": 60, "minVcpuCount": 8, "minMemoryInGb": 30,
                "gpuTypeId": GPU, "name": NAME, "imageName": IMAGE, "ports": "22/tcp", "startSsh": True, "env": [{"key": "PUBLIC_KEY", "value": pub}]}
-        try:
-            pod = rp.gql("mutation($i: PodFindAndDeployOnDemandInput) { podFindAndDeployOnDemand(input: $i) { id name costPerHr machine { gpuTypeId } } }", {"i": inp})["podFindAndDeployOnDemand"]
-        except Exception as e:
-            log("create failed:", repr(e)[:300]); status(f"headext {NAME} POD NOT CREATED (no RTX 4090 SECURE); nothing billed; stopped")
-            raise SystemExit("ABORT: no GPU")
+        pod = None
+        for k in range(CREATE_TRIES):  # SUPPLY_CONSTRAINT: nothing is created or billed; retry once a minute
+            try:
+                pod = rp.gql("mutation($i: PodFindAndDeployOnDemandInput) { podFindAndDeployOnDemand(input: $i) { id name costPerHr machine { gpuTypeId } } }", {"i": inp})["podFindAndDeployOnDemand"]
+                break
+            except Exception as e:
+                log(f"create attempt {k + 1}/{CREATE_TRIES} failed:", repr(e)[:160])
+                if "SUPPLY_CONSTRAINT" not in repr(e) or k == CREATE_TRIES - 1:
+                    status(f"headext {NAME} POD NOT CREATED (no RTX 4090 SECURE after {k + 1} tries); nothing billed; stopped")
+                    raise SystemExit("ABORT: no GPU")
+                if A.gq("query { myself { pods { id name } } }")["myself"]["pods"]: raise SystemExit("ABORT: a pod appeared during retries")
+                time.sleep(60)
         pid, rate = pod["id"], float(pod["costPerHr"]); t0 = time.time()
         cap_s = min(CAP_MIN * 60, CAP_USD / rate * 3600); deadline = t0 + cap_s
         log(f"POD CREATED {pid} gpu={pod['machine']['gpuTypeId']} rate=${rate}/h cap={cap_s/60:.1f}min (${CAP_USD}) seeds=[{a.seeds}]")

@@ -190,4 +190,4 @@ No new rule beyond the amendment. 56 files in `HEADEXT-PINS.json`.
   VPS `headext-20261102/pack-v10c`.
 - New: `pack/pod_pipeline_hx.sh` (§8 recipe, 25 heads, ep 2.0–4.0 average, validation predictions only),
   `make_train_pack.py` (pod pack), `headext_pod_train.py` (one RTX 4090 SECURE pod, cap min(90 min, $3), per-seed
-  archive), `tests/test_train_pod.py`.
+  archive; retries creation once a minute for up to 30 min on SUPPLY_CONSTRAINT), `tests/test_train_pod.py`.
