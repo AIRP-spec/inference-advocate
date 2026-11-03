@@ -195,3 +195,11 @@ No new rule beyond the amendment. 56 files in `HEADEXT-PINS.json`.
   process held the session's stdin; training itself ran). That driver was killed (no pod action); the `--attach` mode
   re-attached from `state.json` (no create / upload / launch; checks the in-pod watchdog). Launch now passes
   `</dev/null`. Box watchdog untouched throughout.
+- Pod one result: FAILED in seed 60, terminated 1.5 min after the failure (11.2 min, $0.166). 2,616 micro-batches were
+  skipped as nonfinite, so the 4-epoch schedule stopped at ep 1.6 (460 steps). The pipeline then stopped at
+  `AVG_SRC_MISSING ep2.0` (exit 12). No checkpoints kept; logs on the VPS (`train-hx-t1/logs`, sha256sum -c OK).
+- Cause (box reproduction, real public base, CPU bf16 autocast): the ModernBERT encoder with `sdpa` attention returns
+  NaN, at real-token positions too, for every row padded well past its length in a batch. data-v9 rows are at most 59
+  tokens; 579 of the 1,535 new rows are over 128 (max 435), so most mixed batches carry long padding. Under fp32 there
+  are no NaNs; with `eager` attention under bf16 there are none either. P3-3 (data-v9 only) had 0 skips. The CPU smoke
+  missed it because it ran fp32 on the first 320 (data-v9) rows. No fix applied: it changes the pinned recipe/code path.
