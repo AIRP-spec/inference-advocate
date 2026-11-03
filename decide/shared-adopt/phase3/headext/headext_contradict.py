@@ -351,14 +351,14 @@ SAFETY_PREFIXES = ("ed-", "sub-", "offer-", "cr-")
 
 def flagged_nonsafety(dec: dict, rows: list[dict], spec: dict, per_kind=5, salt="t219u") -> dict:
     """A19: for every NON-safety kind still over 30 % after the rerun, five A13-flagged rows (lowest sha256(salt|flagged|id)),
-    each carrying the primitive(s) the checkers named. Safety kinds (ed/sub/offer/cr prefixes, self_harm head) are never
+    each carrying the primitive(s) the checkers named; rows A18 deletes are never picked. Safety kinds (ed/sub/offer/cr prefixes, self_harm head) are never
     included. The caller writes the file without printing it; Zimmer reads it."""
     kh = {k["id"]: k["head"] for k in spec["kinds"]}
     kinds = [k for k in dec["stop_kinds_a13"] if not k.startswith(SAFETY_PREFIXES) and kh[k] != "self_harm"]
     by = {r["id"]: r for r in rows}
     out, counts = [], {}
     for k in kinds:
-        ids = sorted((i for i in dec["a13"] if by[i]["provenance"]["kind_spec"] == k),
+        ids = sorted((i for i in dec["a13"] if by[i]["provenance"]["kind_spec"] == k and i not in dec.get("a18", {})),
                      key=lambda i: hashlib.sha256(f"{salt}|flagged|{i}".encode()).hexdigest())
         counts[k] = dict(Counter(t.split(":", 2)[2] if t.count(":") >= 2 else t.split(":")[0]
                                  for i in dec["a13"] if by[i]["provenance"]["kind_spec"] == k for t in dec["a13"][i]))

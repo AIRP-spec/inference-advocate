@@ -109,9 +109,9 @@ nemotron-3-super all OK.
 ## t219u re-pin (amendment A17–A20, signed 2026-11-03 09:01 NPT)
 
 - **Changed / added files** (full shas in `HEADEXT-PINS.json`, 49 files):
-  - 25e5d794… `headext_contradict.py`
+  - fd4a2419… `headext_contradict.py`
   - 8c36879b… `headext_pod_a17.py`
-  - 12d0bcf3… `tests/test_t219.py`
+  - 33148b75… `tests/test_t219.py`
   - cfc45696… `../DRAFT-HEAD-EXTENSION-SIZING-ADDENDUM.md`
   - `vocabulary.json` `32917116…` (added: A17 per-primitive definitions; unchanged file)
 - **A17.** `headext_contradict.py run --prompt v2 --kinds-from`: every assigned primitive with its own definition, object =
@@ -121,5 +121,5 @@ nemotron-3-super all OK.
 - **A18.** `decide2`: non-safety-kind rows deleted only if either checker label composes to class `self_harm` (composition
   2a `59ddf1f6…`); the composing path is logged with ids only. Working set rebuilt by `merge` from the archived G1 + G2
   generation files: 3,616 rows, sha `42f5fc4a…` (identical to the G2 set before A15). Rerun rows: 723 (15 kinds).
-- **A19.** `flagged_nonsafety`: 5 flagged rows per non-safety kind still over 30 %, never ed/sub/offer/cr/self_harm.
+- **A19.** `flagged_nonsafety`: 5 flagged rows per non-safety kind still over 30 %, never ed/sub/offer/cr/self_harm, never a row A18 deletes.
 - **Tests.** headext 68 pass (14 new in `tests/test_t219.py`), pack/tests 10 pass, evaluator-suite v3 138 pass + 5 skipped.

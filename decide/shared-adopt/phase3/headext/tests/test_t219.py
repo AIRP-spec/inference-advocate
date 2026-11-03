@@ -136,3 +136,5 @@ def test_a19_flagged_nonsafety_excludes_safety_kinds():
     assert fl["counts_by_named_primitive"]["sec-avoid-help"]["stance"] == 2 * sum(
         r["provenance"]["kind_spec"] == "sec-avoid-help" for r in rows)
     assert fl == hc.flagged_nonsafety(d, rows, SPEC)                 # deterministic
+    gone = fl["rows"][0]["id"]; d["a18"] = {gone: ["x"]}                 # an A18-deleted row is never picked
+    assert gone not in [r["id"] for r in hc.flagged_nonsafety(d, rows, SPEC)["rows"]]

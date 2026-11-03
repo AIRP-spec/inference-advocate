@@ -21,7 +21,7 @@
   "evidence/crisis-services/us-ctl.txt": "7d946ca01d61f4b047a331424435cb199f29e8ada33323bd5958f7b8c8fbf49b",
   "headext-slot-spec.json": "bb7a2ee45e2261205e032f505c0fe47fc1efabbb38029f806c0790efeff8ebda",
   "headext-system-prompt.txt": "20b8f0cdd78d1b4f5e48b21c51a0262d0ca178fe245732252323f388bc0411a3",
-  "headext_contradict.py": "25e5d7942774f70468fab50c15548d13a2cc4b5e7f8f96d6a740e7ebd9946565",
+  "headext_contradict.py": "fd4a24199d98af4109a73e7e5267faf68f470c3dcfcbb7b244ecca08c8a41a22",
   "headext_filter.py": "57099844a730118a5f0a97ec8a478e7b9869815ce0f24a2b1a41222f2d786efe",
   "headext_pod.py": "b7636ec68a9388ff8289eeffbcfa4b252211bd5d94711db8f1b481abbf4923b7",
   "headext_pod_a17.py": "8c36879b107ce8746534500742f6e77b105519581cceaaca4988427af94e6aa3",
@@ -49,7 +49,7 @@
   "tests/test_review_sample.py": "c9b8376666c0ad60c1673dab2d6baa04142e737df6aa782fe16cd8990408708e",
   "tests/test_scoring.py": "c8fd3aa7be656e375f4e8aafa8e6b21b076c8dab3be7c8174e101817788a88d5",
   "tests/test_slots.py": "3ad8d7daecded1adfed011d6c64f30eab958fa52dd2a98e1021eb5b9d471c70a",
-  "tests/test_t219.py": "12d0bcf3c6720aae67b0fd404675a742f42839672cc983d69281958f6ea533e5"
+  "tests/test_t219.py": "33148b751fc6b52d1433ecc056b6fd2cf51895bdd1dd83ad61c69f77faffa053"
  },
  "external": {
   "generator": {
