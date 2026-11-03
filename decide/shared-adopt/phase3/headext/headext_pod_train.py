@@ -55,12 +55,17 @@ def precheck(signed, pack_sha):
 def main():
     ap = argparse.ArgumentParser()
     for x in ("--signed", "--pack", "--pack-sha", "--seeds", "--name", "--train-sha", "--val-sha"): ap.add_argument(x, required=True)
+    ap.add_argument("--attach", action="store_true", help="re-attach to the running pod in state.json (driver restart): "
+                    "no create, no upload, no launch; verify both watchdogs, then monitor / archive / terminate")
     ap.add_argument("--local-pull-test", help="box test of the per-seed archive path on a finished local work dir; no pod")
     a = ap.parse_args(); PODW = a.local_pull_test or "/root/hx"
     NAME = a.name; ROOT = f"/workspace/headext-train/{NAME}"; OUT = f"{ROOT}/out"; VD = f"{A.VPSDIR}/train-{NAME}"
     os.makedirs(f"{OUT}/logs", exist_ok=True)
-    if os.listdir(f"{OUT}/logs") or A.vps(f"test -e {VD}", check=False).returncode == 0: raise SystemExit("ABORT: output exists (no silent resume)")
-    if a.local_pull_test:
+    if not a.attach and os.listdir(f"{OUT}/logs") or not a.attach and A.vps(f"test -e {VD}", check=False).returncode == 0: raise SystemExit("ABORT: output exists (no silent resume)")
+    if a.attach:
+        st = json.load(open(f"{ROOT}/state.json")); pid, rate, t0, deadline, bal0 = st["pod"], st["rate"], st["t0"], st["deadline"], st["bal0"]
+        log(f"ATTACH {pid} rate=${rate}/h deadline={time.strftime('%H:%M:%S', time.localtime(deadline))}")
+    elif a.local_pull_test:
         VD = f"{A.VPSDIR}/train-{NAME}"; bal0 = 0; pid = "local"; rate = 0; t0 = time.time(); deadline = t0 + 3600
     else:
         bal0, cum0 = precheck(a.signed, A.sha(a.pack) == a.pack_sha)
@@ -144,18 +149,23 @@ def main():
         for _ in range(30):
             if A.sh(S + ["true"], check=False).returncode == 0: break
             time.sleep(10)
-        remain = int(deadline - time.time() - 60)
-        A.sh(S + [f"cat > /root/wd.sh <<'EOF'\n. /etc/rp_environment\nsleep {remain}\nrunpodctl remove pod $RUNPOD_POD_ID\nEOF"])
-        wd = A.sh(S + ["nohup bash /root/wd.sh >/root/wd.log 2>&1 & sleep 1; pgrep -f 'bash /root/wd.sh' >/dev/null && echo wd_running; "
-                       ". /etc/rp_environment; [ -n \"$RUNPOD_POD_ID\" ] && echo has_pod_id; which runpodctl >/dev/null && echo has_runpodctl; "
-                       "nvidia-smi --query-gpu=name,memory.total --format=csv,noheader; df -BG --output=avail / | tail -1"]).stdout
-        log("IN-POD WATCHDOG + GPU:", wd.replace("\n", " | "))
-        if "wd_running" not in wd or "has_runpodctl" not in wd: raise RuntimeError("in-pod watchdog not running")
-        A.sh(f"cat {shlex.quote(a.pack)} | " + " ".join(shlex.quote(x) for x in S) + " 'mkdir -p /root/hx && tar xzf - -C /root/hx'")
-        log("PACK UPLOADED", A.sh(S + ["cd /root/hx && sha256sum -c --quiet PACK.sha256 && echo PACK_OK; sha256sum PACK.sha256"]).stdout.replace("\n", " "))
-        A.sh(S + [f"cd /root/hx && setsid nohup sh -c 'SEEDS=\"{a.seeds}\" TRAIN_SHA={a.train_sha} VAL_SHA={a.val_sha} W=/root/hx bash pod_pipeline_hx.sh "
-                  f"> /root/hx/pipe.log 2>&1; echo PIPE_EXIT $? >> /root/hx/pipe.log' >/dev/null 2>&1 &"])
-        log("PIPELINE STARTED")
+        if a.attach:
+            wd = A.sh(S + ["pgrep -f 'bash /root/wd.sh' >/dev/null && echo wd_running; pgrep -f pod_pipeline_hx.sh >/dev/null && echo pipe_running"]).stdout
+            log("ATTACH CHECK:", wd.replace("\n", " | "))
+            if "wd_running" not in wd: raise RuntimeError("in-pod watchdog not running")
+        else:
+            remain = int(deadline - time.time() - 60)
+            A.sh(S + [f"cat > /root/wd.sh <<'EOF'\n. /etc/rp_environment\nsleep {remain}\nrunpodctl remove pod $RUNPOD_POD_ID\nEOF"])
+            wd = A.sh(S + ["nohup bash /root/wd.sh >/root/wd.log 2>&1 & sleep 1; pgrep -f 'bash /root/wd.sh' >/dev/null && echo wd_running; "
+                           ". /etc/rp_environment; [ -n \"$RUNPOD_POD_ID\" ] && echo has_pod_id; which runpodctl >/dev/null && echo has_runpodctl; "
+                           "nvidia-smi --query-gpu=name,memory.total --format=csv,noheader; df -BG --output=avail / | tail -1"]).stdout
+            log("IN-POD WATCHDOG + GPU:", wd.replace("\n", " | "))
+            if "wd_running" not in wd or "has_runpodctl" not in wd: raise RuntimeError("in-pod watchdog not running")
+            A.sh(f"cat {shlex.quote(a.pack)} | " + " ".join(shlex.quote(x) for x in S) + " 'mkdir -p /root/hx && tar xzf - -C /root/hx'")
+            log("PACK UPLOADED", A.sh(S + ["cd /root/hx && sha256sum -c --quiet PACK.sha256 && echo PACK_OK; sha256sum PACK.sha256"]).stdout.replace("\n", " "))
+            A.sh(S + [f"cd /root/hx && setsid nohup sh -c 'SEEDS=\"{a.seeds}\" TRAIN_SHA={a.train_sha} VAL_SHA={a.val_sha} W=/root/hx bash pod_pipeline_hx.sh "
+                      f"> /root/hx/pipe.log 2>&1; echo PIPE_EXIT $? >> /root/hx/pipe.log' </dev/null >/dev/null 2>&1 &"])
+            log("PIPELINE STARTED")
         seen = set()
         while True:
             time.sleep(30)

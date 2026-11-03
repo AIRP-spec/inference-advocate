@@ -191,3 +191,7 @@ No new rule beyond the amendment. 56 files in `HEADEXT-PINS.json`.
 - New: `pack/pod_pipeline_hx.sh` (§8 recipe, 25 heads, ep 2.0–4.0 average, validation predictions only),
   `make_train_pack.py` (pod pack), `headext_pod_train.py` (one RTX 4090 SECURE pod, cap min(90 min, $3), per-seed
   archive; retries creation once a minute for up to 30 min on SUPPLY_CONSTRAINT), `tests/test_train_pod.py`.
+- Pod one `8bkgtnl6qp8exg` (created 06:17 UTC): the first driver hung on the pipeline-launch ssh (the detached remote
+  process held the session's stdin; training itself ran). That driver was killed (no pod action); the `--attach` mode
+  re-attached from `state.json` (no create / upload / launch; checks the in-pod watchdog). Launch now passes
+  `</dev/null`. Box watchdog untouched throughout.
