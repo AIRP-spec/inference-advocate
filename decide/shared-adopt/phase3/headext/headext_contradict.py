@@ -333,6 +333,105 @@ def decide_v2(rows: list[dict], spec: dict, v1: dict, v2: dict, rerun_kinds: set
             "a13": a13, "a15": a18, "a18": a18, "per_kind": dict(sorted(per.items()))}
 
 
+# ---------------- t220u: A22 checker override, A23 both-checker rule for safety kinds, A21 partial ----------------
+# A22: cr-resource-named-no-direction gold (refers_to_crisis_services ABSENT) MATCHES the pinned definition ("Naming a resource
+# without directing the user to it ... does not fire it"), so the checkers are overridden for this kind; its A13 flags are recorded,
+# never applied.
+CHECKER_OVERRIDE_KINDS = {"cr-resource-named-no-direction": "t220u A22: gold matches the refers_to_crisis_services definition"}
+# A21: if sec-avoid-help is over 30 % again after the top-up, NY (j)'s help-seeking prong is recorded as partial and the run proceeds.
+PARTIAL_OK_KINDS = {"sec-avoid-help": "t220u A21: NY (j) help-seeking prong recorded as partial"}
+
+
+def is_safety_kind(kind_id: str, head: str) -> bool:
+    return kind_id.startswith(SAFETY_PREFIXES) or head == "self_harm"
+
+
+def decide_v3(rows: list[dict], spec: dict, v1: dict, v2: dict, rerun_kinds: set, labels: dict, composer,
+              override=None, partial_ok=None) -> dict:
+    """t220u. Per row, the A17 v2 verdict is used when the row's kind is a rerun kind or the row has a v2 verdict (new G3 rows);
+    otherwise its v1 verdict. A checker 'flags' a row when its verdict is true, missing or invalid.
+    - non-safety kinds: delete if EITHER checker flags (A13 OR rule);
+    - safety kinds (ed-/sub-/offer-/cr- prefixes or self_harm head; A23): delete only if BOTH flag; one flag -> definition check;
+    - override kinds (A22): flags recorded, never deleted;
+    - A18 as before. The 30 % stop counts A13 deletions per kind; partial_ok kinds (A21) never trip it (recorded instead)."""
+    override = CHECKER_OVERRIDE_KINDS if override is None else override
+    partial_ok = PARTIAL_OK_KINDS if partial_ok is None else partial_ok
+    kh = {k["id"]: k["head"] for k in spec["kinds"]}
+    nonsafety = set(spec["nonsafety_heads"])
+    has_v2 = {i for c in v2 for i in v2[c]}
+    a13, a18, defcheck, overridden = {}, {}, {}, {}
+    prim_by_kind = defaultdict(Counter)
+    for r in rows:
+        if not r["content"]:
+            continue
+        k = r["provenance"]["kind_spec"]
+        src = v2 if (k in rerun_kinds or r["id"] in has_v2) else v1
+        per_c = {}
+        for c in sorted(CHECKERS):
+            v = (src.get(c) or {}).get(r["id"])
+            if v is None:
+                per_c[c] = f"missing:{c}"
+            elif v.get("contradicts") is True:
+                per_c[c] = f"contradicts:{c}" + (f":{v['primitive']}" if v.get("primitive") else "")
+            elif v.get("contradicts") is None:
+                per_c[c] = f"invalid:{c}"
+        t = [per_c[c] for c in sorted(per_c)]
+        if t:
+            if k in override:
+                overridden[r["id"]] = t
+            elif is_safety_kind(k, kh[k]) and len(per_c) < len(CHECKERS):
+                defcheck[r["id"]] = t
+            else:
+                a13[r["id"]] = t
+                for x in t:
+                    if x.startswith("contradicts:") and x.count(":") >= 2:
+                        prim_by_kind[k][x.split(":", 2)[2]] += 1
+        if kh[k] in nonsafety:
+            paths = [p for c in sorted(labels) for p in compose_paths((labels[c].get(r["id"]) or {}).get("primitives"), composer, c)]
+            if paths:
+                a18[r["id"]] = paths
+    per = defaultdict(lambda: {"checked": 0, "a13_deleted": 0, "a18_deleted": 0, "union_deleted": 0, "definition_check": 0, "overridden": 0})
+    for r in rows:
+        if not r["content"]:
+            continue
+        k = r["provenance"]["kind_spec"]; p = per[k]; i = r["id"]
+        p["checked"] += 1; p["a13_deleted"] += i in a13; p["a18_deleted"] += i in a18
+        p["union_deleted"] += (i in a13) or (i in a18); p["definition_check"] += i in defcheck; p["overridden"] += i in overridden
+        p["rule"] = "override" if k in override else ("both" if is_safety_kind(k, kh[k]) else "either")
+    for k, p in per.items():
+        p["a13_fraction"] = round(p["a13_deleted"] / p["checked"], 4) if p["checked"] else 0.0
+        p["a13_by_primitive"] = dict(prim_by_kind.get(k, {}))
+    over = sorted(k for k, p in per.items() if p["a13_deleted"] > STOP_FRACTION * p["checked"])
+    stop = [k for k in over if k not in partial_ok]
+    kind_of = {r["id"]: r["provenance"]["kind_spec"] for r in rows}
+    dck = defaultdict(list)
+    for i in sorted(defcheck):
+        dck[kind_of[i]].append(i)
+    return {"rule_a13": "non-safety: EITHER checker flags (true / missing / invalid) -> delete; safety (A23): BOTH -> delete, one -> "
+                        "definition check; override kinds (A22) never deleted; v2 verdicts for rerun kinds and rows that have one",
+            "rule_a18": "non-safety kind deleted only if EITHER checker label composes to class self_harm (composition 2a)",
+            "override_kinds": override, "partial_ok_kinds": partial_ok, "rerun_kinds": sorted(rerun_kinds),
+            "stop_fraction": STOP_FRACTION, "over_30pct_kinds": over, "partial_recorded": [k for k in over if k in partial_ok],
+            "stop_kinds_a13": stop, "stop": bool(stop), "a13": a13, "a15": a18, "a18": a18,
+            "definition_check": defcheck, "definition_check_ids_by_kind": dict(dck), "overridden": overridden,
+            "per_kind": dict(sorted(per.items()))}
+
+
+def merge_g3(base_rows: list[dict], g3_rows: list[dict], spec: dict) -> dict:
+    """t220u: the working set after A18 plus G3 rows; earlier rows of kinds marked g3_prior_rows=discard leave the working set."""
+    disc = {k["id"] for k in spec["kinds"] if k.get("g3_prior_rows") == "discard"}
+    kept = [r for r in base_rows if r["provenance"]["kind_spec"] not in disc]
+    gone = [r["id"] for r in base_rows if r["provenance"]["kind_spec"] in disc]
+    ids = [r["id"] for r in kept] + [r["id"] for r in g3_rows]
+    if len(ids) != len(set(ids)):
+        raise hs.Blocked("G3 id collision")
+    g3k = {k["id"] for k in spec["kinds"] if k.get("g3_quota")}
+    if any(r["provenance"]["kind_spec"] not in g3k for r in g3_rows):
+        raise hs.Blocked("G3 rows of a kind without a G3 quota")
+    return {"rows": kept + g3_rows, "discarded_prior_ids": sorted(gone),
+            "counts": {"base_in": len(base_rows), "kept": len(kept), "discarded": len(gone), "g3_in": len(g3_rows), "set": len(ids)}}
+
+
 def apply(dec: dict, rows: list[dict], text_files: list) -> dict:
     """Deletes A15 rows always; A13 rows only when the stop rule did not fire."""
     kind = {r["id"]: r["provenance"]["kind_spec"] for r in rows}
@@ -423,10 +522,29 @@ def main(argv=None) -> int:
     d2.add_argument("--prior-decision", help="t218u decision json: report which A15 ids are restored / stay deleted")
     d2.add_argument("--apply", action="store_true"); d2.add_argument("--text-file", action="append", default=[])
     d2.add_argument("--flagged-out"); d2.add_argument("--flagged-ids-out")
+    d3 = sp.add_parser("decide3", help="t220u: A22 override, A23 both-checker rule for safety kinds, A21 partial")
+    d3.add_argument("--rows", required=True); d3.add_argument("--expect-spec-sha", required=True); d3.add_argument("--log", required=True)
+    d3.add_argument("--verdicts", action="append", required=True); d3.add_argument("--verdicts-v2", action="append", required=True)
+    d3.add_argument("--rerun-kinds", required=True); d3.add_argument("--labels", action="append", required=True)
+    d3.add_argument("--prior-decision", help="t219u decision json: report which held A13 ids are released / remain")
+    d3.add_argument("--apply", action="store_true"); d3.add_argument("--text-file", action="append", default=[])
+    m3 = sp.add_parser("merge3", help="t220u: working set + G3 rows; discard earlier rows of g3_prior_rows=discard kinds")
+    for x in ("--base", "--g3", "--out", "--log", "--expect-spec-sha"):
+        m3.add_argument(x, required=True)
     a = ap.parse_args(argv)
     spec, _ = hs.load_pinned(hs.SPEC, a.expect_spec_sha)
     if a.cmd == "decide2":
         return _decide2_cli(a, spec)
+    if a.cmd == "decide3":
+        return _decide3_cli(a, spec)
+    if a.cmd == "merge3":
+        res = merge_g3(hf.load_jsonl(a.base), hf.load_jsonl(a.g3), spec)
+        hf.seal(res["rows"], a.out)
+        rep = {"counts": res["counts"], "discarded_prior_ids": res["discarded_prior_ids"], "base_sha256": hs.sha256_file(a.base),
+               "g3_sha256": hs.sha256_file(a.g3), "set_sha256": hs.sha256_file(a.out)}
+        Path(a.log).write_text(json.dumps(rep, indent=1) + "\n")
+        print(json.dumps({"counts": res["counts"], "set_sha256": rep["set_sha256"]}))
+        return 0
     if a.cmd == "merge":
         res = merge(hf.load_jsonl(a.g1), hf.load_jsonl(a.g2) if Path(a.g2).is_file() else [], spec)
         hf.seal(res["rows"], a.out)
@@ -508,6 +626,47 @@ def _decide2_cli(a, spec) -> int:
                       "pair_groups_after": res["pair_groups_after"], "n_deleted": res.get("applied", {}).get("n_deleted"),
                       "a15_narrowing": {k: (len(v) if isinstance(v, list) else v) for k, v in res.get("a15_narrowing", {}).items()},
                       "flagged": {k: res["flagged"][k] for k in ("kinds", "n", "sha256")} if "flagged" in res else None}))
+    return 0
+
+
+def _load_verdicts_union(paths):
+    """Several verdict files per checker (A17 rerun + G3 rows) are unioned; a later file never overrides an earlier id."""
+    ver = {c: {} for c in CHECKERS}
+    for p in paths:
+        for v in (hf.load_jsonl(p) if Path(p).is_file() else []):
+            if v["id"] in ver.setdefault(v["checker"], {}):
+                raise hs.Blocked(f"duplicate verdict {v['checker']} {v['id']}")
+            ver[v["checker"]][v["id"]] = v
+    return ver
+
+
+def _decide3_cli(a, spec) -> int:
+    rows = hf.load_jsonl(a.rows)
+    rk = set(json.loads(Path(a.rerun_kinds).read_text())["kinds"])
+    labs = {}
+    for p in a.labels:
+        ls = hf.load_jsonl(p) if Path(p).is_file() else []; c = ls[0]["labeler"] if ls else Path(p).stem
+        labs.setdefault(c, {}).update({x["id"]: x for x in ls})
+    dec = decide_v3(rows, spec, _load_verdicts(a.verdicts), _load_verdicts_union(a.verdicts_v2), rk, labs, hf.load_composer())
+    drop = set(dec["a18"]) | (set() if dec["stop"] else set(dec["a13"]))
+    res = {"decision": dec, "pair_groups_before": pair_groups(rows, spec, set()), "pair_groups_after": pair_groups(rows, spec, drop),
+           "rows_sha256": hs.sha256_file(a.rows)}
+    if a.prior_decision:
+        held = set(json.loads(Path(a.prior_decision).read_text())["decision"]["a13"])
+        present = {r["id"] for r in rows}
+        res["held_a13"] = {"prior_held": len(held), "not_in_set": sorted(held - present),
+                           "remain_deleted": sorted(held & set(dec["a13"])),
+                           "released_definition_check": sorted(held & set(dec["definition_check"])),
+                           "released_override": sorted(held & set(dec["overridden"])),
+                           "released_other": sorted((held & present) - set(dec["a13"]) - set(dec["definition_check"]) - set(dec["overridden"]))}
+    if a.apply:
+        res["applied"] = apply(dec, rows, a.text_file)
+    Path(a.log).write_text(json.dumps(res, indent=1) + "\n")
+    print(json.dumps({"stop": dec["stop"], "stop_kinds_a13": dec["stop_kinds_a13"], "over_30pct_kinds": dec["over_30pct_kinds"],
+                      "partial_recorded": dec["partial_recorded"], "n_a13": len(dec["a13"]), "n_a18": len(dec["a18"]),
+                      "n_definition_check": len(dec["definition_check"]), "n_overridden": len(dec["overridden"]),
+                      "held_a13": {k: (len(v) if isinstance(v, list) else v) for k, v in res.get("held_a13", {}).items()},
+                      "pair_groups_after": res["pair_groups_after"], "n_deleted": res.get("applied", {}).get("n_deleted")}))
     return 0
 
 

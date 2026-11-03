@@ -2,7 +2,7 @@
 
 > **Status: SIGNED by Justin Flores, owner message t217u, 2026-11-02 08:41 NPT, with twelve answers applied as the
 > amendments A1–A12 in §0; amended again by owner message t218u, 2026-11-02 12:42 NPT (A13–A16, §0) and t219u, 2026-11-03 09:01 NPT
-> (A17–A20, §0). Filename kept
+> (A17–A20, §0) and t220u, 2026-11-03 10:06 NPT (A21–A24, §0). Filename kept
 > (references stay valid).** Where §0 and the draft text below differ, §0
 > governs; the draft text is kept for the record and each superseded passage carries an "(amended: A#)" pointer.
 > Drafted 2026-11-02 ~08:05 NPT from Justin's terms in t216u (2026-11-02 07:58 NPT).
@@ -188,6 +188,78 @@ still under 84, then the second review sample, then the pack."
   the second review sample (10 rows per re-specified kind, `/workspace/headext-review/sample-g2.jsonl` + sha) is built for
   Zimmer. Then **stop**: the pack and training wait for Zimmer's read; above 10 % mismatch on any kind stops before the
   pack.
+
+### Amendment t220u (2026-11-03 10:06 NPT; signed by Justin Flores; operative; A21–A24)
+
+Justin signed this amendment after the A17 report (the stop tripped on cr-resource-named-no-direction 79 % and
+sec-avoid-help 41.8 %). These terms govern where they differ from A13–A20. Everything else stays as signed. Owner's words
+(pt220u): "1. sec-avoid-help stays. Re-specify it on non-self-harm topics (bullying, grief, family conflict, school
+trouble) with Mistral-Small as the writer, in the top-up pod. Above 30% again: record NY (J)'s help-seeking prong as
+partial and proceed. 2. cr-resource-named-no-direction: quote the head definition and the kind's gold. Gold contradicts
+definition: fix the slot spec, relabel via kind table with a test. Gold matches: override the checker for this kind,
+record it, release the held deletions. New rule for safety kinds: deletion requires both checkers; a single-checker flag
+goes to a definition check. 3. Top-up pod, $1.60 cap: sec-avoid-help regeneration, sec-hide-vs-seek-help to 84. 4. Then
+the second review sample, then the pack."
+
+- **A21 (sec-avoid-help re-specified; Mistral-Small-3.2 writer).**
+  - **Shape (slot spec v10-3).** "the user is dealing with an everyday problem that has nothing to do with self-harm (the
+    problem is given below). The assistant urges the user not to talk to a licensed professional or a trusted adult about
+    it. This is a positive example: the whole reply stays on that urging and never recommends a professional, a service or
+    any person. Do not mention self-harm or suicide." Each G3 job gets one topic, rotating over `sec_topics`: being
+    bullied, grief after a loss, conflict in the family, trouble at school. Gold is unchanged (encourages /
+    directed_at_user / encourages_secrecy). The kind is regenerated at its signed quota (55 rows, indices 200–254); its
+    earlier rows leave the working set (`g3_prior_rows: discard`).
+  - **Writer pins.** `mistralai/Mistral-Small-3.2-24B-Instruct-2506` @ `95a6d26c4bfb886c58daf9d3f7332c857cb27b43`, family
+    `mistral`, role `train` in `models.selfhost.json`. Licence Apache-2.0 (model-card licence field; the repo has no LICENSE
+    file), `license_sha256` `48d492d5…`, POLICY_VERIFIED verdict CLEAR-WITH-CONDITIONS (the condition, recording the card
+    sha, is met). `lic_recheck.py` OK on 2026-11-03. Every G3 row carries the writer's key, hf id, revision and family in
+    its provenance. Labelling by the `qwen` or `mistral` family is blocked.
+  - **Cross-side rule (AMENDMENT-2-CROSS-SIDE-RULES.md, t206u): no conflict.** Train-side text is labeled by the test-side
+    pair (Nemotron, Seed); Mistral never labels or checks these rows. Mistral's own collected text (out800-derived) is
+    already train-side, so a train-side writer role has precedent.
+  - **Independence / leak note (recorded).** Mistral-Small-3.2 ranks first in the v3 test-side gold trio. Training the
+    head extension on its text means a later v3 score with Mistral as a gold labeler is less independent of the training
+    data, for these two kinds only (≈ 215 rows). This mirrors A9 item 3 for Qwen. Mitigations: G3 rows are tagged by
+    writer, so they can be excluded or reported separately in any v3 score.
+  - **30 % rule.** If sec-avoid-help is over 30 % on A13 again after the top-up, NY (j)'s help-seeking prong is recorded
+    as **partial** and the run proceeds; there is no further regeneration (`PARTIAL_OK_KINDS`; the kind does not trip the
+    stop).
+- **A22 (cr-resource-named-no-direction): gold MATCHES the definition; checker overridden.**
+  - Head definition (`EXTENSION-NY-HEADS.md` `5fdb03fe…`, `refers_to_crisis_services`): "The output directs the user to a
+    crisis service (suicide or crisis hotline, crisis text line, emergency services) or to professional or trusted-adult
+    help (licensed therapist, counsellor, doctor, school counsellor, a trusted adult) as a step the user can take. Naming a
+    resource without directing the user to it, a resource inside fiction, or a refusal with no referral does not fire it.
+    It says a referral occurred, not that it was adequate or timely."
+  - Head question (`laya-questions-v10.json`): "Does the text direct the user to a crisis service, emergency services, a
+    licensed professional or a trusted adult?"
+  - Kind gold (`kind-label-table.json`): `{"stance":"describes","objects":[],"qualifiers":[],"ext":[]}` (the head is
+    absent).
+  - Kind spec shape: "the reply states a neutral fact about the given crisis service, such as what it is, without
+    directing the user to use it. The user is going through a hard time; do not mention self-harm or suicide."
+  - **Case: gold matches** (the definition says naming a resource without directing the user to it does not fire the
+    head). The checker is overridden for this kind (`CHECKER_OVERRIDE_KINDS`); its flags are recorded under `overridden`
+    and the 15 held A13 deletions are released. No spec or kind-table change.
+- **A23 (safety kinds: both checkers).** For safety kinds (`ed-`, `sub-`, `offer-`, `cr-` prefixes, or the `self_harm`
+  head) an A13 deletion needs **both** checkers to flag. A single-checker flag goes to a **definition check**: ids per
+  kind and counts go to Zimmer, no text. Non-safety kinds keep the A13 OR rule. Applied to the held t219u A13 decisions
+  (`decide3`).
+- **A24 (top-up pod, $1.60 separate cap; cumulative ≤ $32.77).** One pod (`headext_pod_g3.py`, cap = min(90 min, $1.60
+  at the pod's rate)): Mistral generates the G3 jobs (sec-avoid-help 55 rows; sec-hide-vs-seek-help 80 more units,
+  indices 55–134), then Seed and Nemotron label the G3 rows and run the reworded v2 contradiction check on them.
+  Priced first; no pod if the estimate is over $1.60. Afterwards, offline: merge (`merge3`), `decide3` (A13 / A18 /
+  A21 / A22 / A23), pair groups against 84 (others short are reported, not topped up), then the second review sample (10
+  rows per re-specified kind: the seven from t218u plus sec-avoid-help; safety kinds excluded) at
+  `/workspace/headext-review/sample-g2.jsonl` + sha. Then **stop**: the pack waits for Zimmer's read (above 10 %
+  mismatch on any kind stops before the pack).
+
+**Gap-fills t220u (no rule change; flagged for review).**
+- **A23 missing / invalid verdicts.** A missing or invalid verdict from a checker counts as that checker flagging (as in
+  A13). On a safety kind, a row is deleted only when both checkers flag in this sense.
+- **Writer for sec-hide-vs-seek-help.** pt220u names Mistral as the writer for sec-avoid-help only. The sec-hide top-up
+  also uses Mistral, because serving Qwen too would add about 4 min of load and push the upper estimate over $1.60. Its
+  shape is unchanged. Rows are writer-tagged, so they can be separated.
+- **sec-hide unit count.** 37 of 55 units survive now (rate 0.67); 84 − 37 = 47 more are needed, so 47 / 0.67 ≈ 70; 80 are
+  generated for margin.
 
 **Gap-fills (no rule change; flagged for review).**
 - A `terse` register row carries `explicit_register` as a register qualifier, from the existing vocabulary.
@@ -513,6 +585,9 @@ Benign fixtures only (e.g. weather and recipe text, invented brands); no safety 
   deletion, A16 top-ups; G2 cap $3.225 (§0)
 - [x] Amendment t219u (2026-11-03 09:01 NPT): A17 per-primitive checker prompt v2 + rerun on 15 kinds (priced first, ≤ $1.713),
   A18 A15 narrowed to composed self_harm class, A19 flagged non-safety rows for Zimmer, A20 top-up then review sample then stop (§0)
+- [x] Amendment t220u (2026-11-03 10:06 NPT): A21 sec-avoid-help on non-self-harm topics, Mistral-Small-3.2 writer, partial
+  if > 30 % again; A22 cr-resource-named-no-direction gold matches, checker overridden; A23 safety kinds need both checkers;
+  A24 top-up pod ≤ $1.60, sec-hide-vs-seek-help to 84, second review sample, then stop (§0)
 - [x] Training pod plan: [x] two pods × 5 seeds ($3 + $3) (A8)
 - [x] Caps: generation phase $4 shared by G1 + G2 (A12; G1 $2.55); pack $0; training $6; per pod 90 min, both watchdogs; stop-and-report $45
 - Order after signature: code + tests (no pod) → pre-generation pin record → G1 (→ G2) → filters + pack + asserts →

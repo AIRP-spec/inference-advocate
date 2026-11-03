@@ -123,3 +123,37 @@ nemotron-3-super all OK.
   generation files: 3,616 rows, sha `42f5fc4a…` (identical to the G2 set before A15). Rerun rows: 723 (15 kinds).
 - **A19.** `flagged_nonsafety`: 5 flagged rows per non-safety kind still over 30 %, never ed/sub/offer/cr/self_harm, never a row A18 deletes.
 - **Tests.** headext 68 pass (14 new in `tests/test_t219.py`), pack/tests 10 pass, evaluator-suite v3 138 pass + 5 skipped.
+
+## t220u re-pin (amendment A21–A24, signed 2026-11-03 10:06 NPT)
+
+- **Changed / added files** (full shas in `HEADEXT-PINS.json`, 51 files):
+  - b98911ca… `headext-slot-spec.json` (v10-3; supersedes `bb7a2ee4…`)
+  - 1cf6c35b… `make_slot_spec.py`
+  - 0ab359eb… `headext_slots.py`
+  - cb2eda61… `headext_contradict.py`
+  - 282eabc2… `review_sample.py`
+  - 83a0d5d6… `headext_pod_g3.py` (new)
+  - 7584d989… `tests/test_t220.py` (new), 6714cdf3… `tests/test_g2.py`
+  - ffaf56e9… `../DRAFT-HEAD-EXTENSION-SIZING-ADDENDUM.md`
+- **G3 writer pins** (`external.writer_g3`): `mistralai/Mistral-Small-3.2-24B-Instruct-2506` @
+  `95a6d26c4bfb886c58daf9d3f7332c857cb27b43`, family `mistral`, role `train`, licence Apache-2.0 (model card),
+  `license_sha256` `48d492d5…`, `models.selfhost.json` `886a4301…`; `lic_recheck.py` OK 2026-11-03.
+- **Slot spec diff v10-2 → v10-3** (counts of the G1 / G2 plans unchanged: 3,010 G1 jobs, 470 G2 jobs):
+  - `version` v10-2 → v10-3; `addendum` names t219u and t220u; `supersedes_spec_sha256` → `bb7a2ee4…`.
+  - Added `writers.mistral-small-3.2` (pins above; `phases: ["g3"]`), `sec_topics` (being bullied, grief after a loss,
+    conflict in the family, trouble at school) and `respec_kinds_g3: ["sec-avoid-help"]`.
+  - `sec-avoid-help`: `shape` replaced by the A21 shape (non-self-harm everyday problem, positive example, "Do not mention
+    self-harm or suicide"); added `g3_start 200`, `g3_quota 55`, `g3_prior_rows discard`, `g3_extra topic`,
+    `respec_g3 t220u-A21`, `g3_writer mistral-small-3.2`. Gold unchanged.
+  - `sec-hide-vs-seek-help`: added `g3_start 55`, `g3_quota 80` (units), `g3_prior_rows keep`, `topup t220u-A24`,
+    `g3_writer mistral-small-3.2`. Shape and gold unchanged.
+  - No kind-table change (A22 case: gold matches).
+- **Code.** `headext_slots.py`: phase `g3`, per-job `writer`, writer pins in row provenance (`model_key`, `hf_id`,
+  `revision`, `writer_family`), served model must equal every job's pinned writer, labelling by `qwen` or `mistral` blocked,
+  `topic` extra on G3 sec-avoid-help jobs only. `headext_contradict.py`: `decide_v3` / `decide3` (A22
+  `CHECKER_OVERRIDE_KINDS`, A23 both-checker rule + `definition_check`, A21 `PARTIAL_OK_KINDS`; v2 verdicts for rerun kinds and
+  for any row that has one), `merge_g3` / `merge3`. `review_sample.py`: kinds = `respec_kinds` + `respec_kinds_g3`, safety
+  prefixes excluded. Driver `headext_pod_g3.py` (Mistral gen → Seed labels + v2 check → Nemotron labels + v2 check on G3
+  rows; checker-delete; cap min(90 min, $1.60)).
+- **Tests.** headext 78 pass (10 new in `tests/test_t220.py`; two `test_g2.py` expectations updated for G3), pack/tests 10
+  pass, evaluator-suite v3 138 pass + 5 skipped.

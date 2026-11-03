@@ -41,7 +41,8 @@ def build_per_kind(rows: list[dict], spec: dict, out_path, ids_path=None) -> dic
     Pair kinds: the lowest-key units, both arms, up to 10 rows. Same key as build(); not a gate."""
     kmap = {k["id"]: k for k in spec["kinds"]}
     nons = set(spec["nonsafety_heads"])
-    kinds = [k for k in spec["respec_kinds"] if kmap[k]["head"] in nons]
+    respec = list(spec["respec_kinds"]) + [k for k in spec.get("respec_kinds_g3", []) if k not in spec["respec_kinds"]]  # t220u A24
+    kinds = [k for k in respec if kmap[k]["head"] in nons and not k.startswith(("ed-", "sub-", "offer-", "cr-"))]
     key = lambda x: hashlib.sha256(f"{spec['split_salt']}|review2|{x}".encode()).hexdigest()
     out, ids = [], {}
     for kid in kinds:
@@ -68,7 +69,7 @@ def build_per_kind(rows: list[dict], spec: dict, out_path, ids_path=None) -> dic
     Path(out_path).write_text("".join(json.dumps(r, ensure_ascii=False) + "\n" for r in out), encoding="utf-8")
     res = {"path": str(out_path), "sha256": hashlib.sha256(Path(out_path).read_bytes()).hexdigest(), "n": len(out), "kinds": kinds,
            "ids": ids, "short": {k: N_PER_HEAD - len(v) for k, v in ids.items() if len(v) < N_PER_HEAD}, "gate": False,
-           "excluded_safety_adjacent": [k for k in spec["respec_kinds"] if kmap[k]["head"] not in nons]}
+           "excluded_safety_adjacent": [k for k in respec if k not in kinds]}
     if ids_path:
         Path(ids_path).write_text(json.dumps(res, indent=1) + "\n")
     return res

@@ -1,10 +1,10 @@
 {
- "record": "head-extension pin record (sizing addendum signed t217u 08:41 NPT, A1-A12; amendment t218u 12:42 NPT, A13-A16; G2 re-pin; amendment t219u 2026-11-03 09:01 NPT, A17-A20 re-pin)",
+ "record": "head-extension pin record (sizing addendum signed t217u 08:41 NPT, A1-A12; amendment t218u 12:42 NPT, A13-A16; G2 re-pin; amendment t219u 2026-11-03 09:01 NPT, A17-A20 re-pin); amendment t220u 2026-11-03 10:06 NPT, A21-A24 re-pin (slot spec v10-3, G3 writer Mistral-Small-3.2)",
  "files": {
   "../../../../tools/evaluator-training/primitives/kind-label-table.json": "b266a46891c571de8b95c7b2813697b712a1523064b03568f3f5ada85efb8b90",
   "../../../../tools/evaluator-training/primitives/vocabulary.json": "329171161e510d604fbaa05db53f42fe05a4b075a298684ef5c394b1c2a0342b",
   "../DRAFT-HEAD-EXTENSION-DECLARATION.md": "8f136b2654955d365f273cc211e219bee35df32536e15e4d02d8b1e910f1382b",
-  "../DRAFT-HEAD-EXTENSION-SIZING-ADDENDUM.md": "cfc456967ca13d8140ae8a0da1a7f2d8f7ef50ab5e07088732639bf45d82ed26",
+  "../DRAFT-HEAD-EXTENSION-SIZING-ADDENDUM.md": "ffaf56e914086027990e789722555ff9a78fcb38ecc9518e40cf12d9b0eb823f",
   "append_kind_table.py": "613744f060bc2e4afea481be6ff113d38ae8507ac190afaf8aa3a80a88bd6013",
   "build_data_v10.py": "822aa8e3c1877d8afe290ac36729ba72d9c52f88bb513e99f353fd1bbf743497",
   "evidence/crisis-services/ORIGINALS.sha256": "8892bcdf6166a680e3899a0ceeed931fbdfdf54186348b0bb355ce897e35c3f3",
@@ -19,16 +19,17 @@
   "evidence/crisis-services/uk-samaritans.txt": "b67bd582d93fae3294d5b7eca82df0210f80123a9cebe0fdd8d2fb631b53f041",
   "evidence/crisis-services/us-988.txt": "cd2b22990e1ff1ac974a22cca8da845cf1ee2095eb0a5dd02c8d90960ae387d1",
   "evidence/crisis-services/us-ctl.txt": "7d946ca01d61f4b047a331424435cb199f29e8ada33323bd5958f7b8c8fbf49b",
-  "headext-slot-spec.json": "bb7a2ee45e2261205e032f505c0fe47fc1efabbb38029f806c0790efeff8ebda",
+  "headext-slot-spec.json": "b98911ca0e4c754698c6a708787ba2665ec6820c9efdaf7b62d1c9aaadceabf2",
   "headext-system-prompt.txt": "20b8f0cdd78d1b4f5e48b21c51a0262d0ca178fe245732252323f388bc0411a3",
-  "headext_contradict.py": "fd4a24199d98af4109a73e7e5267faf68f470c3dcfcbb7b244ecca08c8a41a22",
+  "headext_contradict.py": "cb2eda610ac6e055b03e1cbefe35039001d5550a0538a4bb47b197666517fb14",
   "headext_filter.py": "57099844a730118a5f0a97ec8a478e7b9869815ce0f24a2b1a41222f2d786efe",
   "headext_pod.py": "b7636ec68a9388ff8289eeffbcfa4b252211bd5d94711db8f1b481abbf4923b7",
   "headext_pod_a17.py": "8c36879b107ce8746534500742f6e77b105519581cceaaca4988427af94e6aa3",
   "headext_pod_g2.py": "7aebf0f3c1e1288b4a6f5ee10948ff4f4fb59aa2c349b965bef7f8f40e268b42",
+  "headext_pod_g3.py": "83a0d5d69e7cdbc3d5c46b2c1c4773077eb059a789827ccb477ebd95e15e1909",
   "headext_scoring.py": "1a212a98d34798c88e2ab8f4265cf3e48b69924dd42371c31a8c5d5ce1c44601",
-  "headext_slots.py": "8ceac110f39e1097de737ae7db0e0890652820f9b79891524399f78df98f6d89",
-  "make_slot_spec.py": "b219db42d23c55c2e103dffa59933c4f5dde67c83d47c1fd3d3458a2efab7bb7",
+  "headext_slots.py": "0ab359eb1988eaccb5a209f7b3968300669bed36fbdae9fcee7631522b5dfb78",
+  "make_slot_spec.py": "1cf6c35bb28fa73c78fdcda1183f2a79a2cd3a603bbb5295879193f919fdb0f8",
   "pack/common_shared.py": "81947944a1a69f40e96a6933e4d4a0ce8345ad54be0d77647f1078d8a5772592",
   "pack/data-v10/excluded-kinds.json": "48314280ab55fdbabd64958a08a463a76640a65f647f8d6824dadeb9424361f4",
   "pack/data-v10/laya-questions-v10.json": "b659d7449b30f689b0b76bab4b87d8cbc5dcabbef11c47ccd42d96d75148612f",
@@ -38,18 +39,19 @@
   "pack/tests/test_head_ext.py": "89bececc70468cadfd7041269596d0529a43cbdb9627e2291e7897f612bcb00f",
   "pack/tests/test_head_init.py": "28d504a23c65e3b576091f399f6f72eb321c04705351bbc6f9b43a4d101db1eb",
   "pack/train_shared.py": "46ea534e366ac80940dfa95c9925f6402612d09ac21c61be7f3cdcca4a7ce882",
-  "review_sample.py": "aa194c253b726060c90637daccb5dc75c5ceff53d767c930205fcbafdf4bad0e",
+  "review_sample.py": "282eabc2893c93af623190787912c81d6bc2acdfe26c1f65a9bf96b06bddd01a",
   "score_v2_pairs.py": "3ffc5bda68104ff90c01a61f50ca021c50bd5fcdb6455522991a072ca74c1683",
   "score_v3_guard.py": "e6b122cf7a27722f77d99b8f35ed197c99bd7eec718db72c723d00303610892e",
   "tests/conftest.py": "9e6426a074f64c4485fa26646db0799f6d8968ab4927ef436a6bb42233a2be08",
   "tests/synth.py": "8e8e026851a96c15597796dfa527f555bbdd15a402a785f429d66c2df18e7718",
   "tests/test_build_v10.py": "c316c133d407d2f58260e29abeec1860a78306ae8f413820d4b21875cd604846",
   "tests/test_filter.py": "250a2c6964c9f4652f6e4a718d4f9e676bb0aa787894bf132c701084c4f455c3",
-  "tests/test_g2.py": "c3c0ae1cd55629d3af87460272c6ff1dab0233bd1641d47055495a4f57bcfb39",
+  "tests/test_g2.py": "6714cdf339062781368b24d681746a4080469cd4bbdbd248fedca27102e211e8",
   "tests/test_review_sample.py": "c9b8376666c0ad60c1673dab2d6baa04142e737df6aa782fe16cd8990408708e",
   "tests/test_scoring.py": "c8fd3aa7be656e375f4e8aafa8e6b21b076c8dab3be7c8174e101817788a88d5",
   "tests/test_slots.py": "3ad8d7daecded1adfed011d6c64f30eab958fa52dd2a98e1021eb5b9d471c70a",
-  "tests/test_t219.py": "33148b751fc6b52d1433ecc056b6fd2cf51895bdd1dd83ad61c69f77faffa053"
+  "tests/test_t219.py": "33148b751fc6b52d1433ecc056b6fd2cf51895bdd1dd83ad61c69f77faffa053",
+  "tests/test_t220.py": "7584d9893233e0b66b5fc1f5bcb1c5970f4dc6b3078b2914e4f975a0e17e6ba4"
  },
  "external": {
   "generator": {
@@ -98,6 +100,17 @@
    "rerun_rows_sha256": "c795ed1d1d6abe89c95d77bd3507685bbb7155a2a5402918ebc94fdb14219bde",
    "rerun_rows": 723,
    "kinds": 15
+  },
+  "writer_g3": {
+   "key": "mistral-small-3.2",
+   "hf_id": "mistralai/Mistral-Small-3.2-24B-Instruct-2506",
+   "revision": "95a6d26c4bfb886c58daf9d3f7332c857cb27b43",
+   "family": "mistral",
+   "role": "train",
+   "licence": "Apache-2.0 (model card)",
+   "license_sha256": "48d492d5ded3dfb80ab53033391c7ada71f42037e442758d9eb29fdb08929edb",
+   "models_selfhost_json_sha256": "886a43014f97119dea58363c2c8c3812d4480e98894ea595ad20e0ca7e8c1c1d",
+   "licence_recheck_2026-11-03": "lic_recheck.py mistral-small-3.2: OK (README, license_sha256)"
   }
  },
  "superseded_g1_pins": {

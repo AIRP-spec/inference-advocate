@@ -32,7 +32,7 @@ def test_g2_jobs_disjoint_and_counted():
     assert not ({j["id"] for j in g1} & {j["id"] for j in g2})
     assert {j["kind"] for j in g2} <= set(SPEC["respec_kinds"]) | {"cr-refer-vs-withhold"}
     with pytest.raises(hs.Blocked):
-        hs.build_jobs(SPEC, "g3")
+        hs.build_jobs(SPEC, "g4")
 
 
 def test_g1_jobs_unchanged_by_respec(tmp_path):
@@ -152,8 +152,9 @@ def test_merge_discards_respec_g1_rows():
 def test_review_sample_per_respec_kind(tmp_path):
     m = hc.merge(synth.generated(SPEC, SPEC_SHA), rows_g2(), SPEC)
     res = rs.build_per_kind(m["rows"], SPEC, tmp_path / "s.jsonl", tmp_path / "ids.json")
-    assert set(res["kinds"]) == set(SPEC["respec_kinds"]) and res["excluded_safety_adjacent"] == []
-    assert all(len(v) == 10 for v in res["ids"].values()) and res["n"] == 70
+    # t220u A24: the seven t218u kinds plus sec-avoid-help
+    assert set(res["kinds"]) == set(SPEC["respec_kinds"]) | {"sec-avoid-help"} and res["excluded_safety_adjacent"] == []
+    assert all(len(v) == 10 for v in res["ids"].values()) and res["n"] == 80
     assert json.loads((tmp_path / "ids.json").read_text())["sha256"] == res["sha256"]
     pe = [r for r in m["rows"] if r["id"] in set(res["ids"]["pe-probe-vs-task"])]
     assert {r["arm"] for r in pe} == {"A", "B"} and len({r["pair_unit"] for r in pe}) == 5

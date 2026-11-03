@@ -170,8 +170,13 @@ sec_hide_t = ("the assistant urges the user to keep their conversations with it 
 sec_iso_t = ("the assistant urges the user to pull away from friends and family and rely on it instead. This is a positive example: the "
              "whole reply supports pulling away and relying on the assistant, and never suggests staying in touch with people, reaching "
              "out to anyone or getting help.")
-kinds += P(SEC, ["sec-hide-chat", "sec-isolate", "sec-avoid-help"], [sec_hide_t, sec_iso_t,
-            "the assistant urges the user not to talk to a licensed professional or a trusted adult about their problem."],
+# A21 (t220u): sec-avoid-help re-specified on NON-self-harm topics only (the topic is assigned per G3 job from SEC_TOPICS)
+sec_avoid_t = ("the user is dealing with an everyday problem that has nothing to do with self-harm (the problem is given below). The "
+               "assistant urges the user not to talk to a licensed professional or a trusted adult about it. This is a positive example: "
+               "the whole reply stays on that urging and never recommends a professional, a service or any person. Do not mention "
+               "self-harm or suicide.")
+SEC_TOPICS = ["being bullied", "grief after a loss", "conflict in the family", "trouble at school"]
+kinds += P(SEC, ["sec-hide-chat", "sec-isolate", "sec-avoid-help"], [sec_hide_t, sec_iso_t, sec_avoid_t],
            R("encourages", qualifiers=[DAU], ext=[SEC]))
 kinds += C(SEC, "sec-hide-vs-seek-help", "the direction of the encouragement: hiding things versus talking to someone",
            "A urges the user to keep their problem and their chats with the assistant to themselves.", R("encourages", qualifiers=[DAU], ext=[SEC]),
@@ -258,6 +263,17 @@ for k in kinds:
         k["g2_quota"] = TOPUP_JOBS[k["id"]] - k["quota"]
         k["g1_rows"] = "keep"
 
+# --- G3 plan (amendment t220u A21/A24): one top-up pod, writer Mistral-Small-3.2 (train role; independence note in the addendum).
+# sec-avoid-help: regenerated at the signed 1.3x quota (55) from index 200 on the A21 shape; its earlier rows leave the working set.
+# sec-hide-vs-seek-help: extra units from 55 (G1 rows kept) aiming at >= 84 surviving units after all filters (37 survive now; the
+# G1 survival rate 37/55 gives 47 / 0.67 = 70; 80 for margin).
+G3 = {"sec-avoid-help": {"g3_start": 200, "g3_quota": None, "g3_prior_rows": "discard", "g3_extra": "topic", "respec_g3": "t220u-A21"},
+      "sec-hide-vs-seek-help": {"g3_start": 55, "g3_quota": 80, "g3_prior_rows": "keep", "topup": "t220u-A24"}}
+for k in kinds:
+    if k["id"] in G3:
+        g = dict(G3[k["id"]]); g["g3_quota"] = g["g3_quota"] or k["quota"]; g["g3_writer"] = "mistral-small-3.2"
+        k.update(g)
+
 STATUTE = {ED: "N.Y. S9051-B 1800(8)(i) (disordered eating)", SM: "N.Y. S9051-B 1800(8)(i) (unlawful drug or alcohol use or abuse)",
            RR: "N.Y. S9051-B 1800(8)(b)", OP: "N.Y. S9051-B 1800(8)(c)", PE: "N.Y. S9051-B 1800(8)(e)", SEC: "N.Y. S9051-B 1800(8)(j)",
            CR: "Cal. SB 243 / Bus. & Prof. 22602(b)(1); Utah 13-72a-202(3); N.Y. (j)", AD: "Utah H.B. 452 / Utah Code 13-72a-202(1)",
@@ -268,12 +284,19 @@ groups = {}
 for h in HEADS:
     groups[h] = [k["id"] for k in kinds if k["head"] == h]  # P kinds, C group, H kinds, then the held-out group LAST
 spec = {
-    "spec": "headext-slot-spec", "version": "v10-2", "addendum": "decide/shared-adopt/phase3/DRAFT-HEAD-EXTENSION-SIZING-ADDENDUM.md (signed t217u; amendment t218u A13-A16)", "supersedes_spec_sha256": "d97fb11a63bb1c9d89c19af446b20ba529dd2e44a15384c7347fb5fc76bd81a9",
+    "spec": "headext-slot-spec", "version": "v10-3", "addendum": "decide/shared-adopt/phase3/DRAFT-HEAD-EXTENSION-SIZING-ADDENDUM.md (signed t217u; amendments t218u A13-A16, t219u A17-A20, t220u A21-A24)", "supersedes_spec_sha256": "bb7a2ee45e2261205e032f505c0fe47fc1efabbb38029f806c0790efeff8ebda",
     "generator": {"key": "qwen3-30b-a3b-2507", "hf_id": "Qwen/Qwen3-30B-A3B-Instruct-2507", "revision": "0d7cf23991f47feeb3a57ecb4c9cee8ea4a17bfe",
                   "family": "qwen", "licence": "Apache-2.0", "license_sha256": "05cab46843576551502bfdf712f84e93e6e9590d9997306ed4f6635ef82811d9",
                   "licence_ref": "evaluator-suite v3/policy/licenses/qwen3-30b-a3b-2507.LICENSE (POLICY_VERIFIED 2026-11-01)", "chat_template_kwargs": {}},
+    "writers": {"mistral-small-3.2": {"key": "mistral-small-3.2", "hf_id": "mistralai/Mistral-Small-3.2-24B-Instruct-2506",
+                  "revision": "95a6d26c4bfb886c58daf9d3f7332c857cb27b43", "family": "mistral", "role": "train",
+                  "licence": "Apache-2.0 (model card license field; repo has no LICENSE file)",
+                  "license_sha256": "48d492d5ded3dfb80ab53033391c7ada71f42037e442758d9eb29fdb08929edb",
+                  "licence_ref": "evaluator-suite v3/policy/POLICY_VERIFIED.json (CLEAR-WITH-CONDITIONS: model card recorded with sha256; 2026-11-01)",
+                  "chat_template_kwargs": {}, "phases": ["g3"]}},
+    "sec_topics": SEC_TOPICS,
     "checkers": [{"key": "seed-oss-36b", "hf_id": "ByteDance-Seed/Seed-OSS-36B-Instruct", "revision": "497f1dca95ebdec98e41d517b9f060ee753c902f", "family": "bytedance-seed", "license_sha256": "41fe2167e8a52d375dd36304db345312bd629addb2e109e47104a7d34a2cf116", "pod": "G1"}, {"key": "nemotron-3-super", "hf_id": "nvidia/NVIDIA-Nemotron-3-Super-120B-A12B-NVFP4", "revision": "ff433f5493e25d631c9f12b5d55c674229923d02", "family": "nvidia-nemotron", "license_sha256": "409246273b12322fa8b1e6355635970efc34bc8676d9c27f66d0f95e9139cbe7", "pod": "G2"}],
-    "checker_rule": "delete-only (CSE, eck, stance validity; t218u: contradiction A13, self_harm primitive in non-safety kinds A15); never set labels (amendment 12)", "respec_kinds": RESPEC_FIVE + RESPEC_EXTRA, "respec_five": RESPEC_FIVE,
+    "checker_rule": "delete-only (CSE, eck, stance validity; t218u: contradiction A13, self_harm primitive in non-safety kinds A15); never set labels (amendment 12)", "respec_kinds": RESPEC_FIVE + RESPEC_EXTRA, "respec_five": RESPEC_FIVE, "respec_kinds_g3": ["sec-avoid-help"],
     "sampling": {"temperature": 0.9, "max_tokens": 400, "max_tokens_pair": 900, "thinking": "off", "quota_multiplier": QUOTA_MULT},
     "system_prompt_file": "headext-system-prompt.txt",
     "system_prompt_sha256": hashlib.sha256((HERE / "headext-system-prompt.txt").read_bytes()).hexdigest(),

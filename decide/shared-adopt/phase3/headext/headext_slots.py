@@ -20,6 +20,7 @@ from pathlib import Path
 HERE = Path(__file__).resolve().parent
 SPEC = HERE / "headext-slot-spec.json"
 GEN_FAMILY = "qwen"
+WRITER_FAMILIES = {"qwen", "mistral"}  # t220u A21: Mistral-Small-3.2 writes the G3 rows
 OPENAI_MARKERS = ("openai", "gpt-")
 LOCAL_HOSTS = {"127.0.0.1", "localhost", "::1"}
 
@@ -55,8 +56,8 @@ def load_pinned(spec_path=SPEC, expect_spec_sha: str | None = None):
 
 def check_labeler_family(labeler_family: str):
     """Same-family rule: the generator family never labels or checks its own rows."""
-    if labeler_family == GEN_FAMILY:
-        raise Blocked(f"labeler family {labeler_family} equals the generator family")
+    if labeler_family in WRITER_FAMILIES:
+        raise Blocked(f"labeler family {labeler_family} is a generator family")
 
 
 def kind_seed(salt: str, kind: str, i: int) -> int:
@@ -67,9 +68,11 @@ def cells_for(spec: dict, kind: dict) -> list[tuple[str, str]]:
     return [(r, l["id"]) for r in kind["registers"] for l in spec["lengths"]]
 
 
-def assignment(spec: dict, kind: dict, i: int) -> dict:
+def assignment(spec: dict, kind: dict, i: int, phase: str = "g1") -> dict:
     ex = kind.get("extra")
     a = {}
+    if phase == "g3" and kind.get("g3_extra") == "topic":
+        return {"topic": spec["sec_topics"][i % len(spec["sec_topics"])]}
     if ex in ("brand", "brand_promo"):
         a["brand"] = spec["brands"][i % len(spec["brands"])]
         a["product"] = spec["products"][(i // len(spec["brands"])) % len(spec["products"])]
@@ -88,6 +91,8 @@ def job_indices(k: dict, phase: str) -> range:
         return range(k["quota"])
     if phase == "g2":
         return range(k["g2_start"], k["g2_start"] + k["g2_quota"]) if k.get("g2_quota") else range(0)
+    if phase == "g3":  # amendment t220u (A21/A24)
+        return range(k["g3_start"], k["g3_start"] + k["g3_quota"]) if k.get("g3_quota") else range(0)
     raise Blocked(f"unknown phase {phase}")
 
 
@@ -99,14 +104,30 @@ def build_jobs(spec: dict, phase: str = "g1") -> list[dict]:
             reg, ln = cells[i % len(cells)]
             jobs.append({"id": f"hx-{k['id']}-{i:03d}", "kind": k["id"], "head": k["head"], "role": k["role"],
                          "pair": bool(k.get("pair")), "sample": i, "register": reg, "length": ln, "cell": f"{reg}/{ln}",
-                         "seed": kind_seed(spec["split_salt"], k["id"], i), "assign": assignment(spec, k, i)})
+                         "seed": kind_seed(spec["split_salt"], k["id"], i), "assign": assignment(spec, k, i, phase),
+                         "writer": writer_key(spec, k, phase)})
     ids = [j["id"] for j in jobs]
     assert len(ids) == len(set(ids))
     return jobs
 
 
+def writer_key(spec: dict, kind: dict, phase: str) -> str:
+    return kind["g3_writer"] if phase == "g3" and kind.get("g3_writer") else spec["generator"]["key"]
+
+
+def writer_pins(spec: dict, key: str) -> dict:
+    if key == spec["generator"]["key"]:
+        return spec["generator"]
+    w = (spec.get("writers") or {}).get(key)
+    if not w:
+        raise Blocked(f"writer {key} is not pinned in the slot spec")
+    return w
+
+
 def _extra_text(spec: dict, job: dict) -> str:
     a = job["assign"]
+    if "topic" in a:
+        return f"\nThe user's problem: {a['topic']}."
     if "brand" in a:
         s = f"\nInvented product: {a['brand']}, {a['product']}. Use the name {a['brand']} exactly."
         if "promo_code" in a:
@@ -132,8 +153,9 @@ def request_body(spec: dict, system_prompt: str, job: dict, served: str) -> dict
     s = spec["sampling"]
     body = {"model": served, "messages": [{"role": "system", "content": system_prompt}, {"role": "user", "content": render_user(spec, job)}],
             "temperature": s["temperature"], "max_tokens": s["max_tokens_pair"] if job["pair"] else s["max_tokens"], "seed": job["seed"]}
-    if spec["generator"].get("chat_template_kwargs"):
-        body["chat_template_kwargs"] = spec["generator"]["chat_template_kwargs"]
+    w = writer_pins(spec, job.get("writer") or spec["generator"]["key"])
+    if w.get("chat_template_kwargs"):
+        body["chat_template_kwargs"] = w["chat_template_kwargs"]
     return body
 
 
@@ -184,10 +206,11 @@ def make_rows(spec: dict, job: dict, raw: dict, host: str, ts: str, spec_sha: st
     clean = clean.strip()
     k = next(x for x in spec["kinds"] if x["id"] == job["kind"])
     ln = next(x for x in spec["lengths"] if x["id"] == job["length"])
-    g = spec["generator"]
+    g = writer_pins(spec, job.get("writer") or spec["generator"]["key"])
     base = {"family": "headext-" + job["head"], "kind_spec": k["id"], "head": job["head"], "role": job["role"],
             "register": job["register"], "length": job["length"], "cell": job["cell"], "sample": job["sample"],
             "seed": job["seed"], "assign": job["assign"], "model_key": g["key"], "hf_id": g["hf_id"], "revision": g["revision"],
+            "writer_family": g["family"],
             "slot_spec_sha256": spec_sha, "system_prompt_sha256": spec["system_prompt_sha256"],
             "temperature": spec["sampling"]["temperature"], "finish_reason": ch.get("finish_reason"), "reasoning_markers": markers,
             "host": host, "timestamp": ts}
@@ -213,6 +236,10 @@ def generate(base_url: str, served: str, out: str, host: str, expect_spec_sha: s
     check_base_url(base_url)
     spec, sysp = load_pinned(spec_path, expect_spec_sha)
     jobs = build_jobs(spec, phase)
+    if any(any(m in (served + writer_pins(spec, j["writer"])["hf_id"]).lower() for m in OPENAI_MARKERS) for j in jobs):
+        raise Blocked("OpenAI models are forbidden")
+    if {j["writer"] for j in jobs} != {served}:
+        raise Blocked(f"served model {served} is not the pinned writer of every {phase} job ({sorted({j['writer'] for j in jobs})})")
     done = set()
     if Path(out).is_file():
         for l in open(out, encoding="utf-8"):
@@ -259,7 +286,8 @@ def generate(base_url: str, served: str, out: str, host: str, expect_spec_sha: s
 
 def items(gen_path: str, out: str) -> dict:
     rows = [json.loads(l) for l in open(gen_path, encoding="utf-8") if l.strip()]
-    its = [{"id": r["id"], "content": r["content"], "writer_family": GEN_FAMILY} for r in rows if r["content"]]
+    its = [{"id": r["id"], "content": r["content"], "writer_family": r.get("provenance", {}).get("writer_family", GEN_FAMILY)}
+           for r in rows if r["content"]]
     ids = [i["id"] for i in its]
     if len(ids) != len(set(ids)):
         raise Blocked("duplicate item ids")
@@ -280,9 +308,9 @@ def main(argv=None) -> int:
     for a in ("--base-url", "--served", "--out", "--host", "--expect-spec-sha"):
         g.add_argument(a, required=True)
     g.add_argument("--concurrency", type=int, default=64); g.add_argument("--max-wall-seconds", type=float, default=1500)
-    g.add_argument("--phase", choices=["g1", "g2"], default="g1")
+    g.add_argument("--phase", choices=["g1", "g2", "g3"], default="g1")
     it = sp.add_parser("items"); it.add_argument("--gen", required=True); it.add_argument("--out", required=True)
-    pl = sp.add_parser("plan"); pl.add_argument("--expect-spec-sha", required=True); pl.add_argument("--phase", choices=["g1", "g2"], default="g1")
+    pl = sp.add_parser("plan"); pl.add_argument("--expect-spec-sha", required=True); pl.add_argument("--phase", choices=["g1", "g2", "g3"], default="g1")
     a = ap.parse_args(argv)
     if a.cmd == "generate":
         st = generate(a.base_url, a.served, a.out, a.host, a.expect_spec_sha, a.concurrency, a.max_wall_seconds, phase=a.phase)
