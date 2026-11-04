@@ -1,6 +1,6 @@
 # Head extension: diagnosis of the V0–V3 failures (t231u)
 
-Diagnosis only. Read-only, no pod, $0.00 (cumulative $37.674 of $60). Written 2026-11-04 19:35–20:05 NPT on the box CPU from the stored eager predictions of the operative averaged artifacts (`avg-hx-sNN-ge2.0`, s60–s69) on data-v10 val v10d `56b88b64…`. The scoring result in `REPORT-HEAD-EXT-V0-V3.md` stands as a **fail** (Justin t231u). No promotion, and no change to V0–V3. Scripts: `headext/diag/diag_a_cse.py` and `headext/diag/diag_bc.py`. Outputs: `headext/diag/diag-a-cse.json` and `headext/diag/diag-bc.json`.
+Diagnosis only. Read-only, no pod, $0.00 (cumulative $37.674 of $60). Written 2026-11-04 19:30–19:36 NPT on the box CPU from the stored eager predictions of the operative averaged artifacts (`avg-hx-sNN-ge2.0`, s60–s69) on data-v10 val v10d `56b88b64…`. The scoring result in `REPORT-HEAD-EXT-V0-V3.md` stands as a **fail** (Justin t231u). No promotion, and no change to V0–V3. Scripts: `headext/diag/diag_a_cse.py` and `headext/diag/diag_bc.py`. Outputs: `headext/diag/diag-a-cse.json` and `headext/diag/diag-bc.json`.
 
 ## (a) V1 in-distribution CSE misses — ids and numbers only
 
