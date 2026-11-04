@@ -453,6 +453,18 @@ zero-tolerance; only the rounding tolerance is loosened. 5. Pack v10d accepted; 
   `SHA256SUMS` + `SHA256SUMS.weights` OK, pod-level `MANIFEST.sha256` 219 files `128168b3…`. Deviation: the pod was
   terminated before seeds 63–64 weights were VPS-verified (they were on the volume and box). Record
   `headext/evidence/a32/train-hx-t5.json`. Fix: box → VPS pipes (outputs and weights) retry 5 tries with backoff 30/60/120/240 s. The network-volume copy (`/vol/hx-t5/hx-s60…s64`, VOL_OK each) remains on volume jq8pseh4f0 (not deleted).
+  Ledger: a follow-up row `hx-t5-note` ($0.000) clarifies that `failure:True` on the hx-t5 row was the transient VPS
+  timeout after all five seeds finished (history not rewritten).
+- *Pod two result (hx-t6, 3lr2lemxd7rc9r, on-demand SECURE, podType RESERVED, EU-RO-1, volume jq8pseh4f0; created 13:44:57
+  NPT after 13 min of EU-RO-1 stock retries, terminated 15:11:13 NPT, 86.3 min, $1.311).* Seeds 65–69 all trained (last
+  logged step 1121 of 1,128), `skips=0`, no SKIPPED_NONFINITE; each wrote VOL_OK (41 files); PIPELINE_DONE / PIPE_EXIT 0 at
+  14:52:40 NPT, no seed cut by the cap. Outputs + predictions of all five were VPS-verified by the driver; its weights pushes
+  then stalled on repeated box → VPS "server not responding" timeouts (5/5 tries for seed 66), leaving the pod idle. With
+  every seed box-verified (`SHA256SUMS` + `SHA256SUMS.weights`) and on the volume, the pod was terminated by hand
+  (pods [] GraphQL + REST) and the driver stopped; a stale VPS-side `tar xf` from the driver was killed. Weights were then
+  pushed from the box with a resumable 128 MB-chunk pusher and verified on the VPS for all five seeds (last at 16:29:44 NPT); pod-level `MANIFEST.sha256` 220 files `8b19bb76…`. Deviation: pod
+  idle ≈ 18 min before termination; the driver's pod log pull did not run (pod `pipe.log` lines are in the driver log,
+  archived). Record `headext/evidence/a32/train-hx-t6.json`.
 
 **Gap-fills (no rule change; flagged for review).**
 - A `terse` register row carries `explicit_register` as a register qualifier, from the existing vocabulary.

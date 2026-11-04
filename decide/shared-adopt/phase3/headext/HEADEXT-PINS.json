@@ -1,10 +1,10 @@
 {
- "record": "head-extension pin record (sizing addendum signed t217u 08:41 NPT, A1-A12; amendment t218u 12:42 NPT, A13-A16; G2 re-pin; amendment t219u 2026-11-03 09:01 NPT, A17-A20 re-pin); amendment t220u 2026-11-03 10:06 NPT, A21-A24 re-pin (slot spec v10-3, G3 writer Mistral-Small-3.2); record t221 2026-11-03 (second review pass, data-v10 pack driver); amendment t221u 2026-11-03 11:12 NPT, A25-A29 re-pin (offer rule: guide 79e29da9, checker prompt v3, A25 pod; A26 record; A28 pair_id); t221u post-A25 re-pin (A25 results, data-v10 train 4f6fa207/val bb522c9e, training pod one code); t226u/t227u A30 re-pin (eager attention, smoke pre-pod check, training cap $6, 65 offer refusals kept as negatives); t227u A31: slot spec v10-4, G4 driver, negatives retag; t227u A31 result: G4 decision, pack v10d; t227u hx-t2 status-poll retry; t227u test_head_ext cross-build tolerance; t227u hx-t4 xtrace false-positive fix; t228u A32: on-demand guard, per-seed volume write, 105 min, finite check; t228u test_train_pod caps; t228u box smokes; t228u hx-t5 result + VPS retry; t228u hx-t5 result + VPS retry/backoff",
+ "record": "head-extension pin record (sizing addendum signed t217u 08:41 NPT, A1-A12; amendment t218u 12:42 NPT, A13-A16; G2 re-pin; amendment t219u 2026-11-03 09:01 NPT, A17-A20 re-pin); amendment t220u 2026-11-03 10:06 NPT, A21-A24 re-pin (slot spec v10-3, G3 writer Mistral-Small-3.2); record t221 2026-11-03 (second review pass, data-v10 pack driver); amendment t221u 2026-11-03 11:12 NPT, A25-A29 re-pin (offer rule: guide 79e29da9, checker prompt v3, A25 pod; A26 record; A28 pair_id); t221u post-A25 re-pin (A25 results, data-v10 train 4f6fa207/val bb522c9e, training pod one code); t226u/t227u A30 re-pin (eager attention, smoke pre-pod check, training cap $6, 65 offer refusals kept as negatives); t227u A31: slot spec v10-4, G4 driver, negatives retag; t227u A31 result: G4 decision, pack v10d; t227u hx-t2 status-poll retry; t227u test_head_ext cross-build tolerance; t227u hx-t4 xtrace false-positive fix; t228u A32: on-demand guard, per-seed volume write, 105 min, finite check; t228u test_train_pod caps; t228u box smokes; t228u hx-t5 result + VPS retry; t228u hx-t5 result + VPS retry/backoff; pod two hx-t6 record",
  "files": {
   "../../../../tools/evaluator-training/primitives/kind-label-table.json": "7368ad17c018fd344fc5ed06ad9fc0e26c089575d63f7b2acb16a64dc43f7c08",
   "../../../../tools/evaluator-training/primitives/vocabulary.json": "329171161e510d604fbaa05db53f42fe05a4b075a298684ef5c394b1c2a0342b",
   "../DRAFT-HEAD-EXTENSION-DECLARATION.md": "8f136b2654955d365f273cc211e219bee35df32536e15e4d02d8b1e910f1382b",
-  "../DRAFT-HEAD-EXTENSION-SIZING-ADDENDUM.md": "0c4755590cc3b7e4f8c492f0178aaedba867d910082927c2c20f87cdbf5950f2",
+  "../DRAFT-HEAD-EXTENSION-SIZING-ADDENDUM.md": "0fc7b8fbd2e16465903b6cff248a98acb6ab2012cd31117a24d7a64ee316fb3b",
   "append_kind_table.py": "613744f060bc2e4afea481be6ff113d38ae8507ac190afaf8aa3a80a88bd6013",
   "build_data_v10.py": "a40d5a9fcaf46d8e5439cdfcdc71768e9d1444e5ea4d9226d154e86f47d1e08a",
   "evidence/crisis-services/ORIGINALS.sha256": "8892bcdf6166a680e3899a0ceeed931fbdfdf54186348b0bb355ce897e35c3f3",
@@ -78,7 +78,8 @@
   "evidence/a31/build-d.sh": "7f794fec9a84d6b00cd3c771a2a4f3574f5e694be9908af0c6725ac49d399f3e",
   "evidence/a32/pack-v10d-acceptance.json": "8dcf877c6d475b1a92cbd6a621d7fa2629fb98453e31ce797d6c8d7d3d43588b",
   "evidence/a32/box-smokes.txt": "1a59eeb7298d317394ab8be6c0674873614a8413fa9440e65b215964f2f2e9e0",
-  "evidence/a32/train-hx-t5.json": "e48177bfb82c0df624a49f0e5710516590d7165af338fa23549f5fdaacbf2e89"
+  "evidence/a32/train-hx-t5.json": "e48177bfb82c0df624a49f0e5710516590d7165af338fa23549f5fdaacbf2e89",
+  "evidence/a32/train-hx-t6.json": "94459f26740e0e30bc671bc60bc193e56bb47dc7adbdb40fdad550af26b8da6d"
  },
  "external": {
   "generator": {
