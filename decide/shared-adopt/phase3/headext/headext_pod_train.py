@@ -56,6 +56,15 @@ def precheck(signed, pack_sha):
     return b["clientBalance"], cum
 
 
+def vps_pipe(cmd, **kw):
+    """box -> VPS tar pipe with retry: a transient 'server not responding' on the VPS failed hx-t5 (t228u) after 5 seeds."""
+    for i in range(5):
+        r = A.sh(cmd, check=False, **kw)
+        if r.returncode == 0: return r
+        log(f"VPS pipe retry {i + 1}/4 rc={r.returncode}:", r.stderr[-160:].replace("\n", " ")); time.sleep(30 * 2 ** i)  # 30, 60, 120, 240 s backoff
+    raise RuntimeError(f"VPS pipe failed 5x: {cmd[:120]}")
+
+
 def rstatus(pid):
     """rp.status with retry: a transient SSL EOF on the status poll failed hx-t2 (t227u) 30 s after create."""
     for i in range(6):
@@ -146,7 +155,7 @@ def main():
         open(f"{d}/SHA256SUMS.weights", "w").write("".join(f"{A.sha(f'{d}/{f}')}  {f}\n" for f in big))
         A.vps(f"mkdir -p {VD}/{R}")
         # predictions, logs, meta, sha files -> VPS now (verified); weights (box-verified) -> VPS in the background queue
-        A.sh(f"cd {d} && tar cf - --exclude=./keep . | " + " ".join(shlex.quote(x) for x in A.VPSH) + f" 'cd {VD}/{R} && tar xf -'")
+        vps_pipe(f"cd {d} && tar cf - --exclude=./keep . | " + " ".join(shlex.quote(x) for x in A.VPSH) + f" 'cd {VD}/{R} && tar xf -'")
         r = A.vps(f"cd {VD}/{R} && sha256sum -c --quiet SHA256SUMS && echo ALLOK", check=False)
         if "ALLOK" not in r.stdout: raise RuntimeError(f"VPS sha256sum -c failed for {R}")
         log(f"ARCHIVED {R}: box {len(files)} files sha256sum -c OK; VPS outputs+predictions {len(small)} files sha256sum -c OK -> {VD}/{R}; weights queued")
@@ -159,7 +168,7 @@ def main():
             if WQ:
                 R = WQ.pop(0); d = f"{OUT}/{R}"
                 try:
-                    A.sh(f"cd {d} && tar cf - keep SHA256SUMS.weights | " + " ".join(shlex.quote(x) for x in A.VPSH) + f" 'cd {VD}/{R} && tar xf -'", timeout=3600)
+                    vps_pipe(f"cd {d} && tar cf - keep SHA256SUMS.weights | " + " ".join(shlex.quote(x) for x in A.VPSH) + f" 'cd {VD}/{R} && tar xf -'", timeout=3600)
                     r = A.vps(f"cd {VD}/{R} && sha256sum -c --quiet SHA256SUMS.weights && echo ALLOK", check=False)
                     WDONE[R] = "ALLOK" in r.stdout
                 except Exception as e: WDONE[R] = False; log(f"weights push {R} failed:", repr(e)[:200])

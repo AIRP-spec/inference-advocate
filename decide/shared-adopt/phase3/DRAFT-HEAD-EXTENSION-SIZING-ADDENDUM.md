@@ -444,6 +444,15 @@ zero-tolerance; only the rounding tolerance is loosened. 5. Pack v10d accepted; 
   (offer removed; 60/60). Record: `headext/evidence/a32/pack-v10d-acceptance.json`.
 - *Other driver hardening.* The pipeline-start ssh is bounded (90 s) and the pipeline + volume mount are then checked
   directly (the hx-t4 start ssh hung).
+- *Pod one result (hx-t5, v7i5sv0mmap3xy, on-demand SECURE, podType RESERVED, EU-RO-1, volume jq8pseh4f0; 12:01:59–13:04:20
+  NPT, $0.925).* Seeds 60–64 all trained 1,128 steps (≈ 371 s each), `skips=0` on every logged step, no SKIPPED_NONFINITE;
+  each wrote VOL_OK (41 files) to the network volume and was archived to `headext-20261102/train-hx-t5/<seed>` with
+  sha256sum -c OK. At 13:00:34 NPT a box → VPS push hit "server not responding" (VPS transient), the driver took its failure
+  path, late-pulled seed 64 (OK) and terminated (3.8 min after the failure; pods [] GraphQL + REST). Weights of seeds 63–64
+  were then pushed from the box (box-verified, also on the volume) and verified on the VPS by 13:27 NPT; all five seeds
+  `SHA256SUMS` + `SHA256SUMS.weights` OK, pod-level `MANIFEST.sha256` 219 files `128168b3…`. Deviation: the pod was
+  terminated before seeds 63–64 weights were VPS-verified (they were on the volume and box). Record
+  `headext/evidence/a32/train-hx-t5.json`. Fix: box → VPS pipes (outputs and weights) retry 5 tries with backoff 30/60/120/240 s. The network-volume copy (`/vol/hx-t5/hx-s60…s64`, VOL_OK each) remains on volume jq8pseh4f0 (not deleted).
 
 **Gap-fills (no rule change; flagged for review).**
 - A `terse` register row carries `explicit_register` as a register qualifier, from the existing vocabulary.
