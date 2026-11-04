@@ -400,6 +400,16 @@ result: identical verdicts on all 1,833 validation rows is the equivalence that 
     existing heads are *bitwise* invariant to the appended heads' parameters within one build (same shapes), and match the
     17-head build to ≤ 1e-6 with the max diff printed (`CROSS_BUILD_MAXDIFF`). Training pack rebuilt (data shas unchanged);
     relaunched as `hx-t4`.
+  - *Third attempt (hx-t4, pod b4zbn52ouizjai, created 10:07:59 NPT)*: the pod ran `CROSS_BUILD_MAXDIFF 2.086e-07` (48 threads)
+    → ALL 6 PASS, bf16 mixed smoke PASS (eager finite), ENCODER_ATTN eager. The start-pipeline ssh hung during a slow pip
+    install, so the box driver was restarted with `--attach` (pipeline running, both watchdogs verified). Seed 60 trained to
+    completion (1,128 steps, 891 s, `skips=0` on all 88 logged steps; the pipeline's own SKIPPED_NONFINITE grep found
+    none). At 10:33:16 NPT the driver falsely failed it: its poll matched the `bash -x` echo `+ grep -q SKIPPED_NONFINITE …`
+    of that very check. The pod was gone by 10:38 NPT (box watchdog "pod gone"; not removed by the driver, cause not
+    established), before seed-60 outputs were pulled; only pipe.log and preprocess logs reached the VPS
+    (`train-hx-t4/logs`, sha256sum -c OK). pods [] (GraphQL + REST); $0.479; ledger `hx-t4` failure:True,
+    seeds_archived 0. **Fix**: the driver ignores `+`-prefixed xtrace lines in the skip check (`headext_pod_train.py`,
+    re-pinned). Not relaunched (parent: no further pod without instruction).
 
 **Gap-fills (no rule change; flagged for review).**
 - A `terse` register row carries `explicit_register` as a register qualifier, from the existing vocabulary.

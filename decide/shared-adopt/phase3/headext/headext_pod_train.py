@@ -186,7 +186,10 @@ def main():
                 R = f"hx-s{sd}"
                 if f"RUN_DONE_{R}" in st and R not in pulled: pull(R)
                 elif f"RUN_START {R}" in st and R not in pulled: res["seeds"][sd] = "running"
-            if "SKIPPED_NONFINITE" in st or "skip nonfinite" in st or "SKIPPED_MICROBATCH_STOP" in st:
+            # bash -x echoes the pipeline's own `+ grep -q SKIPPED_NONFINITE ...` check; that echo failed hx-t4 (t227u) with
+            # skips=0. Only non-xtrace lines count.
+            st_real = "\n".join(l for l in st.splitlines() if not l.startswith("+"))
+            if "SKIPPED_NONFINITE" in st_real or "skip nonfinite" in st_real or "SKIPPED_MICROBATCH_STOP" in st_real:
                 raise RuntimeError("skipped micro-batch (A30: must be 0)")
             if "PIPELINE_DONE" in st: break
             if "PIPE_EXIT" in st: raise RuntimeError("pipeline exited without PIPELINE_DONE")
