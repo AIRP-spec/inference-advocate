@@ -1,7 +1,8 @@
 """Head-extension CPU tests (no GPU, no data, no base weights; FakeEnc stub as tests/test_head_init.py).
   1. 25-head build: the first 17 head rows, the shared head layers and the encoder are identical to the 17-head build;
      the global RNG state after build is unchanged by the extension; the base sha recorded equals the 17-head sha.
-  2. Cross-attention only: the 17 existing heads' logits are identical with and without the 8 appended heads.
+  2. Cross-attention only: the 17 existing heads' logits are bitwise invariant to the 8 appended heads' parameters, and
+     match the 17-head build to <= 1e-6 (Q-shape kernel rounding can differ by hardware).
   3. New heads come from a Generator seeded with head_init_seed: same seed -> identical, other seed -> different.
   4. weighted_losses with all weights 1 equals the P3-3 unweighted losses; weight 0 removes that head's gradient.
   5. soft_mix_partial mixes only covered rows and only the base heads.
@@ -67,7 +68,18 @@ def test_existing_heads_forward_unchanged():
     ids = torch.tensor([[1, 2, 3, 4, 5, 6], [7, 8, 9, 10, 0, 0]]); att = torch.tensor([[1] * 6, [1] * 4 + [0, 0]])
     with torch.no_grad():
         a, b = m17(ids, att), m25(ids, att)
-    assert b.shape == (2, 25, SM.KMAX) and torch.allclose(a, b[:, :17], atol=0, rtol=0)
+    assert b.shape == (2, 25, SM.KMAX)
+    # Across builds Q differs (17 vs 25 query rows), so CPU kernels may round differently on other hardware: the hx-t3
+    # pod (t227u) failed the earlier atol=0 form here while the box passes bitwise. Cross-build: <= 1e-6, diff printed.
+    import platform
+    dmax = (a - b[:, :17]).abs().max().item()
+    print(f"CROSS_BUILD_MAXDIFF {dmax:.3e} threads={torch.get_num_threads()} cpu={platform.processor() or platform.machine()}")
+    assert dmax <= 1e-6, dmax
+    # Within one build (same shapes, same kernels): the 17 existing heads are bitwise invariant to the 8 appended heads.
+    with torch.no_grad():
+        m25.queries[17:].add_(1.0); m25.out_w[17:].mul_(-3.0); m25.out_b[17:].add_(5.0)
+        c = m25(ids, att)
+    assert torch.equal(c[:, :17], b[:, :17]) and not torch.equal(c[:, 17:], b[:, 17:])
 
 
 def test_new_heads_seeded_separately():

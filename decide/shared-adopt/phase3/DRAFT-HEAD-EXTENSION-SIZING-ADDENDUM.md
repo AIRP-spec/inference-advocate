@@ -392,6 +392,14 @@ result: identical verdicts on all 1,833 validation rows is the equivalence that 
     the driver failed 31 s later on an unretried RunPod status poll (transient SSL EOF, same class as the G4 licence recheck).
     Terminated 0.3 min after the failure; pods [] (GraphQL + REST); $0.012; ledger row `hx-t2` failure:True; no seed ran.
     Fix: the status poll retries (6 tries, 10 s), `headext_pod_train.py` re-pinned. Relaunched as `hx-t3`, same pack and seeds.
+  - *Second attempt (hx-t3, 10:00–10:04 NPT)*: the in-pod CPU test `test_existing_heads_forward_unchanged` failed its
+    `atol=0` cross-build comparison (17-head vs 25-head build; no training started). It passes bitwise on the box at 1–32
+    threads, and the test's FakeEnc stub never touches the attention switch, so eager is not the cause; the 17 vs 25 query
+    rows change kernel shapes and the pod CPU rounds differently. Archived logs (`train-hx-t3`), terminated 1.5 min after the
+    failure, pods [], $0.049, ledger `hx-t3` failure:True. **Gap-fill (flagged for review):** the test now asserts the 17
+    existing heads are *bitwise* invariant to the appended heads' parameters within one build (same shapes), and match the
+    17-head build to ≤ 1e-6 with the max diff printed (`CROSS_BUILD_MAXDIFF`). Training pack rebuilt (data shas unchanged);
+    relaunched as `hx-t4`.
 
 **Gap-fills (no rule change; flagged for review).**
 - A `terse` register row carries `explicit_register` as a register qualifier, from the existing vocabulary.
