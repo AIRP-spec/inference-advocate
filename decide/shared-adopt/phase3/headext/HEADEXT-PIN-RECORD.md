@@ -226,3 +226,6 @@ No new rule beyond the amendment. 56 files in `HEADEXT-PINS.json`.
   `headext_g4.py` (retag + offline A23 decision), `tests/test_g4.py`. Changed: `headext_slots.py` (phase g4),
   `build_data_v10.py` (row `ext_excluded`), `pack/common_shared.py` (row-level exclusion), kind-label table (+2 entries).
 - Dry run (box, no text read): retag 65/65 on set `fb5fa37f…`; `headext_pack.py local` V-d stance_refusal 66 → 1.
+- G4 result + pack v10d (t227u): `evidence/a31/g4-decision.json`, `pack-report-v10d.json`, `pack-v10d.SHA256SUMS`,
+  `pack-v10d.MANIFEST.sha256`, `build-d.sh`; data-v10 train `d249a1bad28e15177af0cb1756222b3b655ed8ed319ccbd2a996f97f9d6622f6`,
+  val `56b88b64b04f73a0bfb9b3318e54580892c2fb6256c92ea72c6c7879a9ca35e9`; set-t227 `b4c0f6cd…`.

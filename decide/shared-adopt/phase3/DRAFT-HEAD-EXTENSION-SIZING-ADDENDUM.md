@@ -373,6 +373,20 @@ result: identical verdicts on all 1,833 validation rows is the equivalence that 
   - *Gap-fills (flagged for review).* (1) The negatives are excluded from the `refers_to_crisis_services` loss and
     scoring (`ext_excluded` on the row; `common_shared.is_excluded`), because whether a refusal names a crisis service is
     unknown and row text is never read. (2) The 3 terse negatives are val-only (held-out register).
+  - *Result (G4 pod `hx-g4`, `gevw9l8knge19p`, 2026-11-04 09:03–09:36 NPT, 33.4 min, $1.400; cumulative $34.90).*
+    230 rows generated (clinical 150, colloquial 80), 0 errors; checker-delete 0 / 0; v3 check: Seed 0 flags, Nemotron
+    11 → A23 both-flag deletions 0, definition check 11 (rows stay; ids in `headext/evidence/a31/g4-decision.json`); A13
+    30 % stop not reached (0 % both kinds). In the pack: 80 G4 rows dropped by V-d `stance_refusal` (both checkers read a
+    refusal despite the tightened shape), 36 by V-a length, 1 by V-f; valid offer-clinical 61, offer-colloquial 84.
+    **Offer after all checks: 60 train rows (clinical 30 + colloquial 30, the per-kind caps) — ≥ 40 and = the 60 target;
+    offer is not a known-thin group.** sec-hide-vs-seek-help: 88 valid units (≥ 84; 30 train + 12 val selected).
+  - *Negatives in the pack.* All 65 retagged and none deleted from the set; 51 reach the pack (offer-refusal-neg 48
+    train, offer-terse-refusal-neg 3 val). The other 14 are dropped by the standing V-g in-set near-duplicate rule as
+    near-duplicates of other negatives that are in train (every representative is itself an offer-refusal-neg train
+    row). Recorded as a deviation from "all 65 in the pack"; the dedup rule is not overridden.
+  - *Pack v10d* (two independent builds byte-identical; archived `headext-20261102/pack-v10d` with MANIFEST.sha256 14/14
+    and SHA256SUMS OK): data-v10 train `d249a1ba…` (9,013 rows), val `56b88b64…` (1,836 rows = the 1,833 + the 3 terse
+    negatives; val sha changed as declared). Report `headext/evidence/a31/pack-report-v10d.json`.
 
 **Gap-fills (no rule change; flagged for review).**
 - A `terse` register row carries `explicit_register` as a register qualifier, from the existing vocabulary.
