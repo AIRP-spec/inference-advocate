@@ -15,7 +15,10 @@ import headext_pod_a25 as A  # shared helpers (sh, vps, gq, balance, ledger_spen
 HERE = os.path.dirname(os.path.abspath(__file__))
 GPU = "NVIDIA GeForce RTX 4090"
 IMAGE = "runpod/pytorch:2.4.0-py3.11-cuda12.4.1-devel-ubuntu22.04"
-CAP_USD, CAP_MIN = 6.0, 90.0          # t227u item 4: training pod one $6 cap
+CAP_USD, CAP_MIN = 6.0, 105.0         # t227u item 4 ($6 per pod); t228u item 3: watchdog 105 min
+DC = "EU-RO-1"            # t228u item 2: the only datacenter with SECURE RTX 4090 stock (2026-11-04); network volume lives here
+VOL_MOUNT = "/vol"
+CREATE_MUTATION = "podFindAndDeployOnDemand"   # t228u item 1: on-demand only, never interruptible / spot / bid
 STOP_LINE, CEILING = 45.0, 60.0       # t227u item 5: $45 = one-line note, continue; abort only past $60
 TRAIN_SHA = None; VAL_SHA = None
 CREATE_TRIES = 30       # one try a minute for up to 30 min (no pod, no bill while supply-constrained)
@@ -62,9 +65,28 @@ def rstatus(pid):
             log(f"status poll retry {i + 1}/5:", repr(e)[:120]); time.sleep(10)
 
 
+def assert_on_demand_request(mutation, inp):
+    """t228u item 1 (standing): refuse anything but an on-demand SECURE request."""
+    bad = [k for k in inp if "bid" in k.lower() or "interrupt" in k.lower() or "spot" in k.lower()]
+    if mutation != "podFindAndDeployOnDemand" or bad or inp.get("cloudType") != "SECURE":
+        raise SystemExit(f"ABORT: pod request is not on-demand SECURE (mutation={mutation} keys={bad} cloud={inp.get('cloudType')})")
+
+
+def assert_on_demand_pod(pid):
+    """After create: the pod record must not be interruptible. Returns the podType string for the log."""
+    p = A.gq('query { pod(input:{podId:"%s"}) { id podType machine { secureCloud } } }' % pid)["pod"] or {}
+    pt = str(p.get("podType")); sec = (p.get("machine") or {}).get("secureCloud")
+    if any(x in pt.upper() for x in ("INTERRUPT", "SPOT", "BID")) or sec is False:
+        raise RuntimeError(f"pod {pid} is not on-demand SECURE (podType={pt} secureCloud={sec})")
+    return pt, sec
+
+
 def main():
     ap = argparse.ArgumentParser()
     for x in ("--signed", "--pack", "--pack-sha", "--seeds", "--name", "--train-sha", "--val-sha"): ap.add_argument(x, required=True)
+    ap.add_argument("--volume-id", required=True, help="t228u item 2: RunPod network volume (in DC) mounted at /vol; each seed's "
+                    "artifacts + MANIFEST.sha256 are written there by the pipeline as the seed finishes")
+    ap.add_argument("--label", default="training pod", help="ledger description prefix")
     ap.add_argument("--attach", action="store_true", help="re-attach to the running pod in state.json (driver restart): "
                     "no create, no upload, no launch; verify both watchdogs, then monitor / archive / terminate")
     ap.add_argument("--local-pull-test", help="box test of the per-seed archive path on a finished local work dir; no pod")
@@ -81,11 +103,13 @@ def main():
         bal0, cum0 = precheck(a.signed, A.sha(a.pack) == a.pack_sha)
         pub = open(A.KEY + ".pub").read().strip()
         inp = {"cloudType": "SECURE", "gpuCount": 1, "volumeInGb": 0, "containerDiskInGb": 60, "minVcpuCount": 8, "minMemoryInGb": 30,
-               "gpuTypeId": GPU, "name": NAME, "imageName": IMAGE, "ports": "22/tcp", "startSsh": True, "env": [{"key": "PUBLIC_KEY", "value": pub}]}
+               "gpuTypeId": GPU, "name": NAME, "imageName": IMAGE, "ports": "22/tcp", "startSsh": True, "env": [{"key": "PUBLIC_KEY", "value": pub}],
+               "dataCenterId": DC, "networkVolumeId": a.volume_id, "volumeMountPath": VOL_MOUNT}
+        assert_on_demand_request(CREATE_MUTATION, inp)
         pod = None
         for k in range(CREATE_TRIES):  # SUPPLY_CONSTRAINT: nothing is created or billed; retry once a minute
             try:
-                pod = rp.gql("mutation($i: PodFindAndDeployOnDemandInput) { podFindAndDeployOnDemand(input: $i) { id name costPerHr machine { gpuTypeId } } }", {"i": inp})["podFindAndDeployOnDemand"]
+                pod = rp.gql("mutation($i: PodFindAndDeployOnDemandInput) { " + CREATE_MUTATION + "(input: $i) { id name costPerHr machine { gpuTypeId } } }", {"i": inp})[CREATE_MUTATION]
                 break
             except Exception as e:
                 log(f"create attempt {k + 1}/{CREATE_TRIES} failed:", repr(e)[:160])
@@ -97,6 +121,9 @@ def main():
         pid, rate = pod["id"], float(pod["costPerHr"]); t0 = time.time()
         cap_s = min(CAP_MIN * 60, CAP_USD / rate * 3600); deadline = t0 + cap_s
         log(f"POD CREATED {pid} gpu={pod['machine']['gpuTypeId']} rate=${rate}/h cap={cap_s/60:.1f}min (${CAP_USD}) seeds=[{a.seeds}]")
+        try: ptype = assert_on_demand_pod(pid); log(f"ON-DEMAND CHECK OK podType={ptype[0]} secureCloud={ptype[1]} dc={DC} volume={a.volume_id}")
+        except Exception as e:
+            log("ON-DEMAND CHECK FAILED:", repr(e)[:300]); rp.terminate(pid); log(f"TERMINATED {pid} (not on-demand)"); raise SystemExit("ABORT: not on-demand")
         json.dump({"pod": pid, "rate": rate, "t0": t0, "deadline": deadline, "bal0": bal0, "signed": a.signed}, open(f"{ROOT}/state.json", "w"))
         subprocess.Popen(["nohup", "python3", "/workspace/v3collect/watchdog.py", pid, str(deadline)],
                          stdout=open(f"{ROOT}/watchdog.log", "a"), stderr=subprocess.STDOUT, start_new_session=True)
@@ -173,18 +200,26 @@ def main():
             if "wd_running" not in wd or "has_runpodctl" not in wd: raise RuntimeError("in-pod watchdog not running")
             A.sh(f"cat {shlex.quote(a.pack)} | " + " ".join(shlex.quote(x) for x in S) + " 'mkdir -p /root/hx && tar xzf - -C /root/hx'")
             log("PACK UPLOADED", A.sh(S + ["cd /root/hx && sha256sum -c --quiet PACK.sha256 && echo PACK_OK; sha256sum PACK.sha256"]).stdout.replace("\n", " "))
-            A.sh(S + [f"cd /root/hx && setsid nohup sh -c 'SEEDS=\"{a.seeds}\" TRAIN_SHA={a.train_sha} VAL_SHA={a.val_sha} W=/root/hx bash pod_pipeline_hx.sh "
-                      f"> /root/hx/pipe.log 2>&1; echo PIPE_EXIT $? >> /root/hx/pipe.log' </dev/null >/dev/null 2>&1 &"])
+            # hx-t4: this ssh hung (pipeline ran); bounded now, then the pipeline is checked directly
+            try:
+                A.sh(S[:1] + ["-n"] + S[1:] + [f"cd /root/hx && mountpoint -q {VOL_MOUNT} && mkdir -p {VOL_MOUNT}/{NAME} && setsid nohup sh -c 'SEEDS=\"{a.seeds}\" TRAIN_SHA={a.train_sha} VAL_SHA={a.val_sha} VOL={VOL_MOUNT}/{NAME} W=/root/hx bash pod_pipeline_hx.sh "
+                          f"> /root/hx/pipe.log 2>&1; echo PIPE_EXIT $? >> /root/hx/pipe.log' </dev/null >/dev/null 2>&1 &"], timeout=90)
+            except subprocess.TimeoutExpired: log("start ssh timed out after 90 s; checking the pipeline directly")
+            time.sleep(5)
+            chk = A.sh(S + [f"pgrep -f pod_pipeline_hx.sh >/dev/null && echo pipe_running; mountpoint -q {VOL_MOUNT} && echo vol_mounted"], check=False).stdout
+            if "pipe_running" not in chk or "vol_mounted" not in chk: raise RuntimeError(f"pipeline/volume not up: {chk!r}")
             log("PIPELINE STARTED")
         seen = set()
         while True:
             time.sleep(30)
-            st = A.sh(S + ["grep -aE '^(RUN_START|RUN_DONE_|HEADINIT_OK|PIPELINE_DONE|PIPE_EXIT|PREPROCESS_DONE|ALL [0-9]+ PASS|ENCODER_ATTN|SMOKE_BF16_MIXED|\\[(train|val)\\])|STOP|FAIL|BAD|SKIPPED|skip nonfinite' /root/hx/pipe.log"], check=False).stdout
+            st = A.sh(S + ["grep -aE '^(RUN_START|RUN_DONE_|VOL_OK_|HEADINIT_OK|PIPELINE_DONE|PIPE_EXIT|PREPROCESS_DONE|ALL [0-9]+ PASS|ENCODER_ATTN|SMOKE_BF16_MIXED|\\[(train|val)\\])|STOP|FAIL|BAD|SKIPPED|skip nonfinite' /root/hx/pipe.log"], check=False).stdout
             for ln in st.splitlines():
                 if ln not in seen: seen.add(ln); log("POD:", ln[:300])
             for sd in seeds:
                 R = f"hx-s{sd}"
-                if f"RUN_DONE_{R}" in st and R not in pulled: pull(R)
+                if f"RUN_DONE_{R}" in st and R not in pulled:
+                    if f"VOL_OK_{R}" not in st: raise RuntimeError(f"{R} done without VOL_OK (network-volume write not verified)")
+                    pull(R)
                 elif f"RUN_START {R}" in st and R not in pulled: res["seeds"][sd] = "running"
             # bash -x echoes the pipeline's own `+ grep -q SKIPPED_NONFINITE ...` check; that echo failed hx-t4 (t227u) with
             # skips=0. Only non-xtrace lines count.
@@ -196,6 +231,10 @@ def main():
             if time.time() > deadline - CLOSE_S: raise RuntimeError("time cap reached before PIPELINE_DONE")
         missing = [s for s in seeds if f"hx-s{s}" not in pulled]
         if missing: raise RuntimeError(f"seeds not archived: {missing}")
+        # t228u: terminate only after every seed's weights are verified on the VPS (outputs/manifests already are)
+        while (WQ or len(WDONE) < len(pulled)) and time.time() < deadline - 90: time.sleep(10)
+        if not all(WDONE.get(f"hx-s{s}") for s in seeds): raise RuntimeError(f"weights not VPS-verified before cap: {WDONE}")
+        log("ALL SEEDS VPS-VERIFIED (outputs + weights):", sorted(WDONE))
     except Exception as e:
         t_fail = time.time()
         log("FAILURE:", repr(e)[:1500]); res["failure"] = repr(e)[:300]
@@ -234,7 +273,7 @@ def main():
             + (f" terminate_after_failure={(t1 - t_fail)/60:.1f}min" if t_fail else ""))
         row = "\t".join(str(x) for x in [NAME, pid, GPU, rate, time.strftime("%Y-%m-%dT%H:%M:%S%z", time.localtime(t0)),
             time.strftime("%Y-%m-%dT%H:%M:%S%z", time.localtime(t1)), f"{bal0:.3f}", f"{bal1:.3f}", f"{cost:.3f}",
-            f"headext training pod one (t227u, eager) seeds {a.seeds} data-v10 25 heads; seeds_archived:{len(pulled)} failure:{bool(res.get('failure'))}"])
+            f"headext {a.label} (t228u, eager, vol {a.volume_id}) seeds {a.seeds} data-v10 25 heads; seeds_archived:{len(pulled)} failure:{bool(res.get('failure'))}"])
         A.vps(f"echo {shlex.quote(row)} >> {A.LEDGER}")
         tot = A.SPENT_BEFORE_LEDGER + A.ledger_spent()
         out = {"pod": pid, "rate": rate, "cost": cost, "bal0": bal0, "bal1": bal1, "pod_list_after": allp, "rest_pods_after": rpods,

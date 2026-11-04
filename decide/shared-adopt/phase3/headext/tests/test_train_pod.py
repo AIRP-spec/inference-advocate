@@ -27,7 +27,7 @@ def test_validation_only_no_scoring():
 
 
 def test_caps_and_gpu():
-    assert 'CAP_USD, CAP_MIN = 6.0, 90.0' in DRV and 'GPU = "NVIDIA GeForce RTX 4090"' in DRV and '"SECURE"' in DRV
+    assert 'CAP_USD, CAP_MIN = 6.0, 105.0' in DRV and 'assert_on_demand_request(CREATE_MUTATION, inp)' in DRV and 'CREATE_MUTATION = "podFindAndDeployOnDemand"' in DRV and 'GPU = "NVIDIA GeForce RTX 4090"' in DRV and '"SECURE"' in DRV
     assert "STOP_LINE, CEILING = 45.0, 60.0" in DRV and "cum + CAP_USD > CEILING" in DRV and "skipped micro-batch" in DRV and "watchdog.py" in DRV and "wd.sh" in DRV
 
 

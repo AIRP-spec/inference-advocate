@@ -4,7 +4,7 @@
 # 25-head init sha is recorded and must be equal across seeds), soft-mix 0.5 on the 17 for rows the ens5 teacher covers
 # (data-v9 train rows), hard labels elsewhere and on the 8 new heads (--soft-partial --ext-heads 8). Artifact = within-run
 # average of ep 2.0-4.0. VALIDATION predictions only (raw logits; no scoring here). Stops at the first invalid output.
-# Env: TRAIN_SHA / VAL_SHA (pinned data-v10 shas, required), SEEDS (default "60 61 62 63 64"), W (work dir), SMOKE=1 (box CPU smoke: fake tiny base, few rows, no GPU).
+# Env: TRAIN_SHA / VAL_SHA (pinned data-v10 shas, required), VOL (t228u: network-volume dir; per-seed artifacts + MANIFEST written there), SEEDS (default "60 61 62 63 64"), W (work dir), SMOKE=1 (box CPU smoke: fake tiny base, few rows, no GPU).
 set -uxo pipefail
 export PYTHONUNBUFFERED=1 TORCHDYNAMO_DISABLE=1 TOKENIZERS_PARALLELISM=false
 # A30 (t227u): encoder attention = eager (sdpa NaNs under bf16 on rows padded far past their length); skipped micro-batches must be 0.
@@ -82,6 +82,15 @@ for SEED in $SEEDS; do
     rm -rf $CK
     find out/raw/$R out/raw-avg/$R out/avg-meta/*$R* logs/*$R* keep/$R-final.sha256 -type f 2>/dev/null | sort | xargs sha256sum > out/$R.sha256
     sha256sum -c --quiet out/$R.sha256 && touch out/raw-avg/$R/.done
+    # t228u item 2: as the seed finishes, write its artifacts + MANIFEST.sha256 to the network volume and verify there
+    if [ -n "${VOL:-}" ] && [ -f out/raw-avg/$R/.done ]; then
+      rm -rf "$VOL/$R"; mkdir -p "$VOL/$R"
+      tar cf - out/raw/$R out/raw-avg/$R out/avg-meta/$A.average-meta.json out/$R.sha256 keep/$R-final keep/$A keep/$R-final.sha256 logs/*$R* | tar xf - -C "$VOL/$R"
+      if (cd "$VOL/$R" && sha256sum -c --quiet out/$R.sha256 && cd keep && sha256sum -c --quiet $R-final.sha256) \
+         && (cd "$VOL/$R" && find . -type f ! -name MANIFEST.sha256 | sort | xargs sha256sum > MANIFEST.sha256 && sha256sum -c --quiet MANIFEST.sha256) && sync; then
+        echo "VOL_OK_$R $(wc -l < "$VOL/$R/MANIFEST.sha256") files $(sha256sum "$VOL/$R/MANIFEST.sha256" | cut -c1-64)"
+      else echo "VOL_WRITE_FAILED_$R"; exit 16; fi
+    fi
     echo "RUN_DONE_$R $(date -u +%FT%TZ)"
   fi
   [ -f out/raw-avg/$R/.done ] || { echo "RUN_FAILED_$R"; exit 15; }

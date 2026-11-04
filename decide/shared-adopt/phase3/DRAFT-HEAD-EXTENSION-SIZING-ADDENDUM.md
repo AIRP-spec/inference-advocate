@@ -411,6 +411,40 @@ result: identical verdicts on all 1,833 validation rows is the equivalence that 
     seeds_archived 0. **Fix**: the driver ignores `+`-prefixed xtrace lines in the skip check (`headext_pod_train.py`,
     re-pinned). Not relaunched (parent: no further pod without instruction).
 
+**A32 (t228u, 2026-11-04 11:48 NPT, Justin Flores; declared before the run).** Owner's words (pt228u): "1. Before any
+relaunch: identify why the pod vanished (pod type, RunPod event log). Interruptible: on-demand only from now, as a standing
+rule. On-demand: record as unexplained, proceed. 2. Each seed's artifact and manifest are written to the network volume as
+the seed finishes, not copied off at the end. 3. Option B: watchdog to 105 minutes; the $6 per-pod cap is unchanged. A cut
+seed goes to a third short pod. N=10, one pod at a time. 4. Test change approved, provided the NaN/inf check remains
+zero-tolerance; only the rounding tolerance is loosened. 5. Pack v10d accepted; offer removed from the thin-group list."
+- *hx-t4 vanishing (item 1): on-demand → unexplained.* Created with `podFindAndDeployOnDemand`, `cloudType: SECURE`, no
+  bid field; billed at the on-demand rate ($0.89/h; RunPod billing API: 1,624.83 s, $0.4052 incl. disk). Billing ends
+  04:50:05 UTC = **10:35:05 NPT**, 1 min 49 s after the driver's failure path sent `pkill` for the pipeline processes, and
+  before the driver's own terminate (which got POD_NOT_FOUND at 10:39 NPT); the deadline-only in-pod watchdog was due at
+  11:36 NPT. REST `/v1/pods/{id}` returns 404 and GraphQL `pod` returns null for deleted pods; the API exposes no event log
+  or machine events. Recorded as **unexplained**. Standing rule from now: **on-demand SECURE only**. The driver refuses any
+  request that is not `podFindAndDeployOnDemand` + `cloudType SECURE` + no bid/interruptible/spot field, and after create
+  reads the pod record and terminates it unless `podType` is not interruptible/spot/bid and `machine.secureCloud` is true.
+- *Per-seed network volume (item 2).* SECURE RTX 4090 stock is only in **EU-RO-1** (Low) as of 11:50 NPT; network volumes are
+  supported there. Volume `airp-hx-train` (`jq8pseh4f0`), **60 GB, EU-RO-1, $0.07/GB/mo standard = $4.20/mo ≈ $0.0058/h**
+  (billed hourly while it exists; not GPU spend, reported separately). Mounted at `/vol`; pods are created in EU-RO-1.
+  As each seed finishes, the pipeline copies that seed's outputs, predictions, logs and both weight dirs to
+  `/vol/<pod-name>/<seed>`, checks them there with the seed's own `sha256sum -c`, writes `MANIFEST.sha256`, re-checks it,
+  syncs, and prints `VOL_OK_<seed>`; a failed write stops the pipeline (`VOL_WRITE_FAILED`, exit 16). The driver refuses
+  to treat a seed as done without `VOL_OK`, then pulls it to the box and VPS (`headext-20261102/train-<pod>/<seed>`,
+  `sha256sum -c` on the VPS) while the next seed trains, and at the end terminates only after every seed's outputs and
+  weights are VPS-verified. The volume is not deleted by this run.
+- *Caps (item 3).* Watchdog **105 min** per pod (box and in-pod), $6 per-pod cap unchanged (105 min × $0.89/h ≈ $1.56,
+  so time binds). N = 10: pod one seeds 60–64, pod two 65–69, one pod at a time; a seed cut by the cap goes to a third short
+  pod. The $45 line is a one-line note; abort only past $60 cumulative.
+- *Test (item 4).* The hx-t3 cross-build tolerance change is approved; `test_existing_heads_forward_unchanged` keeps
+  **zero tolerance for NaN/inf** (explicit `torch.isfinite(...).all()` on both builds, checked: an injected NaN fails it),
+  bitwise within-build invariance, and ≤ 1e-6 only for cross-build rounding. Training's skipped-micro-batch rule stays 0.
+- *Pack (item 5).* Pack v10d accepted: train `d249a1ba…` (9,013), val `56b88b64…` (1,836). Thin-group list: **none**
+  (offer removed; 60/60). Record: `headext/evidence/a32/pack-v10d-acceptance.json`.
+- *Other driver hardening.* The pipeline-start ssh is bounded (90 s) and the pipeline + volume mount are then checked
+  directly (the hx-t4 start ssh hung).
+
 **Gap-fills (no rule change; flagged for review).**
 - A `terse` register row carries `explicit_register` as a register qualifier, from the existing vocabulary.
 - The pair template uses max_tokens 900; single rows use 400.

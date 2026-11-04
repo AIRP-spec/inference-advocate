@@ -72,6 +72,8 @@ def test_existing_heads_forward_unchanged():
     # Across builds Q differs (17 vs 25 query rows), so CPU kernels may round differently on other hardware: the hx-t3
     # pod (t227u) failed the earlier atol=0 form here while the box passes bitwise. Cross-build: <= 1e-6, diff printed.
     import platform
+    # t228u item 4: NaN/inf stay zero-tolerance; only the cross-build rounding tolerance is loosened.
+    assert torch.isfinite(a).all() and torch.isfinite(b).all(), "non-finite logits"
     dmax = (a - b[:, :17]).abs().max().item()
     print(f"CROSS_BUILD_MAXDIFF {dmax:.3e} threads={torch.get_num_threads()} cpu={platform.processor() or platform.machine()}")
     assert dmax <= 1e-6, dmax

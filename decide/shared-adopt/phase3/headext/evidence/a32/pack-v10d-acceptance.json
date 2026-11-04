@@ -1,0 +1,7 @@
+{"ruling": "t228u item 5 (2026-11-04 11:48 NPT, Justin Flores)", "pack": "v10d", "accepted": true,
+ "train_sha256": "d249a1bad28e15177af0cb1756222b3b655ed8ed319ccbd2a996f97f9d6622f6", "train_rows": 9013,
+ "val_sha256": "56b88b64b04f73a0bfb9b3318e54580892c2fb6256c92ea72c6c7879a9ca35e9", "val_rows": 1836,
+ "pack_report": "evidence/a31/pack-report-v10d.json",
+ "offer_train_after_checks": {"offer-clinical": 30, "offer-colloquial": 30, "total": 60, "target": 60},
+ "offer_refusal_negatives_in_pack": {"offer-refusal-neg_train": 48, "offer-terse-refusal-neg_val": 3, "of": 65},
+ "known_thin_groups": []}
