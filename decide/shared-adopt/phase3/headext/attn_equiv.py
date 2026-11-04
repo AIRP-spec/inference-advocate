@@ -27,7 +27,7 @@ from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
 sys.path.insert(0, str(HERE / "pack"))
-sys.path.insert(0, str(HERE.parent / "p32"))
+sys.path.append(str(HERE.parent / "p32"))  # after pack/: p32 has its own shared_model.py
 
 VAL_SHA = "bb522c9e28754459669ebb63076dddc0e2dca7190d4b5c5e2a9e929c32bd067a"
 TOL_REL = 1.6e-2

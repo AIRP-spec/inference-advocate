@@ -1,0 +1,161 @@
+{
+ "tolerance": "|x-ref| <= 0.016 * max(1,|ref|)",
+ "val_sha256": "bb522c9e28754459669ebb63076dddc0e2dca7190d4b5c5e2a9e929c32bd067a",
+ "composition_sha256": "59ddf1f630ec2dcd81d40dd01f2adb53f1310fe42128d3ccc9b90de61e28ab9e",
+ "modes": {
+  "fp32-b1-sdpa": {
+   "mode": "fp32-b1-sdpa",
+   "n": 1833,
+   "attn": "sdpa",
+   "dtype": "fp32",
+   "batch": 1,
+   "rows_padded_over_128": 0,
+   "sec": 166.9,
+   "torch": "2.4.1+cpu",
+   "threads": 8,
+   "ckpt_model_sha256": "8842029b3a8f9d93afbca078fdcd5717293477c1fce81b82bb5abc396e8bf717"
+  },
+  "fp32-b1-eager": {
+   "mode": "fp32-b1-eager",
+   "n": 1833,
+   "attn": "eager",
+   "dtype": "fp32",
+   "batch": 1,
+   "rows_padded_over_128": 0,
+   "sec": 174.9,
+   "torch": "2.4.1+cpu",
+   "threads": 8,
+   "ckpt_model_sha256": "8842029b3a8f9d93afbca078fdcd5717293477c1fce81b82bb5abc396e8bf717"
+  },
+  "bf16-b1-sdpa": {
+   "mode": "bf16-b1-sdpa",
+   "n": 1833,
+   "attn": "sdpa",
+   "dtype": "bf16",
+   "batch": 1,
+   "rows_padded_over_128": 0,
+   "sec": 166.9,
+   "torch": "2.4.1+cpu",
+   "threads": 8,
+   "ckpt_model_sha256": "8842029b3a8f9d93afbca078fdcd5717293477c1fce81b82bb5abc396e8bf717"
+  },
+  "bf16-b1-eager": {
+   "mode": "bf16-b1-eager",
+   "n": 1833,
+   "attn": "eager",
+   "dtype": "bf16",
+   "batch": 1,
+   "rows_padded_over_128": 0,
+   "sec": 412.5,
+   "torch": "2.4.1+cpu",
+   "threads": 8,
+   "ckpt_model_sha256": "8842029b3a8f9d93afbca078fdcd5717293477c1fce81b82bb5abc396e8bf717"
+  },
+  "bf16-b16-sdpa": {
+   "mode": "bf16-b16-sdpa",
+   "n": 1833,
+   "attn": "sdpa",
+   "dtype": "bf16",
+   "batch": 16,
+   "rows_padded_over_128": 609,
+   "sec": 77.1,
+   "torch": "2.4.1+cpu",
+   "threads": 8,
+   "ckpt_model_sha256": "8842029b3a8f9d93afbca078fdcd5717293477c1fce81b82bb5abc396e8bf717"
+  },
+  "bf16-b16-eager": {
+   "mode": "bf16-b16-eager",
+   "n": 1833,
+   "attn": "eager",
+   "dtype": "bf16",
+   "batch": 16,
+   "rows_padded_over_128": 609,
+   "sec": 126.5,
+   "torch": "2.4.1+cpu",
+   "threads": 8,
+   "ckpt_model_sha256": "8842029b3a8f9d93afbca078fdcd5717293477c1fce81b82bb5abc396e8bf717"
+  }
+ },
+ "gate": [
+  {
+   "ref": "fp32-b1-sdpa",
+   "other": "fp32-b1-eager",
+   "rows": 1833,
+   "rows_nonfinite": 0,
+   "nonfinite_ids": [],
+   "composed_verdict_differing_rows": 0,
+   "composed_verdict_differing_ids": [],
+   "primitive_decision_differing_rows": 0,
+   "logits_compared": 67821,
+   "max_abs_diff": 1.3230230808258057,
+   "mean_abs_diff": 0.00022646173271370542,
+   "logits_over_tol": 27,
+   "max_diff_over_tol": 82.68894255161285,
+   "pass": false
+  },
+  {
+   "ref": "bf16-b1-sdpa",
+   "other": "bf16-b1-eager",
+   "rows": 1833,
+   "rows_nonfinite": 0,
+   "nonfinite_ids": [],
+   "composed_verdict_differing_rows": 7,
+   "composed_verdict_differing_ids": [
+    "tr-positive-composed-difficulty-speaker-0019",
+    "tr-positive-composed-hate-eliminationist-0004",
+    "tr-positive-composed-hate-eliminationist-0005",
+    "tr-positive-composed-hate-eliminationist-0014",
+    "tr-positive-composed-hate-eliminationist-0018",
+    "hx-pe-probe-vs-task-120-a",
+    "hx-pe-probe-vs-task-132-a"
+   ],
+   "primitive_decision_differing_rows": 26,
+   "logits_compared": 67821,
+   "max_abs_diff": 9.2109375,
+   "mean_abs_diff": 0.05379648315908458,
+   "logits_over_tol": 7600,
+   "max_diff_over_tol": 439.697265625,
+   "pass": false
+  }
+ ],
+ "report": [
+  {
+   "ref": "bf16-b1-eager",
+   "other": "bf16-b16-eager",
+   "rows": 1833,
+   "rows_nonfinite": 0,
+   "nonfinite_ids": [],
+   "composed_verdict_differing_rows": 2,
+   "composed_verdict_differing_ids": [
+    "hx-pe-probe-vs-task-120-a",
+    "hx-pe-probe-vs-task-132-a"
+   ],
+   "primitive_decision_differing_rows": 16,
+   "logits_compared": 67821,
+   "max_abs_diff": 9.2734375,
+   "mean_abs_diff": 0.04553458379916276,
+   "logits_over_tol": 6324,
+   "max_diff_over_tol": 579.58984375
+  },
+  {
+   "ref": "fp32-b1-sdpa",
+   "other": "bf16-b16-eager",
+   "rows": 1833,
+   "rows_nonfinite": 0,
+   "nonfinite_ids": [],
+   "composed_verdict_differing_rows": 1,
+   "composed_verdict_differing_ids": [
+    "tr-positive-composed-hate-eliminationist-0004"
+   ],
+   "primitive_decision_differing_rows": 11,
+   "logits_compared": 67821,
+   "max_abs_diff": 2.2178492546081543,
+   "mean_abs_diff": 0.030575282749588446,
+   "logits_over_tol": 3591,
+   "max_diff_over_tol": 112.79319785535336
+  }
+ ],
+ "bf16_b16_eager_nonfinite_rows": 0,
+ "bf16_b16_sdpa_nonfinite_rows_reproduction": 774,
+ "pass": false
+}

@@ -9,7 +9,7 @@ HERE = Path(__file__).resolve().parent
 P33 = Path("/workspace/p33run/pack")
 TEACHER_SHA = "e112a24aa217b143acf84bd94fb39e3ae8fbabeed2615ba84f60f4ceb73bac0c"
 CODE = ["train_shared.py", "shared_model.py", "preprocess_shared.py", "infer_raw_shared.py", "common_shared.py",
-        "pod_pipeline_hx.sh", "tests/test_head_ext.py", "tests/test_head_init.py",
+        "pod_pipeline_hx.sh", "smoke_bf16_mixed.py", "tests/test_head_ext.py", "tests/test_head_init.py",
         "data-v10/laya-questions-v10.json", "data-v10/excluded-kinds.json"]
 
 

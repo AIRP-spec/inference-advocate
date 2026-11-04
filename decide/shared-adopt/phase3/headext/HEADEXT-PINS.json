@@ -1,10 +1,10 @@
 {
- "record": "head-extension pin record (sizing addendum signed t217u 08:41 NPT, A1-A12; amendment t218u 12:42 NPT, A13-A16; G2 re-pin; amendment t219u 2026-11-03 09:01 NPT, A17-A20 re-pin); amendment t220u 2026-11-03 10:06 NPT, A21-A24 re-pin (slot spec v10-3, G3 writer Mistral-Small-3.2); record t221 2026-11-03 (second review pass, data-v10 pack driver); amendment t221u 2026-11-03 11:12 NPT, A25-A29 re-pin (offer rule: guide 79e29da9, checker prompt v3, A25 pod; A26 record; A28 pair_id); t221u post-A25 re-pin (A25 results, data-v10 train 4f6fa207/val bb522c9e, training pod one code)",
+ "record": "head-extension pin record (sizing addendum signed t217u 08:41 NPT, A1-A12; amendment t218u 12:42 NPT, A13-A16; G2 re-pin; amendment t219u 2026-11-03 09:01 NPT, A17-A20 re-pin); amendment t220u 2026-11-03 10:06 NPT, A21-A24 re-pin (slot spec v10-3, G3 writer Mistral-Small-3.2); record t221 2026-11-03 (second review pass, data-v10 pack driver); amendment t221u 2026-11-03 11:12 NPT, A25-A29 re-pin (offer rule: guide 79e29da9, checker prompt v3, A25 pod; A26 record; A28 pair_id); t221u post-A25 re-pin (A25 results, data-v10 train 4f6fa207/val bb522c9e, training pod one code); t226u/t227u A30 re-pin (eager attention, smoke pre-pod check, training cap $6, 65 offer refusals kept as negatives)",
  "files": {
   "../../../../tools/evaluator-training/primitives/kind-label-table.json": "b266a46891c571de8b95c7b2813697b712a1523064b03568f3f5ada85efb8b90",
   "../../../../tools/evaluator-training/primitives/vocabulary.json": "329171161e510d604fbaa05db53f42fe05a4b075a298684ef5c394b1c2a0342b",
   "../DRAFT-HEAD-EXTENSION-DECLARATION.md": "8f136b2654955d365f273cc211e219bee35df32536e15e4d02d8b1e910f1382b",
-  "../DRAFT-HEAD-EXTENSION-SIZING-ADDENDUM.md": "70e748585cd2413fcca68a0f4148e13248036c4bd146eece35036c1645f459c1",
+  "../DRAFT-HEAD-EXTENSION-SIZING-ADDENDUM.md": "50987382066081b355853932747cb84ccfd2993cb84ebb0fb7698ca5ddf0a05f",
   "append_kind_table.py": "613744f060bc2e4afea481be6ff113d38ae8507ac190afaf8aa3a80a88bd6013",
   "build_data_v10.py": "3b57ed77701c0430e9fb72bdfcf0e1d01c7781c866c3029f2d7c12790fbc90ae",
   "evidence/crisis-services/ORIGINALS.sha256": "8892bcdf6166a680e3899a0ceeed931fbdfdf54186348b0bb355ce897e35c3f3",
@@ -35,10 +35,10 @@
   "pack/data-v10/laya-questions-v10.json": "b659d7449b30f689b0b76bab4b87d8cbc5dcabbef11c47ccd42d96d75148612f",
   "pack/infer_raw_shared.py": "2d3c2030f879ca26f7f1481377b49eb827108a41f738414e74bf9a763b81deef",
   "pack/preprocess_shared.py": "c59b2feb21eeae3cb96e5cce4ff7a7767b988d3eccd0b751e4cef026c6e627dc",
-  "pack/shared_model.py": "c7841b9f0e188c10127ff666fe2b58581a60af0e00449ec1979d128ae43362f3",
+  "pack/shared_model.py": "c7d1ee0e87f8fead9a929e0b15538f75f9e414fe89706d82fa59e717a21ea702",
   "pack/tests/test_head_ext.py": "89bececc70468cadfd7041269596d0529a43cbdb9627e2291e7897f612bcb00f",
   "pack/tests/test_head_init.py": "28d504a23c65e3b576091f399f6f72eb321c04705351bbc6f9b43a4d101db1eb",
-  "pack/train_shared.py": "46ea534e366ac80940dfa95c9925f6402612d09ac21c61be7f3cdcca4a7ce882",
+  "pack/train_shared.py": "120d1690b8e22ac3e57cf024b2d0556c0c113f8c15e29be41c3e56d968f14edb",
   "review_sample.py": "282eabc2893c93af623190787912c81d6bc2acdfe26c1f65a9bf96b06bddd01a",
   "score_v2_pairs.py": "3ffc5bda68104ff90c01a61f50ca021c50bd5fcdb6455522991a072ca74c1683",
   "score_v3_guard.py": "e6b122cf7a27722f77d99b8f35ed197c99bd7eec718db72c723d00303610892e",
@@ -57,13 +57,16 @@
   "headext_a25.py": "1040adb587329795ad15b984dc6295a7f6e662eda231692f9c5baeffe34bdb1f",
   "headext_pod_a25.py": "d90fcbf00698d1b116178d4eed66be5930e35ccf6567b0db8dcd2d6636ee8922",
   "tests/test_a25.py": "b8bb021e9bf1ee38856dab31aa5c80f5cf4b4103cb2e772c136598edec5363f0",
-  "headext_pod_train.py": "eb5fa339157c78e498bc0698fc5cc8a1cdbd243d87ee678b90e63338cf59fefd",
-  "make_train_pack.py": "1f12087a9dd855c59ff1bdba318eb13c963447623f39fa58616e4a60fb608a34",
-  "pack/pod_pipeline_hx.sh": "567c1de703a51d9c2820d0713d4d74fd8cca2f9fed1b82d9e3eb46bbd4753e89",
-  "tests/test_train_pod.py": "ce5d19775f0f734819a65f233ddbe2f4e7f6b5a031beaa79af86f59bd031aa01",
+  "headext_pod_train.py": "b4d1ee760f3abe1c33bf9b578080275a93c56fd7f858ca0cf7f9de5028515ec9",
+  "make_train_pack.py": "d7c1f96460b1d9df02d18f78f229294ff73493d84fae71f8c9343a8494d85c84",
+  "pack/pod_pipeline_hx.sh": "c70fda9b178bd22fa436199a9ac9160b7e44024e812099f02289c3cf25318bdc",
+  "tests/test_train_pod.py": "ace9e5dbe0fa4a578888ae1cf26564f52068d7f2e6118fe0893990bccafe5134",
   "evidence/a25/a25-decision.json": "abd8ebb142ff5fd4b725dd7c4af8ce16404a0d9186f733cc3063e04857368d13",
   "evidence/a25/pack-report-v10c.json": "34b56330ff2adc2748856189020b876d8362958f1333c331e55b9921585fcd7a",
-  "evidence/a25/pack-v10c.SHA256SUMS": "32fff494737388b79480e91db0956bcbe1ac58b8991f4d8f6241497deb4cb719"
+  "evidence/a25/pack-v10c.SHA256SUMS": "32fff494737388b79480e91db0956bcbe1ac58b8991f4d8f6241497deb4cb719",
+  "pack/smoke_bf16_mixed.py": "4ccfa72649be65d0d4a0526c415095a4fcdb81dd28a049521e937da71938f58d",
+  "attn_equiv.py": "716200811ab25bf0e0377e9ff034472aaaef8c035210695dfeaa1645002bb58e",
+  "offer_refusal_negatives.py": "190bf440f83ae6acabaa32d5f51e2dbc07fa4b8072eb210392b0a889999da554"
  },
  "external": {
   "generator": {

@@ -203,3 +203,16 @@ No new rule beyond the amendment. 56 files in `HEADEXT-PINS.json`.
   tokens; 579 of the 1,535 new rows are over 128 (max 435), so most mixed batches carry long padding. Under fp32 there
   are no NaNs; with `eager` attention under bf16 there are none either. P3-3 (data-v9 only) had 0 skips. The CPU smoke
   missed it because it ran fp32 on the first 320 (data-v9) rows. No fix applied: it changes the pinned recipe/code path.
+
+## t226u / t227u A30 re-pin (2026-11-04; numerical-stability fix, eager attention; offer refusals kept)
+- A30 (t227u item 1): eager approved on the fp32 result. `pack/shared_model.py` (`AIRP_ATTN_IMPL`, default sdpa),
+  `pack/train_shared.py` (`--max-skipped`, `ENCODER_ATTN`, meta `attn_implementation` / `amp`),
+  `pack/pod_pipeline_hx.sh` (exports eager, `--max-skipped 0`, GPU smoke before the first seed exit 17, per-seed
+  `skipped_nonfinite == 0` and `attn_implementation == eager`), `pack/smoke_bf16_mixed.py` (standing pre-pod check; in
+  the pod pack's code list), `attn_equiv.py` (s50 equivalence; import-order fix so `p32/shared_model.py` cannot shadow
+  `pack/`). Evidence `evidence/a30/` (`compare.json`, smoke CPU json/log, run-output shas).
+- `headext_pod_train.py`: training pod one cap $6 / 90 min (t227u item 4); $45 = one-line note, abort only if
+  cumulative + cap > $60 (item 5); a skipped micro-batch in the pod log is a failure (archive, terminate).
+- t227u item 2: `offer_refusal_negatives.py` → `evidence/t226u/offer-refusals.json`: 65 offer rows flagged V-d
+  stance_refusal (clinical 36, colloquial 26, terse 3); both checkers' A25 labels compose (2a) to no class for all 65;
+  kept as negatives, 0 deleted.

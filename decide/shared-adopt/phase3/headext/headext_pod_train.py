@@ -15,8 +15,8 @@ import headext_pod_a25 as A  # shared helpers (sh, vps, gq, balance, ledger_spen
 HERE = os.path.dirname(os.path.abspath(__file__))
 GPU = "NVIDIA GeForce RTX 4090"
 IMAGE = "runpod/pytorch:2.4.0-py3.11-cuda12.4.1-devel-ubuntu22.04"
-CAP_USD, CAP_MIN = 3.0, 90.0
-STOP_LINE, CEILING = 45.0, 60.0
+CAP_USD, CAP_MIN = 6.0, 90.0          # t227u item 4: training pod one $6 cap
+STOP_LINE, CEILING = 45.0, 60.0       # t227u item 5: $45 = one-line note, continue; abort only past $60
 TRAIN_SHA = None; VAL_SHA = None
 CREATE_TRIES = 30       # one try a minute for up to 30 min (no pod, no bill while supply-constrained)
 CLOSE_S = 8 * 60          # stop the pipeline this long before the deadline to archive the last seed and terminate
@@ -43,7 +43,8 @@ def precheck(signed, pack_sha):
         f"cumulative=${cum:.2f} +cap ${CAP_USD} -> ${cum + CAP_USD:.2f} (stop line ${STOP_LINE}) signed_on_remote={anc} code_clean={clean} "
         f"pins_ok={all(files_ok.values())} pack_sha_ok={pack_sha}")
     if pods or rpods: raise SystemExit("ABORT: a pod is already running")
-    if cum + CAP_USD > STOP_LINE: raise SystemExit("ABORT: would pass the $45 stop line")
+    if cum + CAP_USD > CEILING: raise SystemExit("ABORT: would pass the $60 ceiling")
+    if cum + CAP_USD > STOP_LINE: log(f"NOTE ($45 line, t227u item 5): cumulative ${cum:.2f} + cap ${CAP_USD} may pass $45; pre-authorized through $60; continuing")
     if not anc or not clean: raise SystemExit("ABORT: signed commit not on remote or working tree differs")
     if not all(files_ok.values()): raise SystemExit(f"ABORT: pinned file sha mismatch {[f for f, v in files_ok.items() if not v]}")
     if box < 20 or vfree < 20: raise SystemExit("ABORT: disk headroom < 20 GB")
@@ -169,13 +170,15 @@ def main():
         seen = set()
         while True:
             time.sleep(30)
-            st = A.sh(S + ["grep -aE '^(RUN_START|RUN_DONE_|HEADINIT_OK|PIPELINE_DONE|PIPE_EXIT|PREPROCESS_DONE|ALL [0-9]+ PASS|\\[(train|val)\\])|STOP|FAIL|BAD' /root/hx/pipe.log"], check=False).stdout
+            st = A.sh(S + ["grep -aE '^(RUN_START|RUN_DONE_|HEADINIT_OK|PIPELINE_DONE|PIPE_EXIT|PREPROCESS_DONE|ALL [0-9]+ PASS|ENCODER_ATTN|SMOKE_BF16_MIXED|\\[(train|val)\\])|STOP|FAIL|BAD|SKIPPED|skip nonfinite' /root/hx/pipe.log"], check=False).stdout
             for ln in st.splitlines():
                 if ln not in seen: seen.add(ln); log("POD:", ln[:300])
             for sd in seeds:
                 R = f"hx-s{sd}"
                 if f"RUN_DONE_{R}" in st and R not in pulled: pull(R)
                 elif f"RUN_START {R}" in st and R not in pulled: res["seeds"][sd] = "running"
+            if "SKIPPED_NONFINITE" in st or "skip nonfinite" in st or "SKIPPED_MICROBATCH_STOP" in st:
+                raise RuntimeError("skipped micro-batch (A30: must be 0)")
             if "PIPELINE_DONE" in st: break
             if "PIPE_EXIT" in st: raise RuntimeError("pipeline exited without PIPELINE_DONE")
             if time.time() > deadline - CLOSE_S: raise RuntimeError("time cap reached before PIPELINE_DONE")
@@ -219,7 +222,7 @@ def main():
             + (f" terminate_after_failure={(t1 - t_fail)/60:.1f}min" if t_fail else ""))
         row = "\t".join(str(x) for x in [NAME, pid, GPU, rate, time.strftime("%Y-%m-%dT%H:%M:%S%z", time.localtime(t0)),
             time.strftime("%Y-%m-%dT%H:%M:%S%z", time.localtime(t1)), f"{bal0:.3f}", f"{bal1:.3f}", f"{cost:.3f}",
-            f"headext training pod one (t221u) seeds {a.seeds} data-v10 25 heads; seeds_archived:{len(pulled)} failure:{bool(res.get('failure'))}"])
+            f"headext training pod one (t227u, eager) seeds {a.seeds} data-v10 25 heads; seeds_archived:{len(pulled)} failure:{bool(res.get('failure'))}"])
         A.vps(f"echo {shlex.quote(row)} >> {A.LEDGER}")
         tot = A.SPENT_BEFORE_LEDGER + A.ledger_spent()
         out = {"pod": pid, "rate": rate, "cost": cost, "bal0": bal0, "bal1": bal1, "pod_list_after": allp, "rest_pods_after": rpods,

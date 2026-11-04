@@ -7,6 +7,8 @@
 # Env: TRAIN_SHA / VAL_SHA (pinned data-v10 shas, required), SEEDS (default "60 61 62 63 64"), W (work dir), SMOKE=1 (box CPU smoke: fake tiny base, few rows, no GPU).
 set -uxo pipefail
 export PYTHONUNBUFFERED=1 TORCHDYNAMO_DISABLE=1 TOKENIZERS_PARALLELISM=false
+# A30 (t227u): encoder attention = eager (sdpa NaNs under bf16 on rows padded far past their length); skipped micro-batches must be 0.
+export AIRP_ATTN_IMPL=eager
 export HF_HOME=${HF_HOME:-/root/hf-cache} HUGGING_FACE_HUB_TOKEN="${HF_TOKEN:-}"
 BASE_SHA=10a35c7911392632d212b188849fae39fd9fe583252eb07ba27873d0c17106c5
 SEEDS=${SEEDS:-"60 61 62 63 64"}; SMOKE=${SMOKE:-0}; W=${W:-/root/hx}; PY=${PY:-python3}
@@ -31,6 +33,12 @@ $PY tests/test_head_ext.py || { echo HEADEXT_TEST_FAIL; exit 10; }
 [ -f pre/train_items.pt ] || $PY preprocess_shared.py --data-dir data-v10 --out-dir pre $MODEL \
   --expect-train-sha $TRAIN_SHA --expect-val-sha $VAL_SHA 2>&1 | tee logs/preprocess.log
 [ -f pre/train_items.pt ] || { echo PREPROCESS_FAIL; exit 9; }
+if [ "$SMOKE" != 1 ] && [ ! -f logs/smoke-bf16-mixed.json ]; then  # A30 standing pre-train check on the pod GPU (eager must be finite)
+  MD=$($PY -c "import json;print(json.load(open('pre/preprocess-meta.json'))['model_dir'])")
+  $PY -u smoke_bf16_mixed.py --model-dir "$MD" --train data-v10/train.jsonl --device cuda --attn sdpa,eager --require-finite eager \
+    --out logs/smoke-bf16-mixed.json 2>&1 | tee logs/smoke-bf16-mixed.log
+  grep -q "SMOKE_BF16_MIXED PASS" logs/smoke-bf16-mixed.log || { rm -f logs/smoke-bf16-mixed.json; echo SMOKE_BF16_MIXED_FAIL_STOP; exit 17; }
+fi
 TEACHER=teacher/ens5-train-soft-v9.jsonl
 if [ "$SMOKE" = 1 ]; then  # teacher rows must be a subset of the (truncated) train rows
   $PY -c "
@@ -51,10 +59,12 @@ for SEED in $SEEDS; do
     echo "RUN_START $R $(date -u +%FT%TZ)"
     $PY -u train_shared.py --train-items pre/train_items.pt --preprocess-meta pre/preprocess-meta.json \
       --output-dir $CK --epochs 4 --eta-min 0 --head-init-seed 7 --batch-size 8 --grad-accum 4 --lr-encoder 2e-5 --lr-head 1e-4 \
-      --amp $AMP --sigma-start 0.25 --seed $SEED --soft-targets $TEACHER --soft-mix 0.5 --soft-partial --ext-heads 8 2>&1 | tee logs/train-$R.log
+      --amp $AMP --sigma-start 0.25 --seed $SEED --soft-targets $TEACHER --soft-mix 0.5 --soft-partial --ext-heads 8 --max-skipped 0 2>&1 | tee logs/train-$R.log
+    grep -q "SKIPPED_NONFINITE" logs/train-$R.log && { echo "SKIPPED_MICROBATCH_STOP_$R"; exit 18; }
+    grep -q "^ENCODER_ATTN eager" logs/train-$R.log || { echo "ATTN_NOT_EAGER_STOP_$R"; exit 18; }
     [ -f $CK/training-meta.json ] || { echo "RUN_FAILED_$R"; exit 11; }
     cp $CK/training-meta.json logs/training-meta-$R.json; cp $CK/loss_curve.jsonl logs/loss_curve-$R.jsonl
-    read HB H < <($PY -c "import json;m=json.load(open('$CK/training-meta.json'));assert m['head_init_seed']==7 and m['ext_heads']==8 and m['n_base_heads']==17;print(m['init_head_sha256_base'], m['init_head_sha256'])") || { echo "HEADINIT_META_BAD_$R"; exit 16; }
+    read HB H < <($PY -c "import json;m=json.load(open('$CK/training-meta.json'));assert m['head_init_seed']==7 and m['ext_heads']==8 and m['n_base_heads']==17 and m['skipped_nonfinite']==0 and m['attn_implementation']=='eager';print(m['init_head_sha256_base'], m['init_head_sha256'])") || { echo "HEADINIT_META_BAD_$R"; exit 16; }
     if [ "$SMOKE" != 1 ] && [ "$HB" != "$BASE_SHA" ]; then echo "HEADINIT_MISMATCH_STOP_$R $HB != $BASE_SHA"; exit 16; fi
     [ -z "$H25" ] && H25=$H
     [ "$H" = "$H25" ] || { echo "HEADINIT25_DIFFERS_STOP_$R $H != $H25"; exit 16; }

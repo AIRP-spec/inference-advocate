@@ -27,10 +27,17 @@ def test_validation_only_no_scoring():
 
 
 def test_caps_and_gpu():
-    assert 'CAP_USD, CAP_MIN = 3.0, 90.0' in DRV and 'GPU = "NVIDIA GeForce RTX 4090"' in DRV and '"SECURE"' in DRV
-    assert "STOP_LINE, CEILING = 45.0, 60.0" in DRV and "watchdog.py" in DRV and "wd.sh" in DRV
+    assert 'CAP_USD, CAP_MIN = 6.0, 90.0' in DRV and 'GPU = "NVIDIA GeForce RTX 4090"' in DRV and '"SECURE"' in DRV
+    assert "STOP_LINE, CEILING = 45.0, 60.0" in DRV and "cum + CAP_USD > CEILING" in DRV and "skipped micro-batch" in DRV and "watchdog.py" in DRV and "wd.sh" in DRV
+
+
+def test_a30_eager_smoke_and_skip_guard():
+    assert "export AIRP_ATTN_IMPL=eager" in PIPE and "--max-skipped 0" in PIPE
+    assert "smoke_bf16_mixed.py" in PIPE and "--require-finite eager" in PIPE and "exit 17" in PIPE
+    assert "SKIPPED_MICROBATCH_STOP" in PIPE and "m['skipped_nonfinite']==0" in PIPE and "ATTN_NOT_EAGER_STOP" in PIPE
+    assert PIPE.index("smoke_bf16_mixed.py") < PIPE.index("train_shared.py --train-items")
 
 
 if __name__ == "__main__":
-    fs = [test_recipe_flags, test_average_window_and_headinit, test_validation_only_no_scoring, test_caps_and_gpu]
+    fs = [test_recipe_flags, test_average_window_and_headinit, test_validation_only_no_scoring, test_caps_and_gpu, test_a30_eager_smoke_and_skip_guard]
     for f in fs: f(); print("PASS", f.__name__)

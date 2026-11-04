@@ -2,7 +2,7 @@
 
 > **Status: SIGNED by Justin Flores, owner message t217u, 2026-11-02 08:41 NPT, with twelve answers applied as the
 > amendments A1–A12 in §0; amended again by owner message t218u, 2026-11-02 12:42 NPT (A13–A16, §0) and t219u, 2026-11-03 09:01 NPT
-> (A17–A20, §0), t220u, 2026-11-03 10:06 NPT (A21–A24, §0) and t221u, 2026-11-03 11:12 NPT (A25–A29, §0). Filename kept
+> (A17–A20, §0), t220u, 2026-11-03 10:06 NPT (A21–A24, §0) t221u, 2026-11-03 11:12 NPT (A25–A29, §0) and t226u/t227u, 2026-11-04 07:55/08:47 NPT (A30–, §0). Filename kept
 > (references stay valid).** Where §0 and the draft text below differ, §0
 > governs; the draft text is kept for the record and each superseded passage carries an "(amended: A#)" pointer.
 > Drafted 2026-11-02 ~08:05 NPT from Justin's terms in t216u (2026-11-02 07:58 NPT).
@@ -319,6 +319,34 @@ the pack, verify byte-identical twice, then the checker pod, then training pod o
   `bb522c9e…` (1,833 rows); pack report `34b56330…`. Archived on the VPS (`headext-20261102/pack-v10c`,
   `sha256sum -c` OK). Flagged for review: the offer rule did not restore the offer rows; the shortfall to 60 is
   reported, not accepted.
+
+### Amendments t226u / t227u (2026-11-04 07:55 / 08:47 NPT; signed by Justin Flores; operative; A30–)
+Owner message t226u item 1: "Attention: eager. Before the pod, score s50 on the 1,833 validation rows under default and
+under eager without a GPU; confirm composed verdicts identical and logits within bf16 tolerance. [...] The mixed
+long/short bf16 smoke test is now a standing pre-pod check." Owner message t227u item 1: "eager approved on the fp32
+result: identical verdicts on all 1,833 validation rows is the equivalence that matters. [...] P3-3 remains the V1 baseline."
+- **A30 (numerical-stability fix: encoder attention = eager).** Training pod one (`hx-t1`, `8bkgtnl6qp8exg`, 2026-11-03)
+  failed on non-finite losses. Cause: ModernBERT `sdpa` attention under bf16 autocast returns NaN/inf on rows padded far
+  past their length (local window 128) in mixed long/short micro-batches; `eager` (fp32 softmax) stays finite. The
+  encoder's `config._attn_implementation` is now set by `AIRP_ATTN_IMPL` (`headext/pack/shared_model.py`; default
+  `sdpa`, so inference of existing checkpoints is unchanged); the training pipeline exports `eager`, passes
+  `--max-skipped 0` (the first skipped micro-batch stops the run) and checks `skipped_nonfinite == 0` and
+  `attn_implementation == eager` in every seed's training meta. The recipe is otherwise unchanged; P3-3 remains the V1
+  baseline.
+  - *Reproduction* (`headext/pack/smoke_bf16_mixed.py`, box CPU bf16, real base, 25 heads; batches of 8 = 1 short +
+    7 longest, 4 + 4, spread): sdpa non-finite in every batch (3, 4, 7 rows; loss and gradients non-finite); eager 0
+    non-finite rows, loss and gradients finite. On the s50 validation run at batch 16 (bf16, padded): sdpa 774 / 1,833
+    rows non-finite, eager 0.
+  - *Equivalence* (`headext/attn_equiv.py`, s50 `avg-p33-s50-ge2.0` model `8842029b…`, data-v10 val `bb522c9e…`,
+    composition 2a `59ddf1f6…`; tolerance declared before the run, |x−ref| ≤ 1.6e-2·max(1,|ref|); evidence
+    `headext/evidence/a30/compare.json`). **fp32, batch 1, sdpa vs eager: 0 / 1,833 composed verdicts differ, 0
+    primitive decisions differ, 0 non-finite** (mean |Δlogit| 2.3e-4). This is the equivalence that governs (t227u).
+    One row, `hx-offer-terse-002` (396 tokens), has 27 logits over the tolerance (max |Δ| 1.32) with an unchanged
+    verdict; cause not pursued. bf16 CPU, batch 1, sdpa vs eager: 7 composed verdicts differ (14–21-token rows, no
+    padding); against fp32, sdpa-bf16 differs on 5 and eager-bf16 on 3, eager-bf16 at batch 16 on 1. Recorded as CPU
+    bf16 noise below seed variance, not an attention difference.
+  - *Standing pre-pod check.* `smoke_bf16_mixed.py` runs on the box before every training pod and again on the pod GPU
+    before the first seed (pipeline exit 17 if eager is non-finite); it is in the training pack's code list and pinned.
 
 **Gap-fills (no rule change; flagged for review).**
 - A `terse` register row carries `explicit_register` as a register qualifier, from the existing vocabulary.
