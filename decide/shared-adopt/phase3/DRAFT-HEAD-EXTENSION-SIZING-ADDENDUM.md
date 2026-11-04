@@ -387,6 +387,11 @@ result: identical verdicts on all 1,833 validation rows is the equivalence that 
   - *Pack v10d* (two independent builds byte-identical; archived `headext-20261102/pack-v10d` with MANIFEST.sha256 14/14
     and SHA256SUMS OK): data-v10 train `d249a1ba…` (9,013 rows), val `56b88b64…` (1,836 rows = the 1,833 + the 3 terse
     negatives; val sha changed as declared). Report `headext/evidence/a31/pack-report-v10d.json`.
+  - *Training pod one, first attempt (hx-t2, 09:53–09:54 NPT)*: box smokes passed first (bf16 mixed long/short on CPU:
+    sdpa non-finite, eager finite on all 3 batches; SMOKE=1 pipeline with eager to PIPELINE_DONE). The pod was created, then
+    the driver failed 31 s later on an unretried RunPod status poll (transient SSL EOF, same class as the G4 licence recheck).
+    Terminated 0.3 min after the failure; pods [] (GraphQL + REST); $0.012; ledger row `hx-t2` failure:True; no seed ran.
+    Fix: the status poll retries (6 tries, 10 s), `headext_pod_train.py` re-pinned. Relaunched as `hx-t3`, same pack and seeds.
 
 **Gap-fills (no rule change; flagged for review).**
 - A `terse` register row carries `explicit_register` as a register qualifier, from the existing vocabulary.

@@ -53,6 +53,15 @@ def precheck(signed, pack_sha):
     return b["clientBalance"], cum
 
 
+def rstatus(pid):
+    """rp.status with retry: a transient SSL EOF on the status poll failed hx-t2 (t227u) 30 s after create."""
+    for i in range(6):
+        try: return rp.status(pid)
+        except Exception as e:
+            if i == 5: raise
+            log(f"status poll retry {i + 1}/5:", repr(e)[:120]); time.sleep(10)
+
+
 def main():
     ap = argparse.ArgumentParser()
     for x in ("--signed", "--pack", "--pack-sha", "--seeds", "--name", "--train-sha", "--val-sha"): ap.add_argument(x, required=True)
@@ -140,7 +149,7 @@ def main():
     try:
         ip = port = None
         for _ in range(90):
-            s = rp.status(pid)
+            s = rstatus(pid)
             for p in ((s or {}).get("runtime") or {}).get("ports") or []:
                 if p["privatePort"] == 22 and p["isIpPublic"]: ip, port = p["ip"], p["publicPort"]
             if ip: break

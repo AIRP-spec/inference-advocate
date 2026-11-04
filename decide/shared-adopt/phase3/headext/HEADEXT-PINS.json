@@ -1,10 +1,10 @@
 {
- "record": "head-extension pin record (sizing addendum signed t217u 08:41 NPT, A1-A12; amendment t218u 12:42 NPT, A13-A16; G2 re-pin; amendment t219u 2026-11-03 09:01 NPT, A17-A20 re-pin); amendment t220u 2026-11-03 10:06 NPT, A21-A24 re-pin (slot spec v10-3, G3 writer Mistral-Small-3.2); record t221 2026-11-03 (second review pass, data-v10 pack driver); amendment t221u 2026-11-03 11:12 NPT, A25-A29 re-pin (offer rule: guide 79e29da9, checker prompt v3, A25 pod; A26 record; A28 pair_id); t221u post-A25 re-pin (A25 results, data-v10 train 4f6fa207/val bb522c9e, training pod one code); t226u/t227u A30 re-pin (eager attention, smoke pre-pod check, training cap $6, 65 offer refusals kept as negatives); t227u A31: slot spec v10-4, G4 driver, negatives retag; t227u A31 result: G4 decision, pack v10d",
+ "record": "head-extension pin record (sizing addendum signed t217u 08:41 NPT, A1-A12; amendment t218u 12:42 NPT, A13-A16; G2 re-pin; amendment t219u 2026-11-03 09:01 NPT, A17-A20 re-pin); amendment t220u 2026-11-03 10:06 NPT, A21-A24 re-pin (slot spec v10-3, G3 writer Mistral-Small-3.2); record t221 2026-11-03 (second review pass, data-v10 pack driver); amendment t221u 2026-11-03 11:12 NPT, A25-A29 re-pin (offer rule: guide 79e29da9, checker prompt v3, A25 pod; A26 record; A28 pair_id); t221u post-A25 re-pin (A25 results, data-v10 train 4f6fa207/val bb522c9e, training pod one code); t226u/t227u A30 re-pin (eager attention, smoke pre-pod check, training cap $6, 65 offer refusals kept as negatives); t227u A31: slot spec v10-4, G4 driver, negatives retag; t227u A31 result: G4 decision, pack v10d; t227u hx-t2 status-poll retry",
  "files": {
   "../../../../tools/evaluator-training/primitives/kind-label-table.json": "7368ad17c018fd344fc5ed06ad9fc0e26c089575d63f7b2acb16a64dc43f7c08",
   "../../../../tools/evaluator-training/primitives/vocabulary.json": "329171161e510d604fbaa05db53f42fe05a4b075a298684ef5c394b1c2a0342b",
   "../DRAFT-HEAD-EXTENSION-DECLARATION.md": "8f136b2654955d365f273cc211e219bee35df32536e15e4d02d8b1e910f1382b",
-  "../DRAFT-HEAD-EXTENSION-SIZING-ADDENDUM.md": "1ec7da0e2e2ff2d46d80589de88df00ce3eaa32f9b7ea2040c3efac3a8d47854",
+  "../DRAFT-HEAD-EXTENSION-SIZING-ADDENDUM.md": "9746d3d0605519ccdaf948d45cc78688e579ef52680b61e0ddcb2e9b624bfb0d",
   "append_kind_table.py": "613744f060bc2e4afea481be6ff113d38ae8507ac190afaf8aa3a80a88bd6013",
   "build_data_v10.py": "a40d5a9fcaf46d8e5439cdfcdc71768e9d1444e5ea4d9226d154e86f47d1e08a",
   "evidence/crisis-services/ORIGINALS.sha256": "8892bcdf6166a680e3899a0ceeed931fbdfdf54186348b0bb355ce897e35c3f3",
@@ -57,7 +57,7 @@
   "headext_a25.py": "1040adb587329795ad15b984dc6295a7f6e662eda231692f9c5baeffe34bdb1f",
   "headext_pod_a25.py": "d90fcbf00698d1b116178d4eed66be5930e35ccf6567b0db8dcd2d6636ee8922",
   "tests/test_a25.py": "b8bb021e9bf1ee38856dab31aa5c80f5cf4b4103cb2e772c136598edec5363f0",
-  "headext_pod_train.py": "b4d1ee760f3abe1c33bf9b578080275a93c56fd7f858ca0cf7f9de5028515ec9",
+  "headext_pod_train.py": "d929587afb0d936be3968a1a9261e066e35a21dad65506cc5d6dd810014cf04b",
   "make_train_pack.py": "d7c1f96460b1d9df02d18f78f229294ff73493d84fae71f8c9343a8494d85c84",
   "pack/pod_pipeline_hx.sh": "c70fda9b178bd22fa436199a9ac9160b7e44024e812099f02289c3cf25318bdc",
   "tests/test_train_pod.py": "ace9e5dbe0fa4a578888ae1cf26564f52068d7f2e6118fe0893990bccafe5134",
