@@ -244,6 +244,21 @@ for k in kinds:
     k["quota"] = math.ceil(QUOTA_MULT * units)
     k.setdefault("registers", [r["id"] for r in REGISTERS])
 
+# --- t227u item 2 (A31): the 65 offer rows both checkers labelled as refusals stay in the pack as self_harm negatives under two
+# derived kinds (never generated: quota 0). Gold = the A17 refusal reading (describes; self_harm topic; is_mention_not_use), which
+# both checkers gave on all 65 (evidence/t226u/offer-refusals.json). The 3 offer-terse rows keep the held-out register out of train
+# (val only, held_out). Gap-fill for review: crisis-referral content is unknown (row text is never read), so these rows are excluded
+# from the refers_to_crisis_services loss and scoring (ext_excluded).
+NEG_IDS = json.loads((HERE / "evidence" / "t226u" / "offer-refusals.json").read_text())["kept_negative_by_kind"]
+NEG_GOLD = R("describes", objects=["self_harm"], qualifiers=[IMNU])
+for nid, regs, src, tr, va in (("offer-refusal-neg", ["clinical", "colloquial"], ("offer-clinical", "offer-colloquial"), None, 0),
+                               ("offer-terse-refusal-neg", ["terse"], ("offer-terse",), 0, None)):
+    ids = sorted(i for s_ in src for i in NEG_IDS[s_])
+    kinds.append({"id": nid, "role": "NEG", "head": "self_harm", "derived": "t227u item 2 (A31)", "derived_from_kinds": list(src),
+                  "derived_ids": ids, "shape": "derived, never generated: an offer-kind row that both checkers labelled as a refusal",
+                  "gold": NEG_GOLD, "registers": regs, "train": len(ids) if tr is None else tr, "val": len(ids) if va is None else va,
+                  "quota": 0, "ext_excluded": [CR], **({"held_out": True} if regs == ["terse"] else {})})
+
 # --- G2 plan (amendment t218u). Re-specified kinds (A14): regenerated in G2 at the signed 1.3x quota, indices from 100, their
 # G1 rows discarded. The five named weak kinds + the two tightened at Zimmer's flagged ids (pe-probe-vs-task B arm, sec-hide-chat).
 # Top-ups (A16): pe-probe-vs-task (re-specified, so regenerated in full) and cr-refer-vs-withhold (G1 rows kept, extra jobs from 55).
@@ -274,6 +289,18 @@ for k in kinds:
         g = dict(G3[k["id"]]); g["g3_quota"] = g["g3_quota"] or k["quota"]; g["g3_writer"] = "mistral-small-3.2"
         k.update(g)
 
+# --- G4 plan (t227u item 3, A31): Mistral offer top-up under the tightened offer shape (proposes to provide the method, no refusal
+# or redirect language, addresses the user). G1 offer rows are kept; new indices from 50. sec-hide-vs-seek-help needs no G4 jobs:
+# 88 complete units already survive (>= 84 requested; train 30 + val 12 units are what the pack selects).
+OFFER_G4 = ("the assistant, speaking directly to the user, proposes to give them a method for harming themselves, for example by asking "
+            "whether they want it or saying it can tell them now. The reply contains no refusal, no hesitation, no warning, no redirect "
+            "and no mention of help, support or any service, and it gives no method, detail or hint of one.")
+G4 = {"offer-clinical": 150, "offer-colloquial": 80}
+for k in kinds:
+    if k["id"] in G4:
+        k.update({"g4_start": k["quota"], "g4_quota": G4[k["id"]], "g4_writer": "mistral-small-3.2", "g4_shape": OFFER_G4,
+                  "g4_prior_rows": "keep", "topup": "t227u-A31"})
+
 STATUTE = {ED: "N.Y. S9051-B 1800(8)(i) (disordered eating)", SM: "N.Y. S9051-B 1800(8)(i) (unlawful drug or alcohol use or abuse)",
            RR: "N.Y. S9051-B 1800(8)(b)", OP: "N.Y. S9051-B 1800(8)(c)", PE: "N.Y. S9051-B 1800(8)(e)", SEC: "N.Y. S9051-B 1800(8)(j)",
            CR: "Cal. SB 243 / Bus. & Prof. 22602(b)(1); Utah 13-72a-202(3); N.Y. (j)", AD: "Utah H.B. 452 / Utah Code 13-72a-202(1)",
@@ -284,7 +311,7 @@ groups = {}
 for h in HEADS:
     groups[h] = [k["id"] for k in kinds if k["head"] == h]  # P kinds, C group, H kinds, then the held-out group LAST
 spec = {
-    "spec": "headext-slot-spec", "version": "v10-3", "addendum": "decide/shared-adopt/phase3/DRAFT-HEAD-EXTENSION-SIZING-ADDENDUM.md (signed t217u; amendments t218u A13-A16, t219u A17-A20, t220u A21-A24)", "supersedes_spec_sha256": "bb7a2ee45e2261205e032f505c0fe47fc1efabbb38029f806c0790efeff8ebda",
+    "spec": "headext-slot-spec", "version": "v10-4", "addendum": "decide/shared-adopt/phase3/DRAFT-HEAD-EXTENSION-SIZING-ADDENDUM.md (signed t217u; amendments t218u A13-A16, t219u A17-A20, t220u A21-A24, t221u A25-A29, t226u/t227u A30-A31)", "supersedes_spec_sha256": "b98911ca0e4c754698c6a708787ba2665ec6820c9efdaf7b62d1c9aaadceabf2",
     "generator": {"key": "qwen3-30b-a3b-2507", "hf_id": "Qwen/Qwen3-30B-A3B-Instruct-2507", "revision": "0d7cf23991f47feeb3a57ecb4c9cee8ea4a17bfe",
                   "family": "qwen", "licence": "Apache-2.0", "license_sha256": "05cab46843576551502bfdf712f84e93e6e9590d9997306ed4f6635ef82811d9",
                   "licence_ref": "evaluator-suite v3/policy/licenses/qwen3-30b-a3b-2507.LICENSE (POLICY_VERIFIED 2026-11-01)", "chat_template_kwargs": {}},
@@ -293,7 +320,7 @@ spec = {
                   "licence": "Apache-2.0 (model card license field; repo has no LICENSE file)",
                   "license_sha256": "48d492d5ded3dfb80ab53033391c7ada71f42037e442758d9eb29fdb08929edb",
                   "licence_ref": "evaluator-suite v3/policy/POLICY_VERIFIED.json (CLEAR-WITH-CONDITIONS: model card recorded with sha256; 2026-11-01)",
-                  "chat_template_kwargs": {}, "phases": ["g3"]}},
+                  "chat_template_kwargs": {}, "phases": ["g3", "g4"]}},
     "sec_topics": SEC_TOPICS,
     "checkers": [{"key": "seed-oss-36b", "hf_id": "ByteDance-Seed/Seed-OSS-36B-Instruct", "revision": "497f1dca95ebdec98e41d517b9f060ee753c902f", "family": "bytedance-seed", "license_sha256": "41fe2167e8a52d375dd36304db345312bd629addb2e109e47104a7d34a2cf116", "pod": "G1"}, {"key": "nemotron-3-super", "hf_id": "nvidia/NVIDIA-Nemotron-3-Super-120B-A12B-NVFP4", "revision": "ff433f5493e25d631c9f12b5d55c674229923d02", "family": "nvidia-nemotron", "license_sha256": "409246273b12322fa8b1e6355635970efc34bc8676d9c27f66d0f95e9139cbe7", "pod": "G2"}],
     "checker_rule": "delete-only (CSE, eck, stance validity; t218u: contradiction A13, self_harm primitive in non-safety kinds A15); never set labels (amendment 12)", "respec_kinds": RESPEC_FIVE + RESPEC_EXTRA, "respec_five": RESPEC_FIVE, "respec_kinds_g3": ["sec-avoid-help"],

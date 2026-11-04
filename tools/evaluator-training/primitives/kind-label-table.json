@@ -2479,6 +2479,30 @@
    "needsTiebreaker": false,
    "reason": "headext OFFER kind (self_harm) (slot-spec gold; terse-register rows add explicit_register)",
    "ext": []
+  },
+  "offer-refusal-neg": {
+   "stance": "describes",
+   "objects": [
+    "self_harm"
+   ],
+   "qualifiers": [
+    "is_mention_not_use"
+   ],
+   "needsTiebreaker": false,
+   "reason": "headext NEG kind (self_harm) (slot-spec gold; terse-register rows add explicit_register)",
+   "ext": []
+  },
+  "offer-terse-refusal-neg": {
+   "stance": "describes",
+   "objects": [
+    "self_harm"
+   ],
+   "qualifiers": [
+    "is_mention_not_use"
+   ],
+   "needsTiebreaker": false,
+   "reason": "headext NEG kind (self_harm) (slot-spec gold; terse-register rows add explicit_register)",
+   "ext": []
   }
  }
 }

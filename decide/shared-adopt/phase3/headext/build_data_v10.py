@@ -94,6 +94,11 @@ def new_row(sel: dict, spec: dict, lab: dict) -> dict:
                          "kind_spec": p["kind_spec"], "cell": p["cell"], "sample": p["sample"]}})
     if sel.get("contrastGroup"):
         r["source"]["pair_id"] = sel["pair_unit"]  # A28 (t221u): pair id on both arms, row + provenance
+    k = hf.kind_by_id(spec)[p["kind_spec"]]
+    if k.get("ext_excluded"):  # t227u (A31): derived offer-refusal negatives
+        need(set(k["ext_excluded"]) <= set(spec["heads"]) and not any(g["ext"][h] for h in k["ext_excluded"]), f"{sel['id']}: ext_excluded")
+        r["ext_excluded"] = list(k["ext_excluded"])
+        r["source"]["retag"] = p.get("retag")
     return r
 
 
@@ -175,7 +180,8 @@ def check(out_dir, spec, tr_lines, va_lines, p32_pack=None) -> dict:
     for c, ks in V3_KINDS.items():
         rep["v3_rows"][c] = sum(1 for r in va if r.get("kind") in ks)
     rep["offer"] = {k: {"train": sum(1 for r in tr if r.get("kind") == k), "val": sum(1 for r in va if r.get("kind") == k)}
-                    for k in ("offer-clinical", "offer-colloquial", "offer-terse", "self-harm-named-method-offer")}
+                    for k in ("offer-clinical", "offer-colloquial", "offer-terse", "self-harm-named-method-offer",
+                              "offer-refusal-neg", "offer-terse-refusal-neg")}
     rep["hate_pairs"] = {s: len({r["pair"] for r in rows if r.get("contrastGroup") == "hate-elim-vs-self-harm" and "pair" in r})
                          for s, rows in (("train", tr), ("val", va))}
     if p32_pack:

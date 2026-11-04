@@ -93,6 +93,8 @@ def job_indices(k: dict, phase: str) -> range:
         return range(k["g2_start"], k["g2_start"] + k["g2_quota"]) if k.get("g2_quota") else range(0)
     if phase == "g3":  # amendment t220u (A21/A24)
         return range(k["g3_start"], k["g3_start"] + k["g3_quota"]) if k.get("g3_quota") else range(0)
+    if phase == "g4":  # t227u (A31): offer top-up under the tightened g4_shape
+        return range(k["g4_start"], k["g4_start"] + k["g4_quota"]) if k.get("g4_quota") else range(0)
     raise Blocked(f"unknown phase {phase}")
 
 
@@ -106,13 +108,17 @@ def build_jobs(spec: dict, phase: str = "g1") -> list[dict]:
                          "pair": bool(k.get("pair")), "sample": i, "register": reg, "length": ln, "cell": f"{reg}/{ln}",
                          "seed": kind_seed(spec["split_salt"], k["id"], i), "assign": assignment(spec, k, i, phase),
                          "writer": writer_key(spec, k, phase)})
+            if phase == "g4" and k.get("g4_shape"):
+                jobs[-1].update({"phase": "g4", "shape": k["g4_shape"]})
     ids = [j["id"] for j in jobs]
     assert len(ids) == len(set(ids))
     return jobs
 
 
 def writer_key(spec: dict, kind: dict, phase: str) -> str:
-    return kind["g3_writer"] if phase == "g3" and kind.get("g3_writer") else spec["generator"]["key"]
+    if phase in ("g3", "g4") and kind.get(f"{phase}_writer"):
+        return kind[f"{phase}_writer"]
+    return spec["generator"]["key"]
 
 
 def writer_pins(spec: dict, key: str) -> dict:
@@ -146,7 +152,7 @@ def render_user(spec: dict, job: dict) -> str:
     if k.get("pair"):
         return spec["pair_template"].format(deciding=k["deciding"], arm_a=k["arms"][0]["shape"], arm_b=k["arms"][1]["shape"],
                                             register=reg, length=ln, extra=_extra_text(spec, job))
-    return spec["user_template"].format(shape=k["shape"], register=reg, length=ln, extra=_extra_text(spec, job))
+    return spec["user_template"].format(shape=job.get("shape") or k["shape"], register=reg, length=ln, extra=_extra_text(spec, job))
 
 
 def request_body(spec: dict, system_prompt: str, job: dict, served: str) -> dict:
@@ -214,6 +220,8 @@ def make_rows(spec: dict, job: dict, raw: dict, host: str, ts: str, spec_sha: st
             "slot_spec_sha256": spec_sha, "system_prompt_sha256": spec["system_prompt_sha256"],
             "temperature": spec["sampling"]["temperature"], "finish_reason": ch.get("finish_reason"), "reasoning_markers": markers,
             "host": host, "timestamp": ts}
+    if job.get("phase") == "g4":
+        base["phase"] = "g4"
     if k.get("pair"):
         pr = parse_pair(clean)
         out = []
@@ -308,9 +316,9 @@ def main(argv=None) -> int:
     for a in ("--base-url", "--served", "--out", "--host", "--expect-spec-sha"):
         g.add_argument(a, required=True)
     g.add_argument("--concurrency", type=int, default=64); g.add_argument("--max-wall-seconds", type=float, default=1500)
-    g.add_argument("--phase", choices=["g1", "g2", "g3"], default="g1")
+    g.add_argument("--phase", choices=["g1", "g2", "g3", "g4"], default="g1")
     it = sp.add_parser("items"); it.add_argument("--gen", required=True); it.add_argument("--out", required=True)
-    pl = sp.add_parser("plan"); pl.add_argument("--expect-spec-sha", required=True); pl.add_argument("--phase", choices=["g1", "g2", "g3"], default="g1")
+    pl = sp.add_parser("plan"); pl.add_argument("--expect-spec-sha", required=True); pl.add_argument("--phase", choices=["g1", "g2", "g3", "g4"], default="g1")
     a = ap.parse_args(argv)
     if a.cmd == "generate":
         st = generate(a.base_url, a.served, a.out, a.host, a.expect_spec_sha, a.concurrency, a.max_wall_seconds, phase=a.phase)

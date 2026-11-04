@@ -32,7 +32,7 @@ def test_g2_jobs_disjoint_and_counted():
     assert not ({j["id"] for j in g1} & {j["id"] for j in g2})
     assert {j["kind"] for j in g2} <= set(SPEC["respec_kinds"]) | {"cr-refer-vs-withhold"}
     with pytest.raises(hs.Blocked):
-        hs.build_jobs(SPEC, "g4")
+        hs.build_jobs(SPEC, "g9")
 
 
 def test_g1_jobs_unchanged_by_respec(tmp_path):

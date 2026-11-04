@@ -216,3 +216,13 @@ No new rule beyond the amendment. 56 files in `HEADEXT-PINS.json`.
 - t227u item 2: `offer_refusal_negatives.py` → `evidence/t226u/offer-refusals.json`: 65 offer rows flagged V-d
   stance_refusal (clinical 36, colloquial 26, terse 3); both checkers' A25 labels compose (2a) to no class for all 65;
   kept as negatives, 0 deleted.
+
+## t227u A31 re-pin (G4 offer top-up + offer-refusal negatives)
+- Slot spec v10-4 `adc23b27ec900c8cb3e78c0cb6e79d209bb379d1b4cfc9efd2efb42d5b03aab1` (supersedes v10-3 `b98911ca…`; diff
+  `evidence/a31/slot-spec-v10-3-to-v10-4.diff`): G4 jobs offer-clinical 50–199, offer-colloquial 50–129 under `g4_shape`;
+  derived kinds `offer-refusal-neg` (62, train) and `offer-terse-refusal-neg` (3, val, held out); writer phases g3+g4.
+  G1/G2/G3 job lists and prompts are identical to v10-3 (checked: 3,010 / 470 / 135 jobs).
+- New: `headext_pod_g4.py` (G4 pod driver from `headext_pod_g3.py`: cap $2.50, guide `79e29da9…`, v3 check, phase g4),
+  `headext_g4.py` (retag + offline A23 decision), `tests/test_g4.py`. Changed: `headext_slots.py` (phase g4),
+  `build_data_v10.py` (row `ext_excluded`), `pack/common_shared.py` (row-level exclusion), kind-label table (+2 entries).
+- Dry run (box, no text read): retag 65/65 on set `fb5fa37f…`; `headext_pack.py local` V-d stance_refusal 66 → 1.

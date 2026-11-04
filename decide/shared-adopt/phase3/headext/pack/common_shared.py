@@ -71,7 +71,10 @@ def load_excluded(path=None) -> dict:
 
 
 def is_excluded(qid: str, row: dict, excluded: dict) -> bool:
-    """Amendment 7: an existing row whose kind is listed for this new head is excluded from the head's loss and scoring."""
+    """Amendment 7: an existing row whose kind is listed for this new head is excluded from the head's loss and scoring.
+    t227u (A31): a new row may name heads in its own `ext_excluded` list (offer-refusal negatives: crisis content unknown)."""
+    if qid in (row.get("ext_excluded") or ()):
+        return True
     e = excluded.get(qid)
     if not e or "ext" in row:
         return False

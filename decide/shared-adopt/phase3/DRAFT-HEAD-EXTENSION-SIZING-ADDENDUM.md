@@ -2,7 +2,7 @@
 
 > **Status: SIGNED by Justin Flores, owner message t217u, 2026-11-02 08:41 NPT, with twelve answers applied as the
 > amendments A1–A12 in §0; amended again by owner message t218u, 2026-11-02 12:42 NPT (A13–A16, §0) and t219u, 2026-11-03 09:01 NPT
-> (A17–A20, §0), t220u, 2026-11-03 10:06 NPT (A21–A24, §0) t221u, 2026-11-03 11:12 NPT (A25–A29, §0) and t226u/t227u, 2026-11-04 07:55/08:47 NPT (A30–, §0). Filename kept
+> (A17–A20, §0), t220u, 2026-11-03 10:06 NPT (A21–A24, §0) t221u, 2026-11-03 11:12 NPT (A25–A29, §0) and t226u/t227u, 2026-11-04 07:55/08:47 NPT (A30–A31, §0). Filename kept
 > (references stay valid).** Where §0 and the draft text below differ, §0
 > governs; the draft text is kept for the record and each superseded passage carries an "(amended: A#)" pointer.
 > Drafted 2026-11-02 ~08:05 NPT from Justin's terms in t216u (2026-11-02 07:58 NPT).
@@ -347,6 +347,32 @@ result: identical verdicts on all 1,833 validation rows is the equivalence that 
     bf16 noise below seed variance, not an attention difference.
   - *Standing pre-pod check.* `smoke_bf16_mixed.py` runs on the box before every training pod and again on the pod GPU
     before the first seed (pipeline exit 17 if eager is non-finite); it is in the training pack's code list and pinned.
+- **A31 (offer top-up G4 and offer-refusal negatives; declared before the pod).** Owner message t227u items 2–3.
+  - *Negatives (item 2).* The 65 offer rows that both checkers labelled as refusals (clinical 36, colloquial 26, terse 3;
+    `headext/evidence/t226u/offer-refusals.json`) stay in the pack as `self_harm` negatives; none is deleted. They move to
+    two derived kinds (never generated, quota 0): `offer-refusal-neg` (62 clinical/colloquial rows, all train) and
+    `offer-terse-refusal-neg` (3 terse rows, val only, held out, so no terse-register row enters train). Gold is the A17
+    refusal reading both checkers gave on all 65: `describes`, objects `[self_harm]`, qualifiers `[is_mention_not_use]`
+    (+ `explicit_register` on terse), no new-head positive. Retag by `headext/headext_g4.py` (kind and
+    `provenance.kind_spec`; `provenance.retag` keeps the source kind). Kind-label-table entries added.
+  - *G4 top-up (item 3).* ONE pod `hx-g4` (`headext/headext_pod_g4.py`), RTX PRO 6000 SECURE, cap **$2.50 / 90 min**, box
+    watchdog + in-pod `wd.sh`, headroom check first (no pod running, disk, balance, cumulative + cap ≤ $60). Writer
+    Mistral-Small-3.2 @95a6d26c; slot spec v10-4 (`headext-slot-spec.json`, supersedes `b98911ca…`; diff in
+    `headext/evidence/a31/slot-spec-v10-3-to-v10-4.diff`) with the tightened offer shape for G4 jobs only (`g4_shape`:
+    the assistant addresses the user and proposes to give a method; no refusal, hesitation, warning, redirect or mention
+    of help or services; no method, detail or hint). Jobs: offer-clinical +150 (indices 50–199), offer-colloquial +80
+    (50–129); G1 offer rows kept. Seed-OSS-36B and Nemotron-3-Super label the new rows only (guide `79e29da9…`) and run the
+    v3 (A25) contradiction check on them only. Checker-delete in-pod (unviewed) before archive; then A23 offline (delete
+    only when BOTH checkers flag, one flag → definition check), the A13 30 % stop per kind, then V-a…V-g in the pack.
+  - *sec-hide-vs-seek-help (to 84).* No G4 jobs: 88 complete units already survive all filters (≥ 84); the pack selects
+    30 train + 12 val units, so more rows could not enter it. Recorded as a deviation from the literal instruction.
+  - *Offer threshold.* Counted after all checks as offer-clinical + offer-colloquial train rows in the rebuilt pack: ≥ 40
+    proceed; < 40 proceed and record `offer` as a known-thin group in the declaration. Target 60 is reported.
+  - *Validation.* New rows change which units the hash split sends to val (selection is round-robin by cell then lowest
+    index; split by `sha256(salt|group|unit)`), so the data-v10 val sha changes; the new sha is recorded with the pack.
+  - *Gap-fills (flagged for review).* (1) The negatives are excluded from the `refers_to_crisis_services` loss and
+    scoring (`ext_excluded` on the row; `common_shared.is_excluded`), because whether a refusal names a crisis service is
+    unknown and row text is never read. (2) The 3 terse negatives are val-only (held-out register).
 
 **Gap-fills (no rule change; flagged for review).**
 - A `terse` register row carries `explicit_register` as a register qualifier, from the existing vocabulary.

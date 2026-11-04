@@ -86,7 +86,8 @@ def test_select_split_and_held_out():
     valid = [r for r in rows if not (hf.va_reasons(r) + hf.ve_reasons(r, SPEC) + hf.vf_reasons(r, ALLOWED))]
     assert len(valid) == len(rows)
     sel = hf.select(valid, SPEC)
-    assert sel["shortfall"] == {}
+    derived = {k["id"] for k in SPEC["kinds"] if k.get("derived")}  # t227u A31: filled only by retag, never generated
+    assert {k: v for k, v in sel["shortfall"].items() if k not in derived} == {}
     kinds = {k["id"]: k for k in SPEC["kinds"]}
     tr_ids = {r["id"] for r in sel["train"]}; va_ids = {r["id"] for r in sel["val"]}
     assert not tr_ids & va_ids
@@ -94,6 +95,9 @@ def test_select_split_and_held_out():
         t = [r for r in sel["train"] if r["provenance"]["kind_spec"] == k["id"]]
         v = [r for r in sel["val"] if r["provenance"]["kind_spec"] == k["id"]]
         m = 2 if k.get("pair") else 1
+        if k["id"] in derived:
+            assert not t and not v
+            continue
         assert len(t) == m * (k.get("train_units", k.get("train"))) and len(v) == m * (k.get("val_units", k.get("val")))
         if k.get("pair"):
             assert len({r["pair_unit"] for r in t} & {r["pair_unit"] for r in v}) == 0

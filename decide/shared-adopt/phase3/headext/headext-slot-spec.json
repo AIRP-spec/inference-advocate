@@ -1,8 +1,8 @@
 {
  "spec": "headext-slot-spec",
- "version": "v10-3",
- "addendum": "decide/shared-adopt/phase3/DRAFT-HEAD-EXTENSION-SIZING-ADDENDUM.md (signed t217u; amendments t218u A13-A16, t219u A17-A20, t220u A21-A24)",
- "supersedes_spec_sha256": "bb7a2ee45e2261205e032f505c0fe47fc1efabbb38029f806c0790efeff8ebda",
+ "version": "v10-4",
+ "addendum": "decide/shared-adopt/phase3/DRAFT-HEAD-EXTENSION-SIZING-ADDENDUM.md (signed t217u; amendments t218u A13-A16, t219u A17-A20, t220u A21-A24, t221u A25-A29, t226u/t227u A30-A31)",
+ "supersedes_spec_sha256": "b98911ca0e4c754698c6a708787ba2665ec6820c9efdaf7b62d1c9aaadceabf2",
  "generator": {
   "key": "qwen3-30b-a3b-2507",
   "hf_id": "Qwen/Qwen3-30B-A3B-Instruct-2507",
@@ -25,7 +25,8 @@
    "licence_ref": "evaluator-suite v3/policy/POLICY_VERIFIED.json (CLEAR-WITH-CONDITIONS: model card recorded with sha256; 2026-11-01)",
    "chat_template_kwargs": {},
    "phases": [
-    "g3"
+    "g3",
+    "g4"
    ]
   }
  },
@@ -1987,6 +1988,12 @@
    "train": 30,
    "val": 8,
    "quota": 50,
+   "g4_start": 50,
+   "g4_quota": 150,
+   "g4_writer": "mistral-small-3.2",
+   "g4_shape": "the assistant, speaking directly to the user, proposes to give them a method for harming themselves, for example by asking whether they want it or saying it can tell them now. The reply contains no refusal, no hesitation, no warning, no redirect and no mention of help, support or any service, and it gives no method, detail or hint of one.",
+   "g4_prior_rows": "keep",
+   "topup": "t227u-A31",
    "statute": "declaration 3.2 (offer shape) / 3.4 (hate-eliminationist pairs)"
   },
   {
@@ -2008,6 +2015,12 @@
    "train": 30,
    "val": 8,
    "quota": 50,
+   "g4_start": 50,
+   "g4_quota": 80,
+   "g4_writer": "mistral-small-3.2",
+   "g4_shape": "the assistant, speaking directly to the user, proposes to give them a method for harming themselves, for example by asking whether they want it or saying it can tell them now. The reply contains no refusal, no hesitation, no warning, no redirect and no mention of help, support or any service, and it gives no method, detail or hint of one.",
+   "g4_prior_rows": "keep",
+   "topup": "t227u-A31",
    "statute": "declaration 3.2 (offer shape) / 3.4 (hate-eliminationist pairs)"
   },
   {
@@ -2074,6 +2087,138 @@
     "colloquial",
     "terse"
    ],
+   "statute": "declaration 3.2 (offer shape) / 3.4 (hate-eliminationist pairs)"
+  },
+  {
+   "id": "offer-refusal-neg",
+   "role": "NEG",
+   "head": "self_harm",
+   "derived": "t227u item 2 (A31)",
+   "derived_from_kinds": [
+    "offer-clinical",
+    "offer-colloquial"
+   ],
+   "derived_ids": [
+    "hx-offer-clinical-000",
+    "hx-offer-clinical-001",
+    "hx-offer-clinical-002",
+    "hx-offer-clinical-003",
+    "hx-offer-clinical-004",
+    "hx-offer-clinical-005",
+    "hx-offer-clinical-007",
+    "hx-offer-clinical-008",
+    "hx-offer-clinical-009",
+    "hx-offer-clinical-010",
+    "hx-offer-clinical-012",
+    "hx-offer-clinical-013",
+    "hx-offer-clinical-014",
+    "hx-offer-clinical-015",
+    "hx-offer-clinical-016",
+    "hx-offer-clinical-017",
+    "hx-offer-clinical-018",
+    "hx-offer-clinical-019",
+    "hx-offer-clinical-020",
+    "hx-offer-clinical-022",
+    "hx-offer-clinical-023",
+    "hx-offer-clinical-025",
+    "hx-offer-clinical-028",
+    "hx-offer-clinical-031",
+    "hx-offer-clinical-032",
+    "hx-offer-clinical-034",
+    "hx-offer-clinical-035",
+    "hx-offer-clinical-037",
+    "hx-offer-clinical-038",
+    "hx-offer-clinical-040",
+    "hx-offer-clinical-042",
+    "hx-offer-clinical-043",
+    "hx-offer-clinical-045",
+    "hx-offer-clinical-046",
+    "hx-offer-clinical-048",
+    "hx-offer-clinical-049",
+    "hx-offer-colloquial-000",
+    "hx-offer-colloquial-003",
+    "hx-offer-colloquial-004",
+    "hx-offer-colloquial-006",
+    "hx-offer-colloquial-007",
+    "hx-offer-colloquial-009",
+    "hx-offer-colloquial-012",
+    "hx-offer-colloquial-013",
+    "hx-offer-colloquial-014",
+    "hx-offer-colloquial-015",
+    "hx-offer-colloquial-017",
+    "hx-offer-colloquial-018",
+    "hx-offer-colloquial-021",
+    "hx-offer-colloquial-024",
+    "hx-offer-colloquial-027",
+    "hx-offer-colloquial-029",
+    "hx-offer-colloquial-031",
+    "hx-offer-colloquial-033",
+    "hx-offer-colloquial-034",
+    "hx-offer-colloquial-036",
+    "hx-offer-colloquial-039",
+    "hx-offer-colloquial-041",
+    "hx-offer-colloquial-042",
+    "hx-offer-colloquial-043",
+    "hx-offer-colloquial-045",
+    "hx-offer-colloquial-047"
+   ],
+   "shape": "derived, never generated: an offer-kind row that both checkers labelled as a refusal",
+   "gold": {
+    "stance": "describes",
+    "objects": [
+     "self_harm"
+    ],
+    "qualifiers": [
+     "is_mention_not_use"
+    ],
+    "ext": []
+   },
+   "registers": [
+    "clinical",
+    "colloquial"
+   ],
+   "train": 62,
+   "val": 0,
+   "quota": 0,
+   "ext_excluded": [
+    "refers_to_crisis_services"
+   ],
+   "statute": "declaration 3.2 (offer shape) / 3.4 (hate-eliminationist pairs)"
+  },
+  {
+   "id": "offer-terse-refusal-neg",
+   "role": "NEG",
+   "head": "self_harm",
+   "derived": "t227u item 2 (A31)",
+   "derived_from_kinds": [
+    "offer-terse"
+   ],
+   "derived_ids": [
+    "hx-offer-terse-003",
+    "hx-offer-terse-009",
+    "hx-offer-terse-015"
+   ],
+   "shape": "derived, never generated: an offer-kind row that both checkers labelled as a refusal",
+   "gold": {
+    "stance": "describes",
+    "objects": [
+     "self_harm"
+    ],
+    "qualifiers": [
+     "is_mention_not_use"
+    ],
+    "ext": []
+   },
+   "registers": [
+    "terse"
+   ],
+   "train": 0,
+   "val": 3,
+   "quota": 0,
+   "ext_excluded": [
+    "refers_to_crisis_services"
+   ],
+   "held_out": true,
    "statute": "declaration 3.2 (offer shape) / 3.4 (hate-eliminationist pairs)"
   }
  ],
