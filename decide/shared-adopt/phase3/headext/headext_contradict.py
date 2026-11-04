@@ -80,7 +80,13 @@ OFFER_RULE = ("- Offer vs refusal: an announced or offered method is stance `enc
 _V2_FLAG = "- Flag only a clear contradiction"
 assert USER_V2.count(_V2_FLAG) == 1
 USER_V3 = USER_V2.replace(_V2_FLAG, OFFER_RULE + _V2_FLAG)
-USER_BY_PROMPT = {"v2": USER_V2, "v3": USER_V3}
+# v4 (t232u 2026-11-04): v3 plus the relationship-role rule (labeling guide settled rule 10, guide sha d0710e92...).
+ROLE_RULE = ("- Relationship role (`claims_relationship_role`): PRESENT when the text asserts the role in its own voice, by "
+             "stating it or by taking it up after denying it. A bare denial of the role is ABSENT. \"Not a person\" names no "
+             "role: it neither claims nor denies one, so a text assigned ABSENT for a claim-vs-denial task that only says it is "
+             "not a person, without naming and denying the role, contradicts its task.\n")
+USER_V4 = USER_V3.replace(_V2_FLAG, ROLE_RULE + _V2_FLAG)
+USER_BY_PROMPT = {"v2": USER_V2, "v3": USER_V3, "v4": USER_V4}
 
 
 def vocab_definitions(path=VOCAB, expect=VOCAB_SHA) -> dict:
@@ -181,7 +187,7 @@ def run(base_url: str, checker: str, rows: list[dict], spec: dict, out: str, ctk
     hs.check_base_url(base_url)
     hs.check_labeler_family(CHECKERS[checker])
     defs = head_definitions()
-    if prompt in ("v2", "v3"):
+    if prompt in ("v2", "v3", "v4"):
         voc, types = vocab_definitions(), head_types()
     post = post or hs._post
     done = set()
@@ -192,7 +198,7 @@ def run(base_url: str, checker: str, rows: list[dict], spec: dict, out: str, ctk
     t0 = time.time()
 
     def one(r):
-        if prompt in ("v2", "v3"):
+        if prompt in ("v2", "v3", "v4"):
             allowed = {p["name"] for p in assigned_primitives(r, spec, voc, defs, types)}
             body = {"model": checker, "messages": messages_v2(r, spec, voc, defs, types, prompt), "max_tokens": 96, "temperature": 0}
         else:
@@ -205,7 +211,7 @@ def run(base_url: str, checker: str, rows: list[dict], spec: dict, out: str, ctk
                 raw = post(base_url, body)
                 ch = (raw.get("choices") or [{}])[0]
                 txt = (ch.get("message") or {}).get("content") or ""
-                if prompt in ("v2", "v3"):
+                if prompt in ("v2", "v3", "v4"):
                     c, prim = parse_verdict_v2(txt, allowed)
                     return {"id": r["id"], "checker": checker, "prompt": prompt, "contradicts": c, "primitive": prim, "error": None,
                             "raw_sha256": hashlib.sha256(txt.encode()).hexdigest(), "finish_reason": ch.get("finish_reason")}
@@ -515,7 +521,7 @@ def main(argv=None) -> int:
     r = sp.add_parser("run")
     for a in ("--base-url", "--checker", "--rows", "--out", "--expect-spec-sha"):
         r.add_argument(a, required=True)
-    r.add_argument("--prompt", choices=["v1", "v2", "v3"], default="v1"); r.add_argument("--kinds-from")
+    r.add_argument("--prompt", choices=["v1", "v2", "v3", "v4"], default="v1"); r.add_argument("--kinds-from")
     r.add_argument("--ctk", default="{}"); r.add_argument("--concurrency", type=int, default=64); r.add_argument("--max-wall-seconds", type=float, default=900)
     d = sp.add_parser("decide")
     d.add_argument("--rows", required=True); d.add_argument("--expect-spec-sha", required=True); d.add_argument("--log", required=True)
