@@ -1,5 +1,5 @@
 {
- "record": "head-extension pin record (sizing addendum signed t217u 08:41 NPT, A1-A12; amendment t218u 12:42 NPT, A13-A16; G2 re-pin; amendment t219u 2026-11-03 09:01 NPT, A17-A20 re-pin); amendment t220u 2026-11-03 10:06 NPT, A21-A24 re-pin (slot spec v10-3, G3 writer Mistral-Small-3.2); record t221 2026-11-03 (second review pass, data-v10 pack driver); amendment t221u 2026-11-03 11:12 NPT, A25-A29 re-pin (offer rule: guide 79e29da9, checker prompt v3, A25 pod; A26 record; A28 pair_id); t221u post-A25 re-pin (A25 results, data-v10 train 4f6fa207/val bb522c9e, training pod one code); t226u/t227u A30 re-pin (eager attention, smoke pre-pod check, training cap $6, 65 offer refusals kept as negatives); t227u A31: slot spec v10-4, G4 driver, negatives retag; t227u A31 result: G4 decision, pack v10d; t227u hx-t2 status-poll retry; t227u test_head_ext cross-build tolerance; t227u hx-t4 xtrace false-positive fix; t228u A32: on-demand guard, per-seed volume write, 105 min, finite check; t228u test_train_pod caps; t228u box smokes; t228u hx-t5 result + VPS retry; t228u hx-t5 result + VPS retry/backoff; pod two hx-t6 record; V0-V3 scoring of s60-s69 (CPU, stored preds; 0/10 pass: V1 CSE s63/s66, V2 claims_relationship_role pairs, V3 (c)); report wording; t231u no-pod diagnosis (a)(b)(c) + DRAFT redeclaration (unsigned); diag report time fix; t232u rerun: contradict v4 (D2), headext_pod_g5.py (audit + gen stages)",
+ "record": "head-extension pin record (sizing addendum signed t217u 08:41 NPT, A1-A12; amendment t218u 12:42 NPT, A13-A16; G2 re-pin; amendment t219u 2026-11-03 09:01 NPT, A17-A20 re-pin); amendment t220u 2026-11-03 10:06 NPT, A21-A24 re-pin (slot spec v10-3, G3 writer Mistral-Small-3.2); record t221 2026-11-03 (second review pass, data-v10 pack driver); amendment t221u 2026-11-03 11:12 NPT, A25-A29 re-pin (offer rule: guide 79e29da9, checker prompt v3, A25 pod; A26 record; A28 pair_id); t221u post-A25 re-pin (A25 results, data-v10 train 4f6fa207/val bb522c9e, training pod one code); t226u/t227u A30 re-pin (eager attention, smoke pre-pod check, training cap $6, 65 offer refusals kept as negatives); t227u A31: slot spec v10-4, G4 driver, negatives retag; t227u A31 result: G4 decision, pack v10d; t227u hx-t2 status-poll retry; t227u test_head_ext cross-build tolerance; t227u hx-t4 xtrace false-positive fix; t228u A32: on-demand guard, per-seed volume write, 105 min, finite check; t228u test_train_pod caps; t228u box smokes; t228u hx-t5 result + VPS retry; t228u hx-t5 result + VPS retry/backoff; pod two hx-t6 record; V0-V3 scoring of s60-s69 (CPU, stored preds; 0/10 pass: V1 CSE s63/s66, V2 claims_relationship_role pairs, V3 (c)); report wording; t231u no-pod diagnosis (a)(b)(c) + DRAFT redeclaration (unsigned); diag report time fix; t232u rerun: contradict v4 (D2), headext_pod_g5.py (audit + gen stages); G5 driver: attempt suffix, 8-min start wait, POD_NOT_FOUND; slots g5/re-arm support (no spec change yet)",
  "files": {
   "../../../../tools/evaluator-training/primitives/kind-label-table.json": "7368ad17c018fd344fc5ed06ad9fc0e26c089575d63f7b2acb16a64dc43f7c08",
   "../../../../tools/evaluator-training/primitives/vocabulary.json": "329171161e510d604fbaa05db53f42fe05a4b075a298684ef5c394b1c2a0342b",
@@ -28,7 +28,7 @@
   "headext_pod_g2.py": "7aebf0f3c1e1288b4a6f5ee10948ff4f4fb59aa2c349b965bef7f8f40e268b42",
   "headext_pod_g3.py": "83a0d5d69e7cdbc3d5c46b2c1c4773077eb059a789827ccb477ebd95e15e1909",
   "headext_scoring.py": "1a212a98d34798c88e2ab8f4265cf3e48b69924dd42371c31a8c5d5ce1c44601",
-  "headext_slots.py": "c6914e6eeb8bd401716540fe4cf0043150e52f60be0fcff673e878de27a1b066",
+  "headext_slots.py": "7f05079ef1fb1548ae7581a83dbccebb7f50e3edc1ee444218d2573b2ce7aeae",
   "make_slot_spec.py": "2f4714323fb04da68060d385860e81d30f7de4bde8b632c7cd1a68bc0f4c5752",
   "pack/common_shared.py": "0e2c8674f456e2f71e1b00d3dc40eef2a9a3979e6a169180a87022aeff19c6a2",
   "pack/data-v10/excluded-kinds.json": "48314280ab55fdbabd64958a08a463a76640a65f647f8d6824dadeb9424361f4",
@@ -89,7 +89,7 @@
   "diag/diag-bc.json": "a37d3a3cd8d2d9075fcad38006295c7fab7a3a1175d2cd3bb3494448c102b041",
   "../REPORT-HEAD-EXT-DIAG-t231u.md": "bdaa5d33d568e2dba0172374714b192fc334ba568df9b45994f5aafc36300c6f",
   "../DECLARATION-HEAD-EXTENSION-RERUN.md": "f8c7a8cc2ba7a5face4b08ac480c1a8e3817fd4526a706d54d63ff6aeafa72a5",
-  "headext_pod_g5.py": "cf507cd849d9053bd8c549966eb2339db8282501d3e17b8000138d5cd48109f1"
+  "headext_pod_g5.py": "3a845e26ec5ef4e65626240924a8262fe84a821f2f260c13f31dd04d90eae6d0"
  },
  "external": {
   "generator": {

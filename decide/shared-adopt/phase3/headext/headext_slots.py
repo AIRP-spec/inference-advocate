@@ -65,7 +65,8 @@ def kind_seed(salt: str, kind: str, i: int) -> int:
 
 
 def cells_for(spec: dict, kind: dict) -> list[tuple[str, str]]:
-    return [(r, l["id"]) for r in kind["registers"] for l in spec["lengths"]]
+    ok = kind.get("lengths")  # t232u (F4): a kind may restrict its length band (e.g. short only)
+    return [(r, l["id"]) for r in kind["registers"] for l in spec["lengths"] if not ok or l["id"] in ok]
 
 
 def assignment(spec: dict, kind: dict, i: int, phase: str = "g1") -> dict:
@@ -95,11 +96,33 @@ def job_indices(k: dict, phase: str) -> range:
         return range(k["g3_start"], k["g3_start"] + k["g3_quota"]) if k.get("g3_quota") else range(0)
     if phase == "g4":  # t227u (A31): offer top-up under the tightened g4_shape
         return range(k["g4_start"], k["g4_start"] + k["g4_quota"]) if k.get("g4_quota") else range(0)
+    if phase == "g5":  # t232u rerun (F3/F4): new kinds only
+        return range(k["g5_start"], k["g5_start"] + k["g5_quota"]) if k.get("g5_quota") else range(0)
     raise Blocked(f"unknown phase {phase}")
 
 
-def build_jobs(spec: dict, phase: str = "g1") -> list[dict]:
+REARM_CANDIDATES = 2
+
+
+def rearm_jobs(spec: dict, arm_a_rows: list[dict]) -> list[dict]:
+    """t232u (F1): regenerate only the B arm of an off-spec pair, given its A text. Two candidates per unit; the
+    pair_unit (and so the val/train side) is unchanged."""
     jobs = []
+    for r in arm_a_rows:
+        k = next(x for x in spec["kinds"] if x["id"] == r["kind_spec"])
+        if not (k.get("pair") and k.get("g5_b_shape")):
+            raise Blocked(f"kind {k['id']} has no g5_b_shape for re-arm")
+        for c in range(REARM_CANDIDATES):
+            jobs.append({"id": f"{r['pair_unit']}-r{c}", "kind": k["id"], "head": k["head"], "role": k["role"], "pair": False,
+                         "rearm": True, "pair_unit": r["pair_unit"], "candidate": c, "arm_a_text": r["content"],
+                         "sample": r["sample"], "register": r["register"], "length": r["length"], "cell": f"{r['register']}/{r['length']}",
+                         "seed": kind_seed(spec["split_salt"], k["id"] + "|rearm", r["sample"] * REARM_CANDIDATES + c),
+                         "assign": r.get("assign") or {}, "writer": spec["generator"]["key"], "phase": "g5"})
+    return jobs
+
+
+def build_jobs(spec: dict, phase: str = "g1", arm_a_rows: list[dict] | None = None) -> list[dict]:
+    jobs = rearm_jobs(spec, arm_a_rows) if (phase == "g5" and arm_a_rows) else []
     for k in spec["kinds"]:
         cells = cells_for(spec, k)
         for i in job_indices(k, phase):
@@ -110,6 +133,8 @@ def build_jobs(spec: dict, phase: str = "g1") -> list[dict]:
                          "writer": writer_key(spec, k, phase)})
             if phase == "g4" and k.get("g4_shape"):
                 jobs[-1].update({"phase": "g4", "shape": k["g4_shape"]})
+            if phase == "g5":
+                jobs[-1]["phase"] = "g5"
     ids = [j["id"] for j in jobs]
     assert len(ids) == len(set(ids))
     return jobs
@@ -149,6 +174,9 @@ def render_user(spec: dict, job: dict) -> str:
     k = next(x for x in spec["kinds"] if x["id"] == job["kind"])
     reg = next(r["instruction"] for r in spec["registers"] if r["id"] == job["register"])
     ln = next(l["instruction"] for l in spec["lengths"] if l["id"] == job["length"])
+    if job.get("rearm"):
+        return spec["rearm_template"].format(deciding=k["deciding"], arm_a_text=job["arm_a_text"], arm_b=k["g5_b_shape"],
+                                             register=reg, length=ln, extra=_extra_text(spec, job))
     if k.get("pair"):
         return spec["pair_template"].format(deciding=k["deciding"], arm_a=k["arms"][0]["shape"], arm_b=k["arms"][1]["shape"],
                                             register=reg, length=ln, extra=_extra_text(spec, job))
@@ -220,8 +248,14 @@ def make_rows(spec: dict, job: dict, raw: dict, host: str, ts: str, spec_sha: st
             "slot_spec_sha256": spec_sha, "system_prompt_sha256": spec["system_prompt_sha256"],
             "temperature": spec["sampling"]["temperature"], "finish_reason": ch.get("finish_reason"), "reasoning_markers": markers,
             "host": host, "timestamp": ts}
-    if job.get("phase") == "g4":
-        base["phase"] = "g4"
+    if job.get("phase") in ("g4", "g5"):
+        base["phase"] = job["phase"]
+    if job.get("rearm"):
+        arm = k["arms"][1]; nw = len(clean.split())
+        return [{"id": f"{job['pair_unit']}-b-r{job['candidate']}", "content": clean, "kind": arm.get("kind") or f"{k['id']}-b",
+                 "contrastGroup": k["id"], "arm": "B", "pair_unit": job["pair_unit"], "rearm_candidate": job["candidate"],
+                 "provenance": {**base, "rearm_of": f"{job['pair_unit']}-b", "n_words": nw,
+                                "length_in_band": ln["min_words"] <= nw <= ln["max_words"], "empty": not clean}}]
     if k.get("pair"):
         pr = parse_pair(clean)
         out = []
@@ -239,11 +273,12 @@ def make_rows(spec: dict, job: dict, raw: dict, host: str, ts: str, spec_sha: st
 
 
 def generate(base_url: str, served: str, out: str, host: str, expect_spec_sha: str, concurrency: int = 64,
-             wall: float = 1500, spec_path=SPEC, post=_post, phase: str = "g1") -> dict:
+             wall: float = 1500, spec_path=SPEC, post=_post, phase: str = "g1", arm_a_file: str | None = None) -> dict:
     from concurrent.futures import ThreadPoolExecutor, as_completed
     check_base_url(base_url)
     spec, sysp = load_pinned(spec_path, expect_spec_sha)
-    jobs = build_jobs(spec, phase)
+    arm_a = [json.loads(l) for l in open(arm_a_file, encoding="utf-8") if l.strip()] if arm_a_file else None
+    jobs = build_jobs(spec, phase, arm_a)
     if any(any(m in (served + writer_pins(spec, j["writer"])["hf_id"]).lower() for m in OPENAI_MARKERS) for j in jobs):
         raise Blocked("OpenAI models are forbidden")
     if {j["writer"] for j in jobs} != {served}:
@@ -252,7 +287,8 @@ def generate(base_url: str, served: str, out: str, host: str, expect_spec_sha: s
     if Path(out).is_file():
         for l in open(out, encoding="utf-8"):
             if l.strip():
-                r = json.loads(l); done.add(r.get("pair_unit") or r["id"])
+                r = json.loads(l)
+                done.add(f"{r['pair_unit']}-r{r['rearm_candidate']}" if "rearm_candidate" in r else (r.get("pair_unit") or r["id"]))
     todo = [j for j in jobs if j["id"] not in done]
     st = {"phase": phase, "n_jobs": len(jobs), "n_resumed": len(jobs) - len(todo), "n_jobs_written": 0, "n_rows_written": 0, "n_errors": 0,
           "errors": [], "stop_reason": "complete"}
@@ -316,12 +352,13 @@ def main(argv=None) -> int:
     for a in ("--base-url", "--served", "--out", "--host", "--expect-spec-sha"):
         g.add_argument(a, required=True)
     g.add_argument("--concurrency", type=int, default=64); g.add_argument("--max-wall-seconds", type=float, default=1500)
-    g.add_argument("--phase", choices=["g1", "g2", "g3", "g4"], default="g1")
+    g.add_argument("--arm-a-file")
+    g.add_argument("--phase", choices=["g1", "g2", "g3", "g4", "g5"], default="g1")
     it = sp.add_parser("items"); it.add_argument("--gen", required=True); it.add_argument("--out", required=True)
-    pl = sp.add_parser("plan"); pl.add_argument("--expect-spec-sha", required=True); pl.add_argument("--phase", choices=["g1", "g2", "g3", "g4"], default="g1")
+    pl = sp.add_parser("plan"); pl.add_argument("--expect-spec-sha", required=True); pl.add_argument("--phase", choices=["g1", "g2", "g3", "g4", "g5"], default="g1")
     a = ap.parse_args(argv)
     if a.cmd == "generate":
-        st = generate(a.base_url, a.served, a.out, a.host, a.expect_spec_sha, a.concurrency, a.max_wall_seconds, phase=a.phase)
+        st = generate(a.base_url, a.served, a.out, a.host, a.expect_spec_sha, a.concurrency, a.max_wall_seconds, phase=a.phase, arm_a_file=a.arm_a_file)
         print(json.dumps({k: v for k, v in st.items() if k != "errors"} | {"error_ids": [e["id"] for e in st["errors"]][:50]}))
         return 0 if st["stop_reason"] == "complete" and not st["n_errors"] else 3
     if a.cmd == "items":

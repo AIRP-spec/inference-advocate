@@ -120,8 +120,9 @@ def main():
     global NAME, OUT, LOG
     ap = argparse.ArgumentParser(); ap.add_argument("--signed", required=True); ap.add_argument("--stage", choices=["audit", "gen"], required=True)
     ap.add_argument("--cap-usd", type=float, required=True); ap.add_argument("--rows"); ap.add_argument("--arm-a-file")
+    ap.add_argument("--attempt", type=int, default=1)
     a = ap.parse_args()
-    NAME = "hx-g5-" + a.stage; OUT = ROOT + "/out-" + NAME
+    NAME = "hx-g5-" + a.stage + (f"-{a.attempt}" if a.attempt > 1 else ""); OUT = ROOT + "/out-" + NAME
     os.makedirs(f"{ROOT}/logs", exist_ok=True); os.makedirs(f"{OUT}/logs", exist_ok=True)
     LOG = open(f"{ROOT}/logs/{NAME}.log", "a")
     cap = a.cap_usd
@@ -171,14 +172,14 @@ def main():
         except RuntimeError: raise
         except Exception as e: log("pod record read failed (continuing; created via podFindAndDeployOnDemand SECURE):", repr(e)[:200])
         ip = port = None
-        for _ in range(90):
+        for _ in range(48):  # 8 min: a host that has not started by then is abandoned (attempt 1 waited 16 min, t232u run)
             try: s = rp.status(pid)
             except Exception: s = None
             for p in ((s or {}).get("runtime") or {}).get("ports") or []:
                 if p["privatePort"] == 22 and p["isIpPublic"]: ip, port = p["ip"], p["publicPort"]
             if ip: break
             time.sleep(10)
-        if not ip: raise RuntimeError("no ssh port after 15 min")
+        if not ip: raise RuntimeError("no ssh port after 8 min")
         S = ssh_base(ip, port)
         for _ in range(30):
             if sh(S + ["true"], check=False).returncode == 0: break
@@ -338,7 +339,9 @@ def main():
         except Exception as e: log("ARCHIVE FAILURE (terminating anyway):", repr(e)[:600])
         for i in range(5):
             try: rp.terminate(pid); break
-            except Exception as e: log("terminate retry", repr(e)[:200]); time.sleep(10)
+            except Exception as e:
+                if "POD_NOT_FOUND" in repr(e): log("terminate: pod already gone"); break
+                log("terminate retry", repr(e)[:200]); time.sleep(10)
         t1 = time.time(); time.sleep(25)
         allp = gq("query { myself { pods { id name } } }")["myself"]["pods"]
         try: rpods = rest_pods()
