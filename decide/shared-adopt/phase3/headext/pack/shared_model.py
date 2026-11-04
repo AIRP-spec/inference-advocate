@@ -18,6 +18,26 @@ import torch.nn.functional as F
 
 QTYPE = {"choice": 0, "score": 1, "noul": 2}
 KMAX = 5
+# Encoder attention (head extension A30, t226u): laya builds the encoder with "sdpa"; under bf16 that returns NaN for rows
+# padded far past their length. AIRP_ATTN_IMPL=eager switches the encoder to transformers' eager attention after build.
+# Unset = "sdpa" (the P3-3 path, unchanged).
+ATTN_IMPLS = ("sdpa", "eager")
+
+
+def attn_impl() -> str:
+    import os
+    v = os.environ.get("AIRP_ATTN_IMPL", "sdpa")
+    if v not in ATTN_IMPLS:
+        raise ValueError(f"AIRP_ATTN_IMPL={v!r} not in {ATTN_IMPLS}")
+    return v
+
+
+def set_encoder_attn(enc, impl: str | None = None):
+    impl = impl or attn_impl()
+    assert impl in ATTN_IMPLS, impl
+    enc.config._attn_implementation = impl
+    assert enc.config._attn_implementation == impl
+    return enc
 
 
 def question_spec(questions: Dict) -> Tuple[List[str], List[int], List[int]]:
@@ -90,7 +110,7 @@ class SharedModel(nn.Module):
         return torch.einsum("bqd,qdk->bqk", x, self.out_w.to(x.dtype)) + self.out_b.to(x.dtype)
 
 
-def load_base(model_dir: str | Path, n_questions: int, head_layers: int = 2, device="cpu"):
+def load_base(model_dir: str | Path, n_questions: int, head_layers: int = 2, device="cpu", attn: str | None = None):
     """Build SharedModel with the Laya base encoder tensors; heads freshly initialised (seed set by caller)."""
     from safetensors.torch import load_file
     from laya.common import build_model
@@ -102,10 +122,11 @@ def load_base(model_dir: str | Path, n_questions: int, head_layers: int = 2, dev
     enc = full.encoder
     if hasattr(enc.config, "reference_compile"):
         enc.config.reference_compile = False
+    set_encoder_attn(enc, attn)
     return SharedModel(enc, n_questions, head_layers=head_layers), cfg
 
 
-def build_for_inference(ckpt_dir: str | Path, device="cpu"):
+def build_for_inference(ckpt_dir: str | Path, device="cpu", attn: str | None = None):
     """Rebuild a saved checkpoint (model.safetensors fp16 + encoder/ config + shared_config.json)."""
     from safetensors.torch import load_file
     from transformers import AutoConfig, AutoModel
@@ -121,4 +142,5 @@ def build_for_inference(ckpt_dir: str | Path, device="cpu"):
     m.load_state_dict(sd, strict=True)
     if hasattr(enc.config, "reference_compile"):
         enc.config.reference_compile = False
+    set_encoder_attn(enc, attn)
     return m.to(device).eval(), sc

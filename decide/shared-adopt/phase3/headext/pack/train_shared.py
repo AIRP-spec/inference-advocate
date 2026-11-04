@@ -177,6 +177,8 @@ def main():
     p.add_argument("--amp", choices=("bf16", "fp16", "off"), default="bf16")
     p.add_argument("--logit-clamp", type=float, default=30.0)
     p.add_argument("--max-consecutive-nan-logs", type=int, default=30)
+    p.add_argument("--max-skipped", type=int, default=-1, help="A30: stop (exit) once more than N micro-batches were skipped as "
+                   "nonfinite; -1 = never (P3-3 behaviour)")
     p.add_argument("--head-layers", type=int, default=2)
     p.add_argument("--head-init-seed", type=int, default=None,
                    help="P3-2: seed for the head initialisation only (default unset = old behaviour: heads from --seed)")
@@ -202,6 +204,7 @@ def main():
         extend_heads(model, a.ext_heads, a.head_init_seed)
         print(f"INIT_SHA_BASE{n_base} head={init_sha_base['head']}", flush=True)
     init_sha = init_state_sha256(model)
+    print(f"ENCODER_ATTN {model.encoder.config._attn_implementation}", flush=True)
     print(f"INIT_SHA head={init_sha['head']} full={init_sha['full']} head_init_seed={a.head_init_seed} seed={a.seed}", flush=True)
     tok = AutoTokenizer.from_pretrained(str(Path(meta["model_dir"]) / "tokenizer"))
     if not a.no_grad_checkpointing and hasattr(model.encoder, "gradient_checkpointing_enable"):
@@ -300,6 +303,8 @@ def main():
             loss = (loss_rl + 1.0 * loss_ce) / GA
             if not torch.isfinite(loss):
                 skipped += 1
+                if 0 <= a.max_skipped < skipped:
+                    raise SystemExit(f"FATAL: SKIPPED_NONFINITE {skipped} > --max-skipped {a.max_skipped} at opt_step≈{global_step}")
                 if skipped % 20 == 1:
                     print(f"  skip nonfinite loss (count={skipped}) at opt_step≈{global_step}", flush=True)
                 continue
@@ -357,6 +362,7 @@ def main():
           "head_init_seed": a.head_init_seed, "init_head_sha256": init_sha["head"], "init_full_sha256": init_sha["full"],
           "ext_heads": a.ext_heads, "init_head_sha256_base": init_sha_base["head"], "n_base_heads": n_base, "loss_weighted": weighted,
           "wall_time_sec": time.time() - t0, "global_steps": global_step, "skipped_nonfinite": skipped, "n_train_items": n_items,
+          "attn_implementation": model.encoder.config._attn_implementation, "amp": amp,
           "checkpoints": ckpt_records, "loss_first": losses[0] if losses else None, "loss_last": losses[-1] if losses else None,
           "loss_mean": float(np.mean(losses)) if losses else None}
     json.dump(tm, open(a.output_dir / "training-meta.json", "w"), indent=2)
