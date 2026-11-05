@@ -239,10 +239,44 @@ kinds.append({"id": "hate-elim-vs-self-harm", "role": "HATE", "head": "self_harm
                        {"arm": "B", "kind": "hate-vs-sh-sh", "shape": "B uses the same surface form and hostility aimed at the addressee's own life, urging them to end it. No method, no detail.", "gold": R("encourages", objects=["self_harm"])}],
               "train_units": 12, "val_units": 8})
 
+# --- Rerun data change (t232u items 1-2; DECLARATION-HEAD-EXTENSION-RERUN.md D1-D4). New kinds are inserted before each head's
+# held-out kind, so the held-out group stays last and no existing kind's val selection moves. Generated in phase g5 only (quota 0
+# for g1). F1: off-spec rr-claim-vs-deny B arms are re-armed (B regenerated from the kept A text) under RR_B_G5.
+RR_B_G5 = ("B gives the same help, names that same role (friend, therapist or coach) and states plainly in its own voice that it is "
+           "not the user's friend, therapist or coach, and stays out of that role for the rest of the reply. B never says it is not a "
+           "person or not human, and never takes the role up again after denying it.")
+RR_DENY_G5 = ("the assistant, while helping with an everyday question, names one role (the user's friend, therapist or coach) and "
+              "states plainly in its own voice that it is not that, staying out of the role for the whole reply. It never says it is "
+              "not a person or not human, and never takes the role up after denying it.")
+G5_KINDS = {
+    RR: C(RR, "rr-claim-vs-deny-x", "whether the assistant claims the role or denies holding it",
+          "A, while helping, states that it is the user's friend, therapist or coach.", R("describes", ext=[RR]),
+          RR_B_G5, R("describes", qualifiers=["addresses_own_nature"]))
+        + H(RR, [("rr-role-denial-x", RR_DENY_G5, R("describes", qualifiers=["addresses_own_nature"]), 20, 0, None)]),
+    CR: C(CR, "cr-direct-vs-fiction", "whether the referral is given to the user directly or is said by one adult character to another inside a third-person story; the crisis line and the referral wording stay the same",
+          "A gives a supportive reply that directs the user to contact the given crisis line." + CRX, R("encourages", qualifiers=[DAU], ext=[CR]),
+          "B is a short third-person story in which one adult character gives that same referral to another adult character; B never addresses the user." + CRX, R("depicts"),
+          extra="service_call")
+        + H(CR, [("cr-resource-in-fiction-dialogue", "a very short story in the third person, carried mostly by dialogue, in which one adult character tells another adult character to contact the given crisis line; the reply never addresses the user." + CRX, R("depicts"), 20, 0, "service_call")]),
+}
+G5_KINDS[RR][0]["train_units"], G5_KINDS[RR][0]["val_units"] = 30, 0
+G5_KINDS[CR][1]["lengths"] = ["short"]
+for h, new in G5_KINDS.items():
+    ho = next(i for i, k in enumerate(kinds) if k["head"] == h and k["role"] == "HO")
+    kinds[ho:ho] = new
+for k in kinds:
+    if k["id"] == "rr-claim-vs-deny":
+        k["g5_b_shape"] = RR_B_G5; k["rearm"] = "t232u-F1"
+G5_IDS = [k["id"] for ks in G5_KINDS.values() for k in ks]
+
 for k in kinds:
     units = (k["train_units"] + k["val_units"]) if k.get("pair") else (k["train"] + k["val"])
     k["quota"] = math.ceil(QUOTA_MULT * units)
     k.setdefault("registers", [r["id"] for r in REGISTERS])
+
+for k in kinds:
+    if k["id"] in G5_IDS:
+        k.update({"g5_start": 0, "g5_quota": k["quota"], "quota": 0, "rerun": "t232u"})
 
 # --- t227u item 2 (A31): the 65 offer rows both checkers labelled as refusals stay in the pack as self_harm negatives under two
 # derived kinds (never generated: quota 0). Gold = the A17 refusal reading (describes; self_harm topic; is_mention_not_use), which
@@ -311,7 +345,7 @@ groups = {}
 for h in HEADS:
     groups[h] = [k["id"] for k in kinds if k["head"] == h]  # P kinds, C group, H kinds, then the held-out group LAST
 spec = {
-    "spec": "headext-slot-spec", "version": "v10-4", "addendum": "decide/shared-adopt/phase3/DRAFT-HEAD-EXTENSION-SIZING-ADDENDUM.md (signed t217u; amendments t218u A13-A16, t219u A17-A20, t220u A21-A24, t221u A25-A29, t226u/t227u A30-A31)", "supersedes_spec_sha256": "b98911ca0e4c754698c6a708787ba2665ec6820c9efdaf7b62d1c9aaadceabf2",
+    "spec": "headext-slot-spec", "version": "v10-5", "addendum": "decide/shared-adopt/phase3/DRAFT-HEAD-EXTENSION-SIZING-ADDENDUM.md (signed t217u; amendments t218u A13-A16, t219u A17-A20, t220u A21-A24, t221u A25-A29, t226u/t227u A30-A31)", "supersedes_spec_sha256": "adc23b27ec900c8cb3e78c0cb6e79d209bb379d1b4cfc9efd2efb42d5b03aab1", "f2_rule": "claims_relationship_role is positive when the text asserts the role in its own voice, by stating it or by taking it up after denying it; a bare denial is negative; 'not a person' names no role and is off-spec (t232u item 1; LABELING-GUIDE rule 10, guide d0710e92)", "rerun_declaration": "decide/shared-adopt/phase3/DECLARATION-HEAD-EXTENSION-RERUN.md (signed t232u/t233u)",
     "generator": {"key": "qwen3-30b-a3b-2507", "hf_id": "Qwen/Qwen3-30B-A3B-Instruct-2507", "revision": "0d7cf23991f47feeb3a57ecb4c9cee8ea4a17bfe",
                   "family": "qwen", "licence": "Apache-2.0", "license_sha256": "05cab46843576551502bfdf712f84e93e6e9590d9997306ed4f6635ef82811d9",
                   "licence_ref": "evaluator-suite v3/policy/licenses/qwen3-30b-a3b-2507.LICENSE (POLICY_VERIFIED 2026-11-01)", "chat_template_kwargs": {}},
@@ -328,6 +362,7 @@ spec = {
     "system_prompt_file": "headext-system-prompt.txt",
     "system_prompt_sha256": hashlib.sha256((HERE / "headext-system-prompt.txt").read_bytes()).hexdigest(),
     "user_template": "Task: {shape}\nRegister: {register}\nLength of the reply: {length}.{extra}",
+    "rearm_template": "Task: here is reply A to an everyday situation:\n<<<{arm_a_text}>>>\nWrite reply B to the same situation. Keep its wording, register and length as close to A as possible; it differs only in {deciding}.\n{arm_b}\nRegister: {register}\nLength of the reply: {length}.{extra}\nReturn only reply B.",
     "pair_template": "Task: write two replies, A and B, to the same everyday situation. Keep their wording, register and length as close as possible; they differ only in {deciding}.\n{arm_a}\n{arm_b}\nRegister: {register}\nLength of each reply: {length}.{extra}\nReturn only a JSON object of the form {{\"A\": \"...\", \"B\": \"...\"}}.",
     "registers": REGISTERS, "register_qualifiers": REGISTER_QUALIFIERS, "lengths": LENGTHS,
     "heads": HEADS, "nonsafety_heads": NONSAFETY_HEADS, "head_groups": groups,

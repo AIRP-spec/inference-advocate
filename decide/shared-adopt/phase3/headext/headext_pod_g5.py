@@ -20,7 +20,9 @@ REL = os.path.relpath(HERE, REPO_WT)
 V3 = "/workspace/evaluator-suite/v3"
 ROOT = "/workspace/headext-g5"; NAME = None
 GPU = "NVIDIA RTX PRO 6000 Blackwell Server Edition"
-cap, CAP_MIN = None, 90.0          # t232u item 4: generation $4 total over audit + gen pods
+cap, CAP_MIN = None, 90.0
+import headext_g5_budget as B
+LISTED_RATE = 2.49  # RTX PRO 6000 Blackwell SECURE on-demand, as billed on G4/G5          # t232u item 4: generation $4 total over audit + gen pods
 STOP_LINE, CEILING = 45.0, 60.0
 WRITER = "qwen3-30b-a3b-2507"
 CHECKERS = [("seed-oss-36b", "bytedance-seed"), ("nemotron-3-super", "nvidia-nemotron")]
@@ -150,12 +152,17 @@ def main():
            "gpuTypeId": GPU, "name": NAME, "imageName": "runpod/pytorch:1.0.3-cu1290-torch280-ubuntu2204",
            "ports": "22/tcp", "startSsh": True, "env": env}
     assert inp["cloudType"] == "SECURE" and not any(k in inp for k in ("bidPerGpu", "interruptible", "spot"))  # A32 on-demand only
+    est = B.estimate_usd(a.stage, LISTED_RATE)
+    log(f"ESTIMATE {B.estimate_minutes(a.stage)} min = ${est} at ${LISTED_RATE}/h vs cap ${cap}")
+    if est > cap: raise SystemExit(f"ABORT: estimate ${est} exceeds cap ${cap} (t234u item 4)")
     try:
         pod = rp.gql("mutation($i: PodFindAndDeployOnDemandInput) { podFindAndDeployOnDemand(input: $i) { id name costPerHr machine { gpuTypeId } } }", {"i": inp})["podFindAndDeployOnDemand"]
     except Exception as e:
         log("create failed:", repr(e)[:300]); status(f"headext {NAME} POD NOT CREATED (no RTX PRO 6000 SECURE); nothing billed; stopped")
         raise SystemExit("ABORT: no GPU")
     pid, rate = pod["id"], float(pod["costPerHr"]); t0 = time.time()
+    if B.estimate_usd(a.stage, rate) > cap:  # t234u item 4 (defence in depth; the pre-create check below uses the listed rate)
+        rp.terminate(pid); raise SystemExit(f"ABORT: estimate ${B.estimate_usd(a.stage, rate)} over cap ${cap}")
     cap_s = min(CAP_MIN * 60, cap / rate * 3600); deadline = t0 + cap_s
     log(f"POD CREATED {pid} gpu={pod['machine']['gpuTypeId']} rate=${rate}/h cap={cap_s/60:.1f}min")
     json.dump({"pod": pid, "rate": rate, "t0": t0, "deadline": deadline, "bal0": bal0, "signed": a.signed}, open(f"{ROOT}/logs/{NAME}.state.json", "w"))
@@ -208,7 +215,7 @@ def main():
         host = f"runpod:{pid}/{GPU.replace(' ', '_')}/vllm-{inst.stdout.split()[0]}"
         lport = [18600]
 
-        def serve(k, max_len):
+        def serve(k, max_len, until=None):
             m = mf[k]
             while True:
                 st = sh(S + [f"ls /root/dl-{k}.done /root/dl-{k}.fail 2>/dev/null"], check=False).stdout
@@ -223,7 +230,7 @@ def main():
             sh(S + [f"export HF_HOME=/root/hf HF_HUB_OFFLINE=1 VLLM_USE_FLASHINFER_SAMPLER=0 PATH=/opt/v/bin:/usr/local/cuda/bin:$PATH CUDA_HOME=/usr/local/cuda; nohup /opt/v/bin/vllm serve {m['hf_id']} --revision {m['revision']} --served-model-name {k} "
                     f"--host 127.0.0.1 --port 8000 --gpu-memory-utilization 0.92 {qa} >/root/serve-{k}.log 2>&1 &"])
             up = False; ts = time.time()
-            while time.time() < deadline - 8 * 60:
+            while time.time() < (until or deadline - 8 * 60):
                 h = sh(S + ["curl -sf localhost:8000/health && echo UP; pgrep -f '[v]llm serve' >/dev/null || echo DEAD"], check=False).stdout
                 if "UP" in h: up = True; break
                 if "DEAD" in h: break
@@ -285,7 +292,7 @@ def main():
         for k in models: prefetch(k)
         if a.stage == "gen":
             BASE[0] = serve(WRITER, 4096)
-            wall = int(min(10 * 60, deadline - time.time() - 24 * 60))
+            wall = B.gen_wall_seconds(time.time(), deadline)
             if wall < 120: raise RuntimeError("not enough time left for generation + checkers")
             g = py("headext_slots.py", "generate", "--base-url", BASE[0], "--served", WRITER, "--out", gen, "--host", host, "--phase", "g5",
                    "--arm-a-file", a.arm_a_file, "--expect-spec-sha", spec_sha, "--concurrency", "64", "--max-wall-seconds", str(wall))
@@ -298,11 +305,13 @@ def main():
         it = py("headext_slots.py", "items", "--gen", gen, "--out", items)
         log("ITEMS " + it.stdout.strip()[-400:]); results["items"] = json.loads(it.stdout.strip().splitlines()[-1])
         BASE[0] = serve("seed-oss-36b", 8192)
-        label("seed-oss-36b", items, lab["seed-oss-36b"], min(6 * 60, deadline - time.time() - 16 * 60))
-        contradict("seed-oss-36b", min(6 * 60, deadline - time.time() - 15 * 60))
+        label("seed-oss-36b", items, lab["seed-oss-36b"], min(6 * 60, deadline - time.time() - (B.AFTER_SEED + 3) * 60))
+        contradict("seed-oss-36b", min(6 * 60, deadline - time.time() - (B.AFTER_SEED + 1) * 60))
         stop_serve("seed-oss-36b")
-        BASE[0] = serve("nemotron-3-super", 8192)
-        label("nemotron-3-super", items, lab["nemotron-3-super"], min(6 * 60, deadline - time.time() - 4 * 60))
+        if not B.nemotron_may_start(time.time(), deadline):  # t234u item 3: full load time or no start
+            raise RuntimeError(f"not enough time for the Nemotron full load ({B.AFTER_SEED} min needed)")
+        BASE[0] = serve("nemotron-3-super", 8192, until=B.nemotron_load_until(deadline))
+        label("nemotron-3-super", items, lab["nemotron-3-super"], min(6 * 60, deadline - time.time() - 4 * 60))  # inside CHECK_WINDOW
         contradict("nemotron-3-super", min(6 * 60, deadline - time.time() - 2.5 * 60))
         stop_serve("nemotron-3-super")
         T["run"] = False

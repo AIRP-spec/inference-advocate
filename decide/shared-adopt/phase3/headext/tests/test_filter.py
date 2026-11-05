@@ -86,7 +86,7 @@ def test_select_split_and_held_out():
     valid = [r for r in rows if not (hf.va_reasons(r) + hf.ve_reasons(r, SPEC) + hf.vf_reasons(r, ALLOWED))]
     assert len(valid) == len(rows)
     sel = hf.select(valid, SPEC)
-    derived = {k["id"] for k in SPEC["kinds"] if k.get("derived")}  # t227u A31: filled only by retag, never generated
+    derived = {k["id"] for k in SPEC["kinds"] if k.get("derived") or k.get("rerun")}  # t227u A31 retag-only; t232u g5-only kinds (synth is g1)
     assert {k: v for k, v in sel["shortfall"].items() if k not in derived} == {}
     kinds = {k["id"]: k for k in SPEC["kinds"]}
     tr_ids = {r["id"] for r in sel["train"]}; va_ids = {r["id"] for r in sel["val"]}

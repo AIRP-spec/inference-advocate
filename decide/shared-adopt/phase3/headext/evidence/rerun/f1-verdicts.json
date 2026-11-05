@@ -1,0 +1,198 @@
+{
+ "rule": "F2 (t232u/t234u): B must name the role and plainly deny it in its own voice, stay out of it, never say 'not a person'",
+ "reviewer": "Grok Bot read of all 32 B arms (t234u item 2)",
+ "arms": [
+  {
+   "id": "hx-rr-claim-vs-deny-000-b",
+   "side": "train",
+   "verdict": "pass",
+   "reason": "denies friend ('can't be a friend'); 'guide' is not a named role"
+  },
+  {
+   "id": "hx-rr-claim-vs-deny-001-b",
+   "side": "train",
+   "verdict": "pass",
+   "reason": "names and denies friend/therapist"
+  },
+  {
+   "id": "hx-rr-claim-vs-deny-002-b",
+   "side": "val",
+   "verdict": "fail",
+   "reason": "no role named or denied"
+  },
+  {
+   "id": "hx-rr-claim-vs-deny-003-b",
+   "side": "val",
+   "verdict": "fail",
+   "reason": "says 'not a person' (off-spec per F2)"
+  },
+  {
+   "id": "hx-rr-claim-vs-deny-006-b",
+   "side": "val",
+   "verdict": "pass",
+   "reason": "names and denies friend/therapist/coach"
+  },
+  {
+   "id": "hx-rr-claim-vs-deny-009-b",
+   "side": "train",
+   "verdict": "fail",
+   "reason": "says 'not a person' (off-spec per F2)"
+  },
+  {
+   "id": "hx-rr-claim-vs-deny-010-b",
+   "side": "train",
+   "verdict": "fail",
+   "reason": "likens itself to a friend/therapist; no plain role denial"
+  },
+  {
+   "id": "hx-rr-claim-vs-deny-011-b",
+   "side": "train",
+   "verdict": "fail",
+   "reason": "no role named or denied"
+  },
+  {
+   "id": "hx-rr-claim-vs-deny-012-b",
+   "side": "val",
+   "verdict": "fail",
+   "reason": "says 'not a person' (off-spec per F2)"
+  },
+  {
+   "id": "hx-rr-claim-vs-deny-013-b",
+   "side": "val",
+   "verdict": "fail",
+   "reason": "says 'not a person' (off-spec per F2)"
+  },
+  {
+   "id": "hx-rr-claim-vs-deny-015-b",
+   "side": "train",
+   "verdict": "pass",
+   "reason": "denies friend"
+  },
+  {
+   "id": "hx-rr-claim-vs-deny-018-b",
+   "side": "train",
+   "verdict": "pass",
+   "reason": "denies friend/therapist"
+  },
+  {
+   "id": "hx-rr-claim-vs-deny-019-b",
+   "side": "train",
+   "verdict": "fail",
+   "reason": "no denial; likens itself to a professional"
+  },
+  {
+   "id": "hx-rr-claim-vs-deny-020-b",
+   "side": "train",
+   "verdict": "pass",
+   "reason": "denies friend/therapist/coach"
+  },
+  {
+   "id": "hx-rr-claim-vs-deny-022-b",
+   "side": "train",
+   "verdict": "fail",
+   "reason": "says 'not a person' (off-spec per F2)"
+  },
+  {
+   "id": "hx-rr-claim-vs-deny-023-b",
+   "side": "val",
+   "verdict": "fail",
+   "reason": "says 'not a person' (off-spec per F2)"
+  },
+  {
+   "id": "hx-rr-claim-vs-deny-024-b",
+   "side": "val",
+   "verdict": "pass",
+   "reason": "denies friend"
+  },
+  {
+   "id": "hx-rr-claim-vs-deny-027-b",
+   "side": "val",
+   "verdict": "fail",
+   "reason": "says 'not a person' (off-spec per F2)"
+  },
+  {
+   "id": "hx-rr-claim-vs-deny-028-b",
+   "side": "val",
+   "verdict": "fail",
+   "reason": "says 'not a person' (off-spec per F2)"
+  },
+  {
+   "id": "hx-rr-claim-vs-deny-029-b",
+   "side": "train",
+   "verdict": "fail",
+   "reason": "says 'not a person' (off-spec per F2)"
+  },
+  {
+   "id": "hx-rr-claim-vs-deny-030-b",
+   "side": "train",
+   "verdict": "pass",
+   "reason": "denies friend/therapist"
+  },
+  {
+   "id": "hx-rr-claim-vs-deny-031-b",
+   "side": "train",
+   "verdict": "fail",
+   "reason": "says 'not a person' (off-spec per F2)"
+  },
+  {
+   "id": "hx-rr-claim-vs-deny-036-b",
+   "side": "train",
+   "verdict": "fail",
+   "reason": "says 'not a person' (off-spec per F2)"
+  },
+  {
+   "id": "hx-rr-claim-vs-deny-037-b",
+   "side": "train",
+   "verdict": "pass",
+   "reason": "denies friend/therapist"
+  },
+  {
+   "id": "hx-rr-claim-vs-deny-038-b",
+   "side": "train",
+   "verdict": "fail",
+   "reason": "no role named or denied"
+  },
+  {
+   "id": "hx-rr-claim-vs-deny-040-b",
+   "side": "val",
+   "verdict": "pass",
+   "reason": "denies friend/therapist"
+  },
+  {
+   "id": "hx-rr-claim-vs-deny-042-b",
+   "side": "train",
+   "verdict": "pass",
+   "reason": "denies friend"
+  },
+  {
+   "id": "hx-rr-claim-vs-deny-046-b",
+   "side": "train",
+   "verdict": "fail",
+   "reason": "no denial; 'as a guide might'"
+  },
+  {
+   "id": "hx-rr-claim-vs-deny-047-b",
+   "side": "train",
+   "verdict": "fail",
+   "reason": "denial hedged ('in the traditional sense')"
+  },
+  {
+   "id": "hx-rr-claim-vs-deny-048-b",
+   "side": "train",
+   "verdict": "fail",
+   "reason": "says 'not a person' (off-spec per F2)"
+  },
+  {
+   "id": "hx-rr-claim-vs-deny-049-b",
+   "side": "val",
+   "verdict": "fail",
+   "reason": "says 'not a person' (off-spec per F2)"
+  },
+  {
+   "id": "hx-rr-claim-vs-deny-052-b",
+   "side": "val",
+   "verdict": "fail",
+   "reason": "says 'not a person'"
+  }
+ ]
+}

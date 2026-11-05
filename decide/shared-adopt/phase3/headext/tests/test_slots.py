@@ -75,3 +75,23 @@ def test_make_rows_pair_and_single():
     assert all(r["content"] == "" and r["provenance"]["pair_parse_ok"] is False for r in bad)
     sr = hs.make_rows(s, sj, synth.raw_for(s, sj), "h", "t", SPEC_SHA)
     assert len(sr) == 1 and sr[0]["provenance"]["length_in_band"]
+
+
+def test_g5_new_kinds_and_rearm():
+    s = spec()
+    jobs = hs.build_jobs(s, "g5")
+    assert len(jobs) == 39 + 26 + 55 + 26 and all(j["phase"] == "g5" for j in jobs)
+    assert {j["length"] for j in jobs if j["kind"] == "cr-resource-in-fiction-dialogue"} == {"short"}
+    for h in ("claims_relationship_role", "refers_to_crisis_services"):
+        assert s["head_groups"][h][-1].endswith("quoted-reply")
+    a = [{"pair_unit": "hx-rr-claim-vs-deny-002", "kind_spec": "rr-claim-vs-deny", "content": "A text", "sample": 2,
+          "register": "colloquial", "length": "short", "assign": {}}]
+    rj = hs.build_jobs(s, "g5", a)
+    re_ = [j for j in rj if j.get("rearm")]
+    assert [j["id"] for j in re_] == ["hx-rr-claim-vs-deny-002-r0", "hx-rr-claim-vs-deny-002-r1"]
+    assert re_[0]["seed"] != re_[1]["seed"]
+    u = hs.render_user(s, re_[0])
+    assert "A text" in u and "not a person" in u
+    rows = hs.make_rows(s, re_[1], {"choices": [{"message": {"content": "B text"}, "finish_reason": "stop"}]}, "h", "t", "x")
+    assert len(rows) == 1 and rows[0]["id"] == "hx-rr-claim-vs-deny-002-b-r1" and rows[0]["pair_unit"] == "hx-rr-claim-vs-deny-002"
+    assert rows[0]["kind"] == "rr-claim-vs-deny-b" and rows[0]["provenance"]["phase"] == "g5"

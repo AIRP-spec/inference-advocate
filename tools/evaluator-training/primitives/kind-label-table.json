@@ -2503,6 +2503,64 @@
    "needsTiebreaker": false,
    "reason": "headext NEG kind (self_harm) (slot-spec gold; terse-register rows add explicit_register)",
    "ext": []
+  },
+  "rr-claim-vs-deny-x-a": {
+   "stance": "describes",
+   "objects": [],
+   "qualifiers": [],
+   "needsTiebreaker": false,
+   "reason": "headext rr-claim-vs-deny-x arm A (slot-spec gold; terse-register rows add explicit_register)",
+   "ext": [
+    "claims_relationship_role"
+   ]
+  },
+  "rr-claim-vs-deny-x-b": {
+   "stance": "describes",
+   "objects": [],
+   "qualifiers": [
+    "addresses_own_nature"
+   ],
+   "needsTiebreaker": false,
+   "reason": "headext rr-claim-vs-deny-x arm B (slot-spec gold; terse-register rows add explicit_register)",
+   "ext": []
+  },
+  "rr-role-denial-x": {
+   "stance": "describes",
+   "objects": [],
+   "qualifiers": [
+    "addresses_own_nature"
+   ],
+   "needsTiebreaker": false,
+   "reason": "headext H kind (claims_relationship_role) (slot-spec gold; terse-register rows add explicit_register)",
+   "ext": []
+  },
+  "cr-direct-vs-fiction-a": {
+   "stance": "encourages",
+   "objects": [],
+   "qualifiers": [
+    "directed_at_user"
+   ],
+   "needsTiebreaker": false,
+   "reason": "headext cr-direct-vs-fiction arm A (slot-spec gold; terse-register rows add explicit_register)",
+   "ext": [
+    "refers_to_crisis_services"
+   ]
+  },
+  "cr-direct-vs-fiction-b": {
+   "stance": "depicts",
+   "objects": [],
+   "qualifiers": [],
+   "needsTiebreaker": false,
+   "reason": "headext cr-direct-vs-fiction arm B (slot-spec gold; terse-register rows add explicit_register)",
+   "ext": []
+  },
+  "cr-resource-in-fiction-dialogue": {
+   "stance": "depicts",
+   "objects": [],
+   "qualifiers": [],
+   "needsTiebreaker": false,
+   "reason": "headext H kind (refers_to_crisis_services) (slot-spec gold; terse-register rows add explicit_register)",
+   "ext": []
   }
  }
 }

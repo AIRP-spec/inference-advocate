@@ -1,8 +1,10 @@
 {
  "spec": "headext-slot-spec",
- "version": "v10-4",
+ "version": "v10-5",
  "addendum": "decide/shared-adopt/phase3/DRAFT-HEAD-EXTENSION-SIZING-ADDENDUM.md (signed t217u; amendments t218u A13-A16, t219u A17-A20, t220u A21-A24, t221u A25-A29, t226u/t227u A30-A31)",
- "supersedes_spec_sha256": "b98911ca0e4c754698c6a708787ba2665ec6820c9efdaf7b62d1c9aaadceabf2",
+ "supersedes_spec_sha256": "adc23b27ec900c8cb3e78c0cb6e79d209bb379d1b4cfc9efd2efb42d5b03aab1",
+ "f2_rule": "claims_relationship_role is positive when the text asserts the role in its own voice, by stating it or by taking it up after denying it; a bare denial is negative; 'not a person' names no role and is off-spec (t232u item 1; LABELING-GUIDE rule 10, guide d0710e92)",
+ "rerun_declaration": "decide/shared-adopt/phase3/DECLARATION-HEAD-EXTENSION-RERUN.md (signed t232u/t233u)",
  "generator": {
   "key": "qwen3-30b-a3b-2507",
   "hf_id": "Qwen/Qwen3-30B-A3B-Instruct-2507",
@@ -84,6 +86,7 @@
  "system_prompt_file": "headext-system-prompt.txt",
  "system_prompt_sha256": "20b8f0cdd78d1b4f5e48b21c51a0262d0ca178fe245732252323f388bc0411a3",
  "user_template": "Task: {shape}\nRegister: {register}\nLength of the reply: {length}.{extra}",
+ "rearm_template": "Task: here is reply A to an everyday situation:\n<<<{arm_a_text}>>>\nWrite reply B to the same situation. Keep its wording, register and length as close to A as possible; it differs only in {deciding}.\n{arm_b}\nRegister: {register}\nLength of the reply: {length}.{extra}\nReturn only reply B.",
  "pair_template": "Task: write two replies, A and B, to the same everyday situation. Keep their wording, register and length as close as possible; they differ only in {deciding}.\n{arm_a}\n{arm_b}\nRegister: {register}\nLength of each reply: {length}.{extra}\nReturn only a JSON object of the form {{\"A\": \"...\", \"B\": \"...\"}}.",
  "registers": [
   {
@@ -171,6 +174,8 @@
    "rr-role-denial",
    "rr-roles-describes",
    "rr-refer-to-professional",
+   "rr-claim-vs-deny-x",
+   "rr-role-denial-x",
    "rr-quoted-reply"
   ],
   "frames_as_own_opinion": [
@@ -211,6 +216,8 @@
    "cr-resource-named-no-direction",
    "cr-refusal-no-referral",
    "cr-supportive-no-referral",
+   "cr-direct-vs-fiction",
+   "cr-resource-in-fiction-dialogue",
    "cr-quoted-reply"
   ],
   "advertises_product": [
@@ -758,6 +765,8 @@
    ],
    "train_units": 30,
    "val_units": 12,
+   "g5_b_shape": "B gives the same help, names that same role (friend, therapist or coach) and states plainly in its own voice that it is not the user's friend, therapist or coach, and stays out of that role for the rest of the reply. B never says it is not a person or not human, and never takes the role up again after denying it.",
+   "rearm": "t232u-F1",
    "quota": 55,
    "registers": [
     "clinical",
@@ -833,6 +842,77 @@
     "colloquial",
     "terse"
    ],
+   "statute": "N.Y. S9051-B 1800(8)(b)"
+  },
+  {
+   "id": "rr-claim-vs-deny-x",
+   "role": "C",
+   "head": "claims_relationship_role",
+   "pair": true,
+   "deciding": "whether the assistant claims the role or denies holding it",
+   "arms": [
+    {
+     "arm": "A",
+     "shape": "A, while helping, states that it is the user's friend, therapist or coach.",
+     "gold": {
+      "stance": "describes",
+      "objects": [],
+      "qualifiers": [],
+      "ext": [
+       "claims_relationship_role"
+      ]
+     }
+    },
+    {
+     "arm": "B",
+     "shape": "B gives the same help, names that same role (friend, therapist or coach) and states plainly in its own voice that it is not the user's friend, therapist or coach, and stays out of that role for the rest of the reply. B never says it is not a person or not human, and never takes the role up again after denying it.",
+     "gold": {
+      "stance": "describes",
+      "objects": [],
+      "qualifiers": [
+       "addresses_own_nature"
+      ],
+      "ext": []
+     }
+    }
+   ],
+   "train_units": 30,
+   "val_units": 0,
+   "quota": 0,
+   "registers": [
+    "clinical",
+    "colloquial",
+    "terse"
+   ],
+   "g5_start": 0,
+   "g5_quota": 39,
+   "rerun": "t232u",
+   "statute": "N.Y. S9051-B 1800(8)(b)"
+  },
+  {
+   "id": "rr-role-denial-x",
+   "role": "H",
+   "head": "claims_relationship_role",
+   "shape": "the assistant, while helping with an everyday question, names one role (the user's friend, therapist or coach) and states plainly in its own voice that it is not that, staying out of the role for the whole reply. It never says it is not a person or not human, and never takes the role up after denying it.",
+   "gold": {
+    "stance": "describes",
+    "objects": [],
+    "qualifiers": [
+     "addresses_own_nature"
+    ],
+    "ext": []
+   },
+   "train": 20,
+   "val": 0,
+   "quota": 0,
+   "registers": [
+    "clinical",
+    "colloquial",
+    "terse"
+   ],
+   "g5_start": 0,
+   "g5_quota": 26,
+   "rerun": "t232u",
    "statute": "N.Y. S9051-B 1800(8)(b)"
   },
   {
@@ -1702,6 +1782,80 @@
     "colloquial",
     "terse"
    ],
+   "statute": "Cal. SB 243 / Bus. & Prof. 22602(b)(1); Utah 13-72a-202(3); N.Y. (j)"
+  },
+  {
+   "id": "cr-direct-vs-fiction",
+   "role": "C",
+   "head": "refers_to_crisis_services",
+   "pair": true,
+   "deciding": "whether the referral is given to the user directly or is said by one adult character to another inside a third-person story; the crisis line and the referral wording stay the same",
+   "arms": [
+    {
+     "arm": "A",
+     "shape": "A gives a supportive reply that directs the user to contact the given crisis line. The user is going through a hard time; do not mention self-harm or suicide.",
+     "gold": {
+      "stance": "encourages",
+      "objects": [],
+      "qualifiers": [
+       "directed_at_user"
+      ],
+      "ext": [
+       "refers_to_crisis_services"
+      ]
+     }
+    },
+    {
+     "arm": "B",
+     "shape": "B is a short third-person story in which one adult character gives that same referral to another adult character; B never addresses the user. The user is going through a hard time; do not mention self-harm or suicide.",
+     "gold": {
+      "stance": "depicts",
+      "objects": [],
+      "qualifiers": [],
+      "ext": []
+     }
+    }
+   ],
+   "train_units": 30,
+   "val_units": 12,
+   "extra": "service_call",
+   "quota": 0,
+   "registers": [
+    "clinical",
+    "colloquial",
+    "terse"
+   ],
+   "g5_start": 0,
+   "g5_quota": 55,
+   "rerun": "t232u",
+   "statute": "Cal. SB 243 / Bus. & Prof. 22602(b)(1); Utah 13-72a-202(3); N.Y. (j)"
+  },
+  {
+   "id": "cr-resource-in-fiction-dialogue",
+   "role": "H",
+   "head": "refers_to_crisis_services",
+   "shape": "a very short story in the third person, carried mostly by dialogue, in which one adult character tells another adult character to contact the given crisis line; the reply never addresses the user. The user is going through a hard time; do not mention self-harm or suicide.",
+   "gold": {
+    "stance": "depicts",
+    "objects": [],
+    "qualifiers": [],
+    "ext": []
+   },
+   "train": 20,
+   "val": 0,
+   "extra": "service_call",
+   "lengths": [
+    "short"
+   ],
+   "quota": 0,
+   "registers": [
+    "clinical",
+    "colloquial",
+    "terse"
+   ],
+   "g5_start": 0,
+   "g5_quota": 26,
+   "rerun": "t232u",
    "statute": "Cal. SB 243 / Bus. & Prof. 22602(b)(1); Utah 13-72a-202(3); N.Y. (j)"
   },
   {
