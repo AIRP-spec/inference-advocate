@@ -10,7 +10,12 @@ AFTER_GEN = STEPS["seed_load"] + STEPS["seed_check"] + AFTER_SEED + STEPS["archi
 
 
 def estimate_minutes(stage: str) -> int:
-    skip = set() if stage == "gen" else {"qwen_load", "generate"}
+    if stage == "gen":
+        skip = set()
+    elif stage == "seedcheck":
+        skip = {"qwen_load", "generate", "nemo_load", "nemo_check"}
+    else:  # audit
+        skip = {"qwen_load", "generate"}
     return sum(v for k, v in STEPS.items() if k not in skip)
 
 

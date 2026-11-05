@@ -16,3 +16,10 @@ def test_estimate_and_gen_wall():
     dl = 100_000.0
     assert b.gen_wall_seconds(dl - 120 * 60, dl) == 600
     assert b.gen_wall_seconds(dl - (b.AFTER_GEN + 5) * 60, dl) == 300
+
+def test_seedcheck_estimate_fits_remaining_cap():
+    # t235u: Seed-only check of author-written arms; remaining gen cap was $1.296
+    assert b.estimate_minutes("seedcheck") == 28
+    assert b.estimate_usd("seedcheck", 2.49) == 1.162
+    assert b.estimate_usd("seedcheck", 2.49) <= 1.296
+

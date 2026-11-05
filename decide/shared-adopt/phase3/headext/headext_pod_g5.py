@@ -120,7 +120,7 @@ def py(*args, **kw):
 
 def main():
     global NAME, OUT, LOG
-    ap = argparse.ArgumentParser(); ap.add_argument("--signed", required=True); ap.add_argument("--stage", choices=["audit", "gen"], required=True)
+    ap = argparse.ArgumentParser(); ap.add_argument("--signed", required=True); ap.add_argument("--stage", choices=["audit", "gen", "seedcheck"], required=True)
     ap.add_argument("--cap-usd", type=float, required=True); ap.add_argument("--rows"); ap.add_argument("--arm-a-file")
     ap.add_argument("--attempt", type=int, default=1)
     a = ap.parse_args()
@@ -132,7 +132,7 @@ def main():
     mf = {m["key"]: m for m in json.load(open(f"{V3}/collect/models.selfhost.json"))["models"]}
     bal0, cum0, pins = precheck(a.signed, cap)
     spec_sha = pins["files"]["headext-slot-spec.json"]
-    models = ([WRITER] if a.stage == "gen" else []) + [c for c, _ in CHECKERS]
+    models = ([WRITER] if a.stage == "gen" else []) + ([c for c, _ in CHECKERS] if a.stage != "seedcheck" else ["seed-oss-36b"])
     lic = sh(f"python3 /workspace/v3collect/lic_recheck.py " + " ".join(models), check=False)
     log("LICENCE RECHECK\n" + lic.stdout.strip())
     if lic.returncode: raise SystemExit("ABORT: licence recheck mismatch")
@@ -140,7 +140,8 @@ def main():
         gen = f"{OUT}/gen-g5-{WRITER}.jsonl"
         if os.path.exists(gen): raise SystemExit("ABORT: output already exists (no silent resume)")
     else:
-        gen = f"{OUT}/audit-rows.jsonl"
+        gen = f"{OUT}/{a.stage}-rows.jsonl"
+        if not a.rows: raise SystemExit("ABORT: --rows required for audit/seedcheck")
         import shutil; shutil.copyfile(a.rows, gen)
     items = f"{OUT}/items-{a.stage}.jsonl"
     lab = {c: f"{OUT}/labels-{c}-{a.stage}.jsonl" for c, _ in CHECKERS}
@@ -305,15 +306,17 @@ def main():
         it = py("headext_slots.py", "items", "--gen", gen, "--out", items)
         log("ITEMS " + it.stdout.strip()[-400:]); results["items"] = json.loads(it.stdout.strip().splitlines()[-1])
         BASE[0] = serve("seed-oss-36b", 8192)
-        label("seed-oss-36b", items, lab["seed-oss-36b"], min(6 * 60, deadline - time.time() - (B.AFTER_SEED + 3) * 60))
-        contradict("seed-oss-36b", min(6 * 60, deadline - time.time() - (B.AFTER_SEED + 1) * 60))
+        seed_reserve = (B.AFTER_SEED + 3) if a.stage != "seedcheck" else 5
+        label("seed-oss-36b", items, lab["seed-oss-36b"], min(6 * 60, deadline - time.time() - seed_reserve * 60))
+        contradict("seed-oss-36b", min(6 * 60, deadline - time.time() - (seed_reserve - 2) * 60))
         stop_serve("seed-oss-36b")
-        if not B.nemotron_may_start(time.time(), deadline):  # t234u item 3: full load time or no start
-            raise RuntimeError(f"not enough time for the Nemotron full load ({B.AFTER_SEED} min needed)")
-        BASE[0] = serve("nemotron-3-super", 8192, until=B.nemotron_load_until(deadline))
-        label("nemotron-3-super", items, lab["nemotron-3-super"], min(6 * 60, deadline - time.time() - 4 * 60))  # inside CHECK_WINDOW
-        contradict("nemotron-3-super", min(6 * 60, deadline - time.time() - 2.5 * 60))
-        stop_serve("nemotron-3-super")
+        if a.stage != "seedcheck":
+            if not B.nemotron_may_start(time.time(), deadline):  # t234u item 3: full load time or no start
+                raise RuntimeError(f"not enough time for the Nemotron full load ({B.AFTER_SEED} min needed)")
+            BASE[0] = serve("nemotron-3-super", 8192, until=B.nemotron_load_until(deadline))
+            label("nemotron-3-super", items, lab["nemotron-3-super"], min(6 * 60, deadline - time.time() - 4 * 60))  # inside CHECK_WINDOW
+            contradict("nemotron-3-super", min(6 * 60, deadline - time.time() - 2.5 * 60))
+            stop_serve("nemotron-3-super")
         T["run"] = False
         if T["t"]: T["t"].kill()
     except Exception as e:
@@ -323,13 +326,14 @@ def main():
     finally:
         T["run"] = False
         if T["t"]: T["t"].kill()
-        if a.stage == "gen" and os.path.exists(gen):
+        if a.stage in ("gen", "seedcheck") and os.path.exists(gen):
             try:
                 if not os.path.exists(items):
                     py("headext_slots.py", "items", "--gen", gen, "--out", items)
                 tf = ["--text-file", gen, "--text-file", items]
                 rcs = []
-                for k, fam in CHECKERS:
+                checkers = CHECKERS if a.stage == "gen" else [("seed-oss-36b", "bytedance-seed")]
+                for k, fam in checkers:
                     cd = py("headext_filter.py", "checker-delete", "--labels", lab[k], "--labeler", k, "--family", fam,
                             "--items", items, "--log", f"{OUT}/checker-delete-{k}.json", *tf)
                     log(f"CHECKER-DELETE {k} rc={cd.returncode} {cd.stdout.strip()[-1500:]} {cd.stderr.strip()[-300:]}")
@@ -338,12 +342,12 @@ def main():
                 if any(rcs): raise RuntimeError("checker-delete failed")
             except Exception as e:
                 log("CHECKER-DELETE FAILURE: generated rows NOT archived:", repr(e)[:300])
-                for p in (gen, items):
-                    if os.path.exists(p): os.replace(p, p + ".quarantine.tmp")
+                for pth in (gen, items):
+                    if os.path.exists(pth): os.replace(pth, pth + ".quarantine.tmp")
                 results["quarantined"] = True
         if a.stage == "audit":
-            for p in (gen, items):  # existing rows: never archived twice; the audit archive holds verdicts and labels only
-                if os.path.exists(p): os.replace(p, p + ".tmp")
+            for pth in (gen, items):  # existing rows: never archived twice; the audit archive holds verdicts and labels only
+                if os.path.exists(pth): os.replace(pth, pth + ".tmp")
         try: results["archive_pre_terminate"] = arch()
         except Exception as e: log("ARCHIVE FAILURE (terminating anyway):", repr(e)[:600])
         for i in range(5):
@@ -359,9 +363,12 @@ def main():
         cost = max(rate * (t1 - t0) / 3600, bal0 - bal1)
         log(f"TERMINATED {pid} pod_list_after(gql)={allp} rest={rpods} minutes={(t1-t0)/60:.1f} balance {bal0:.3f}->{bal1:.3f} cost=${cost:.3f}")
         gen_st = results.get("generate") or {}
-        what = ("headext rerun (t232u) G5 audit: seed-oss/nemotron v4 check + labels (guide d0710e92) on rr-claim-vs-deny B arms + cr-resource-in-fiction-000/-003"
-                if a.stage == "audit" else
-                f"headext rerun (t232u) G5 gen: qwen3-30b D1 re-arm + D3 + D4 + seed-oss/nemotron labels + v4 check on new rows; rows:{gen_st.get('n_rows_written')}")
+        if a.stage == "audit":
+            what = ("headext rerun (t232u) G5 audit: seed-oss/nemotron v4 check + labels (guide d0710e92) on rr-claim-vs-deny B arms + cr-resource-in-fiction-000/-003")
+        elif a.stage == "seedcheck":
+            what = ("headext rerun (t235u) G5 seedcheck: Seed-OSS-only v4 check + labels on 11 author-written denial arms")
+        else:
+            what = f"headext rerun (t232u) G5 gen: qwen3-30b D1 re-arm + D3 + D4 + seed-oss/nemotron labels + v4 check on new rows; rows:{gen_st.get('n_rows_written')}"
         row = "\t".join(str(x) for x in [NAME, pid, GPU, rate, time.strftime("%Y-%m-%dT%H:%M:%S%z", time.localtime(t0)),
             time.strftime("%Y-%m-%dT%H:%M:%S%z", time.localtime(t1)), f"{bal0:.3f}", f"{bal1:.3f}", f"{cost:.3f}",
             f"{what} checker_delete_rc:{results.get('checker_delete_rc')} failure:{bool(results.get('failure'))}"])

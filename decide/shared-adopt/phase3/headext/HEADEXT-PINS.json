@@ -1,5 +1,5 @@
 {
- "record": "head-extension pin record (sizing addendum signed t217u 08:41 NPT, A1-A12; amendment t218u 12:42 NPT, A13-A16; G2 re-pin; amendment t219u 2026-11-03 09:01 NPT, A17-A20 re-pin); amendment t220u 2026-11-03 10:06 NPT, A21-A24 re-pin (slot spec v10-3, G3 writer Mistral-Small-3.2); record t221 2026-11-03 (second review pass, data-v10 pack driver); amendment t221u 2026-11-03 11:12 NPT, A25-A29 re-pin (offer rule: guide 79e29da9, checker prompt v3, A25 pod; A26 record; A28 pair_id); t221u post-A25 re-pin (A25 results, data-v10 train 4f6fa207/val bb522c9e, training pod one code); t226u/t227u A30 re-pin (eager attention, smoke pre-pod check, training cap $6, 65 offer refusals kept as negatives); t227u A31: slot spec v10-4, G4 driver, negatives retag; t227u A31 result: G4 decision, pack v10d; t227u hx-t2 status-poll retry; t227u test_head_ext cross-build tolerance; t227u hx-t4 xtrace false-positive fix; t228u A32: on-demand guard, per-seed volume write, 105 min, finite check; t228u test_train_pod caps; t228u box smokes; t228u hx-t5 result + VPS retry; t228u hx-t5 result + VPS retry/backoff; pod two hx-t6 record; V0-V3 scoring of s60-s69 (CPU, stored preds; 0/10 pass: V1 CSE s63/s66, V2 claims_relationship_role pairs, V3 (c)); report wording; t231u no-pod diagnosis (a)(b)(c) + DRAFT redeclaration (unsigned); diag report time fix; t232u rerun: contradict v4 (D2), headext_pod_g5.py (audit + gen stages); G5 driver: attempt suffix, 8-min start wait, POD_NOT_FOUND; slots g5/re-arm support (no spec change yet); t234u: spec v10-5 (F1 re-arm, F3, F4, F2 text), G5 budget gate (Nemotron full load), F1 verdicts, gold audit record; t234u G5 decide + F5 dup",
+ "record": "head-extension pin record (sizing addendum signed t217u 08:41 NPT, A1-A12; amendment t218u 12:42 NPT, A13-A16; G2 re-pin; amendment t219u 2026-11-03 09:01 NPT, A17-A20 re-pin); amendment t220u 2026-11-03 10:06 NPT, A21-A24 re-pin (slot spec v10-3, G3 writer Mistral-Small-3.2); record t221 2026-11-03 (second review pass, data-v10 pack driver); amendment t221u 2026-11-03 11:12 NPT, A25-A29 re-pin (offer rule: guide 79e29da9, checker prompt v3, A25 pod; A26 record; A28 pair_id); t221u post-A25 re-pin (A25 results, data-v10 train 4f6fa207/val bb522c9e, training pod one code); t226u/t227u A30 re-pin (eager attention, smoke pre-pod check, training cap $6, 65 offer refusals kept as negatives); t227u A31: slot spec v10-4, G4 driver, negatives retag; t227u A31 result: G4 decision, pack v10d; t227u hx-t2 status-poll retry; t227u test_head_ext cross-build tolerance; t227u hx-t4 xtrace false-positive fix; t228u A32: on-demand guard, per-seed volume write, 105 min, finite check; t228u test_train_pod caps; t228u box smokes; t228u hx-t5 result + VPS retry; t228u hx-t5 result + VPS retry/backoff; pod two hx-t6 record; V0-V3 scoring of s60-s69 (CPU, stored preds; 0/10 pass: V1 CSE s63/s66, V2 claims_relationship_role pairs, V3 (c)); report wording; t231u no-pod diagnosis (a)(b)(c) + DRAFT redeclaration (unsigned); diag report time fix; t232u rerun: contradict v4 (D2), headext_pod_g5.py (audit + gen stages); G5 driver: attempt suffix, 8-min start wait, POD_NOT_FOUND; slots g5/re-arm support (no spec change yet); t234u: spec v10-5 (F1 re-arm, F3, F4, F2 text), G5 budget gate (Nemotron full load), F1 verdicts, gold audit record; t234u G5 decide + F5 dup; t235u seedcheck stage + adopt",
  "files": {
   "../../../../tools/evaluator-training/primitives/kind-label-table.json": "0d6a110a6d9ce39b995de2e03d18ff11baca8ba8d5e779b4b027e1d48189d52b",
   "../../../../tools/evaluator-training/primitives/vocabulary.json": "329171161e510d604fbaa05db53f42fe05a4b075a298684ef5c394b1c2a0342b",
@@ -89,12 +89,15 @@
   "diag/diag-bc.json": "a37d3a3cd8d2d9075fcad38006295c7fab7a3a1175d2cd3bb3494448c102b041",
   "../REPORT-HEAD-EXT-DIAG-t231u.md": "bdaa5d33d568e2dba0172374714b192fc334ba568df9b45994f5aafc36300c6f",
   "../DECLARATION-HEAD-EXTENSION-RERUN.md": "f8c7a8cc2ba7a5face4b08ac480c1a8e3817fd4526a706d54d63ff6aeafa72a5",
-  "headext_pod_g5.py": "7e4522172ee28040dfe1a729768fe8a9d9344fba716e0aaab58f8f97e8d60df4",
-  "headext_g5_budget.py": "8e160852ddbd9813d0bb458200a402a839c39b59f4c17e60c7c776ce0f34b661",
-  "tests/test_g5_budget.py": "682d8218d5c6d42f9cfb9cb0c9ee1a82f6f90a9a7e5b468cd4fcf97171c87f7e",
+  "headext_pod_g5.py": "b71bb8156be153f9f6733df82250b762cf81bc2865a42a0814d6536e76ac416f",
+  "headext_g5_budget.py": "f5a773d09797945b1e851390d4573ea431d52670dd173adfb02147830956cd68",
+  "tests/test_g5_budget.py": "7856b314ffef5f77e1bcae7469a5220632f3c137ef03ca23bf153b31e1bc4b12",
   "headext_g5.py": "025fbb2c9057dbd8424409f1e25c994c110908613a9e3ca639b9b112ef4423fa",
   "headext_f5_dup.py": "c489081dbfa58fb5b51ff85f30dd85fd083ff6d86d98da87ed8ccad218a401a7",
-  "tests/test_g5_decide.py": "da2b9ece97f27fd0949d389c07a53eab011a2d4e82212073a695954fa3dcec7e"
+  "tests/test_g5_decide.py": "da2b9ece97f27fd0949d389c07a53eab011a2d4e82212073a695954fa3dcec7e",
+  "headext_g5_adopt.py": "c34be89649ac6374248c99c3cccfe725b9a56a295ca47d0d4e95964cd5162663",
+  "evidence/rerun/authored-denials-t235.jsonl": "e1ac36465ef433352035c9156139e045d2d849c2caa7d4dd5e21f11991584b99",
+  "evidence/rerun/authored-denials-f2-verdicts.json": "7d49f736c15895f18f4eef718df99b8eb05be7c4463ffac5dcdb96628c195fd4"
  },
  "external": {
   "generator": {
