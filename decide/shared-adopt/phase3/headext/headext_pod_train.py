@@ -96,10 +96,16 @@ def main():
     ap.add_argument("--volume-id", required=True, help="t228u item 2: RunPod network volume (in DC) mounted at /vol; each seed's "
                     "artifacts + MANIFEST.sha256 are written there by the pipeline as the seed finishes")
     ap.add_argument("--label", default="training pod", help="ledger description prefix")
+    ap.add_argument("--cap-usd", type=float, default=None, help="override CAP_USD (short pod headroom); default module CAP_USD")
     ap.add_argument("--attach", action="store_true", help="re-attach to the running pod in state.json (driver restart): "
                     "no create, no upload, no launch; verify both watchdogs, then monitor / archive / terminate")
     ap.add_argument("--local-pull-test", help="box test of the per-seed archive path on a finished local work dir; no pod")
-    a = ap.parse_args(); PODW = a.local_pull_test or "/root/hx"
+    a = ap.parse_args()
+    global CAP_USD
+    if a.cap_usd is not None:
+        if not (0.5 <= a.cap_usd <= CAP_USD): raise SystemExit(f"ABORT: --cap-usd {a.cap_usd} out of range")
+        CAP_USD = float(a.cap_usd); log(f"CAP_USD override -> {CAP_USD}")
+    PODW = a.local_pull_test or "/root/hx"
     NAME = a.name; ROOT = f"/workspace/headext-train/{NAME}"; OUT = f"{ROOT}/out"; VD = f"{A.VPSDIR}/train-{NAME}"
     os.makedirs(f"{OUT}/logs", exist_ok=True)
     if not a.attach and os.listdir(f"{OUT}/logs") or not a.attach and A.vps(f"test -e {VD}", check=False).returncode == 0: raise SystemExit("ABORT: output exists (no silent resume)")
