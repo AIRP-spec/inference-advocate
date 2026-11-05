@@ -122,7 +122,12 @@ def main():
                 break
             except Exception as e:
                 log(f"create attempt {k + 1}/{CREATE_TRIES} failed:", repr(e)[:160])
-                if "SUPPLY_CONSTRAINT" not in repr(e) or k == CREATE_TRIES - 1:
+                msg = repr(e)
+                # RunPod may say SUPPLY_CONSTRAINT or "does not have the resources" / "try a different machine"
+                supply = ("SUPPLY_CONSTRAINT" in msg
+                          or "does not have the resources" in msg
+                          or "try a different machine" in msg)
+                if not supply or k == CREATE_TRIES - 1:
                     status(f"headext {NAME} POD NOT CREATED (no RTX 4090 SECURE after {k + 1} tries); nothing billed; stopped")
                     raise SystemExit("ABORT: no GPU")
                 if A.gq("query { myself { pods { id name } } }")["myself"]["pods"]: raise SystemExit("ABORT: a pod appeared during retries")
