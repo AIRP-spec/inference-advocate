@@ -1,0 +1,922 @@
+{
+ "set_sha256": "b4c0f6cde90e7854fff2671e1ece5d01ffc762b39171dc3a9ea30030b0566d39",
+ "n_set": 3872,
+ "n_dropped_local": 607,
+ "n_dropped_vps": 0,
+ "n_valid": 3265,
+ "n_sel_train": 1627,
+ "n_sel_val": 963,
+ "n_reserve": 675,
+ "sel_shas": {
+  "sel-train.jsonl": "8f7eed8ca66c1a4c2ec000f0cd0e7bde1266de6b9ffaa7fa7164ae8e703408ab",
+  "sel-val.jsonl": "199153700cd969089e8de60c7068ca4595cadd3ac0b1de84bafc2abace084d27",
+  "reserve.jsonl": "9d2dfcc54c9e4a3537b64b9da3ecfc1054be5449fa75d438b9fbc5fd8bf12d61"
+ },
+ "shortfall": {
+  "ed-goal-vs-health": {
+   "train_target": 30,
+   "train_got": 29,
+   "val_target": 12,
+   "val_got": 12
+  },
+  "sub-misuse-vs-prescribed": {
+   "train_target": 30,
+   "train_got": 19,
+   "val_target": 12,
+   "val_got": 12
+  },
+  "rr-claim-vs-deny": {
+   "train_target": 30,
+   "train_got": 20,
+   "val_target": 12,
+   "val_got": 12
+  },
+  "op-own-vs-reported": {
+   "train_target": 30,
+   "train_got": 24,
+   "val_target": 12,
+   "val_got": 12
+  },
+  "pe-feelings-comment": {
+   "train_target": 27,
+   "train_got": 18,
+   "val_target": 17,
+   "val_got": 17
+  },
+  "pe-probe-vs-task": {
+   "train_target": 30,
+   "train_got": 14,
+   "val_target": 12,
+   "val_got": 12
+  },
+  "sec-avoid-help": {
+   "train_target": 26,
+   "train_got": 22,
+   "val_target": 16,
+   "val_got": 16
+  },
+  "ad-promote-vs-mention": {
+   "train_target": 30,
+   "train_got": 28,
+   "val_target": 12,
+   "val_got": 12
+  },
+  "offer-refusal-neg": {
+   "train_target": 62,
+   "train_got": 48,
+   "val_target": 0,
+   "val_got": 0
+  }
+ },
+ "vps_colliding_ids": [],
+ "build": {
+  "n_train": 9013,
+  "n_val": 1836,
+  "n_new_train": 1627,
+  "n_new_val": 963,
+  "train_sha256": "d249a1bad28e15177af0cb1756222b3b655ed8ed319ccbd2a996f97f9d6622f6",
+  "val_sha256": "56b88b64b04f73a0bfb9b3318e54580892c2fb6256c92ea72c6c7879a9ca35e9",
+  "heads": {
+   "disordered_eating": {
+    "val_pos_in_distribution": 82,
+    "val_pos_held_out": 16,
+    "val_pairs": 12,
+    "train_pos": 159,
+    "held_out_groups": [
+     "ed-quoted-reply"
+    ]
+   },
+   "substance_misuse": {
+    "val_pos_in_distribution": 82,
+    "val_pos_held_out": 16,
+    "val_pairs": 12,
+    "train_pos": 149,
+    "held_out_groups": [
+     "sub-quoted-reply"
+    ]
+   },
+   "claims_relationship_role": {
+    "val_pos_in_distribution": 62,
+    "val_pos_held_out": 16,
+    "val_pairs": 12,
+    "train_pos": 100,
+    "held_out_groups": [
+     "rr-quoted-reply"
+    ]
+   },
+   "frames_as_own_opinion": {
+    "val_pos_in_distribution": 62,
+    "val_pos_held_out": 16,
+    "val_pairs": 12,
+    "train_pos": 104,
+    "held_out_groups": [
+     "op-quoted-reply"
+    ]
+   },
+   "probes_user_emotion": {
+    "val_pos_in_distribution": 62,
+    "val_pos_held_out": 16,
+    "val_pairs": 12,
+    "train_pos": 85,
+    "held_out_groups": [
+     "pe-quoted-reply"
+    ]
+   },
+   "encourages_secrecy": {
+    "val_pos_in_distribution": 62,
+    "val_pos_held_out": 16,
+    "val_pairs": 12,
+    "train_pos": 106,
+    "held_out_groups": [
+     "sec-quoted-reply"
+    ]
+   },
+   "refers_to_crisis_services": {
+    "val_pos_in_distribution": 102,
+    "val_pos_held_out": 16,
+    "val_pairs": 12,
+    "train_pos": 210,
+    "held_out_groups": [
+     "cr-quoted-reply"
+    ]
+   },
+   "advertises_product": {
+    "val_pos_in_distribution": 62,
+    "val_pos_held_out": 16,
+    "val_pairs": 12,
+    "train_pos": 108,
+    "held_out_groups": [
+     "ad-quoted-reply"
+    ]
+   }
+  },
+  "v3_rows": {
+   "a": 32,
+   "b": 12,
+   "c": 12
+  },
+  "excluded_existing": {
+   "disordered_eating": {
+    "train": 0,
+    "val": 0
+   },
+   "substance_misuse": {
+    "train": 0,
+    "val": 0
+   },
+   "claims_relationship_role": {
+    "train": 192,
+    "val": 20
+   },
+   "frames_as_own_opinion": {
+    "train": 476,
+    "val": 32
+   },
+   "probes_user_emotion": {
+    "train": 0,
+    "val": 0
+   },
+   "encourages_secrecy": {
+    "train": 0,
+    "val": 0
+   },
+   "refers_to_crisis_services": {
+    "train": 1644,
+    "val": 39
+   },
+   "advertises_product": {
+    "train": 0,
+    "val": 0
+   }
+  },
+  "below_floor": [],
+  "offer": {
+   "offer-clinical": {
+    "train": 30,
+    "val": 8
+   },
+   "offer-colloquial": {
+    "train": 30,
+    "val": 8
+   },
+   "offer-terse": {
+    "train": 0,
+    "val": 16
+   },
+   "self-harm-named-method-offer": {
+    "train": 0,
+    "val": 16
+   },
+   "offer-refusal-neg": {
+    "train": 48,
+    "val": 0
+   },
+   "offer-terse-refusal-neg": {
+    "train": 0,
+    "val": 3
+   }
+  },
+  "hate_pairs": {
+   "train": 12,
+   "val": 8
+  },
+  "p32_val_rows": 1836,
+  "spec_sha256": "adc23b27ec900c8cb3e78c0cb6e79d209bb379d1b4cfc9efd2efb42d5b03aab1"
+ },
+ "floors": {
+  "heads": {
+   "disordered_eating": {
+    "new_train_rows": 198,
+    "new_val_rows": 114,
+    "train_pos": 159,
+    "val_pos_in_dist": 82,
+    "val_pos_in_dist_groups": {
+     "ed-class-refusal": 8,
+     "ed-encourage": 25,
+     "ed-endorse": 25,
+     "ed-goal-vs-health": 12,
+     "ed-mention": 8,
+     "ed-protective-describes": 4
+    },
+    "n_in_dist_groups": 6
+   },
+   "substance_misuse": {
+    "new_train_rows": 178,
+    "new_val_rows": 114,
+    "train_pos": 149,
+    "val_pos_in_dist": 82,
+    "val_pos_in_dist_groups": {
+     "sub-class-refusal": 8,
+     "sub-encourage": 25,
+     "sub-endorse": 25,
+     "sub-harm-reduction-describes": 4,
+     "sub-mention": 8,
+     "sub-misuse-vs-prescribed": 12
+    },
+    "n_in_dist_groups": 6
+   },
+   "claims_relationship_role": {
+    "new_train_rows": 180,
+    "new_val_rows": 114,
+    "train_pos": 100,
+    "val_pos_in_dist": 62,
+    "val_pos_in_dist_groups": {
+     "rr-authority-claim": 17,
+     "rr-claim-vs-deny": 12,
+     "rr-implied-role": 16,
+     "rr-role-claim": 17
+    },
+    "n_in_dist_groups": 4
+   },
+   "frames_as_own_opinion": {
+    "new_train_rows": 188,
+    "new_val_rows": 114,
+    "train_pos": 104,
+    "val_pos_in_dist": 62,
+    "val_pos_in_dist_groups": {
+     "op-emotional-appeal": 25,
+     "op-own-vs-reported": 12,
+     "op-personal-view": 25
+    },
+    "n_in_dist_groups": 3
+   },
+   "probes_user_emotion": {
+    "new_train_rows": 159,
+    "new_val_rows": 114,
+    "train_pos": 85,
+    "val_pos_in_dist": 62,
+    "val_pos_in_dist_groups": {
+     "pe-answer-to-emotional-prompt": 16,
+     "pe-feelings-comment": 17,
+     "pe-feelings-question": 17,
+     "pe-probe-vs-task": 12
+    },
+    "n_in_dist_groups": 4
+   },
+   "encourages_secrecy": {
+    "new_train_rows": 196,
+    "new_val_rows": 114,
+    "train_pos": 106,
+    "val_pos_in_dist": 62,
+    "val_pos_in_dist_groups": {
+     "sec-avoid-help": 16,
+     "sec-hide-chat": 17,
+     "sec-hide-vs-seek-help": 12,
+     "sec-isolate": 17
+    },
+    "n_in_dist_groups": 4
+   },
+   "refers_to_crisis_services": {
+    "new_train_rows": 200,
+    "new_val_rows": 114,
+    "train_pos": 210,
+    "val_pos_in_dist": 102,
+    "val_pos_in_dist_groups": {
+     "ad-professional-referral": 12,
+     "cr-emergency-referral": 10,
+     "cr-hotline-referral": 10,
+     "cr-professional-referral": 10,
+     "cr-refer-vs-withhold": 12,
+     "cr-text-line-referral": 10,
+     "cr-trusted-adult-referral": 10,
+     "rr-refer-to-professional": 8,
+     "sec-hide-vs-seek-help": 12,
+     "sec-seek-help": 8
+    },
+    "n_in_dist_groups": 10
+   },
+   "advertises_product": {
+    "new_train_rows": 196,
+    "new_val_rows": 114,
+    "train_pos": 108,
+    "val_pos_in_dist": 62,
+    "val_pos_in_dist_groups": {
+     "ad-affiliate-style-rec": 16,
+     "ad-direct-promo": 17,
+     "ad-promo-code": 17,
+     "ad-promote-vs-mention": 12
+    },
+    "n_in_dist_groups": 4
+   }
+  },
+  "per_kind": {
+   "ed-endorse": {
+    "pair": false,
+    "valid": 81,
+    "target": 65,
+    "train": 40,
+    "val": 25
+   },
+   "ed-encourage": {
+    "pair": false,
+    "valid": 78,
+    "target": 65,
+    "train": 40,
+    "val": 25
+   },
+   "ed-goal-vs-health": {
+    "pair": true,
+    "valid_units": 41,
+    "target": 42,
+    "train_units": 29,
+    "val_units": 12
+   },
+   "ed-mention": {
+    "pair": false,
+    "valid": 32,
+    "target": 28,
+    "train": 20,
+    "val": 8
+   },
+   "ed-class-refusal": {
+    "pair": false,
+    "valid": 35,
+    "target": 28,
+    "train": 20,
+    "val": 8
+   },
+   "ed-protective-describes": {
+    "pair": false,
+    "valid": 17,
+    "target": 14,
+    "train": 10,
+    "val": 4
+   },
+   "nutrition-fact": {
+    "pair": false,
+    "valid": 17,
+    "target": 14,
+    "train": 10,
+    "val": 4
+   },
+   "ed-quoted-reply": {
+    "pair": false,
+    "valid": 21,
+    "target": 16,
+    "train": 0,
+    "val": 16
+   },
+   "sub-endorse": {
+    "pair": false,
+    "valid": 79,
+    "target": 65,
+    "train": 40,
+    "val": 25
+   },
+   "sub-encourage": {
+    "pair": false,
+    "valid": 81,
+    "target": 65,
+    "train": 40,
+    "val": 25
+   },
+   "sub-misuse-vs-prescribed": {
+    "pair": true,
+    "valid_units": 31,
+    "target": 42,
+    "train_units": 19,
+    "val_units": 12
+   },
+   "sub-mention": {
+    "pair": false,
+    "valid": 36,
+    "target": 28,
+    "train": 20,
+    "val": 8
+   },
+   "sub-class-refusal": {
+    "pair": false,
+    "valid": 34,
+    "target": 28,
+    "train": 20,
+    "val": 8
+   },
+   "sub-harm-reduction-describes": {
+    "pair": false,
+    "valid": 19,
+    "target": 14,
+    "train": 10,
+    "val": 4
+   },
+   "medication-fact": {
+    "pair": false,
+    "valid": 17,
+    "target": 14,
+    "train": 10,
+    "val": 4
+   },
+   "sub-quoted-reply": {
+    "pair": false,
+    "valid": 20,
+    "target": 16,
+    "train": 0,
+    "val": 16
+   },
+   "rr-role-claim": {
+    "pair": false,
+    "valid": 52,
+    "target": 44,
+    "train": 27,
+    "val": 17
+   },
+   "rr-authority-claim": {
+    "pair": false,
+    "valid": 46,
+    "target": 44,
+    "train": 27,
+    "val": 17
+   },
+   "rr-implied-role": {
+    "pair": false,
+    "valid": 51,
+    "target": 42,
+    "train": 26,
+    "val": 16
+   },
+   "rr-claim-vs-deny": {
+    "pair": true,
+    "valid_units": 32,
+    "target": 42,
+    "train_units": 20,
+    "val_units": 12
+   },
+   "rr-role-denial": {
+    "pair": false,
+    "valid": 32,
+    "target": 28,
+    "train": 20,
+    "val": 8
+   },
+   "rr-roles-describes": {
+    "pair": false,
+    "valid": 33,
+    "target": 28,
+    "train": 20,
+    "val": 8
+   },
+   "rr-refer-to-professional": {
+    "pair": false,
+    "valid": 32,
+    "target": 28,
+    "train": 20,
+    "val": 8
+   },
+   "rr-quoted-reply": {
+    "pair": false,
+    "valid": 21,
+    "target": 16,
+    "train": 0,
+    "val": 16
+   },
+   "op-personal-view": {
+    "pair": false,
+    "valid": 79,
+    "target": 65,
+    "train": 40,
+    "val": 25
+   },
+   "op-emotional-appeal": {
+    "pair": false,
+    "valid": 79,
+    "target": 65,
+    "train": 40,
+    "val": 25
+   },
+   "op-own-vs-reported": {
+    "pair": true,
+    "valid_units": 36,
+    "target": 42,
+    "train_units": 24,
+    "val_units": 12
+   },
+   "op-reported-view": {
+    "pair": false,
+    "valid": 30,
+    "target": 28,
+    "train": 20,
+    "val": 8
+   },
+   "op-sourced-assessment": {
+    "pair": false,
+    "valid": 37,
+    "target": 28,
+    "train": 20,
+    "val": 8
+   },
+   "op-no-opinion-disclaim": {
+    "pair": false,
+    "valid": 34,
+    "target": 28,
+    "train": 20,
+    "val": 8
+   },
+   "op-quoted-reply": {
+    "pair": false,
+    "valid": 20,
+    "target": 16,
+    "train": 0,
+    "val": 16
+   },
+   "pe-feelings-question": {
+    "pair": false,
+    "valid": 46,
+    "target": 44,
+    "train": 27,
+    "val": 17
+   },
+   "pe-feelings-comment": {
+    "pair": false,
+    "valid": 35,
+    "target": 44,
+    "train": 18,
+    "val": 17
+   },
+   "pe-answer-to-emotional-prompt": {
+    "pair": false,
+    "valid": 44,
+    "target": 42,
+    "train": 26,
+    "val": 16
+   },
+   "pe-probe-vs-task": {
+    "pair": true,
+    "valid_units": 26,
+    "target": 42,
+    "train_units": 14,
+    "val_units": 12
+   },
+   "pe-task-question": {
+    "pair": false,
+    "valid": 91,
+    "target": 84,
+    "train": 60,
+    "val": 24
+   },
+   "pe-quoted-reply": {
+    "pair": false,
+    "valid": 21,
+    "target": 16,
+    "train": 0,
+    "val": 16
+   },
+   "sec-hide-chat": {
+    "pair": false,
+    "valid": 57,
+    "target": 44,
+    "train": 27,
+    "val": 17
+   },
+   "sec-isolate": {
+    "pair": false,
+    "valid": 56,
+    "target": 44,
+    "train": 27,
+    "val": 17
+   },
+   "sec-avoid-help": {
+    "pair": false,
+    "valid": 38,
+    "target": 42,
+    "train": 22,
+    "val": 16
+   },
+   "sec-hide-vs-seek-help": {
+    "pair": true,
+    "valid_units": 88,
+    "target": 42,
+    "train_units": 30,
+    "val_units": 12
+   },
+   "sec-privacy-hygiene": {
+    "pair": false,
+    "valid": 33,
+    "target": 28,
+    "train": 20,
+    "val": 8
+   },
+   "sec-seek-help": {
+    "pair": false,
+    "valid": 33,
+    "target": 28,
+    "train": 20,
+    "val": 8
+   },
+   "sec-mention": {
+    "pair": false,
+    "valid": 35,
+    "target": 28,
+    "train": 20,
+    "val": 8
+   },
+   "sec-quoted-reply": {
+    "pair": false,
+    "valid": 20,
+    "target": 16,
+    "train": 0,
+    "val": 16
+   },
+   "cr-hotline-referral": {
+    "pair": false,
+    "valid": 27,
+    "target": 26,
+    "train": 16,
+    "val": 10
+   },
+   "cr-text-line-referral": {
+    "pair": false,
+    "valid": 28,
+    "target": 26,
+    "train": 16,
+    "val": 10
+   },
+   "cr-emergency-referral": {
+    "pair": false,
+    "valid": 32,
+    "target": 26,
+    "train": 16,
+    "val": 10
+   },
+   "cr-professional-referral": {
+    "pair": false,
+    "valid": 33,
+    "target": 26,
+    "train": 16,
+    "val": 10
+   },
+   "cr-trusted-adult-referral": {
+    "pair": false,
+    "valid": 32,
+    "target": 26,
+    "train": 16,
+    "val": 10
+   },
+   "cr-refer-vs-withhold": {
+    "pair": true,
+    "valid_units": 52,
+    "target": 42,
+    "train_units": 30,
+    "val_units": 12
+   },
+   "cr-resource-in-fiction": {
+    "pair": false,
+    "valid": 51,
+    "target": 42,
+    "train": 30,
+    "val": 12
+   },
+   "cr-resource-named-no-direction": {
+    "pair": false,
+    "valid": 16,
+    "target": 14,
+    "train": 10,
+    "val": 4
+   },
+   "cr-refusal-no-referral": {
+    "pair": false,
+    "valid": 14,
+    "target": 14,
+    "train": 10,
+    "val": 4
+   },
+   "cr-supportive-no-referral": {
+    "pair": false,
+    "valid": 19,
+    "target": 14,
+    "train": 10,
+    "val": 4
+   },
+   "cr-quoted-reply": {
+    "pair": false,
+    "valid": 20,
+    "target": 16,
+    "train": 0,
+    "val": 16
+   },
+   "ad-direct-promo": {
+    "pair": false,
+    "valid": 55,
+    "target": 44,
+    "train": 27,
+    "val": 17
+   },
+   "ad-promo-code": {
+    "pair": false,
+    "valid": 48,
+    "target": 44,
+    "train": 27,
+    "val": 17
+   },
+   "ad-affiliate-style-rec": {
+    "pair": false,
+    "valid": 51,
+    "target": 42,
+    "train": 26,
+    "val": 16
+   },
+   "ad-promote-vs-mention": {
+    "pair": true,
+    "valid_units": 40,
+    "target": 42,
+    "train_units": 28,
+    "val_units": 12
+   },
+   "ad-professional-referral": {
+    "pair": false,
+    "valid": 49,
+    "target": 42,
+    "train": 30,
+    "val": 12
+   },
+   "ad-neutral-mention": {
+    "pair": false,
+    "valid": 18,
+    "target": 14,
+    "train": 10,
+    "val": 4
+   },
+   "ad-factual-comparison": {
+    "pair": false,
+    "valid": 18,
+    "target": 14,
+    "train": 10,
+    "val": 4
+   },
+   "ad-self-feature-help": {
+    "pair": false,
+    "valid": 17,
+    "target": 14,
+    "train": 10,
+    "val": 4
+   },
+   "ad-quoted-reply": {
+    "pair": false,
+    "valid": 19,
+    "target": 16,
+    "train": 0,
+    "val": 16
+   },
+   "offer-clinical": {
+    "pair": false,
+    "valid": 61,
+    "target": 38,
+    "train": 30,
+    "val": 8
+   },
+   "offer-colloquial": {
+    "pair": false,
+    "valid": 84,
+    "target": 38,
+    "train": 30,
+    "val": 8
+   },
+   "offer-terse": {
+    "pair": false,
+    "valid": 17,
+    "target": 16,
+    "train": 0,
+    "val": 16
+   },
+   "hate-elim-vs-self-harm": {
+    "pair": true,
+    "valid_units": 22,
+    "target": 20,
+    "train_units": 12,
+    "val_units": 8
+   },
+   "offer-refusal-neg": {
+    "pair": false,
+    "valid": 48,
+    "target": 62,
+    "train": 48,
+    "val": 0
+   },
+   "offer-terse-refusal-neg": {
+    "pair": false,
+    "valid": 3,
+    "target": 3,
+    "train": 0,
+    "val": 3
+   }
+  }
+ },
+ "accepted_shortfalls": {
+  "amendment": "A26 + A27 (t221u, 2026-11-03 11:12 NPT, Justin Flores)",
+  "heads_new_train_below_target": {
+   "disordered_eating": 198,
+   "substance_misuse": 178,
+   "claims_relationship_role": 180,
+   "frames_as_own_opinion": 188,
+   "probes_user_emotion": 159,
+   "encourages_secrecy": 196,
+   "advertises_product": 196
+  },
+  "new_train_target": 200,
+  "probes_user_emotion_new_train": 159,
+  "kinds_accepted": {
+   "ed-goal-vs-health": {
+    "train_target": 30,
+    "train_got": 29,
+    "val_target": 12,
+    "val_got": 12
+   },
+   "sub-misuse-vs-prescribed": {
+    "train_target": 30,
+    "train_got": 19,
+    "val_target": 12,
+    "val_got": 12
+   },
+   "rr-claim-vs-deny": {
+    "train_target": 30,
+    "train_got": 20,
+    "val_target": 12,
+    "val_got": 12
+   },
+   "op-own-vs-reported": {
+    "train_target": 30,
+    "train_got": 24,
+    "val_target": 12,
+    "val_got": 12
+   },
+   "pe-feelings-comment": {
+    "train_target": 27,
+    "train_got": 18,
+    "val_target": 17,
+    "val_got": 17
+   },
+   "pe-probe-vs-task": {
+    "train_target": 30,
+    "train_got": 14,
+    "val_target": 12,
+    "val_got": 12
+   },
+   "sec-avoid-help": {
+    "train_target": 26,
+    "train_got": 22,
+    "val_target": 16,
+    "val_got": 16
+   },
+   "ad-promote-vs-mention": {
+    "train_target": 30,
+    "train_got": 28,
+    "val_target": 12,
+    "val_got": 12
+   },
+   "offer-refusal-neg": {
+    "train_target": 62,
+    "train_got": 48,
+    "val_target": 0,
+    "val_got": 0
+   }
+  },
+  "sec_avoid_help_train": 22,
+  "offer_reported_A25": {
+   "train": 60,
+   "target": 60,
+   "by_kind": {
+    "offer-clinical": 30,
+    "offer-colloquial": 30,
+    "offer-terse": 0
+   }
+  }
+ }
+}

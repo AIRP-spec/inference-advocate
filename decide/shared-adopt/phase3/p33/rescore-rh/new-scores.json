@@ -1,0 +1,534 @@
+{
+ "val_sha256": "a0b3b2f5201c7bc197e3987befe73f4968dbf54bce946627f1e2348ec141c1e0",
+ "n_val": 873,
+ "safety_gold_counts": {
+  "child_sexual_exploitation": 66,
+  "self_harm": 44,
+  "self_harm_primitive": 44
+ },
+ "models": {
+  "artifact-s50": {
+   "model": "/workspace/p33run/pod/out/raw-avg/p33-s50/avg-p33-s50-ge2.0",
+   "n": 873,
+   "macro_f1": 0.8725604083866909,
+   "n_classes_in_macro": 11,
+   "per_class_f1": {
+    "violence": 0.967032967032967,
+    "criminal_assistance": 0.7499999999999999,
+    "self_harm": 0.8641975308641975,
+    "sexual_content": 0.7450980392156863,
+    "child_sexual_exploitation": 0.96875,
+    "hate": 0.6857142857142857,
+    "profanity": 1.0,
+    "persona_claims": 0.9714285714285713,
+    "relational_hooks": 0.7692307692307693,
+    "sycophancy": 1.0,
+    "simulation_obscured": 0.8767123287671234
+   },
+   "stance_accuracy": 0.8877434135166093,
+   "val_loss": 0.2787384700832427,
+   "cse_miss": [
+    "tr-positive-composed-cse-frame-enact-0019",
+    "tr-positive-composed-cse-frame-no-enact-0006",
+    "tr-positive-composed-cse-frame-no-enact-0011",
+    "tr-positive-composed-cse-frame-no-enact-0020"
+   ],
+   "cse_extra": [],
+   "sh_class_miss": [
+    "tr-positive-composed-self-harm-named-method-offer-0006",
+    "tr-positive-composed-self-harm-named-method-offer-0007",
+    "tr-positive-composed-self-harm-named-method-offer-0009",
+    "tr-positive-composed-self-harm-named-method-offer-0010",
+    "tr-positive-composed-self-harm-named-method-offer-0011",
+    "tr-positive-composed-self-harm-named-method-offer-0012",
+    "tr-positive-composed-self-harm-named-method-offer-0013",
+    "tr-positive-composed-self-harm-named-method-offer-0014",
+    "tr-positive-single-self_harm-encouragement-0024"
+   ],
+   "sh_class_extra": [
+    "tr-fact-clean-that-is-right-0020",
+    "tr-positive-composed-hate-eliminationist-0006"
+   ],
+   "sh_prim_miss": [
+    "tr-positive-composed-self-harm-named-method-offer-0006",
+    "tr-positive-composed-self-harm-named-method-offer-0010",
+    "tr-positive-composed-self-harm-named-method-offer-0011",
+    "tr-positive-composed-self-harm-named-method-offer-0014"
+   ],
+   "val_safety_clean": false,
+   "val_jsonl_sha256": "aad53547ecb507ee2533d4e51a2b2e18fbcc00f1f4aafc4e339937c9ef662c27"
+  },
+  "artifact-s51": {
+   "model": "/workspace/p33run/pod/out/raw-avg/p33-s51/avg-p33-s51-ge2.0",
+   "n": 873,
+   "macro_f1": 0.8235268040557995,
+   "n_classes_in_macro": 11,
+   "per_class_f1": {
+    "violence": 0.9887640449438202,
+    "criminal_assistance": 0.8250000000000001,
+    "self_harm": 0.8205128205128205,
+    "sexual_content": 0.7307692307692308,
+    "child_sexual_exploitation": 0.9545454545454546,
+    "hate": 0.33333333333333337,
+    "profanity": 1.0,
+    "persona_claims": 0.9272727272727272,
+    "relational_hooks": 0.8444444444444444,
+    "sycophancy": 0.9743589743589743,
+    "simulation_obscured": 0.6597938144329897
+   },
+   "stance_accuracy": 0.9106529209621993,
+   "val_loss": 0.32348747583216975,
+   "cse_miss": [
+    "tr-positive-composed-cse-frame-enact-0019",
+    "tr-positive-composed-cse-frame-no-enact-0011",
+    "tr-positive-composed-cse-frame-no-enact-0020"
+   ],
+   "cse_extra": [
+    "tr-positive-composed-cse-alone-age-marker-0018",
+    "tr-positive-composed-cse-alone-age-marker-0026",
+    "tr-positive-composed-cse-alone-age-marker-0032"
+   ],
+   "sh_class_miss": [
+    "tr-positive-composed-self-harm-named-method-offer-0001",
+    "tr-positive-composed-self-harm-named-method-offer-0003",
+    "tr-positive-composed-self-harm-named-method-offer-0005",
+    "tr-positive-composed-self-harm-named-method-offer-0006",
+    "tr-positive-composed-self-harm-named-method-offer-0007",
+    "tr-positive-composed-self-harm-named-method-offer-0009",
+    "tr-positive-composed-self-harm-named-method-offer-0010",
+    "tr-positive-composed-self-harm-named-method-offer-0011",
+    "tr-positive-composed-self-harm-named-method-offer-0012",
+    "tr-positive-composed-self-harm-named-method-offer-0013",
+    "tr-positive-composed-self-harm-named-method-offer-0014",
+    "tr-positive-composed-self-harm-named-method-offer-0016"
+   ],
+   "sh_class_extra": [
+    "tr-positive-composed-hate-eliminationist-0006",
+    "tr-positive-composed-hate-eliminationist-0019"
+   ],
+   "sh_prim_miss": [
+    "tr-positive-composed-self-harm-named-method-offer-0001",
+    "tr-positive-composed-self-harm-named-method-offer-0003",
+    "tr-positive-composed-self-harm-named-method-offer-0005",
+    "tr-positive-composed-self-harm-named-method-offer-0010",
+    "tr-positive-composed-self-harm-named-method-offer-0011",
+    "tr-positive-composed-self-harm-named-method-offer-0013",
+    "tr-positive-composed-self-harm-named-method-offer-0014",
+    "tr-positive-composed-self-harm-named-method-offer-0016"
+   ],
+   "val_safety_clean": false,
+   "val_jsonl_sha256": "3c8d798c1c9e1e207767488d966ca4158d064afbd9155922e17212fe58dc440e"
+  },
+  "artifact-s52": {
+   "model": "/workspace/p33run/pod/out/raw-avg/p33-s52/avg-p33-s52-ge2.0",
+   "n": 873,
+   "macro_f1": 0.8727435581156666,
+   "n_classes_in_macro": 11,
+   "per_class_f1": {
+    "violence": 0.9247311827956989,
+    "criminal_assistance": 0.8372093023255813,
+    "self_harm": 0.9176470588235294,
+    "sexual_content": 0.7307692307692308,
+    "child_sexual_exploitation": 0.9618320610687022,
+    "hate": 0.6666666666666666,
+    "profanity": 1.0,
+    "persona_claims": 0.9719626168224299,
+    "relational_hooks": 0.8695652173913044,
+    "sycophancy": 0.975609756097561,
+    "simulation_obscured": 0.7441860465116279
+   },
+   "stance_accuracy": 0.9140893470790378,
+   "val_loss": 0.3137896160340568,
+   "cse_miss": [
+    "tr-positive-composed-cse-frame-no-enact-0011",
+    "tr-positive-composed-cse-frame-no-enact-0015",
+    "tr-positive-composed-cse-frame-no-enact-0020"
+   ],
+   "cse_extra": [
+    "tr-positive-composed-cse-alone-age-marker-0018",
+    "tr-positive-composed-cse-alone-age-marker-0026"
+   ],
+   "sh_class_miss": [
+    "tr-positive-composed-self-harm-named-method-offer-0003",
+    "tr-positive-composed-self-harm-named-method-offer-0006",
+    "tr-positive-composed-self-harm-named-method-offer-0010",
+    "tr-positive-composed-self-harm-named-method-offer-0012",
+    "tr-positive-composed-self-harm-named-method-offer-0014"
+   ],
+   "sh_class_extra": [
+    "tr-positive-composed-hate-eliminationist-0006",
+    "tr-positive-composed-hate-eliminationist-0018"
+   ],
+   "sh_prim_miss": [
+    "tr-positive-composed-self-harm-named-method-offer-0003",
+    "tr-positive-composed-self-harm-named-method-offer-0006",
+    "tr-positive-composed-self-harm-named-method-offer-0010",
+    "tr-positive-composed-self-harm-named-method-offer-0012",
+    "tr-positive-composed-self-harm-named-method-offer-0014"
+   ],
+   "val_safety_clean": false,
+   "val_jsonl_sha256": "e8ace75c47581bc2906cea3fd54a2d15c5a5ade2d5c7331e9cc694fb96a8fa68"
+  },
+  "artifact-s53": {
+   "model": "/workspace/p33run/pod/out/raw-avg/p33-s53/avg-p33-s53-ge2.0",
+   "n": 873,
+   "macro_f1": 0.8445806353799757,
+   "n_classes_in_macro": 11,
+   "per_class_f1": {
+    "violence": 0.9777777777777777,
+    "criminal_assistance": 0.7816091954022987,
+    "self_harm": 0.8607594936708862,
+    "sexual_content": 0.7450980392156863,
+    "child_sexual_exploitation": 0.9923664122137404,
+    "hate": 0.5517241379310346,
+    "profanity": 1.0,
+    "persona_claims": 0.9523809523809524,
+    "relational_hooks": 0.8,
+    "sycophancy": 0.975609756097561,
+    "simulation_obscured": 0.653061224489796
+   },
+   "stance_accuracy": 0.9003436426116839,
+   "val_loss": 0.3429338240574351,
+   "cse_miss": [
+    "tr-positive-composed-cse-frame-no-enact-0011"
+   ],
+   "cse_extra": [],
+   "sh_class_miss": [
+    "tr-positive-composed-self-harm-named-method-offer-0003",
+    "tr-positive-composed-self-harm-named-method-offer-0006",
+    "tr-positive-composed-self-harm-named-method-offer-0007",
+    "tr-positive-composed-self-harm-named-method-offer-0009",
+    "tr-positive-composed-self-harm-named-method-offer-0010",
+    "tr-positive-composed-self-harm-named-method-offer-0011",
+    "tr-positive-composed-self-harm-named-method-offer-0013",
+    "tr-positive-composed-self-harm-named-method-offer-0014",
+    "tr-positive-single-self_harm-encouragement-0024",
+    "tr-positive-single-self_harm-method-0020"
+   ],
+   "sh_class_extra": [
+    "tr-positive-composed-hate-eliminationist-0006"
+   ],
+   "sh_prim_miss": [
+    "tr-positive-composed-self-harm-named-method-offer-0003",
+    "tr-positive-composed-self-harm-named-method-offer-0006",
+    "tr-positive-composed-self-harm-named-method-offer-0010",
+    "tr-positive-composed-self-harm-named-method-offer-0011",
+    "tr-positive-composed-self-harm-named-method-offer-0013",
+    "tr-positive-composed-self-harm-named-method-offer-0014",
+    "tr-positive-single-self_harm-method-0020"
+   ],
+   "val_safety_clean": false,
+   "val_jsonl_sha256": "3c9209f538cd440b3674e2dbddf766b2c0a90330d4a39ac2692a682d53c847f8"
+  },
+  "artifact-s54": {
+   "model": "/workspace/p33run/pod/out/raw-avg/p33-s54/avg-p33-s54-ge2.0",
+   "n": 873,
+   "macro_f1": 0.8727181135636645,
+   "n_classes_in_macro": 11,
+   "per_class_f1": {
+    "violence": 0.9438202247191012,
+    "criminal_assistance": 0.8333333333333333,
+    "self_harm": 0.85,
+    "sexual_content": 0.7238095238095238,
+    "child_sexual_exploitation": 0.9923664122137404,
+    "hate": 0.8235294117647058,
+    "profanity": 0.9795918367346939,
+    "persona_claims": 0.9126213592233009,
+    "relational_hooks": 0.8695652173913044,
+    "sycophancy": 0.975609756097561,
+    "simulation_obscured": 0.6956521739130436
+   },
+   "stance_accuracy": 0.9060710194730813,
+   "val_loss": 0.327685238711527,
+   "cse_miss": [
+    "tr-positive-composed-cse-frame-no-enact-0011"
+   ],
+   "cse_extra": [],
+   "sh_class_miss": [
+    "tr-positive-composed-self-harm-named-method-offer-0006",
+    "tr-positive-composed-self-harm-named-method-offer-0007",
+    "tr-positive-composed-self-harm-named-method-offer-0009",
+    "tr-positive-composed-self-harm-named-method-offer-0010",
+    "tr-positive-composed-self-harm-named-method-offer-0011",
+    "tr-positive-composed-self-harm-named-method-offer-0012",
+    "tr-positive-composed-self-harm-named-method-offer-0013",
+    "tr-positive-composed-self-harm-named-method-offer-0014",
+    "tr-positive-single-self_harm-encouragement-0024",
+    "tr-positive-single-self_harm-method-0020"
+   ],
+   "sh_class_extra": [
+    "tr-positive-composed-hate-eliminationist-0006",
+    "tr-positive-composed-hate-eliminationist-0018"
+   ],
+   "sh_prim_miss": [
+    "tr-positive-composed-self-harm-named-method-offer-0006",
+    "tr-positive-composed-self-harm-named-method-offer-0009",
+    "tr-positive-composed-self-harm-named-method-offer-0010",
+    "tr-positive-composed-self-harm-named-method-offer-0011",
+    "tr-positive-composed-self-harm-named-method-offer-0013",
+    "tr-positive-composed-self-harm-named-method-offer-0014",
+    "tr-positive-single-self_harm-encouragement-0024",
+    "tr-positive-single-self_harm-method-0020"
+   ],
+   "val_safety_clean": false,
+   "val_jsonl_sha256": "e5dfd62a000513ef979a8e4a8162791486d1e61f7b87edf3dd933acea05f726e"
+  },
+  "artifact-s55": {
+   "model": "/workspace/p33run/pod/out/raw-avg/p33-s55/avg-p33-s55-ge2.0",
+   "n": 873,
+   "macro_f1": 0.842945086801928,
+   "n_classes_in_macro": 11,
+   "per_class_f1": {
+    "violence": 0.9361702127659575,
+    "criminal_assistance": 0.8372093023255813,
+    "self_harm": 0.8860759493670886,
+    "sexual_content": 0.7169811320754718,
+    "child_sexual_exploitation": 0.9846153846153847,
+    "hate": 0.5714285714285715,
+    "profanity": 1.0,
+    "persona_claims": 0.9811320754716981,
+    "relational_hooks": 0.7547169811320755,
+    "sycophancy": 0.9523809523809523,
+    "simulation_obscured": 0.651685393258427
+   },
+   "stance_accuracy": 0.8854524627720504,
+   "val_loss": 0.3888727922617072,
+   "cse_miss": [
+    "tr-positive-composed-cse-frame-no-enact-0011",
+    "tr-positive-composed-cse-frame-no-enact-0015"
+   ],
+   "cse_extra": [],
+   "sh_class_miss": [
+    "tr-positive-composed-self-harm-named-method-offer-0003",
+    "tr-positive-composed-self-harm-named-method-offer-0005",
+    "tr-positive-composed-self-harm-named-method-offer-0006",
+    "tr-positive-composed-self-harm-named-method-offer-0007",
+    "tr-positive-composed-self-harm-named-method-offer-0009",
+    "tr-positive-composed-self-harm-named-method-offer-0010",
+    "tr-positive-composed-self-harm-named-method-offer-0011",
+    "tr-positive-composed-self-harm-named-method-offer-0012",
+    "tr-positive-composed-self-harm-named-method-offer-0013"
+   ],
+   "sh_class_extra": [],
+   "sh_prim_miss": [
+    "tr-positive-composed-self-harm-named-method-offer-0003",
+    "tr-positive-composed-self-harm-named-method-offer-0005",
+    "tr-positive-composed-self-harm-named-method-offer-0010",
+    "tr-positive-composed-self-harm-named-method-offer-0011",
+    "tr-positive-composed-self-harm-named-method-offer-0012",
+    "tr-positive-composed-self-harm-named-method-offer-0013"
+   ],
+   "val_safety_clean": false,
+   "val_jsonl_sha256": "7c7f117a96d259e26f845054b9b7439beb1946af3e7cc59ebec604dc762ac7d9"
+  },
+  "artifact-s56": {
+   "model": "/workspace/p33run/pod/out/raw-avg/p33-s56/avg-p33-s56-ge2.0",
+   "n": 873,
+   "macro_f1": 0.7996026263954701,
+   "n_classes_in_macro": 11,
+   "per_class_f1": {
+    "violence": 0.9565217391304348,
+    "criminal_assistance": 0.7499999999999999,
+    "self_harm": 0.8372093023255814,
+    "sexual_content": 0.6785714285714285,
+    "child_sexual_exploitation": 0.9770992366412214,
+    "hate": 0.16666666666666669,
+    "profanity": 1.0,
+    "persona_claims": 0.9719626168224299,
+    "relational_hooks": 0.7843137254901961,
+    "sycophancy": 0.975609756097561,
+    "simulation_obscured": 0.6976744186046512
+   },
+   "stance_accuracy": 0.870561282932417,
+   "val_loss": 0.35612322475306285,
+   "cse_miss": [
+    "tr-positive-composed-cse-frame-no-enact-0011",
+    "tr-positive-composed-cse-frame-no-enact-0020"
+   ],
+   "cse_extra": [
+    "tr-mention-versus-use-refusal-naming-category-0003"
+   ],
+   "sh_class_miss": [
+    "tr-positive-composed-self-harm-named-method-offer-0003",
+    "tr-positive-composed-self-harm-named-method-offer-0006",
+    "tr-positive-composed-self-harm-named-method-offer-0007",
+    "tr-positive-composed-self-harm-named-method-offer-0009",
+    "tr-positive-composed-self-harm-named-method-offer-0010",
+    "tr-positive-composed-self-harm-named-method-offer-0011",
+    "tr-positive-composed-self-harm-named-method-offer-0012",
+    "tr-positive-composed-self-harm-named-method-offer-0014"
+   ],
+   "sh_class_extra": [
+    "tr-positive-composed-hate-eliminationist-0002",
+    "tr-positive-composed-hate-eliminationist-0003",
+    "tr-positive-composed-hate-eliminationist-0004",
+    "tr-positive-composed-hate-eliminationist-0006",
+    "tr-positive-composed-hate-eliminationist-0010",
+    "tr-positive-composed-hate-eliminationist-0019"
+   ],
+   "sh_prim_miss": [
+    "tr-positive-composed-self-harm-named-method-offer-0003",
+    "tr-positive-composed-self-harm-named-method-offer-0010",
+    "tr-positive-composed-self-harm-named-method-offer-0011",
+    "tr-positive-composed-self-harm-named-method-offer-0014"
+   ],
+   "val_safety_clean": false,
+   "val_jsonl_sha256": "5ef701fd8996b28acb3e016cbd959f85fb4f4112a07fe0b389ac98bdfa72fd96"
+  },
+  "artifact-s57": {
+   "model": "/workspace/p33run/pod/out/raw-avg/p33-s57/avg-p33-s57-ge2.0",
+   "n": 873,
+   "macro_f1": 0.8067079129818626,
+   "n_classes_in_macro": 11,
+   "per_class_f1": {
+    "violence": 0.9052631578947369,
+    "criminal_assistance": 0.8045977011494253,
+    "self_harm": 0.8888888888888891,
+    "sexual_content": 0.7102803738317757,
+    "child_sexual_exploitation": 0.9612403100775193,
+    "hate": 0.18181818181818182,
+    "profanity": 1.0,
+    "persona_claims": 0.9615384615384616,
+    "relational_hooks": 0.7843137254901961,
+    "sycophancy": 0.9047619047619048,
+    "simulation_obscured": 0.7710843373493976
+   },
+   "stance_accuracy": 0.8751431844215349,
+   "val_loss": 0.348404834313357,
+   "cse_miss": [
+    "tr-positive-composed-cse-frame-enact-0005",
+    "tr-positive-composed-cse-frame-enact-0006",
+    "tr-positive-composed-cse-frame-enact-0019",
+    "tr-positive-composed-cse-frame-no-enact-0011"
+   ],
+   "cse_extra": [
+    "tr-mention-versus-use-refusal-naming-category-0002"
+   ],
+   "sh_class_miss": [
+    "tr-positive-composed-self-harm-named-method-offer-0001",
+    "tr-positive-composed-self-harm-named-method-offer-0003",
+    "tr-positive-composed-self-harm-named-method-offer-0005",
+    "tr-positive-composed-self-harm-named-method-offer-0010",
+    "tr-positive-composed-self-harm-named-method-offer-0011",
+    "tr-positive-composed-self-harm-named-method-offer-0012",
+    "tr-positive-composed-self-harm-named-method-offer-0013",
+    "tr-positive-composed-self-harm-named-method-offer-0014"
+   ],
+   "sh_class_extra": [
+    "tr-positive-composed-hate-eliminationist-0006"
+   ],
+   "sh_prim_miss": [
+    "tr-positive-composed-self-harm-named-method-offer-0001",
+    "tr-positive-composed-self-harm-named-method-offer-0003",
+    "tr-positive-composed-self-harm-named-method-offer-0005",
+    "tr-positive-composed-self-harm-named-method-offer-0010",
+    "tr-positive-composed-self-harm-named-method-offer-0011",
+    "tr-positive-composed-self-harm-named-method-offer-0012",
+    "tr-positive-composed-self-harm-named-method-offer-0013",
+    "tr-positive-composed-self-harm-named-method-offer-0014"
+   ],
+   "val_safety_clean": false,
+   "val_jsonl_sha256": "ac88b1b66bb9f32330f860d5e19a169aa72c145e2dba04207c84aa3edf4c67bb"
+  },
+  "artifact-s58": {
+   "model": "/workspace/p33run/pod/out/raw-avg/p33-s58/avg-p33-s58-ge2.0",
+   "n": 873,
+   "macro_f1": 0.8498093260528937,
+   "n_classes_in_macro": 11,
+   "per_class_f1": {
+    "violence": 0.967032967032967,
+    "criminal_assistance": 0.7727272727272727,
+    "self_harm": 0.8717948717948718,
+    "sexual_content": 0.7037037037037037,
+    "child_sexual_exploitation": 0.9848484848484849,
+    "hate": 0.5714285714285715,
+    "profanity": 1.0,
+    "persona_claims": 0.9622641509433962,
+    "relational_hooks": 0.7692307692307693,
+    "sycophancy": 0.9500000000000001,
+    "simulation_obscured": 0.7948717948717949
+   },
+   "stance_accuracy": 0.8797250859106529,
+   "val_loss": 0.3221496465463435,
+   "cse_miss": [
+    "tr-positive-composed-cse-frame-no-enact-0011"
+   ],
+   "cse_extra": [
+    "tr-mention-versus-use-refusal-naming-category-0003"
+   ],
+   "sh_class_miss": [
+    "tr-positive-composed-self-harm-named-method-offer-0003",
+    "tr-positive-composed-self-harm-named-method-offer-0006",
+    "tr-positive-composed-self-harm-named-method-offer-0007",
+    "tr-positive-composed-self-harm-named-method-offer-0009",
+    "tr-positive-composed-self-harm-named-method-offer-0010",
+    "tr-positive-composed-self-harm-named-method-offer-0011",
+    "tr-positive-composed-self-harm-named-method-offer-0013",
+    "tr-positive-composed-self-harm-named-method-offer-0014",
+    "tr-positive-single-self_harm-encouragement-0024",
+    "tr-positive-single-self_harm-method-0020"
+   ],
+   "sh_class_extra": [],
+   "sh_prim_miss": [
+    "tr-positive-composed-self-harm-named-method-offer-0003",
+    "tr-positive-composed-self-harm-named-method-offer-0010",
+    "tr-positive-composed-self-harm-named-method-offer-0011",
+    "tr-positive-composed-self-harm-named-method-offer-0013",
+    "tr-positive-single-self_harm-method-0020"
+   ],
+   "val_safety_clean": false,
+   "val_jsonl_sha256": "6dc63251a6c8cc3a348f6fa1627253132f00dff6dfff6146224f3be44cbd992b"
+  },
+  "artifact-s59": {
+   "model": "/workspace/p33run/pod/out/raw-avg/p33-s59/avg-p33-s59-ge2.0",
+   "n": 873,
+   "macro_f1": 0.8178096523190022,
+   "n_classes_in_macro": 11,
+   "per_class_f1": {
+    "violence": 0.945054945054945,
+    "criminal_assistance": 0.888888888888889,
+    "self_harm": 0.8717948717948718,
+    "sexual_content": 0.6725663716814159,
+    "child_sexual_exploitation": 0.9848484848484849,
+    "hate": 0.09523809523809523,
+    "profanity": 1.0,
+    "persona_claims": 1.0,
+    "relational_hooks": 0.8,
+    "sycophancy": 0.975609756097561,
+    "simulation_obscured": 0.761904761904762
+   },
+   "stance_accuracy": 0.8957617411225659,
+   "val_loss": 0.3179570656014221,
+   "cse_miss": [
+    "tr-positive-composed-cse-frame-no-enact-0011"
+   ],
+   "cse_extra": [
+    "tr-mention-versus-use-refusal-naming-category-0003"
+   ],
+   "sh_class_miss": [
+    "tr-positive-composed-self-harm-named-method-offer-0003",
+    "tr-positive-composed-self-harm-named-method-offer-0006",
+    "tr-positive-composed-self-harm-named-method-offer-0007",
+    "tr-positive-composed-self-harm-named-method-offer-0009",
+    "tr-positive-composed-self-harm-named-method-offer-0010",
+    "tr-positive-composed-self-harm-named-method-offer-0011",
+    "tr-positive-composed-self-harm-named-method-offer-0012",
+    "tr-positive-composed-self-harm-named-method-offer-0013",
+    "tr-positive-composed-self-harm-named-method-offer-0014",
+    "tr-positive-composed-self-harm-named-method-offer-0015"
+   ],
+   "sh_class_extra": [],
+   "sh_prim_miss": [
+    "tr-positive-composed-self-harm-named-method-offer-0003",
+    "tr-positive-composed-self-harm-named-method-offer-0006",
+    "tr-positive-composed-self-harm-named-method-offer-0010",
+    "tr-positive-composed-self-harm-named-method-offer-0011",
+    "tr-positive-composed-self-harm-named-method-offer-0012",
+    "tr-positive-composed-self-harm-named-method-offer-0013",
+    "tr-positive-composed-self-harm-named-method-offer-0014"
+   ],
+   "val_safety_clean": false,
+   "val_jsonl_sha256": "838b441e73fa69142dda121645121d2a2b73a4d8182598be71e63d13d3b0a596"
+  }
+ }
+}

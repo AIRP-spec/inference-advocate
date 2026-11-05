@@ -1,0 +1,11 @@
+SMOKE sdpa B1_1short_7long seq_lens=[5, 361, 368, 372, 375, 390, 408, 435] nonfinite_rows=3 loss_finite=False grads_finite=False
+SMOKE sdpa B2_4short_4long seq_lens=[5, 5, 5, 6, 375, 390, 408, 435] nonfinite_rows=4 loss_finite=False grads_finite=False
+SMOKE sdpa B3_spread seq_lens=[5, 12, 16, 18, 22, 26, 41, 435] nonfinite_rows=7 loss_finite=False grads_finite=False
+SMOKE eager B1_1short_7long seq_lens=[5, 361, 368, 372, 375, 390, 408, 435] nonfinite_rows=0 loss_finite=True grads_finite=True
+SMOKE eager B2_4short_4long seq_lens=[5, 5, 5, 6, 375, 390, 408, 435] nonfinite_rows=0 loss_finite=True grads_finite=True
+SMOKE eager B3_spread seq_lens=[5, 12, 16, 18, 22, 26, 41, 435] nonfinite_rows=0 loss_finite=True grads_finite=True
+SMOKE_BF16_MIXED PASS {"sdpa": false, "eager": true}
+VOL_OK_hx-s60 41 files 9aa875242979783e730404de3ad4e0382bc8e7514253f3c24e46932c1e01f965
+RUN_DONE_hx-s60 2026-11-04T06:09:25Z
+PIPELINE_DONE 2026-11-04T06:09:25Z
+pack-t5 PACK.sha256 ff605e006eb093f74219dae8974a420c1a86b24ba93e28890b3b5477b9ef8757 tgz 17a96915f825c2fa3931da51e5bf9bbc19528a72326534704f49b63857120203

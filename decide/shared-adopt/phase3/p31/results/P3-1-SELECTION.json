@@ -1,0 +1,43 @@
+{
+  "winner": "A2",
+  "arms": {
+    "A0": {
+      "N": 5,
+      "k_clean": 2,
+      "k_artifact_clean": 4,
+      "mean_final_flip": 3.126,
+      "valF1_mean": 0.7897,
+      "valF1_sd": 0.0331,
+      "mean_n_converged": 1,
+      "converged_ckpts_clean": "3/5"
+    },
+    "A1": {
+      "N": 5,
+      "k_clean": 2,
+      "k_artifact_clean": 4,
+      "mean_final_flip": 1.978,
+      "valF1_mean": 0.7945,
+      "valF1_sd": 0.0191,
+      "mean_n_converged": 3,
+      "converged_ckpts_clean": "11/15"
+    },
+    "A2": {
+      "N": 5,
+      "k_clean": 3,
+      "k_artifact_clean": 5,
+      "mean_final_flip": 0.952,
+      "valF1_mean": 0.8079,
+      "valF1_sd": 0.0397,
+      "mean_n_converged": 2.4,
+      "converged_ckpts_clean": "12/12"
+    }
+  },
+  "ranking": [
+    "A2",
+    "A1",
+    "A0"
+  ],
+  "rule": "most seeds safety-clean at artifact and every ckpt>=2.0; tie -> lower mean final flip; tie -> lower val-F1 SD; a tail arm must beat A0 strictly",
+  "timestamp_utc": "2026-10-20T20:17:08Z",
+  "note": "v2 E+M not computed or printed before this file was committed"
+}
