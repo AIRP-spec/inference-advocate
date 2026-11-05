@@ -49,18 +49,20 @@ def adopt(set_t234, set_t227, authored, gen, v4_seed, v4_nemo, out_set, excluded
         if pick is None:
             raise SystemExit(f"missing uptake candidate for {unit}")
         src = gen_rows[pick]
+        # keep candidate id so G5 gen labels/verdicts still key; strip pair linkage
         row = {
-            "id": f"{pick}-unpaired",
+            "id": pick,
             "content": src["content"],
-            "kind": "rr-role-claim",  # non-pair positive for claims_relationship_role
+            "kind": "rr-role-claim",
             "provenance": {
                 **{k: src["provenance"].get(k) for k in (
                     "family", "head", "register", "length", "cell", "n_words", "length_in_band", "empty",
                     "model_key", "hf_id", "revision", "slot_spec_sha256", "temperature", "finish_reason",
-                    "host", "timestamp")},
+                    "host", "timestamp", "sample")},
                 "kind_spec": "rr-role-claim",
                 "role": "P",
                 "unpaired_positive_of": pick,
+                "pair_unit_stripped": unit,
                 "ruling": "t235u-1",
                 "source": "g5-rearm-uptake-candidate",
             },
