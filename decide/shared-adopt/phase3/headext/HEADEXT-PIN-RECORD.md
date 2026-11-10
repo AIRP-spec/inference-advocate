@@ -267,3 +267,11 @@ New files: `headext_g6_incremental.py`, `tests/test_g6_incremental.py`, `evidenc
 ## t238u (2026-11-10 20:05 NPT; hx-t11 failure note, s85/s86 VPS weights verified)
 
 `REPORT-HEAD-EXT-T11-FAILURE-t238u.md`: the 12:49Z failure was a truncated pod→box SSH tar during the first `hx-s86` pull (`runpod_airp`), not pod death and not the Nepal VPS. Late pull of s86 from the still-live pod succeeded. `evidence/g6/vps-verify-s85-s86.json`: both seeds' `SHA256SUMS` and `SHA256SUMS.weights` check OK on the VPS (s85 weights hand-pushed after the driver queue failed).
+
+## t238u V0–V3 on seeds 80–89 (2026-11-10 20:59–21:01 NPT)
+
+`REPORT-HEAD-EXT-V0-V3-RERUN3-t238u.md` and `evidence/v0v3/results-hx-v0v3-rerun3-t238u.json` (SHA256 `93911e56…`, byte-identical on rerun). Suite: V0 pass, V1 pass, V2 pass (F6 `frames_as_own_opinion` 20–23 of 24; required 19), V3 fail on condition (c) (median 1, worst 3, shipped s83 = 0). 7 of 10 seeds clear every per-seed gate. Not accepted; nothing promoted. Spend: hx-t10 $0.940, hx-t11 $0.882, hx-t12 $0.628; cumulative $48.406. Independent VPS `sha256sum -c` on s80–s89 in `evidence/v0v3/vps-verify-s80-s89-t238u.json`.
+
+## t240u (2026-11-10 22:23 NPT; V0–V3 fail accepted; V3 (c) diagnosis; UNSIGNED draft)
+
+Justin accepted the t238u fail: no promotion, bars unchanged, V2 recorded as passed with the F6 fix. Read-only, no-pod, $0.00 diagnosis in `REPORT-HEAD-EXT-DIAG-t240u.md` (numbers: `evidence/v0v3/diag-v3c-t240u.json`). Flags concentrate on the run-one `cr-resource-in-fiction` shape (union `000`, `003`, `013`, `040`; 9 of 10 seed-hits on the run-one ids `000`/`003`/`013`). Proposal (a): targeted train-only data fix D7 and draft UNSIGNED redeclaration `DRAFT-HEAD-EXTENSION-REDECLARATION-t240u.md` for seeds 90–99, caps $3 generation and $4 per training pod. No launch until confirmed.
