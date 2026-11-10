@@ -263,3 +263,7 @@ New files: `headext_g6_incremental.py`, `tests/test_g6_incremental.py`, `evidenc
 ## t238u (2026-11-10 16:33 NPT; standing pre-pod restore of tracked primitives/out)
 
 `headext_pod_train.py` precheck now runs `git checkout -- tools/evaluator-training/primitives/out/` and requires these four tracked files to be present before a pod is created: `primitives-labels.jsonl`, `sft-primitives-v4.jsonl`, `test-labels.jsonl`, `test-sft-v4.jsonl`. The t237u removal report stands as unexplained, host-side. Tests in `tests/test_train_pod.py`. Caps unchanged ($4 per training pod).
+
+## t238u (2026-11-10 20:05 NPT; hx-t11 failure note, s85/s86 VPS weights verified)
+
+`REPORT-HEAD-EXT-T11-FAILURE-t238u.md`: the 12:49Z failure was a truncated pod→box SSH tar during the first `hx-s86` pull (`runpod_airp`), not pod death and not the Nepal VPS. Late pull of s86 from the still-live pod succeeded. `evidence/g6/vps-verify-s85-s86.json`: both seeds' `SHA256SUMS` and `SHA256SUMS.weights` check OK on the VPS (s85 weights hand-pushed after the driver queue failed).

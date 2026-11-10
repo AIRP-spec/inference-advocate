@@ -123,7 +123,9 @@
   "evidence/g6/vg-vps.json": "38f1905daff8cfe1c1fac3419a44b4aed7f7c68d15981d314b5f601c39b29dbb",
   "evidence/g6/train-pack-v10f.PACK.sha256": "c7586dc467e8d296c75ae0e61faab596c90a91a7b9cef22b52ddc715f8e5eccf",
   "evidence/g6/train-pack-v10f.pins.json": "4d1684a5ab40f381fc6f50c1255629a0d04dab6b9b04742fbe0d4a7926af139f",
-  "../REPORT-HEAD-EXT-G6-PACK-t237u.md": "5d862a14365c7cc418bef11e591d208fe575537031a9378c2da0cdaac5e00e4c"
+  "../REPORT-HEAD-EXT-G6-PACK-t237u.md": "5d862a14365c7cc418bef11e591d208fe575537031a9378c2da0cdaac5e00e4c",
+  "evidence/g6/vps-verify-s85-s86.json": "31f4a0fe6b0a810e089095cde7ac9ad0815a11fd99b2da31da6fb4ca68312411",
+  "../REPORT-HEAD-EXT-T11-FAILURE-t238u.md": "1ecf9b02f4c817042dc78bb38af562af7005fc5397f7b75dde3af70eaaa24fdf"
  },
  "external": {
   "generator": {
