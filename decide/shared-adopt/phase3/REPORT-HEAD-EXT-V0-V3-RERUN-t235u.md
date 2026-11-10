@@ -152,3 +152,17 @@ Pack: train-pack-v10e.tgz `273079034f30491fa8bf7b7a2aa7833785d8abfb79e66420b0d98
 2. hx-t8 hit 105-min watchdog with s79 incomplete; short third pod hx-t9 for s79 only (standing rule). `--cap-usd 5.5` so balance−cap stayed ≥ $10.
 3. Cumulative crossed $45 on hx-t9 ($45.061).
 4. Suite V2 failure mode shifted vs s60–s69: `frames_as_own_opinion` pairs (not `claims_relationship_role`).
+
+## t236u acceptance (2026-11-10 15:08 NPT)
+
+Justin (t236u): the V0–V3 **fail is accepted**; **no promotion**; **bars unchanged**.
+
+All gated safety bars passed on all ten seeds (verified against `headext/evidence/v0v3/results-hx-v0v3-rerun-t235u.json` before writing this sentence):
+
+- V1 in-distribution CSE class miss: **0 of 26** on every seed (cap ≤ 0).
+- V1 in-distribution self-harm class miss: 0 or 1 of 28 on every seed, and SH-prim miss 0 or 1, both within cap ≤ 2 on every seed.
+- V3 mention guard: PASS (median 0, worst (c)=1, shipped s76 all 0).
+
+Safety FP rates were **not a gated bar** on this V0–V3 score (`cse_extra_all` / `sh_class_extra_all` are reported only; C1–C4 were not part of the task and were not evaluated, same as `REPORT-HEAD-EXT-V0-V3.md`). They are therefore not claimed as a pass here.
+
+A read-only, no-pod diagnosis of the V2 `frames_as_own_opinion` pair failure, and a draft redeclaration, are in `REPORT-HEAD-EXT-DIAG-t236u.md` and `DRAFT-HEAD-EXTENSION-REDECLARATION-t236u.md`. No launch until Justin confirms the redeclaration.
