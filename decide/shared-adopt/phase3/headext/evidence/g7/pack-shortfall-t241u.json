@@ -1,0 +1,289 @@
+{
+ "job": "t241u",
+ "stage": "data-v10g-incremental-shortfall",
+ "stopped": true,
+ "rule": "D7 declared 24 train cr-direct-vs-fiction units; packer requires 24 complete units after filter; got 23",
+ "signed": "2ffdd75725f0d74772194e1e78f3d6b44767d179",
+ "spec_sha256": "70679095f9cbc51018cc21d32329e886e25a7f35d35243443bba56751fa18fdf",
+ "set_sha256": "e2585abdf1d7340dfaa71f0644c49bece62ccba506a3641aed61784dcf3118e0",
+ "gen": {
+  "pod": "6fdilfyu6y53fh",
+  "name": "hx-g7-gen",
+  "cost_usd": 0.878,
+  "minutes": 21.2,
+  "n_rows": 96,
+  "n_jobs": 64,
+  "n_errors": 0,
+  "checker_delete_rc": 0,
+  "n_deleted": 0,
+  "seed_oss_contradict_n_true": 0,
+  "nemotron_contradict_n_true": 0,
+  "out_sha256": "e2585abdf1d7340dfaa71f0644c49bece62ccba506a3641aed61784dcf3118e0",
+  "items_sha256": "bf03a7aba93354e5ee6714a78d66bcc85c1c941d2b34971fa27ef324b2afb513",
+  "archive_sha256sum_c": "13/13 OK",
+  "failure": false
+ },
+ "filter_local": {
+  "n_set": 96,
+  "n_dropped": 10,
+  "n_candidates": 86,
+  "by_reason": {
+   "V-g:inset": 7,
+   "V-g:data-v9": 3
+  },
+  "dropped_by_kind": {
+   "cr-direct-vs-fiction": 9,
+   "cr-resource-in-fiction": 1
+  },
+  "first_stage": {
+   "V-g": 10
+  },
+  "dropped": {
+   "hx-cr-direct-vs-fiction-207-a": [
+    "V-g:data-v9"
+   ],
+   "hx-cr-direct-vs-fiction-209-b": [
+    "V-g:inset:hx-cr-direct-vs-fiction-203-b"
+   ],
+   "hx-cr-direct-vs-fiction-210-a": [
+    "V-g:data-v9"
+   ],
+   "hx-cr-direct-vs-fiction-213-a": [
+    "V-g:inset:hx-cr-direct-vs-fiction-201-a"
+   ],
+   "hx-cr-direct-vs-fiction-222-a": [
+    "V-g:inset:hx-cr-direct-vs-fiction-210-a"
+   ],
+   "hx-cr-direct-vs-fiction-224-a": [
+    "V-g:inset:hx-cr-direct-vs-fiction-218-a"
+   ],
+   "hx-cr-direct-vs-fiction-227-a": [
+    "V-g:inset:hx-cr-direct-vs-fiction-221-a"
+   ],
+   "hx-cr-direct-vs-fiction-228-a": [
+    "V-g:inset:hx-cr-direct-vs-fiction-204-a"
+   ],
+   "hx-cr-direct-vs-fiction-230-a": [
+    "V-g:inset:hx-cr-direct-vs-fiction-218-a"
+   ],
+   "hx-cr-resource-in-fiction-228": [
+    "V-g:data-v9"
+   ]
+  },
+  "vbc_residual": 0,
+  "label_coverage": {
+   "seed-oss-36b": 96,
+   "nemotron-3-super": 96
+  },
+  "candidates_sha256": "0ab483de78e15a49246f00577debdeb585813eabd473901958f183cfe751d8d9"
+ },
+ "vps": {
+  "n_candidates": 86,
+  "n_colliding": 0,
+  "colliding_ids": [],
+  "candidate_sha256": "0ab483de78e15a49246f00577debdeb585813eabd473901958f183cfe751d8d9"
+ },
+ "shortfall": {
+  "cr-direct-vs-fiction": {
+   "train_target": 24,
+   "train_got": 23,
+   "complete_units": 23
+  }
+ },
+ "pair_units_in_set": 32,
+ "complete_units_after_filter": 23,
+ "singles_after_filter": 31,
+ "singles_target": 24,
+ "broken_pair_units": [
+  {
+   "unit": "hx-cr-direct-vs-fiction-207",
+   "cell": "colloquial/short",
+   "arms": [
+    {
+     "id": "hx-cr-direct-vs-fiction-207-a",
+     "arm": "A",
+     "dropped": true,
+     "reasons": [
+      "V-g:data-v9"
+     ]
+    },
+    {
+     "id": "hx-cr-direct-vs-fiction-207-b",
+     "arm": "B",
+     "dropped": false,
+     "reasons": null
+    }
+   ]
+  },
+  {
+   "unit": "hx-cr-direct-vs-fiction-209",
+   "cell": "clinical/short",
+   "arms": [
+    {
+     "id": "hx-cr-direct-vs-fiction-209-a",
+     "arm": "A",
+     "dropped": false,
+     "reasons": null
+    },
+    {
+     "id": "hx-cr-direct-vs-fiction-209-b",
+     "arm": "B",
+     "dropped": true,
+     "reasons": [
+      "V-g:inset:hx-cr-direct-vs-fiction-203-b"
+     ]
+    }
+   ]
+  },
+  {
+   "unit": "hx-cr-direct-vs-fiction-210",
+   "cell": "colloquial/short",
+   "arms": [
+    {
+     "id": "hx-cr-direct-vs-fiction-210-a",
+     "arm": "A",
+     "dropped": true,
+     "reasons": [
+      "V-g:data-v9"
+     ]
+    },
+    {
+     "id": "hx-cr-direct-vs-fiction-210-b",
+     "arm": "B",
+     "dropped": false,
+     "reasons": null
+    }
+   ]
+  },
+  {
+   "unit": "hx-cr-direct-vs-fiction-213",
+   "cell": "colloquial/short",
+   "arms": [
+    {
+     "id": "hx-cr-direct-vs-fiction-213-a",
+     "arm": "A",
+     "dropped": true,
+     "reasons": [
+      "V-g:inset:hx-cr-direct-vs-fiction-201-a"
+     ]
+    },
+    {
+     "id": "hx-cr-direct-vs-fiction-213-b",
+     "arm": "B",
+     "dropped": false,
+     "reasons": null
+    }
+   ]
+  },
+  {
+   "unit": "hx-cr-direct-vs-fiction-222",
+   "cell": "colloquial/short",
+   "arms": [
+    {
+     "id": "hx-cr-direct-vs-fiction-222-a",
+     "arm": "A",
+     "dropped": true,
+     "reasons": [
+      "V-g:inset:hx-cr-direct-vs-fiction-210-a"
+     ]
+    },
+    {
+     "id": "hx-cr-direct-vs-fiction-222-b",
+     "arm": "B",
+     "dropped": false,
+     "reasons": null
+    }
+   ]
+  },
+  {
+   "unit": "hx-cr-direct-vs-fiction-224",
+   "cell": "colloquial/short",
+   "arms": [
+    {
+     "id": "hx-cr-direct-vs-fiction-224-a",
+     "arm": "A",
+     "dropped": true,
+     "reasons": [
+      "V-g:inset:hx-cr-direct-vs-fiction-218-a"
+     ]
+    },
+    {
+     "id": "hx-cr-direct-vs-fiction-224-b",
+     "arm": "B",
+     "dropped": false,
+     "reasons": null
+    }
+   ]
+  },
+  {
+   "unit": "hx-cr-direct-vs-fiction-227",
+   "cell": "colloquial/medium",
+   "arms": [
+    {
+     "id": "hx-cr-direct-vs-fiction-227-a",
+     "arm": "A",
+     "dropped": true,
+     "reasons": [
+      "V-g:inset:hx-cr-direct-vs-fiction-221-a"
+     ]
+    },
+    {
+     "id": "hx-cr-direct-vs-fiction-227-b",
+     "arm": "B",
+     "dropped": false,
+     "reasons": null
+    }
+   ]
+  },
+  {
+   "unit": "hx-cr-direct-vs-fiction-228",
+   "cell": "colloquial/short",
+   "arms": [
+    {
+     "id": "hx-cr-direct-vs-fiction-228-a",
+     "arm": "A",
+     "dropped": true,
+     "reasons": [
+      "V-g:inset:hx-cr-direct-vs-fiction-204-a"
+     ]
+    },
+    {
+     "id": "hx-cr-direct-vs-fiction-228-b",
+     "arm": "B",
+     "dropped": false,
+     "reasons": null
+    }
+   ]
+  },
+  {
+   "unit": "hx-cr-direct-vs-fiction-230",
+   "cell": "colloquial/short",
+   "arms": [
+    {
+     "id": "hx-cr-direct-vs-fiction-230-a",
+     "arm": "A",
+     "dropped": true,
+     "reasons": [
+      "V-g:inset:hx-cr-direct-vs-fiction-218-a"
+     ]
+    },
+    {
+     "id": "hx-cr-direct-vs-fiction-230-b",
+     "arm": "B",
+     "dropped": false,
+     "reasons": null
+    }
+   ]
+  }
+ ],
+ "dropped_singles": [
+  {
+   "id": "hx-cr-resource-in-fiction-228",
+   "cell": "clinical/short",
+   "reasons": [
+    "V-g:data-v9"
+   ]
+  }
+ ],
+ "recorded_at_npt": "2026-11-10 23:04 NPT"
+}

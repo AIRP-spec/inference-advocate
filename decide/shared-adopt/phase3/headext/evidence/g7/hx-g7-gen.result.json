@@ -1,0 +1,64 @@
+{
+ "pod": "6fdilfyu6y53fh",
+ "results": {
+  "generate": {
+   "phase": "g7",
+   "n_jobs": 64,
+   "n_resumed": 0,
+   "n_jobs_written": 64,
+   "n_rows_written": 96,
+   "n_errors": 0,
+   "stop_reason": "complete",
+   "elapsed_seconds": 7.8,
+   "out_sha256": "e2585abdf1d7340dfaa71f0644c49bece62ccba506a3641aed61784dcf3118e0",
+   "error_ids": []
+  },
+  "items": {
+   "n_rows": 96,
+   "n_empty": 0,
+   "n_items": 96,
+   "items_sha256": "bf03a7aba93354e5ee6714a78d66bcc85c1c941d2b34971fa27ef324b2afb513"
+  },
+  "label-seed-oss-36b-items-gen.jsonl": "complete",
+  "contradict-seed-oss-36b": {
+   "checker": "seed-oss-36b",
+   "prompt": "v4",
+   "n_rows": 96,
+   "n_todo": 96,
+   "n_written": 96,
+   "n_invalid": 0,
+   "n_error": 0,
+   "stop_reason": "complete",
+   "elapsed_seconds": 5.0,
+   "n_true": 0
+  },
+  "label-nemotron-3-super-items-gen.jsonl": "complete",
+  "contradict-nemotron-3-super": {
+   "checker": "nemotron-3-super",
+   "prompt": "v4",
+   "n_rows": 96,
+   "n_todo": 96,
+   "n_written": 96,
+   "n_invalid": 0,
+   "n_error": 0,
+   "stop_reason": "complete",
+   "elapsed_seconds": 5.8,
+   "n_true": 0
+  },
+  "checker_delete_rc": 0,
+  "archive_pre_terminate": [
+   12,
+   12
+  ]
+ },
+ "cost": 0.8778457538723947,
+ "bal0": 20.7767792285,
+ "bal1": 19.9068759091,
+ "pod_list_after": [],
+ "rest_pods_after": [],
+ "cumulative": 49.28399999999999,
+ "minutes": 21.15290973186493,
+ "signed": "2ffdd75725f0d74772194e1e78f3d6b44767d179",
+ "t0": 1794329761.8557358,
+ "t1": 1794331031.0303197
+}

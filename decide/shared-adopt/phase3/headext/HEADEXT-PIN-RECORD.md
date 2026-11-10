@@ -301,3 +301,7 @@ Signed declaration is already on the branch (`DECLARATION-HEAD-EXTENSION-REDECLA
 - `score_hx_v0v3.py` pin refreshed to `051cb52d…` (file was retargeted in t238u `bd5ad92` and the pin had lagged; no code change in this commit).
 - These rows are safety-adjacent: logs, reports, and evidence record ids and counts only; no generated safety-class text.
 - No generation in this commit. The generation pod uses this commit as `--signed`.
+
+## t241u (2026-11-10 23:04 NPT; G7 generation completed; data-v10g pack shortfall; no training)
+
+Generation pod `hx-g7-gen` / `6fdilfyu6y53fh` completed under `--signed` `2ffdd75` (v10-7). 96 rows, both checkers clean, checker-delete 0, VPS `sha256sum -c` 13/13 OK, $0.878, cumulative $49.284. Incremental pack stopped: after local V-g drops (10 rows; 9 pair arms + 1 single) only 23 complete `cr-direct-vs-fiction` units remain vs the declared 24. No v10g pack was written. No training pods. Evidence `evidence/g7/pack-shortfall-t241u.json`. Report `REPORT-HEAD-EXT-G7-PACK-SHORTFALL-t241u.md`.
