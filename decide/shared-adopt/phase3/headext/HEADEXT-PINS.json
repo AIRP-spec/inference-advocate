@@ -1,5 +1,5 @@
 {
- "record": "head-extension pin record (sizing addendum signed t217u 08:41 NPT, A1-A12; amendment t218u 12:42 NPT, A13-A16; G2 re-pin; amendment t219u 2026-11-03 09:01 NPT, A17-A20 re-pin); amendment t220u 2026-11-03 10:06 NPT, A21-A24 re-pin (slot spec v10-3, G3 writer Mistral-Small-3.2); record t221 2026-11-03 (second review pass, data-v10 pack driver); amendment t221u 2026-11-03 11:12 NPT, A25-A29 re-pin (offer rule: guide 79e29da9, checker prompt v3, A25 pod; A26 record; A28 pair_id); t221u post-A25 re-pin (A25 results, data-v10 train 4f6fa207/val bb522c9e, training pod one code); t226u/t227u A30 re-pin (eager attention, smoke pre-pod check, training cap $6, 65 offer refusals kept as negatives); t227u A31: slot spec v10-4, G4 driver, negatives retag; t227u A31 result: G4 decision, pack v10d; t227u hx-t2 status-poll retry; t227u test_head_ext cross-build tolerance; t227u hx-t4 xtrace false-positive fix; t228u A32: on-demand guard, per-seed volume write, 105 min, finite check; t228u test_train_pod caps; t228u box smokes; t228u hx-t5 result + VPS retry; t228u hx-t5 result + VPS retry/backoff; pod two hx-t6 record; V0-V3 scoring of s60-s69 (CPU, stored preds; 0/10 pass: V1 CSE s63/s66, V2 claims_relationship_role pairs, V3 (c)); report wording; t231u no-pod diagnosis (a)(b)(c) + DRAFT redeclaration (unsigned); diag report time fix; t232u rerun: contradict v4 (D2), headext_pod_g5.py (audit + gen stages); G5 driver: attempt suffix, 8-min start wait, POD_NOT_FOUND; slots g5/re-arm support (no spec change yet); t234u: spec v10-5 (F1 re-arm, F3, F4, F2 text), G5 budget gate (Nemotron full load), F1 verdicts, gold audit record; t234u G5 decide + F5 dup; t235u seedcheck stage + adopt; t235u adopt after seedcheck; t235u pack-v10e byte-identical + F5; t235u hx-t7 pod one done; t235u train create: treat RunPod capacity msg as SUPPLY_CONSTRAINT; t235u hx-t8 attach recovery after box reboot; t235u hx-t8 done s79 cut; --cap-usd for short pod; t235u hx-t9 short pod s79 done; archives 70-79 verified; $45 crossed",
+ "record": "head-extension pin record (sizing addendum signed t217u 08:41 NPT, A1-A12; amendment t218u 12:42 NPT, A13-A16; G2 re-pin; amendment t219u 2026-11-03 09:01 NPT, A17-A20 re-pin); amendment t220u 2026-11-03 10:06 NPT, A21-A24 re-pin (slot spec v10-3, G3 writer Mistral-Small-3.2); record t221 2026-11-03 (second review pass, data-v10 pack driver); amendment t221u 2026-11-03 11:12 NPT, A25-A29 re-pin (offer rule: guide 79e29da9, checker prompt v3, A25 pod; A26 record; A28 pair_id); t221u post-A25 re-pin (A25 results, data-v10 train 4f6fa207/val bb522c9e, training pod one code); t226u/t227u A30 re-pin (eager attention, smoke pre-pod check, training cap $6, 65 offer refusals kept as negatives); t227u A31: slot spec v10-4, G4 driver, negatives retag; t227u A31 result: G4 decision, pack v10d; t227u hx-t2 status-poll retry; t227u test_head_ext cross-build tolerance; t227u hx-t4 xtrace false-positive fix; t228u A32: on-demand guard, per-seed volume write, 105 min, finite check; t228u test_train_pod caps; t228u box smokes; t228u hx-t5 result + VPS retry; t228u hx-t5 result + VPS retry/backoff; pod two hx-t6 record; V0-V3 scoring of s60-s69 (CPU, stored preds; 0/10 pass: V1 CSE s63/s66, V2 claims_relationship_role pairs, V3 (c)); report wording; t231u no-pod diagnosis (a)(b)(c) + DRAFT redeclaration (unsigned); diag report time fix; t232u rerun: contradict v4 (D2), headext_pod_g5.py (audit + gen stages); G5 driver: attempt suffix, 8-min start wait, POD_NOT_FOUND; slots g5/re-arm support (no spec change yet); t234u: spec v10-5 (F1 re-arm, F3, F4, F2 text), G5 budget gate (Nemotron full load), F1 verdicts, gold audit record; t234u G5 decide + F5 dup; t235u seedcheck stage + adopt; t235u adopt after seedcheck; t235u pack-v10e byte-identical + F5; t235u hx-t7 pod one done; t235u train create: treat RunPod capacity msg as SUPPLY_CONSTRAINT; t235u hx-t8 attach recovery after box reboot; t235u hx-t8 done s79 cut; --cap-usd for short pod; t235u hx-t9 short pod s79 done; archives 70-79 verified; $45 crossed t237u F6 re-pin (slot spec v10-6, G6 driver, missed-shape op-own-vs-reported pairs; signed DECLARATION-HEAD-EXTENSION-REDECLARATION-t237u.md).",
  "files": {
   "../../../../tools/evaluator-training/primitives/kind-label-table.json": "0d6a110a6d9ce39b995de2e03d18ff11baca8ba8d5e779b4b027e1d48189d52b",
   "../../../../tools/evaluator-training/primitives/vocabulary.json": "329171161e510d604fbaa05db53f42fe05a4b075a298684ef5c394b1c2a0342b",
@@ -19,7 +19,7 @@
   "evidence/crisis-services/uk-samaritans.txt": "b67bd582d93fae3294d5b7eca82df0210f80123a9cebe0fdd8d2fb631b53f041",
   "evidence/crisis-services/us-988.txt": "cd2b22990e1ff1ac974a22cca8da845cf1ee2095eb0a5dd02c8d90960ae387d1",
   "evidence/crisis-services/us-ctl.txt": "7d946ca01d61f4b047a331424435cb199f29e8ada33323bd5958f7b8c8fbf49b",
-  "headext-slot-spec.json": "9542e65e8080ec7ffa8deb583279ebb9e59171433b43282d854e226d22e071ef",
+  "headext-slot-spec.json": "179476f421a9f36c164b7e37e04771d690858400a12cb56ca8b7ebe36a2096a9",
   "headext-system-prompt.txt": "20b8f0cdd78d1b4f5e48b21c51a0262d0ca178fe245732252323f388bc0411a3",
   "headext_contradict.py": "19fa356f260d5f4f2171b4caec2d7d375b965bf92a6e5d60f08ee915bf56617a",
   "headext_filter.py": "57099844a730118a5f0a97ec8a478e7b9869815ce0f24a2b1a41222f2d786efe",
@@ -28,7 +28,7 @@
   "headext_pod_g2.py": "7aebf0f3c1e1288b4a6f5ee10948ff4f4fb59aa2c349b965bef7f8f40e268b42",
   "headext_pod_g3.py": "83a0d5d69e7cdbc3d5c46b2c1c4773077eb059a789827ccb477ebd95e15e1909",
   "headext_scoring.py": "1a212a98d34798c88e2ab8f4265cf3e48b69924dd42371c31a8c5d5ce1c44601",
-  "headext_slots.py": "7f05079ef1fb1548ae7581a83dbccebb7f50e3edc1ee444218d2573b2ce7aeae",
+  "headext_slots.py": "174562d9d5963bcbaabf3be58555fc9867523733fb82f41880e1ac0d9d0a1352",
   "make_slot_spec.py": "2f7de5cfbeb96c8a6515958f7bde4bec4a048c62e9500d9bfbb90d9a59a6dba7",
   "pack/common_shared.py": "0e2c8674f456e2f71e1b00d3dc40eef2a9a3979e6a169180a87022aeff19c6a2",
   "pack/data-v10/excluded-kinds.json": "48314280ab55fdbabd64958a08a463a76640a65f647f8d6824dadeb9424361f4",
@@ -49,7 +49,7 @@
   "tests/test_g2.py": "5bae275bf2409a423d5d39d783b04b7df13a61b2c5d5dfebd0e4c044d74cbf4d",
   "tests/test_review_sample.py": "c9b8376666c0ad60c1673dab2d6baa04142e737df6aa782fe16cd8990408708e",
   "tests/test_scoring.py": "c8fd3aa7be656e375f4e8aafa8e6b21b076c8dab3be7c8174e101817788a88d5",
-  "tests/test_slots.py": "8372e9a4e9a967a69ecc43a15b93724fd8d99576b8010fd552266b7dbaa88d8c",
+  "tests/test_slots.py": "efc8a536594fe5303a9db5bc867d0e0d50299ec3db41b3715be5729d846c4085",
   "tests/test_t219.py": "6904b687cfe49b8fd0895b953f2f9e2cf76692afc67552bfceb11430fcfc1f63",
   "tests/test_t220.py": "7584d9893233e0b66b5fc1f5bcb1c5970f4dc6b3078b2914e4f975a0e17e6ba4",
   "headext_pack.py": "c86addfe7dc41d1a706352eda47e4cfc81598a659d4e4d62b285b3db1abd9f40",
@@ -80,7 +80,7 @@
   "evidence/a32/box-smokes.txt": "1a59eeb7298d317394ab8be6c0674873614a8413fa9440e65b215964f2f2e9e0",
   "evidence/a32/train-hx-t5.json": "e48177bfb82c0df624a49f0e5710516590d7165af338fa23549f5fdaacbf2e89",
   "evidence/a32/train-hx-t6.json": "94459f26740e0e30bc671bc60bc193e56bb47dc7adbdb40fdad550af26b8da6d",
-  "score_hx_v0v3.py": "dac384d12dae974aaf2d2c3fa3d810023073aa34e9aae9eba2d58f0ccea2e496",
+  "score_hx_v0v3.py": "f83c49ff7edac16ef8df3a016f63725127d6a72f86c62c05c67159f89adba56f",
   "evidence/v0v3/results-hx-v0v3.json": "9c10dd0f1081c21c8c50733ef18d079c84589f84d57016e8359fcc7a60361d9e",
   "../REPORT-HEAD-EXT-V0-V3.md": "e94fa9815c7a3f05712042b33e9fb0ddf7c29f553d4924ee660121efb4ba9024",
   "diag/diag_a_cse.py": "760263a1a1f3f90e9c53b9dfc4259e14f9ace2314ce7d9bcbdcdab6936790863",
@@ -110,7 +110,10 @@
   "evidence/rerun/hx-t8-cut-s79.json": "86eee35aece540f1b7f26744717c8a2fba81bd2e7a37571edf12090c9e90f3f3",
   "evidence/rerun/hx-t9.result.json": "2539ed71fc9ab868641f743f256a4eb98f15524d46e0b0ec6e6e7a678dfae2d4",
   "evidence/rerun/NOTE-45-LINE-crossed-t235u.json": "f8e1c024ec694da4d09be675500ffebbe2c94327233d89961199f3d8643157dd",
-  "evidence/rerun/archive-verify-seeds-70-79.json": "1722fb56cb74cd95486f0f80ce0084d7a98e0242090cff14f8447acad107ce9d"
+  "evidence/rerun/archive-verify-seeds-70-79.json": "1722fb56cb74cd95486f0f80ce0084d7a98e0242090cff14f8447acad107ce9d",
+  "headext_g6_budget.py": "f440dc371f32359b4e73d783cef3b4ea1d7784ff812d3b5ae49c1f2b36c29e59",
+  "headext_pod_g6.py": "b838c483d5222e02e35109487500c0e707fd839ca0394d83bac02cedd1276dc7",
+  "tests/test_g6_budget.py": "aa6d3771d133dd2c21cfeb61f4b1d2739bd356a7a38c3738d3f80655fcba1736"
  },
  "external": {
   "generator": {

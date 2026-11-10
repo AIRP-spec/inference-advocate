@@ -95,3 +95,42 @@ def test_g5_new_kinds_and_rearm():
     rows = hs.make_rows(s, re_[1], {"choices": [{"message": {"content": "B text"}, "finish_reason": "stop"}]}, "h", "t", "x")
     assert len(rows) == 1 and rows[0]["id"] == "hx-rr-claim-vs-deny-002-b-r1" and rows[0]["pair_unit"] == "hx-rr-claim-vs-deny-002"
     assert rows[0]["kind"] == "rr-claim-vs-deny-b" and rows[0]["provenance"]["phase"] == "g5"
+
+
+def test_g6_f6_jobs_and_shapes():
+    """t237u F6: 47 short train jobs all use the missed shape; 16 val jobs follow the declared
+    register x length mix, with that shape only on short cells (in proportion, not hand-selected)."""
+    s = spec()
+    k = next(x for x in s["kinds"] if x["id"] == "op-own-vs-reported")
+    assert k["train_units"] == 30 and k["val_units"] == 12
+    assert k["g6_add_train"] == 36 and k["g6_add_val"] == 12
+    assert k["g6_train_units_total"] == 60 and k["g6_val_units_total"] == 24
+    assert k["g6_train_start"] == 55 and k["g6_train_quota"] == 47
+    assert k["g6_val_start"] == 102 and k["g6_val_quota"] == 16
+    jobs = hs.build_jobs(s, "g6")
+    assert len(jobs) == 47 + 16
+    ids = [j["id"] for j in jobs]
+    assert len(ids) == len(set(ids))
+    # no collision with G1 indices 0..54 (quota 55)
+    assert all(j["sample"] >= 55 for j in jobs)
+    train = [j for j in jobs if j["pool"] == "train"]
+    val = [j for j in jobs if j["pool"] == "val"]
+    assert len(train) == 47 and len(val) == 16
+    assert all(j["length"] == "short" and j["f6"] is True and j["phase"] == "g6" for j in train)
+    assert {j["register"] for j in train} == {"clinical", "colloquial", "terse"}
+    assert all(j["assign"]["sentiment"] in ("favourable", "unfavourable") for j in train)
+    # val mix is the declared 9 cells, shape in proportion = short cells only
+    assert all(j["f6"] is (j["length"] == "short") for j in val)
+    assert {j["register"] for j in val} == {"clinical", "colloquial", "terse"}
+    assert {j["length"] for j in val} == {"short", "medium", "long"}
+    # prompts: F6 jobs get g6_arms, others the original arms
+    f6 = next(j for j in jobs if j["f6"])
+    plain = next(j for j in val if not j["f6"])
+    u_f6 = hs.render_user(s, f6)
+    u_plain = hs.render_user(s, plain)
+    assert "I personally think" in u_f6 and "framing markers" in u_f6
+    assert "attributed throughout" in u_f6
+    assert k["arms"][0]["shape"] in u_plain
+    assert k["g6_arms"][0]["shape"] not in u_plain
+    plan = hs.plan(s, "g6")
+    assert plan["n_jobs"] == 63 and plan["n_candidate_rows"] == 126

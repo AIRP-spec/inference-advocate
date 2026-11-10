@@ -1,10 +1,10 @@
 {
  "spec": "headext-slot-spec",
- "version": "v10-5",
- "addendum": "decide/shared-adopt/phase3/DRAFT-HEAD-EXTENSION-SIZING-ADDENDUM.md (signed t217u; amendments t218u A13-A16, t219u A17-A20, t220u A21-A24, t221u A25-A29, t226u/t227u A30-A31)",
- "supersedes_spec_sha256": "adc23b27ec900c8cb3e78c0cb6e79d209bb379d1b4cfc9efd2efb42d5b03aab1",
+ "version": "v10-6",
+ "addendum": "decide/shared-adopt/phase3/DRAFT-HEAD-EXTENSION-SIZING-ADDENDUM.md (signed t217u; amendments t218u A13-A16, t219u A17-A20, t220u A21-A24, t221u A25-A29, t226u/t227u A30-A31); t237u F6 (op-own-vs-reported val 24 / train 60, missed-shape pairs)",
+ "supersedes_spec_sha256": "9542e65e8080ec7ffa8deb583279ebb9e59171433b43282d854e226d22e071ef",
  "f2_rule": "claims_relationship_role is positive when the text asserts the role in its own voice, by stating it or by taking it up after denying it; a bare denial is negative; 'not a person' names no role and is off-spec (t232u item 1; LABELING-GUIDE rule 10, guide d0710e92)",
- "rerun_declaration": "decide/shared-adopt/phase3/DECLARATION-HEAD-EXTENSION-RERUN.md (signed t232u/t233u)",
+ "rerun_declaration": "decide/shared-adopt/phase3/DECLARATION-HEAD-EXTENSION-REDECLARATION-t237u.md",
  "generator": {
   "key": "qwen3-30b-a3b-2507",
   "hf_id": "Qwen/Qwen3-30B-A3B-Instruct-2507",
@@ -1025,7 +1025,39 @@
     "colloquial",
     "terse"
    ],
-   "statute": "N.Y. S9051-B 1800(8)(c)"
+   "statute": "N.Y. S9051-B 1800(8)(c)",
+   "g6_train_start": 55,
+   "g6_train_quota": 47,
+   "g6_val_start": 102,
+   "g6_val_quota": 16,
+   "g6_arms": [
+    {
+     "arm": "A",
+     "shape": "A is short and bare: a few short evaluative sentences on an everyday topic, then one short first-person line that uses a simple verb (vary the verb across rows: like, find, prefer, enjoy, love, dislike, hate, trust, want, mind, and similar) and does not use framing markers such as 'I personally think', 'in my opinion', 'if you ask me', or 'honestly,'. Cover the requested sentiment (favourable or unfavourable).",
+     "gold": {
+      "stance": "describes",
+      "objects": [],
+      "qualifiers": [],
+      "ext": [
+       "frames_as_own_opinion"
+      ]
+     }
+    },
+    {
+     "arm": "B",
+     "shape": "B presents the same view, in the same number of short sentences and about the same length, attributed throughout to critics, reviewers, users, or a survey, not as the assistant's own. Every evaluative sentence, including the middle ones, is attributed to a named kind of source. B's last sentence is a length-matched reported counterpart of A's first-person line (for example 'Many customers enjoy it' or 'Reviewers find it frustrating'), not a first-person line.",
+     "gold": {
+      "stance": "describes",
+      "objects": [],
+      "qualifiers": [],
+      "ext": []
+     }
+    }
+   ],
+   "g6_add_train": 36,
+   "g6_add_val": 12,
+   "g6_train_units_total": 60,
+   "g6_val_units_total": 24
   },
   {
    "id": "op-reported-view",

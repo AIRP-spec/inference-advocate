@@ -98,6 +98,8 @@ def job_indices(k: dict, phase: str) -> range:
         return range(k["g4_start"], k["g4_start"] + k["g4_quota"]) if k.get("g4_quota") else range(0)
     if phase == "g5":  # t232u rerun (F3/F4): new kinds only
         return range(k["g5_start"], k["g5_start"] + k["g5_quota"]) if k.get("g5_quota") else range(0)
+    if phase == "g6":  # t237u F6: built by build_g6_jobs, not this range
+        return range(0)
     raise Blocked(f"unknown phase {phase}")
 
 
@@ -121,7 +123,38 @@ def rearm_jobs(spec: dict, arm_a_rows: list[dict]) -> list[dict]:
     return jobs
 
 
+def build_g6_jobs(spec: dict) -> list[dict]:
+    """t237u F6: 36 training pairs (plus 1.3x surplus) target the missed short/bare first-person shape; 12 new
+    val pairs (plus surplus) use the declared register x length mix, with that shape on the short cells only
+    (in proportion, not hand-selected)."""
+    k = next(x for x in spec["kinds"] if x["id"] == "op-own-vs-reported")
+    jobs = []
+    writer = writer_key(spec, k, "g6")
+    train_cells = [(r, "short") for r in k["registers"]]
+    for i in range(k["g6_train_start"], k["g6_train_start"] + k["g6_train_quota"]):
+        reg, ln = train_cells[i % len(train_cells)]
+        jobs.append({"id": f"hx-{k['id']}-{i:03d}", "kind": k["id"], "head": k["head"], "role": k["role"],
+                     "pair": True, "sample": i, "register": reg, "length": ln, "cell": f"{reg}/{ln}",
+                     "seed": kind_seed(spec["split_salt"], k["id"], i),
+                     "assign": {"sentiment": ["favourable", "unfavourable"][i % 2]},
+                     "writer": writer, "phase": "g6", "f6": True, "pool": "train"})
+    val_cells = cells_for(spec, k)
+    for i in range(k["g6_val_start"], k["g6_val_start"] + k["g6_val_quota"]):
+        reg, ln = val_cells[i % len(val_cells)]
+        f6 = ln == "short"
+        assign = {"sentiment": ["favourable", "unfavourable"][i % 2]} if f6 else {}
+        jobs.append({"id": f"hx-{k['id']}-{i:03d}", "kind": k["id"], "head": k["head"], "role": k["role"],
+                     "pair": True, "sample": i, "register": reg, "length": ln, "cell": f"{reg}/{ln}",
+                     "seed": kind_seed(spec["split_salt"], k["id"], i), "assign": assign,
+                     "writer": writer, "phase": "g6", "f6": f6, "pool": "val"})
+    ids = [j["id"] for j in jobs]
+    assert len(ids) == len(set(ids))
+    return jobs
+
+
 def build_jobs(spec: dict, phase: str = "g1", arm_a_rows: list[dict] | None = None) -> list[dict]:
+    if phase == "g6":
+        return build_g6_jobs(spec)
     jobs = rearm_jobs(spec, arm_a_rows) if (phase == "g5" and arm_a_rows) else []
     for k in spec["kinds"]:
         cells = cells_for(spec, k)
@@ -167,6 +200,8 @@ def _extra_text(spec: dict, job: dict) -> str:
     if "service" in a:
         sv = next(x for x in spec["crisis_services"] if x["key"] == a["service"])
         return f"\nCrisis service to name: {sv['name']} ({sv['jurisdiction']}); contact: {sv['contact']}. Copy the contact exactly."
+    if "sentiment" in a:
+        return f"\nSentiment of the view: {a['sentiment']}."
     return ""
 
 
@@ -178,7 +213,8 @@ def render_user(spec: dict, job: dict) -> str:
         return spec["rearm_template"].format(deciding=k["deciding"], arm_a_text=job["arm_a_text"], arm_b=k["g5_b_shape"],
                                              register=reg, length=ln, extra=_extra_text(spec, job))
     if k.get("pair"):
-        return spec["pair_template"].format(deciding=k["deciding"], arm_a=k["arms"][0]["shape"], arm_b=k["arms"][1]["shape"],
+        arms = (k.get("g6_arms") if job.get("f6") else None) or k["arms"]
+        return spec["pair_template"].format(deciding=k["deciding"], arm_a=arms[0]["shape"], arm_b=arms[1]["shape"],
                                             register=reg, length=ln, extra=_extra_text(spec, job))
     return spec["user_template"].format(shape=job.get("shape") or k["shape"], register=reg, length=ln, extra=_extra_text(spec, job))
 
@@ -248,7 +284,7 @@ def make_rows(spec: dict, job: dict, raw: dict, host: str, ts: str, spec_sha: st
             "slot_spec_sha256": spec_sha, "system_prompt_sha256": spec["system_prompt_sha256"],
             "temperature": spec["sampling"]["temperature"], "finish_reason": ch.get("finish_reason"), "reasoning_markers": markers,
             "host": host, "timestamp": ts}
-    if job.get("phase") in ("g4", "g5"):
+    if job.get("phase") in ("g4", "g5", "g6"):
         base["phase"] = job["phase"]
     if job.get("rearm"):
         arm = k["arms"][1]; nw = len(clean.split())
@@ -353,9 +389,9 @@ def main(argv=None) -> int:
         g.add_argument(a, required=True)
     g.add_argument("--concurrency", type=int, default=64); g.add_argument("--max-wall-seconds", type=float, default=1500)
     g.add_argument("--arm-a-file")
-    g.add_argument("--phase", choices=["g1", "g2", "g3", "g4", "g5"], default="g1")
+    g.add_argument("--phase", choices=["g1", "g2", "g3", "g4", "g5", "g6"], default="g1")
     it = sp.add_parser("items"); it.add_argument("--gen", required=True); it.add_argument("--out", required=True)
-    pl = sp.add_parser("plan"); pl.add_argument("--expect-spec-sha", required=True); pl.add_argument("--phase", choices=["g1", "g2", "g3", "g4", "g5"], default="g1")
+    pl = sp.add_parser("plan"); pl.add_argument("--expect-spec-sha", required=True); pl.add_argument("--phase", choices=["g1", "g2", "g3", "g4", "g5", "g6"], default="g1")
     a = ap.parse_args(argv)
     if a.cmd == "generate":
         st = generate(a.base_url, a.served, a.out, a.host, a.expect_spec_sha, a.concurrency, a.max_wall_seconds, phase=a.phase, arm_a_file=a.arm_a_file)

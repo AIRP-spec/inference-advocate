@@ -229,3 +229,19 @@ No new rule beyond the amendment. 56 files in `HEADEXT-PINS.json`.
 - G4 result + pack v10d (t227u): `evidence/a31/g4-decision.json`, `pack-report-v10d.json`, `pack-v10d.SHA256SUMS`,
   `pack-v10d.MANIFEST.sha256`, `build-d.sh`; data-v10 train `d249a1bad28e15177af0cb1756222b3b655ed8ed319ccbd2a996f97f9d6622f6`,
   val `56b88b64b04f73a0bfb9b3318e54580892c2fb6256c92ea72c6c7879a9ca35e9`; set-t227 `b4c0f6cd…`.
+
+## t237u (2026-11-10 15:32 NPT signed redeclaration; F6 re-pin)
+
+Justin signed `DECLARATION-HEAD-EXTENSION-REDECLARATION-t237u.md` with F6 amended in verbatim. Slot spec **v10-6** (supersedes v10-5 `9542e65e…`). One variable: D1 data fix including F6. Bars and recipe unchanged.
+
+| file | sha256 |
+|---|---|
+| `headext-slot-spec.json` | `179476f421a9f36c164b7e37e04771d690858400a12cb56ca8b7ebe36a2096a9` |
+| `headext_slots.py` | `174562d9d5963bcbaabf3be58555fc9867523733fb82f41880e1ac0d9d0a1352` |
+| `headext_pod_g6.py` | `b838c483d5222e02e35109487500c0e707fd839ca0394d83bac02cedd1276dc7` |
+| `headext_g6_budget.py` | `f440dc371f32359b4e73d783cef3b4ea1d7784ff812d3b5ae49c1f2b36c29e59` |
+| `tests/test_slots.py` / `tests/test_g6_budget.py` | see `HEADEXT-PINS.json` |
+
+- `op-own-vs-reported`: historical `train_units` 30 / `val_units` 12 unchanged for G1 select. G6 incremental add: `g6_add_train` 36, `g6_add_val` 12 (totals 60 / 24). Jobs: `g6_train_start` 55 / quota 47 (all short, F6 shape); `g6_val_start` 102 / quota 16 (declared register × length mix; F6 shape on short cells only, in proportion, not hand-selected).
+- Generation cap $3; training $4 per pod; seeds 80–89. `headext_g6_budget` estimate 65 min / $2.698 at $2.49/h (host_start 8, Nemotron load 25).
+- Pack is incremental: keep the existing 12 val and 24 train units; append the new selected units. Do not re-split the old units.
