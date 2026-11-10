@@ -245,3 +245,17 @@ Justin signed `DECLARATION-HEAD-EXTENSION-REDECLARATION-t237u.md` with F6 amende
 - `op-own-vs-reported`: historical `train_units` 30 / `val_units` 12 unchanged for G1 select. G6 incremental add: `g6_add_train` 36, `g6_add_val` 12 (totals 60 / 24). Jobs: `g6_train_start` 55 / quota 47 (all short, F6 shape); `g6_val_start` 102 / quota 16 (declared register × length mix; F6 shape on short cells only, in proportion, not hand-selected).
 - Generation cap $3; training $4 per pod; seeds 80–89. `headext_g6_budget` estimate 65 min / $2.698 at $2.49/h (host_start 8, Nemotron load 25).
 - Pack is incremental: keep the existing 12 val and 24 train units; append the new selected units. Do not re-split the old units.
+
+## t237u data-v10f pack (2026-11-10 16:10 NPT; incremental G6 adopt)
+
+G6 generation and both checkers completed (pod `1lylra8hd90frb`, $0.895, checker-delete 0). Incremental pack: keep v10e (F5 applied) 24 train + 12 val `op-own-vs-reported` units; append 36 train (all F6 short) + 12 val (declared mix, 4 F6 short in proportion, not hand-selected). Two independent rebuilds, byte-identical on train/val/sel/tgz. Training pods 80–89 not launched (RunPod balance $13.288 fails the $10 floor at a $4 cap).
+
+| pin | sha256 |
+|---|---|
+| data-v10f train.jsonl (9283) | `fbeecc0f6326a2f5afed06aee85c10ed48ebe2334f354c2c26cc79b0aca0d4e8` |
+| data-v10f val.jsonl (1884) | `cffe55215c18cfdd17c38f8ad2173869fe7ea06f2149b73b94b378add3a561a7` |
+| train-pack-v10f PACK.sha256 | `c7586dc467e8d296c75ae0e61faab596c90a91a7b9cef22b52ddc715f8e5eccf` |
+| train-pack-v10f.tgz | `f78e417267c725de7c4abd3c8cd41b1a1dfd4b5c551937079fad63eb678e1df0` |
+| G6 set (gen jsonl) | `1730399086102f05d218ac85bbd503543d7cfa04b929ef2d3dfa0663d9776a6f` |
+
+New files: `headext_g6_incremental.py`, `tests/test_g6_incremental.py`, `evidence/g6/*`. VPS `/root/primitives-evaluator/headext-20261102/pack-v10f` (`sha256sum -c` OK).

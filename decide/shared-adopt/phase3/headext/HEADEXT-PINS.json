@@ -113,7 +113,17 @@
   "evidence/rerun/archive-verify-seeds-70-79.json": "1722fb56cb74cd95486f0f80ce0084d7a98e0242090cff14f8447acad107ce9d",
   "headext_g6_budget.py": "f440dc371f32359b4e73d783cef3b4ea1d7784ff812d3b5ae49c1f2b36c29e59",
   "headext_pod_g6.py": "6c216d1446367d2ca2dd79503cf2b805f17a903e2fc4c4d677fcdb398e75ff1e",
-  "tests/test_g6_budget.py": "aa6d3771d133dd2c21cfeb61f4b1d2739bd356a7a38c3738d3f80655fcba1736"
+  "tests/test_g6_budget.py": "aa6d3771d133dd2c21cfeb61f4b1d2739bd356a7a38c3738d3f80655fcba1736",
+  "headext_g6_incremental.py": "58511e412aae2d80c1ca9c809673cff901c6744e7972b2064f529efaf23b527f",
+  "tests/test_g6_incremental.py": "20bdc64e639be7ad52f9dac1166e9742418471bd0a46f1d637bcb20b71a4594f",
+  "evidence/g6/build-f.sh": "3a61af7f5a9cb12acaae5a00d58b4d66e290e5923dcdee12f9c1228cd92d9349",
+  "evidence/g6/pack-v10f-SHA256SUMS": "88a7f2244e5d38faee569148245f2a8000e4d5e3b9e3024198e9ee9edc66d648",
+  "evidence/g6/pack-report-v10f.json": "b0cb893d6ace0d1c4a083409c27878d8a5ef57097d19e9c21c6c853f7dc6f671",
+  "evidence/g6/filter-local.json": "383fd4b8c7d366ebac1232e1c73df38b9bb82e66d51679fba588b369f19dfa9c",
+  "evidence/g6/vg-vps.json": "38f1905daff8cfe1c1fac3419a44b4aed7f7c68d15981d314b5f601c39b29dbb",
+  "evidence/g6/train-pack-v10f.PACK.sha256": "c7586dc467e8d296c75ae0e61faab596c90a91a7b9cef22b52ddc715f8e5eccf",
+  "evidence/g6/train-pack-v10f.pins.json": "4d1684a5ab40f381fc6f50c1255629a0d04dab6b9b04742fbe0d4a7926af139f",
+  "../REPORT-HEAD-EXT-G6-PACK-t237u.md": "5d862a14365c7cc418bef11e591d208fe575537031a9378c2da0cdaac5e00e4c"
  },
  "external": {
   "generator": {
