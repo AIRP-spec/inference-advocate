@@ -24,6 +24,32 @@ TRAIN_SHA = None; VAL_SHA = None
 CREATE_TRIES = 30       # one try a minute for up to 30 min (no pod, no bill while supply-constrained)
 CLOSE_S = 8 * 60          # stop the pipeline this long before the deadline to archive the last seed and terminate
 
+# t238u: four tracked primitives/out files have been removed from the checkout by a host-side
+# mechanism not visible in the guest (REPORT-TRACKED-FILE-REMOVAL-t237u.md). Restore + presence
+# check are part of the standing pre-pod check. The removal report stands as unexplained.
+TRACKED_PRIMITIVES_OUT = (
+    "tools/evaluator-training/primitives/out/primitives-labels.jsonl",
+    "tools/evaluator-training/primitives/out/sft-primitives-v4.jsonl",
+    "tools/evaluator-training/primitives/out/test-labels.jsonl",
+    "tools/evaluator-training/primitives/out/test-sft-v4.jsonl",
+)
+TRACKED_PRIMITIVES_OUT_DIR = "tools/evaluator-training/primitives/out/"
+
+
+def ensure_tracked_primitives_out(repo_wt=None):
+    """Restore the four tracked primitives/out files, then require all four present. Does not delete anything."""
+    root = repo_wt or A.REPO_WT
+    r = subprocess.run(["git", "checkout", "--", TRACKED_PRIMITIVES_OUT_DIR], cwd=root,
+                       capture_output=True, text=True)
+    if r.returncode != 0:
+        err = (r.stderr or r.stdout or "").strip().replace("\n", " ")[:200]
+        raise SystemExit(f"ABORT: git checkout -- {TRACKED_PRIMITIVES_OUT_DIR} failed: {err}")
+    missing = [rel for rel in TRACKED_PRIMITIVES_OUT if not os.path.isfile(os.path.join(root, rel))]
+    if missing:
+        raise SystemExit(f"ABORT: tracked primitives/out files still missing after checkout: {missing}")
+    return list(TRACKED_PRIMITIVES_OUT)
+
+
 
 def log(*a):
     s = time.strftime("%H:%M:%S") + " " + " ".join(str(x) for x in a)
@@ -34,6 +60,7 @@ def status(msg): subprocess.run(["/workspace/xside/status.sh", msg], capture_out
 
 
 def precheck(signed, pack_sha):
+    out_files = ensure_tracked_primitives_out(A.REPO_WT)
     pins = json.load(open(A.PINS))
     pods = A.gq("query { myself { pods { id name } } }")["myself"]["pods"]; rpods = A.rest_pods()
     box = int(A.sh("df -BG --output=avail /workspace | tail -1").stdout.strip().rstrip("G"))
@@ -44,7 +71,7 @@ def precheck(signed, pack_sha):
     files_ok = {f: A.sha(os.path.join(HERE, f)) == s for f, s in pins["files"].items()}
     log(f"PRECHECK (headroom): pods(gql)={len(pods)} pods(rest)={rpods} box_free={box}G vps_free={vfree}G balance=${b['clientBalance']:.2f} "
         f"cumulative=${cum:.2f} +cap ${CAP_USD} -> ${cum + CAP_USD:.2f} (stop line ${STOP_LINE}) signed_on_remote={anc} code_clean={clean} "
-        f"pins_ok={all(files_ok.values())} pack_sha_ok={pack_sha}")
+        f"pins_ok={all(files_ok.values())} pack_sha_ok={pack_sha} tracked_out={len(out_files)}/{len(TRACKED_PRIMITIVES_OUT)}")
     if pods or rpods: raise SystemExit("ABORT: a pod is already running")
     if cum + CAP_USD > CEILING: raise SystemExit("ABORT: would pass the $60 ceiling")
     if cum + CAP_USD > STOP_LINE: log(f"NOTE ($45 line, t227u item 5): cumulative ${cum:.2f} + cap ${CAP_USD} may pass $45; pre-authorized through $60; continuing")

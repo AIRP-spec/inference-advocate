@@ -38,6 +38,55 @@ def test_a30_eager_smoke_and_skip_guard():
     assert PIPE.index("smoke_bf16_mixed.py") < PIPE.index("train_shared.py --train-items")
 
 
+
+def test_tracked_primitives_out_precheck_source():
+    """t238u: standing pre-pod check restores and requires the four tracked primitives/out files."""
+    assert "git" in DRV and "checkout" in DRV and "tools/evaluator-training/primitives/out/" in DRV
+    assert "ensure_tracked_primitives_out" in DRV
+    for f in ("primitives-labels.jsonl", "sft-primitives-v4.jsonl", "test-labels.jsonl", "test-sft-v4.jsonl"):
+        assert f"tools/evaluator-training/primitives/out/{f}" in DRV
+    assert "ABORT: tracked primitives/out files still missing after checkout" in DRV
+    # called from precheck, before a pod is created
+    assert DRV.index("def ensure_tracked_primitives_out") < DRV.index("def precheck")
+    assert "out_files = ensure_tracked_primitives_out" in DRV[DRV.index("def precheck"):DRV.index("if pods or rpods")]
+
+
+def test_ensure_tracked_primitives_out_restores_and_rejects_missing(tmp_path):
+    import os, subprocess, sys
+    sys.path.insert(0, str(H))
+    import headext_pod_train as tr
+    repo = tmp_path / "repo"
+    repo.mkdir()
+    subprocess.run(["git", "init", "-q"], cwd=repo, check=True)
+    subprocess.run(["git", "config", "user.email", "t238u@test"], cwd=repo, check=True)
+    subprocess.run(["git", "config", "user.name", "t238u"], cwd=repo, check=True)
+    out = repo / "tools/evaluator-training/primitives/out"
+    out.mkdir(parents=True)
+    names = [Path(p).name for p in tr.TRACKED_PRIMITIVES_OUT]
+    for n in names:
+        (out / n).write_text(f"{n}\n")
+    subprocess.run(["git", "add", "tools/evaluator-training/primitives/out"], cwd=repo, check=True)
+    subprocess.run(["git", "commit", "-q", "-m", "out"], cwd=repo, check=True)
+    for n in names:
+        (out / n).unlink()
+    assert not any((out / n).is_file() for n in names)
+    got = tr.ensure_tracked_primitives_out(str(repo))
+    assert got == list(tr.TRACKED_PRIMITIVES_OUT)
+    assert all((out / n).is_file() and (out / n).stat().st_size > 0 for n in names)
+    # empty repo: checkout cannot restore untracked-missing files
+    empty = tmp_path / "empty"
+    empty.mkdir()
+    subprocess.run(["git", "init", "-q"], cwd=empty, check=True)
+    try:
+        tr.ensure_tracked_primitives_out(str(empty))
+    except SystemExit as e:
+        msg = str(e)
+        assert "ABORT:" in msg
+        assert "checkout" in msg or "still missing" in msg
+    else:
+        raise AssertionError("expected SystemExit when the four files are not in the repo")
+
+
 if __name__ == "__main__":
-    fs = [test_recipe_flags, test_average_window_and_headinit, test_validation_only_no_scoring, test_caps_and_gpu, test_a30_eager_smoke_and_skip_guard]
+    fs = [test_recipe_flags, test_average_window_and_headinit, test_validation_only_no_scoring, test_caps_and_gpu, test_a30_eager_smoke_and_skip_guard, test_tracked_primitives_out_precheck_source]
     for f in fs: f(); print("PASS", f.__name__)

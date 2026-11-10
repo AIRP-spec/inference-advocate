@@ -259,3 +259,7 @@ G6 generation and both checkers completed (pod `1lylra8hd90frb`, $0.895, checker
 | G6 set (gen jsonl) | `1730399086102f05d218ac85bbd503543d7cfa04b929ef2d3dfa0663d9776a6f` |
 
 New files: `headext_g6_incremental.py`, `tests/test_g6_incremental.py`, `evidence/g6/*`. VPS `/root/primitives-evaluator/headext-20261102/pack-v10f` (`sha256sum -c` OK).
+
+## t238u (2026-11-10 16:33 NPT; standing pre-pod restore of tracked primitives/out)
+
+`headext_pod_train.py` precheck now runs `git checkout -- tools/evaluator-training/primitives/out/` and requires these four tracked files to be present before a pod is created: `primitives-labels.jsonl`, `sft-primitives-v4.jsonl`, `test-labels.jsonl`, `test-sft-v4.jsonl`. The t237u removal report stands as unexplained, host-side. Tests in `tests/test_train_pod.py`. Caps unchanged ($4 per training pod).
