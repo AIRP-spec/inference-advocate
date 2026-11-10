@@ -275,3 +275,7 @@ New files: `headext_g6_incremental.py`, `tests/test_g6_incremental.py`, `evidenc
 ## t240u (2026-11-10 22:23 NPT; V0–V3 fail accepted; V3 (c) diagnosis; UNSIGNED draft)
 
 Justin accepted the t238u fail: no promotion, bars unchanged, V2 recorded as passed with the F6 fix. Read-only, no-pod, $0.00 diagnosis in `REPORT-HEAD-EXT-DIAG-t240u.md` (numbers: `evidence/v0v3/diag-v3c-t240u.json`). Flags concentrate on the run-one `cr-resource-in-fiction` shape (union `000`, `003`, `013`, `040`; 9 of 10 seed-hits on the run-one ids `000`/`003`/`013`). Proposal (a): targeted train-only data fix D7 and draft UNSIGNED redeclaration `DRAFT-HEAD-EXTENSION-REDECLARATION-t240u.md` for seeds 90–99, caps $3 generation and $4 per training pod. No launch until confirmed.
+
+## t241u (2026-11-10 22:28 NPT; signed redeclaration; D7 parameter comparison)
+
+Justin signed `DECLARATION-HEAD-EXTENSION-REDECLARATION-t241u.md` (renamed from the t240u unsigned draft). Item-2 comparison of slot-spec parameters (not text) on `hx-cr-resource-in-fiction-000`/`-003`/`-013` vs the eight never-firing val rows of that kind: **no shared parameter separates them**. D7 is kept as drafted (train-only top-up at short and medium, clinical and colloquial). Table and finding: `REPORT-HEAD-EXT-D7-PARAM-COMPARE-t241u.md`, `evidence/g6/d7-param-compare-t241u.json`. Caps: generation $3, training $4 per pod, seeds 90–99, bars unchanged, cumulative $48.406 of $60. No generation before this signed commit.

@@ -1,8 +1,6 @@
-# DRAFT — Head-extension redeclaration (after the t240u diagnosis)
+# DECLARATION — Head-extension redeclaration (after the t240u diagnosis)
 
-**DRAFT — UNSIGNED. Awaiting Justin Flores's confirmation. Do not launch any pod under this draft.**
-
-Drafted 2026-11-10 22:35 NPT from `REPORT-HEAD-EXT-DIAG-t240u.md` and t240u rulings. It changes **data only** (a train-only top-up for the run-one `cr-resource-in-fiction` shape). It does **not** change V0–V3 bars, conditions, artifact rule, composition 2a, the recipe (signed §2, eager, within-run average of ep 2.0–4.0), or the P3-3 V1 baseline. The t238u V0–V3 fail is accepted; V2 is recorded as passed with the F6 fix; nothing is promoted.
+**SIGNED by Justin Flores, 2026-11-10 22:28 NPT (t241u).** Renamed on signing from `DRAFT-HEAD-EXTENSION-REDECLARATION-t240u.md`. The t241u item-2 comparison of slot-spec parameters (not text) found **no shared parameter** that separates `hx-cr-resource-in-fiction-000`, `-003` and `-013` from the eight never-firing val rows of that kind; **D7 is therefore kept as drafted**. This declaration is in force only after this signed commit. It changes **data only** (a train-only top-up for the run-one `cr-resource-in-fiction` shape). It does **not** change V0–V3 bars, conditions, artifact rule, composition 2a, the recipe (signed §2, eager, within-run average of ep 2.0–4.0), or the P3-3 V1 baseline. The t238u V0–V3 fail is accepted; V2 is recorded as passed with the F6 fix; nothing is promoted.
 
 ## 1. Unchanged (carried from the signed declaration 445afe4 + addendum + A30–A32 + signed rerun + signed t237u redeclaration)
 
@@ -27,9 +25,32 @@ New train rows are added to data-v10 as a new pack pin (proposed name `data-v10g
 
 No gold-rule change, no CSE text generated or read, no repair of existing val rows. F4's earlier contrast and dialogue-negative train stay in the pack; D7 adds to them, at the short/medium clinical and colloquial cells that still fire.
 
-## 3. Order (after this draft is signed)
+## 2b. D7 parameter comparison (t241u item 2)
 
-Signed commit → specify D7 slots (short/medium, clinical/colloquial, declared mix, not hand-selected) → generation pod (new rows only) → both checkers on new rows only → pack rebuild byte-identical twice, pin, push → `smoke_bf16_mixed --max-skipped 0` on the box → training pod one (s90–s94) → archive → training pod two (s95–s99) → short third pod only if a seed is cut by the 105-min watchdog **and** the $60 ceiling still fits → archive every seed (`SHA256SUMS` + `SHA256SUMS.weights`, `sha256sum -c`) before terminate → V0–V3 on validation only. **No pod before confirmation.**
+Compared on 2026-11-10 22:28–22:35 NPT, pack v10f val, parameters/ids/counts only (no generated safety-class text). Full table: `REPORT-HEAD-EXT-D7-PARAM-COMPARE-t241u.md` and `headext/evidence/g6/d7-param-compare-t241u.json`.
+
+Varying parameters on the three firing ids vs the eight never-firing ids:
+
+| id | group | register | length | cell | qualifiers |
+|---|---|---|---|---|---|
+| `000` | firing | clinical | short | clinical/short | (none) |
+| `003` | firing | colloquial | short | colloquial/short | (none) |
+| `013` | firing | colloquial | medium | colloquial/medium | (none) |
+| `001` | never | clinical | medium | clinical/medium | (none) |
+| `002` | never | clinical | long | clinical/long | (none) |
+| `008` | never | terse | long | terse/long | `explicit_register` |
+| `020` | never | clinical | long | clinical/long | (none) |
+| `032` | never | colloquial | long | colloquial/long | (none) |
+| `041` | never | colloquial | long | colloquial/long | (none) |
+| `042` | never | terse | short | terse/short | `explicit_register` |
+| `051` | never | terse | short | terse/short | `explicit_register` |
+
+**Separating parameter: none.** The three firing rows do not share one register, one length, or one cell. No other compared field is shared at a value absent from all eight. D7 is unchanged from the t240u draft.
+
+## 3. Order (this signed commit, then work)
+
+
+This signed commit → specify D7 slots (short/medium, clinical/colloquial, declared mix, not hand-selected) → generation pod (new rows only) → both checkers on new rows only → pack rebuild byte-identical twice, pin, push → `smoke_bf16_mixed --max-skipped 0` on the box → training pod one (s90–s94) → archive → training pod two (s95–s99) → short third pod only if a seed is cut by the 105-min watchdog **and** the $60 ceiling still fits → archive every seed (`SHA256SUMS` + `SHA256SUMS.weights`, `sha256sum -c`) before terminate → V0–V3 on validation only. This commit is the confirmation.
 
 ## 4. Caps, spend, standing rules
 
@@ -46,4 +67,4 @@ Signed commit → specify D7 slots (short/medium, clinical/colloquial, declared 
 
 ## Signature
 
-**UNSIGNED.** Not in force. No generation or training pod until Justin confirms this redeclaration.
+Signed: **Justin Flores**, 2026-11-10 22:28 NPT (t241u; redeclaration confirmed, D7 kept as drafted after the parameter comparison).
