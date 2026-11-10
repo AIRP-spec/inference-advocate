@@ -143,7 +143,12 @@ def main():
     lab = {c: f"{OUT}/labels-{c}-{a.stage}.jsonl" for c, _ in CHECKERS}
     ver = {c: f"{OUT}/contradict-{PROMPT}-{c}-{a.stage}.jsonl" for c, _ in CHECKERS}
     pub = open(KEY + ".pub").read().strip()
-    hf = json.load(open("/home/box/sand-data/box-secrets.json"))["card"].get("HF_TOKEN")
+    hf = os.environ.get("HF_TOKEN")
+    if not hf:
+        try:
+            hf = json.load(open("/home/box/sand-data/box-secrets.json"))["card"].get("HF_TOKEN")
+        except (PermissionError, FileNotFoundError, KeyError):
+            hf = None
     env = [{"key": "PUBLIC_KEY", "value": pub}] + ([{"key": "HF_TOKEN", "value": hf}] if hf else [])
     inp = {"cloudType": "SECURE", "gpuCount": 1, "volumeInGb": 0, "containerDiskInGb": 300, "minVcpuCount": 8, "minMemoryInGb": 60,
            "gpuTypeId": GPU, "name": NAME, "imageName": "runpod/pytorch:1.0.3-cu1290-torch280-ubuntu2204",

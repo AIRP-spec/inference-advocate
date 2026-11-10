@@ -112,7 +112,7 @@
   "evidence/rerun/NOTE-45-LINE-crossed-t235u.json": "f8e1c024ec694da4d09be675500ffebbe2c94327233d89961199f3d8643157dd",
   "evidence/rerun/archive-verify-seeds-70-79.json": "1722fb56cb74cd95486f0f80ce0084d7a98e0242090cff14f8447acad107ce9d",
   "headext_g6_budget.py": "f440dc371f32359b4e73d783cef3b4ea1d7784ff812d3b5ae49c1f2b36c29e59",
-  "headext_pod_g6.py": "b838c483d5222e02e35109487500c0e707fd839ca0394d83bac02cedd1276dc7",
+  "headext_pod_g6.py": "6c216d1446367d2ca2dd79503cf2b805f17a903e2fc4c4d677fcdb398e75ff1e",
   "tests/test_g6_budget.py": "aa6d3771d133dd2c21cfeb61f4b1d2739bd356a7a38c3738d3f80655fcba1736"
  },
  "external": {
