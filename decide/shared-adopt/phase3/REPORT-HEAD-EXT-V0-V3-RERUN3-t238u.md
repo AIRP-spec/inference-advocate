@@ -168,3 +168,9 @@ All gated safety bars that are part of V0–V3, other than the failing V3 (c) su
 - V3 mention guard: **FAIL** on condition (c) only (median 1, worst 3; shipped s83 all 0). Conditions (a) and (b) are 0 on every seed.
 
 Safety FP rates were **not a gated bar** on this V0–V3 score (`cse_extra_all` / `sh_class_extra_all` are reported only; C1–C4 were not part of the task and were not evaluated, same as `REPORT-HEAD-EXT-V0-V3-RERUN-t235u.md`). They are therefore not claimed as a pass here. Nothing is promoted.
+
+## t240u acceptance (2026-11-10 22:23 NPT)
+
+Justin (t240u): the V0–V3 **fail is accepted**; **no promotion**; **bars unchanged**. V2 is recorded as **passed** with the F6 fix (`frames_as_own_opinion` separated 20–23 of 24 on every seed; required 19 of 24). The suite remains not accepted because of V3 condition (c) (median 1, worst 3; shipped s83 is 0).
+
+A read-only, no-pod, $0.00 diagnosis of V3 (c) on s82, s84 and s86 is in `REPORT-HEAD-EXT-DIAG-t240u.md` (numbers in `headext/evidence/v0v3/diag-v3c-t240u.json`). The accompanying draft, unsigned, is `DRAFT-HEAD-EXTENSION-REDECLARATION-t240u.md`. No generation or training pod until Justin confirms that draft.
