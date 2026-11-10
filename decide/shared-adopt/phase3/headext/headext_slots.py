@@ -100,6 +100,8 @@ def job_indices(k: dict, phase: str) -> range:
         return range(k["g5_start"], k["g5_start"] + k["g5_quota"]) if k.get("g5_quota") else range(0)
     if phase == "g6":  # t237u F6: built by build_g6_jobs, not this range
         return range(0)
+    if phase == "g7":  # t241u D7: built by build_g7_jobs, not this range
+        return range(0)
     raise Blocked(f"unknown phase {phase}")
 
 
@@ -152,9 +154,68 @@ def build_g6_jobs(spec: dict) -> list[dict]:
     return jobs
 
 
+
+def proportion_counts(cells: list, n: int) -> list[tuple[str, str]]:
+    """Largest-remainder allocation of n slots over a (possibly repeating) cell list,
+    then emit by cycling the unique cells while each still has remainder. Deterministic,
+    not hand-selected."""
+    from collections import Counter
+    seq = [tuple(c) for c in cells]
+    order = list(dict.fromkeys(seq))
+    w = Counter(seq)
+    tw = sum(w[c] for c in order)
+    raw = [(c, n * w[c] / tw) for c in order]
+    floors = {c: int(v) for c, v in raw}
+    rem = n - sum(floors.values())
+    frac = sorted(raw, key=lambda kv: (-(kv[1] - int(kv[1])), order.index(kv[0])))
+    for i in range(rem):
+        floors[frac[i][0]] += 1
+    left = dict(floors)
+    out = []
+    while len(out) < n:
+        progressed = False
+        for c in order:
+            if left[c] > 0 and len(out) < n:
+                out.append(c)
+                left[c] -= 1
+                progressed = True
+        if not progressed:
+            break
+    if len(out) != n:
+        raise Blocked(f"proportion_counts short: {len(out)} != {n}")
+    return out
+
+
+def build_g7_jobs(spec: dict) -> list[dict]:
+    """t241u D7: train-only top-up. 32 cr-direct-vs-fiction pair jobs (24 needed + surplus) at
+    short/medium clinical/colloquial cells in proportion to cells that still fire (2:4:4);
+    32 cr-resource-in-fiction single-row jobs (24 needed + surplus) even across the four
+    short/medium clinical/colloquial cells. No new val rows. Sample indices start at 200."""
+    jobs = []
+    kinds = {x["id"]: x for x in spec["kinds"]}
+    for kid in ("cr-direct-vs-fiction", "cr-resource-in-fiction"):
+        k = kinds[kid]
+        writer = writer_key(spec, k, "g7")
+        start, quota = k["g7_train_start"], k["g7_train_quota"]
+        cells = proportion_counts(k["g7_cells"], quota)
+        for n, i in enumerate(range(start, start + quota)):
+            reg, ln = cells[n]
+            jobs.append({"id": f"hx-{k['id']}-{i:03d}", "kind": k["id"], "head": k["head"], "role": k["role"],
+                         "pair": bool(k.get("pair")), "sample": i, "register": reg, "length": ln, "cell": f"{reg}/{ln}",
+                         "seed": kind_seed(spec["split_salt"], k["id"], i),
+                         "assign": assignment(spec, k, i, "g7"),
+                         "writer": writer, "phase": "g7", "pool": "train"})
+    ids = [j["id"] for j in jobs]
+    assert len(ids) == len(set(ids))
+    assert all(j["sample"] >= 200 for j in jobs)
+    return jobs
+
+
 def build_jobs(spec: dict, phase: str = "g1", arm_a_rows: list[dict] | None = None) -> list[dict]:
     if phase == "g6":
         return build_g6_jobs(spec)
+    if phase == "g7":
+        return build_g7_jobs(spec)
     jobs = rearm_jobs(spec, arm_a_rows) if (phase == "g5" and arm_a_rows) else []
     for k in spec["kinds"]:
         cells = cells_for(spec, k)
@@ -284,7 +345,7 @@ def make_rows(spec: dict, job: dict, raw: dict, host: str, ts: str, spec_sha: st
             "slot_spec_sha256": spec_sha, "system_prompt_sha256": spec["system_prompt_sha256"],
             "temperature": spec["sampling"]["temperature"], "finish_reason": ch.get("finish_reason"), "reasoning_markers": markers,
             "host": host, "timestamp": ts}
-    if job.get("phase") in ("g4", "g5", "g6"):
+    if job.get("phase") in ("g4", "g5", "g6", "g7"):
         base["phase"] = job["phase"]
     if job.get("rearm"):
         arm = k["arms"][1]; nw = len(clean.split())
@@ -389,9 +450,9 @@ def main(argv=None) -> int:
         g.add_argument(a, required=True)
     g.add_argument("--concurrency", type=int, default=64); g.add_argument("--max-wall-seconds", type=float, default=1500)
     g.add_argument("--arm-a-file")
-    g.add_argument("--phase", choices=["g1", "g2", "g3", "g4", "g5", "g6"], default="g1")
+    g.add_argument("--phase", choices=["g1", "g2", "g3", "g4", "g5", "g6", "g7"], default="g1")
     it = sp.add_parser("items"); it.add_argument("--gen", required=True); it.add_argument("--out", required=True)
-    pl = sp.add_parser("plan"); pl.add_argument("--expect-spec-sha", required=True); pl.add_argument("--phase", choices=["g1", "g2", "g3", "g4", "g5", "g6"], default="g1")
+    pl = sp.add_parser("plan"); pl.add_argument("--expect-spec-sha", required=True); pl.add_argument("--phase", choices=["g1", "g2", "g3", "g4", "g5", "g6", "g7"], default="g1")
     a = ap.parse_args(argv)
     if a.cmd == "generate":
         st = generate(a.base_url, a.served, a.out, a.host, a.expect_spec_sha, a.concurrency, a.max_wall_seconds, phase=a.phase, arm_a_file=a.arm_a_file)

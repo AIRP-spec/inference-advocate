@@ -9,6 +9,9 @@ sys.path.insert(0, str(HERE))
 import headext_g6_incremental as g  # noqa: E402
 import headext_slots as hs  # noqa: E402
 
+# v10-7 supersedes v10-6; G6 kind fields remain. Production packer still pins v10-6.
+g.SPEC_SHA = hs.sha256_file(hs.SPEC)
+
 
 def _row(sample, arm, register, length, pair=None):
     unit = pair or f"hx-op-own-vs-reported-{sample:03d}"

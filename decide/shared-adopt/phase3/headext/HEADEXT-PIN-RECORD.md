@@ -279,3 +279,25 @@ Justin accepted the t238u fail: no promotion, bars unchanged, V2 recorded as pas
 ## t241u (2026-11-10 22:28 NPT; signed redeclaration; D7 parameter comparison)
 
 Justin signed `DECLARATION-HEAD-EXTENSION-REDECLARATION-t241u.md` (renamed from the t240u unsigned draft). Item-2 comparison of slot-spec parameters (not text) on `hx-cr-resource-in-fiction-000`/`-003`/`-013` vs the eight never-firing val rows of that kind: **no shared parameter separates them**. D7 is kept as drafted (train-only top-up at short and medium, clinical and colloquial). Table and finding: `REPORT-HEAD-EXT-D7-PARAM-COMPARE-t241u.md`, `evidence/g6/d7-param-compare-t241u.json`. Caps: generation $3, training $4 per pod, seeds 90–99, bars unchanged, cumulative $48.406 of $60. No generation before this signed commit.
+
+## t241u (2026-11-10 22:36 NPT; D7 slot spec v10-7, G7 jobs / driver / packer; no generation yet)
+
+Signed declaration is already on the branch (`DECLARATION-HEAD-EXTENSION-REDECLARATION-t241u.md`, `2c31f95`). Item-2 comparison found no shared parameter; D7 is as drafted. Slot spec **v10-7** supersedes v10-6 `179476f4…`. One variable: D7 train-only top-up. Bars, recipe, and the 12 V3 (c) val rows unchanged. Val of the later data-v10g pack must stay byte-identical to v10f `cffe5521…`.
+
+| file | sha256 |
+|---|---|
+| `headext-slot-spec.json` | `70679095f9cbc51018cc21d32329e886e25a7f35d35243443bba56751fa18fdf` |
+| `headext_slots.py` | `7b0aa5a31c45c7b35a955fb1f4638b06bfdc26938d5b70b99993d7127b8a2b43` |
+| `headext_pod_g7.py` | `b96e352341bb58c4a06b214a738a4aad6ebb62d6dafeb6cf38124649fee06e54` |
+| `headext_g7_budget.py` | `80e9f8947f1191c3dd9e9d19d05e113ef306cb1c29e899f35987e5ec653cda74` |
+| `headext_g7_incremental.py` | `7c9e2fce2e9d4ae78bfbb3d6189ea5f74168b29ebccb32c336e86fb205916a7d` |
+| `tests/test_slots.py` / `tests/test_g7_budget.py` / `tests/test_g7_incremental.py` | see `HEADEXT-PINS.json` |
+
+- `cr-direct-vs-fiction`: 32 train pair jobs (24 needed + surplus), samples 200–231, cells in 2:4:4 proportion to cells that still fire (`clinical/short` 6, `colloquial/short` 13, `colloquial/medium` 13; largest-remainder on the 2:4:4 weights, including 040 in the medium/colloquial cell). No new val jobs.
+- `cr-resource-in-fiction`: 32 train single-row jobs (24 needed + surplus), samples 200–231, even across the four short/medium × clinical/colloquial cells (8 each). Existing 12 val rows unchanged.
+- Generation cap $3; training $4 per pod; seeds 90–99. `headext_g7_budget` estimate 65 min / $2.698 at $2.49/h (same envelope as G6: host_start 8, Nemotron load 25).
+- Packer is incremental: keep v10f prefix; append 24 pair units + 24 singles; val must remain `cffe5521…`. Two independent rebuilds required before training. Not run in this commit.
+- `tests/test_g6_incremental.py` now loads the live (v10-7) spec for G6 field checks; the sealed G6 packer still pins v10-6 `179476f4…`.
+- `score_hx_v0v3.py` pin refreshed to `051cb52d…` (file was retargeted in t238u `bd5ad92` and the pin had lagged; no code change in this commit).
+- These rows are safety-adjacent: logs, reports, and evidence record ids and counts only; no generated safety-class text.
+- No generation in this commit. The generation pod uses this commit as `--signed`.

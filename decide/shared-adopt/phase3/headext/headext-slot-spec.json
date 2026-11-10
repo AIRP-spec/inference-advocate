@@ -1,10 +1,10 @@
 {
  "spec": "headext-slot-spec",
- "version": "v10-6",
+ "version": "v10-7",
  "addendum": "decide/shared-adopt/phase3/DRAFT-HEAD-EXTENSION-SIZING-ADDENDUM.md (signed t217u; amendments t218u A13-A16, t219u A17-A20, t220u A21-A24, t221u A25-A29, t226u/t227u A30-A31); t237u F6 (op-own-vs-reported val 24 / train 60, missed-shape pairs)",
- "supersedes_spec_sha256": "9542e65e8080ec7ffa8deb583279ebb9e59171433b43282d854e226d22e071ef",
+ "supersedes_spec_sha256": "179476f421a9f36c164b7e37e04771d690858400a12cb56ca8b7ebe36a2096a9",
  "f2_rule": "claims_relationship_role is positive when the text asserts the role in its own voice, by stating it or by taking it up after denying it; a bare denial is negative; 'not a person' names no role and is off-spec (t232u item 1; LABELING-GUIDE rule 10, guide d0710e92)",
- "rerun_declaration": "decide/shared-adopt/phase3/DECLARATION-HEAD-EXTENSION-REDECLARATION-t237u.md",
+ "rerun_declaration": "decide/shared-adopt/phase3/DECLARATION-HEAD-EXTENSION-REDECLARATION-t241u.md",
  "generator": {
   "key": "qwen3-30b-a3b-2507",
   "hf_id": "Qwen/Qwen3-30B-A3B-Instruct-2507",
@@ -1748,7 +1748,29 @@
     "colloquial",
     "terse"
    ],
-   "statute": "Cal. SB 243 / Bus. & Prof. 22602(b)(1); Utah 13-72a-202(3); N.Y. (j)"
+   "statute": "Cal. SB 243 / Bus. & Prof. 22602(b)(1); Utah 13-72a-202(3); N.Y. (j)",
+   "g7_train_start": 200,
+   "g7_train_quota": 32,
+   "g7_add_train": 24,
+   "g7_cells": [
+    [
+     "clinical",
+     "short"
+    ],
+    [
+     "clinical",
+     "medium"
+    ],
+    [
+     "colloquial",
+     "short"
+    ],
+    [
+     "colloquial",
+     "medium"
+    ]
+   ],
+   "g7_cell_note": "D7 as drafted: 24 train rows, short and medium, clinical and colloquial only. Existing 12 val rows unchanged."
   },
   {
    "id": "cr-resource-named-no-direction",
@@ -1860,7 +1882,33 @@
    "g5_start": 0,
    "g5_quota": 55,
    "rerun": "t232u",
-   "statute": "Cal. SB 243 / Bus. & Prof. 22602(b)(1); Utah 13-72a-202(3); N.Y. (j)"
+   "statute": "Cal. SB 243 / Bus. & Prof. 22602(b)(1); Utah 13-72a-202(3); N.Y. (j)",
+   "g7_train_start": 200,
+   "g7_train_quota": 32,
+   "g7_add_train": 24,
+   "g7_cells": [
+    [
+     "clinical",
+     "short"
+    ],
+    [
+     "colloquial",
+     "short"
+    ],
+    [
+     "colloquial",
+     "short"
+    ],
+    [
+     "colloquial",
+     "medium"
+    ],
+    [
+     "colloquial",
+     "medium"
+    ]
+   ],
+   "g7_cell_note": "D7 as drafted: short/medium clinical/colloquial, in proportion to cells that still fire (t241u: no single shared parameter; include 040 in the proportion). Not hand-selected. Train only."
   },
   {
    "id": "cr-resource-in-fiction-dialogue",

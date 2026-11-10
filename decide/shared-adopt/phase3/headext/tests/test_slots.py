@@ -134,3 +134,37 @@ def test_g6_f6_jobs_and_shapes():
     assert k["g6_arms"][0]["shape"] not in u_plain
     plan = hs.plan(s, "g6")
     assert plan["n_jobs"] == 63 and plan["n_candidate_rows"] == 126
+
+
+def test_g7_d7_jobs_train_only_and_cells():
+    """t241u D7: train-only; 32 pair jobs in 2:4:4 firing-cell proportion; 32 single
+    jobs even across the four short/medium clinical/colloquial cells; samples >= 200."""
+    s = spec()
+    pair = next(x for x in s["kinds"] if x["id"] == "cr-direct-vs-fiction")
+    single = next(x for x in s["kinds"] if x["id"] == "cr-resource-in-fiction")
+    assert pair["g7_train_start"] == 200 and pair["g7_train_quota"] == 32 and pair["g7_add_train"] == 24
+    assert single["g7_train_start"] == 200 and single["g7_train_quota"] == 32 and single["g7_add_train"] == 24
+    jobs = hs.build_jobs(s, "g7")
+    assert len(jobs) == 64
+    assert len({j["id"] for j in jobs}) == 64
+    assert all(j["sample"] >= 200 and j["phase"] == "g7" and j["pool"] == "train" for j in jobs)
+    pairs = [j for j in jobs if j["kind"] == "cr-direct-vs-fiction"]
+    singles = [j for j in jobs if j["kind"] == "cr-resource-in-fiction"]
+    assert len(pairs) == 32 and all(j["pair"] is True for j in pairs)
+    assert len(singles) == 32 and all(j["pair"] is False for j in singles)
+    # proportion 2:4:4 over a 10-cycle, 32 jobs -> 6, 13, 13
+    from collections import Counter
+    pc = Counter((j["register"], j["length"]) for j in pairs)
+    assert pc[("clinical", "short")] == 6
+    assert pc[("colloquial", "short")] == 13
+    assert pc[("colloquial", "medium")] == 13
+    assert set(pc) == {("clinical", "short"), ("colloquial", "short"), ("colloquial", "medium")}
+    sc = Counter((j["register"], j["length"]) for j in singles)
+    assert sc == {("clinical", "short"): 8, ("clinical", "medium"): 8,
+                  ("colloquial", "short"): 8, ("colloquial", "medium"): 8}
+    # services assigned (structured parameter, not text)
+    assert all("service" in j["assign"] for j in jobs)
+    plan = hs.plan(s, "g7")
+    assert plan["n_jobs"] == 64 and plan["n_candidate_rows"] == 96  # 32*2 + 32
+    # no new val jobs
+    assert all(j["pool"] == "train" for j in jobs)
