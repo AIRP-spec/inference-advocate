@@ -324,3 +324,7 @@ Justin approved a $1 extra-generation top-up after the t241u pack shortfall (23/
 - Leak filter for the combined set must run against validation and all prior packs. No generation in this commit. The extra-generation pod uses this commit as `--signed`.
 
 - 2026-11-13 08:00 NPT first create aborted after deploy: billed rate $2.69/h made the 24-min estimate $1.076 over the $1 cap. Pod terminated immediately, $0 billed, no ledger row. Budget tightened to 22 min / $0.986 at $2.69/h (still $0.913 at $2.49/h) so the post-create estimate passes; wall cap at $2.69/h is 22.3 min.
+
+## t242u (2026-11-13 08:13 NPT; G7x extra generation failed, no rows, no pack, no training)
+
+Pod `hx-g7x-gen` / `vuhrghm9wbq04h` under `--signed` `cf2f468`. Qwen came up at t+10.9; the 14-min AFTER_GEN reserve exceeded the 11.4 min remaining under the $1 / 22.3 min wall at $2.69/h. No rows written. VPS `sha256sum -c` 2/2 OK, terminated, $0.504, cumulative $49.788. Complete pair units still 23/24. No retry under the same $1 cap. Report `REPORT-HEAD-EXT-G7X-FAIL-t242u.md`.
