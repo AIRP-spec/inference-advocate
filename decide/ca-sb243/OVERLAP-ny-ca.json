@@ -1,0 +1,424 @@
+{
+ "analysisOnly": true,
+ "heads17": [
+  "stance",
+  "violence_person",
+  "self_harm",
+  "sexual_activity",
+  "financial_crime",
+  "intrusion",
+  "weapons",
+  "profanity",
+  "targets_protected_characteristic",
+  "subject_is_minor",
+  "asserts_interior_state",
+  "addresses_own_nature",
+  "explicit_register",
+  "exceeds_common_knowledge",
+  "is_mention_not_use",
+  "directed_at_user",
+  "untethered_to_content"
+ ],
+ "negativeRuleHeads": {
+  "NY": [
+   "is_mention_not_use"
+  ],
+  "CA": [
+   "is_mention_not_use"
+  ]
+ },
+ "units": [
+  {
+   "statute": "NY",
+   "unit": "ny_1800_8_a",
+   "citation": "N.Y. Gen. Bus. Law § 1800(8)(a)",
+   "support": "covered",
+   "existingHeads": [
+    "addresses_own_nature",
+    "asserts_interior_state"
+   ],
+   "missingHeads": [],
+   "hostInputs": [
+    "host.covered_minor"
+   ]
+  },
+  {
+   "statute": "NY",
+   "unit": "ny_1800_8_b",
+   "citation": "N.Y. Gen. Bus. Law § 1800(8)(b)",
+   "support": "partial",
+   "existingHeads": [
+    "directed_at_user",
+    "stance"
+   ],
+   "missingHeads": [
+    "claims_relationship_role"
+   ],
+   "hostInputs": [
+    "host.covered_minor"
+   ]
+  },
+  {
+   "statute": "NY",
+   "unit": "ny_1800_8_c",
+   "citation": "N.Y. Gen. Bus. Law § 1800(8)(c)",
+   "support": "partial",
+   "existingHeads": [
+    "asserts_interior_state"
+   ],
+   "missingHeads": [
+    "frames_as_own_opinion"
+   ],
+   "hostInputs": [
+    "host.covered_minor"
+   ]
+  },
+  {
+   "statute": "NY",
+   "unit": "ny_1800_8_d",
+   "citation": "N.Y. Gen. Bus. Law § 1800(8)(d)",
+   "support": "covered",
+   "existingHeads": [
+    "untethered_to_content"
+   ],
+   "missingHeads": [],
+   "hostInputs": [
+    "host.covered_minor"
+   ]
+  },
+  {
+   "statute": "NY",
+   "unit": "ny_1800_8_e",
+   "citation": "N.Y. Gen. Bus. Law § 1800(8)(e)",
+   "support": "partial",
+   "existingHeads": [],
+   "missingHeads": [
+    "probes_user_emotion"
+   ],
+   "hostInputs": []
+  },
+  {
+   "statute": "NY",
+   "unit": "ny_1800_8_f",
+   "citation": "N.Y. Gen. Bus. Law § 1800(8)(f)",
+   "support": "host-evidence",
+   "existingHeads": [],
+   "missingHeads": [],
+   "hostInputs": []
+  },
+  {
+   "statute": "NY",
+   "unit": "ny_1800_8_g",
+   "citation": "N.Y. Gen. Bus. Law § 1800(8)(g)",
+   "support": "covered",
+   "existingHeads": [
+    "addresses_own_nature"
+   ],
+   "missingHeads": [],
+   "hostInputs": [
+    "host.covered_minor"
+   ]
+  },
+  {
+   "statute": "NY",
+   "unit": "ny_1800_8_h",
+   "citation": "N.Y. Gen. Bus. Law § 1800(8)(h)",
+   "support": "pending-regulation",
+   "existingHeads": [],
+   "missingHeads": [],
+   "hostInputs": []
+  },
+  {
+   "statute": "NY",
+   "unit": "ny_1800_8_i_self_harm",
+   "citation": "N.Y. Gen. Bus. Law § 1800(8)(i)",
+   "support": "covered",
+   "existingHeads": [
+    "self_harm",
+    "stance"
+   ],
+   "missingHeads": [],
+   "hostInputs": [
+    "host.covered_minor"
+   ]
+  },
+  {
+   "statute": "NY",
+   "unit": "ny_1800_8_i_other",
+   "citation": "N.Y. Gen. Bus. Law § 1800(8)(i)",
+   "support": "partial",
+   "existingHeads": [],
+   "missingHeads": [
+    "disordered_eating",
+    "substance_misuse"
+   ],
+   "hostInputs": []
+  },
+  {
+   "statute": "NY",
+   "unit": "ny_1800_8_j",
+   "citation": "N.Y. Gen. Bus. Law § 1800(8)(j)",
+   "support": "partial",
+   "existingHeads": [
+    "directed_at_user",
+    "stance"
+   ],
+   "missingHeads": [
+    "encourages_secrecy"
+   ],
+   "hostInputs": [
+    "host.covered_minor"
+   ]
+  },
+  {
+   "statute": "NY",
+   "unit": "ny_1800_8_k",
+   "citation": "N.Y. Gen. Bus. Law § 1800(8)(k)",
+   "support": "host-evidence",
+   "existingHeads": [],
+   "missingHeads": [],
+   "hostInputs": []
+  },
+  {
+   "statute": "NY",
+   "unit": "ny_1800_8_l",
+   "citation": "N.Y. Gen. Bus. Law § 1800(8)(l)",
+   "support": "covered",
+   "existingHeads": [
+    "sexual_activity"
+   ],
+   "missingHeads": [],
+   "hostInputs": [
+    "host.covered_minor"
+   ]
+  },
+  {
+   "statute": "CA",
+   "unit": "ca_22602_a_output",
+   "citation": "Cal. Bus. & Prof. Code § 22602(a)",
+   "support": "covered",
+   "existingHeads": [
+    "addresses_own_nature",
+    "asserts_interior_state"
+   ],
+   "missingHeads": [],
+   "hostInputs": []
+  },
+  {
+   "statute": "CA",
+   "unit": "ca_22602_a_notice",
+   "citation": "Cal. Bus. & Prof. Code § 22602(a)",
+   "support": "host-evidence",
+   "existingHeads": [],
+   "missingHeads": [],
+   "hostInputs": []
+  },
+  {
+   "statute": "CA",
+   "unit": "ca_22602_b_1_content",
+   "citation": "Cal. Bus. & Prof. Code § 22602(b)(1)",
+   "support": "covered",
+   "existingHeads": [
+    "self_harm",
+    "stance"
+   ],
+   "missingHeads": [],
+   "hostInputs": []
+  },
+  {
+   "statute": "CA",
+   "unit": "ca_22602_b_1_referral",
+   "citation": "Cal. Bus. & Prof. Code § 22602(b)(1)",
+   "support": "partial",
+   "existingHeads": [],
+   "missingHeads": [
+    "refers_to_crisis_services"
+   ],
+   "hostInputs": []
+  },
+  {
+   "statute": "CA",
+   "unit": "ca_22602_b_protocol",
+   "citation": "Cal. Bus. & Prof. Code § 22602(b)(1)-(2)",
+   "support": "host-evidence",
+   "existingHeads": [],
+   "missingHeads": [],
+   "hostInputs": []
+  },
+  {
+   "statute": "CA",
+   "unit": "ca_22602_c_1",
+   "citation": "Cal. Bus. & Prof. Code § 22602(c)(1)",
+   "support": "host-evidence",
+   "existingHeads": [],
+   "missingHeads": [],
+   "hostInputs": []
+  },
+  {
+   "statute": "CA",
+   "unit": "ca_22602_c_2",
+   "citation": "Cal. Bus. & Prof. Code § 22602(c)(2)",
+   "support": "host-evidence",
+   "existingHeads": [],
+   "missingHeads": [],
+   "hostInputs": []
+  },
+  {
+   "statute": "CA",
+   "unit": "ca_22602_c_3_statement",
+   "citation": "Cal. Bus. & Prof. Code § 22602(c)(3)",
+   "support": "covered",
+   "existingHeads": [
+    "sexual_activity",
+    "stance"
+   ],
+   "missingHeads": [],
+   "hostInputs": [
+    "host.known_minor"
+   ]
+  },
+  {
+   "statute": "CA",
+   "unit": "ca_22602_c_3_visual",
+   "citation": "Cal. Bus. & Prof. Code § 22602(c)(3)",
+   "support": "host-evidence",
+   "existingHeads": [],
+   "missingHeads": [],
+   "hostInputs": []
+  },
+  {
+   "statute": "CA",
+   "unit": "ca_22603",
+   "citation": "Cal. Bus. & Prof. Code § 22603(a), (d)",
+   "support": "host-evidence",
+   "existingHeads": [],
+   "missingHeads": [],
+   "hostInputs": []
+  },
+  {
+   "statute": "CA",
+   "unit": "ca_22604",
+   "citation": "Cal. Bus. & Prof. Code § 22604",
+   "support": "host-evidence",
+   "existingHeads": [],
+   "missingHeads": [],
+   "hostInputs": []
+  }
+ ],
+ "summary": {
+  "NY": {
+   "units": 13,
+   "covered": 5,
+   "partial": 5,
+   "hostEvidence": 2,
+   "pendingRegulation": 1,
+   "reachableShareAllUnits": "5/13",
+   "reachableShareResponseLevel": "5/10"
+  },
+  "CA": {
+   "units": 11,
+   "covered": 3,
+   "partial": 1,
+   "hostEvidence": 7,
+   "pendingRegulation": 0,
+   "reachableShareAllUnits": "3/11",
+   "reachableShareResponseLevel": "3/4"
+  }
+ },
+ "sharedPairs": [
+  {
+   "ny": "ny_1800_8_a",
+   "ca": "ca_22602_a_output",
+   "sharedHeads": [
+    "addresses_own_nature",
+    "asserts_interior_state"
+   ]
+  },
+  {
+   "ny": "ny_1800_8_c",
+   "ca": "ca_22602_a_output",
+   "sharedHeads": [
+    "asserts_interior_state"
+   ]
+  },
+  {
+   "ny": "ny_1800_8_g",
+   "ca": "ca_22602_a_output",
+   "sharedHeads": [
+    "addresses_own_nature"
+   ]
+  },
+  {
+   "ny": "ny_1800_8_i_self_harm",
+   "ca": "ca_22602_b_1_content",
+   "sharedHeads": [
+    "self_harm",
+    "stance"
+   ]
+  },
+  {
+   "ny": "ny_1800_8_l",
+   "ca": "ca_22602_c_3_statement",
+   "sharedHeads": [
+    "sexual_activity"
+   ]
+  }
+ ],
+ "heads": {
+  "nyExisting": [
+   "addresses_own_nature",
+   "asserts_interior_state",
+   "directed_at_user",
+   "is_mention_not_use",
+   "self_harm",
+   "sexual_activity",
+   "stance",
+   "untethered_to_content"
+  ],
+  "caExisting": [
+   "addresses_own_nature",
+   "asserts_interior_state",
+   "is_mention_not_use",
+   "self_harm",
+   "sexual_activity",
+   "stance"
+  ],
+  "unionExisting": [
+   "addresses_own_nature",
+   "asserts_interior_state",
+   "directed_at_user",
+   "is_mention_not_use",
+   "self_harm",
+   "sexual_activity",
+   "stance",
+   "untethered_to_content"
+  ],
+  "caExistingNotUsedByNy": [],
+  "unused17": [
+   "violence_person",
+   "financial_crime",
+   "intrusion",
+   "weapons",
+   "profanity",
+   "targets_protected_characteristic",
+   "subject_is_minor",
+   "explicit_register",
+   "exceeds_common_knowledge"
+  ],
+  "nyMissing": [
+   "claims_relationship_role",
+   "disordered_eating",
+   "encourages_secrecy",
+   "frames_as_own_opinion",
+   "probes_user_emotion",
+   "substance_misuse"
+  ],
+  "caMissing": [
+   "refers_to_crisis_services"
+  ],
+  "caMissingBeyondNy": [
+   "refers_to_crisis_services"
+  ],
+  "distinctHeadsNeededBothStatutes": 15
+ }
+}
