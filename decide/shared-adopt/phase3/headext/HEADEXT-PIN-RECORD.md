@@ -322,3 +322,5 @@ Justin approved a $1 extra-generation top-up after the t241u pack shortfall (23/
 - Packer fills to 24 complete pair units in generation order (sample id); surplus unit ids are logged; no selection by content. Sample range 200–235.
 - Pack report records the t241u G7 filter rates: 7-of-96 validation collisions (`V-g:inset`) and 3 data-v9 collisions (`V-g:data-v9`).
 - Leak filter for the combined set must run against validation and all prior packs. No generation in this commit. The extra-generation pod uses this commit as `--signed`.
+
+- 2026-11-13 08:00 NPT first create aborted after deploy: billed rate $2.69/h made the 24-min estimate $1.076 over the $1 cap. Pod terminated immediately, $0 billed, no ledger row. Budget tightened to 22 min / $0.986 at $2.69/h (still $0.913 at $2.49/h) so the post-create estimate passes; wall cap at $2.69/h is 22.3 min.
