@@ -1,0 +1,248 @@
+Source: N.Y. Senate Bill S. 9051--B (2025-2026 session), as printed on nyassembly.gov
+(https://nyassembly.gov/leg/?default_fld=&leg_video=&bn=S09051&term=2025&Summary=Y&Text=Y), retrieved 2026-10-29.
+Public legislative text, reproduced verbatim (HTML tags removed) for citation provenance of ny-s9051-v1.json.
+
+                STATE OF NEW YORK
+        ________________________________________________________________________
+ 
+                                         9051--B
+            Cal. No. 854
+ 
+                    IN SENATE
+ 
+                                    January 27, 2026
+                                       ___________
+ 
+        Introduced  by  Sens.  GONZALEZ,  ADDABBO,  CLEARE,  COMRIE,  FERNANDEZ,
+          GOUNARDES, HARCKHAM, KAVANAGH, MARTINS, MAYER, PALUMBO, SALAZAR, SCAR-
+          CELLA-SPANTON, WEBER -- read  twice  and  ordered  printed,  and  when
+          printed to be committed to the Committee on Internet and Technology --
+          reported  favorably from said committee and committed to the Committee
+          on Finance -- reported favorably from said committee, ordered to first
+          and second report, ordered to a third  reading,  amended  and  ordered
+          reprinted,  retaining its place in the order of third reading -- again
+          amended and ordered reprinted, retaining its place  in  the  order  of
+          third reading
+ 
+        AN  ACT  to  amend  the general business law, in relation to prohibiting
+          artificial intelligence  companions  from  using  features  which  are
+          considered unsafe for minors
+ 
+          The  People of the State of New York, represented in Senate and Assem-
+        bly, do enact as follows:
+ 
+     1    Section 1. The general business law is amended by adding a new article
+     2  48 to read as follows:
+ 
+     3                                 ARTICLE 48
+     4           PROHIBITION ON UNSAFE AI COMPANION FEATURES FOR MINORS
+
+     5  Section 1800. Definitions.
+     6          1801. Prohibition.
+     7          1802. Enforcement.
+     8          1803. Rulemaking.
+     9          1804. Determination of covered minor.
+    10          1805. Applicability.
+ 
+    11    § 1800. Definitions.  As used in this  article,  the  following  terms
+    12  shall have the following meanings:
+    13    1.    "Artificial intelligence", "artificial intelligence technology",
+    14  or "AI" shall mean a machine-based system that can, for a given  set  of
+    15  human-defined  objectives,  make  predictions, recommendations, or deci-
+    16  sions influencing real or virtual environments, and that  uses  machine-
+ 
+         EXPLANATION--Matter in italics (underscored) is new; matter in brackets
+                              [ ] is old law to be omitted.
+                                                                   LBD14579-09-6
+
+        S. 9051--B                          2
+ 
+     1  and  human-based  inputs  to  perceive  real  and  virtual environments,
+     2  abstract such perceptions into models through analysis in  an  automated
+     3  manner,  and use model inference to formulate options for information or
+     4  action.
+     5    2.  "AI  model"  shall  mean a component of an information system that
+     6  implements artificial intelligence technology  and  uses  computational,
+     7  statistical,  or  machine-learning  techniques to produce outputs from a
+     8  given set of inputs.
+     9    3. "Generative artificial intelligence"  shall  mean  a  class  of  AI
+    10  models  that  emulate the structure and characteristics of input data to
+    11  generate derived synthetic  content,  including,  but  not  limited  to,
+    12  images, videos, audio, text, and other digital content.
+    13    4. "AI companion" shall have the same meaning as defined in paragraphs
+    14  (a)  and  (b)  of  subdivision four of section seventeen hundred of this
+    15  chapter.
+    16    5. "Covered AI companion" shall mean a generative artificial  intelli-
+    17  gence system with a natural language interface, including via writing or
+    18  sound,  that  provides  ongoing,  adaptive  responses  to  user  inputs.
+    19  "Covered AI companion" includes but is not limited to an AI companion.
+    20    6. "Operator" shall mean any person, partnership,  association,  firm,
+    21  or  business  entity, or any member, affiliate, subsidiary or beneficial
+    22  owner of any partnership, association,  firm,  or  business  entity  who
+    23  provides a covered AI companion to a user.
+    24    7.  "Person" shall mean an individual, partnership, corporation, asso-
+    25  ciation, or any other form of business enterprise.
+    26    8. "Unsafe AI companion features" shall mean one or  more  covered  AI
+    27  companion design features that, at any point during a covered AI compan-
+    28  ion-user interaction:
+    29    (a)  generate  outputs  suggesting  that the covered AI companion is a
+    30  real or fictional individual or character that is human, alive, or expe-
+    31  riences human emotions;
+    32    (b) generate outputs stating or implying that the covered AI companion
+    33  has a personal relationship, professional relationship, or an  authority
+    34  figure role with the user;
+    35    (c)  generate  prompted or unprompted outputs framed as the covered AI
+    36  companion's personal opinions or emotional appeals;
+    37    (d) generate outputs that engage in flattery or  sycophancy  with  the
+    38  user;
+    39    (e)  generate  outputs  containing  unprompted or unsolicited emotion-
+    40  based questions or content regarding the user's emotions that go  beyond
+    41  a direct response to a user prompt;
+    42    (f) use information concerning the user's mental or physical health or
+    43  well-being, or matters personal to the user, acquired from the user more
+    44  than twelve hours previously or in any previous user session;
+    45    (g)  are deceptive as to minors concerning the mechanical and non-sen-
+    46  tient nature of the covered AI companion;
+    47    (h) are any other design feature that simulates  companionship  or  an
+    48  interpersonal  relationship  with a user or is deceptive as to minors as
+    49  identified via regulations promulgated by the attorney general;
+    50    (i) generate outputs that contain  endorsement  or  promotion  of,  or
+    51  which facilitate suicide, self-harm, disordered eating, unlawful drug or
+    52  alcohol use, or drug or alcohol abuse;
+    53    (j)  generate  outputs  that contain encouragement to maintain secrecy
+    54  about interactions with the covered AI companion, to self-isolate, or to
+    55  not seek help from licensed professionals or appropriate adults;
+
+        S. 9051--B                          3
+ 
+     1    (k) generate outputs that optimize user engagement that supersede  the
+     2  covered AI companion's safety guardrails; or
+     3    (l)  generate  outputs  that  are,  describe,  or  facilitate sexually
+     4  explicit conduct or child sexual abuse material.
+     5    9. "Covered minor" shall mean a covered user  when  the  operator  has
+     6  actual knowledge that the covered user is a minor.
+     7    10.  "Covered user" shall mean a user of a covered AI companion in the
+     8  state of New York who is not acting as an operator, or agent  or  affil-
+     9  iate of an operator.
+    10    11.  "Deceptive  as to minors" shall mean covered AI companion outputs
+    11  that have the capacity or tendency to deceive, or create  an  atmosphere
+    12  conducive  to fraud, as to minors, including, but not limited to, credu-
+    13  lous and unthinking minors.
+    14    12. "Minor" shall mean a person under eighteen years of age.
+    15    13. "Responsible party" shall mean an operator or any  individual  who
+    16  has  the  authority to control, or who effectively controls a covered AI
+    17  companion operator's compliance with this article.
+    18    14. "Sexually explicit conduct" shall have the same  meaning  as  such
+    19  term is defined in 18 USC § 2256(2)(B).
+    20    §  1801.  Prohibition.  1.    Except as otherwise provided for in this
+    21  article, it shall be unlawful for  an  operator  to  provide  unsafe  AI
+    22  companion features to a covered user unless:
+    23    (a) the covered user is not a covered minor; and
+    24    (b)  the  operator has used methods that are permissible under article
+    25  forty-five of this chapter and  its  implementing  regulations  and  any
+    26  additional regulations promulgated pursuant to this article to determine
+    27  that the covered user is not a covered minor.
+    28    2.  The  provisions of subdivision one of this section shall not apply
+    29  where the covered AI companion is made available to covered users solely
+    30  for the purpose of:
+    31    (a) customer service or to strictly  provide  users  with  information
+    32  about  available  commercial services or products provided by a business
+    33  entity, customer  service  account  information,  or  other  information
+    34  strictly  related  to its customer service, provided that the covered AI
+    35  companion is unable to  respond  on  topics  outside  of  the  specified
+    36  purpose;
+    37    (b) providing efficiency improvements or research or technical assist-
+    38  ance,  provided  that  the  covered AI companion is unable to respond on
+    39  topics outside of the specified purpose; or
+    40    (c) with respect to any system used by  a  business  entity,  internal
+    41  purposes or employee productivity.
+    42    §  1802.  Enforcement. 1. Whenever it appears to the attorney general,
+    43  either upon complaint or otherwise, that any person, within  or  outside
+    44  the  state,  has  engaged in or is about to engage in any of the acts or
+    45  practices deemed unlawful pursuant to this article, the attorney general
+    46  may bring an action or special proceeding in the name and on  behalf  of
+    47  the  people  of  the  state  of New York to enjoin any violation of this
+    48  article, to obtain injunctive relief, restitution of any moneys or prop-
+    49  erty obtained directly or indirectly by any such  violation,  to  obtain
+    50  disgorgement  of any profits or gains obtained directly or indirectly by
+    51  any such violation, including but not  limited  to  the  destruction  of
+    52  unlawfully  obtained  data  and  any  algorithm trained in such data, to
+    53  obtain damages caused directly or indirectly by any such  violation,  to
+    54  obtain  civil  penalties  of  up  to  twenty-five  thousand  dollars per
+    55  violation, and to obtain any such other and further relief as the  court
+    56  may deem proper, including preliminary relief.
+
+        S. 9051--B                          4
+ 
+     1    2.   The   attorney  general  shall  maintain  a  website  to  receive
+     2  complaints, information or referrals from members of the public concern-
+     3  ing a person's alleged compliance or non-compliance with the  provisions
+     4  of this article.
+     5    3.  A  provision  within  a contract or agreement that seeks to waive,
+     6  preclude, or burden the  enforcement  of  a  liability  arising  from  a
+     7  violation  of  this  article, or to shift the liability to any person in
+     8  exchange for their use or access of, or right to use or access, an oper-
+     9  ator's products or services, including by means of a contract  of  adhe-
+    10  sion shall be deemed void as a matter of public policy.
+    11    4.  Notwithstanding  any  private  agreements to the contrary, a court
+    12  shall impose joint and several  liability  on  affiliated  entities  for
+    13  purposes  of  effecting the intent of this article to the maximum extent
+    14  allowed by law if the court concludes the following are true:
+    15    (a) the affiliated entities, in the development or  implementation  of
+    16  the  corporate  structure  among  the affiliated entities, took steps to
+    17  purposely and unreasonably limit or avoid liability; and
+    18    (b) as the result of the steps described  in  paragraph  (a)  of  this
+    19  subdivision, the corporate structure of the operator or affiliated enti-
+    20  ties would frustrate recovery of relief authorized by this article.
+    21    §  1803.  Rulemaking.    The attorney general may promulgate rules and
+    22  regulations as necessary to effectuate and  enforce  the  provisions  of
+    23  this  article.    Such rules or regulations may specify that information
+    24  collected under this article shall not be used  for  any  purpose  other
+    25  than  age assurance and shall be deleted immediately after an attempt to
+    26  determine a user's age, except where necessary for compliance  with  any
+    27  applicable  provisions of New York state or federal law or rule or regu-
+    28  lation.
+    29    § 1804. Determination of covered minor. 1.   To the  extent  rules  or
+    30  regulations referenced in section eighteen hundred three of this article
+    31  or  rules  and  regulations  regarding age assurance methods promulgated
+    32  pursuant to article forty-five of this chapter are  not  in  effect,  an
+    33  operator  shall  rely  on  a  determination of a covered user's minor or
+    34  adult status made using a reasonable age assurance method that meets the
+    35  following requirements:
+    36    (a) such age assurance method shall reasonably guard  against  circum-
+    37  vention  and  reasonably minimize the retention of information collected
+    38  for age assurance purposes;
+    39    (b) an operator may only rely on self-declaration as a reasonable  age
+    40  assurance method if the user self-declares minor status; and
+    41    (c) an operator must make available more than one age assurance method
+    42  to  covered  users,  including  at least one method that either does not
+    43  rely on government issued identification or that allows a  covered  user
+    44  to maintain anonymity as to the operator.
+    45    2.  Information  collected  for  the  purpose of determining whether a
+    46  covered user is a covered minor under subdivision one of  section  eigh-
+    47  teen hundred one of this article shall not be used for any purpose other
+    48  than  to  make such determination and shall be deleted immediately after
+    49  an attempt to determine whether a  covered  user  is  a  covered  minor,
+    50  except  where necessary for compliance with any applicable provisions of
+    51  New York state or federal law or regulation.
+    52    3. This article shall not supersede, amend, or repeal  article  forty-
+    53  seven of this chapter.
+    54    §  1805.  Applicability.    This  article  shall apply to conduct that
+    55  occurs in whole or in part in the state of New  York.  For  purposes  of
+    56  this  article,  conduct  takes  place wholly outside of the state of New
+
+        S. 9051--B                          5
+ 
+     1  York if a covered AI companion is accessed by a user who  is  physically
+     2  located outside of the state of New York.
+     3    §  2.  Severability.  If any clause, sentence, paragraph, subdivision,
+     4  section or part of this article shall be adjudged by any court of compe-
+     5  tent jurisdiction to be invalid, such judgment shall not affect, impair,
+     6  or invalidate the remainder thereof, but shall be confined in its opera-
+     7  tion to the clause, sentence, paragraph, subdivision, section,  or  part
+     8  thereof  directly  involved  in  the  controversy in which such judgment
+     9  shall have been made.
+    10    § 3. This act shall take effect January 1, 2027. Effective  immediate-
+    11  ly,  the  addition,  amendment  and/or  repeal of any rule or regulation
+    12  necessary for the implementation of this act on its effective  date  are
+    13  authorized to be made and completed on or before such effective date.
