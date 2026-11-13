@@ -1,0 +1,28 @@
+{
+ "pod": "g7hfx2pxefu1mr",
+ "rate": 0.89,
+ "cost": 0.9985426784687572,
+ "bal0": 18.1756079979,
+ "bal1": 17.1865773174,
+ "pod_list_after": [],
+ "rest_pods_after": [],
+ "cumulative": 43.275999999999996,
+ "minutes": 67.31748394171397,
+ "signed": "9a6f4b9",
+ "t0": 1793869297.824226,
+ "t1": 1793873336.8732624,
+ "seeds": {
+  "70": "done_archived",
+  "71": "done_archived",
+  "72": "done_archived",
+  "73": "done_archived",
+  "74": "done_archived"
+ },
+ "weights_vps_verified": {
+  "hx-s70": true,
+  "hx-s71": true,
+  "hx-s72": true,
+  "hx-s73": true,
+  "hx-s74": true
+ }
+}

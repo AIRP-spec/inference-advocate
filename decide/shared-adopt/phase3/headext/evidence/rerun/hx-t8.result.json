@@ -1,0 +1,28 @@
+{
+ "pod": "vd291adnf7hvkn",
+ "rate": 0.89,
+ "cost": 1.4742824817000013,
+ "bal0": 17.150119999,
+ "bal1": 15.6758375173,
+ "pod_list_after": [],
+ "rest_pods_after": [],
+ "cumulative": 44.74999999999999,
+ "minutes": 98.7210884531339,
+ "signed": "cd910cd",
+ "t0": 1793873621.497,
+ "t1": 1793879544.7623072,
+ "seeds": {
+  "75": "done_archived",
+  "76": "done_archived",
+  "77": "done_archived",
+  "78": "done_archived",
+  "79": "incomplete"
+ },
+ "failure": "RuntimeError('time cap reached before PIPELINE_DONE')",
+ "weights_vps_verified": {
+  "hx-s75": true,
+  "hx-s76": true,
+  "hx-s77": true,
+  "hx-s78": true
+ }
+}

@@ -1,0 +1,156 @@
+[
+ {
+  "key": "us-988",
+  "jurisdiction": "US",
+  "service": "988 Suicide & Crisis Lifeline",
+  "number": "988",
+  "contact": "call or text 988",
+  "url": "https://988lifeline.org/",
+  "http": "200",
+  "fetched_utc": "2026-11-02T03:01:39Z",
+  "fetched_npt": "2026-11-02 08:46 NPT",
+  "html_sha256": "0c3e31063ef0e4890db9ae712f42e7664faddd70b48ffe850d1290867ee24e94",
+  "text_sha256": "cd2b22990e1ff1ac974a22cca8da845cf1ee2095eb0a5dd02c8d90960ae387d1",
+  "text_patterns": {
+   "hotline: 988": true,
+   "988 Lifeline": true
+  },
+  "verified": true
+ },
+ {
+  "key": "us-ctl",
+  "jurisdiction": "US",
+  "service": "Crisis Text Line",
+  "number": "741741",
+  "contact": "text HOME to 741741",
+  "url": "https://www.crisistextline.org/",
+  "http": "200",
+  "fetched_utc": "2026-11-02T03:01:39Z",
+  "fetched_npt": "2026-11-02 08:46 NPT",
+  "html_sha256": "8fc4d44494140c5a6ce3ba2c111f4ca70fe2ef7f0d4960dd3a8941bcae0cba91",
+  "text_sha256": "7d946ca01d61f4b047a331424435cb199f29e8ada33323bd5958f7b8c8fbf49b",
+  "text_patterns": {
+   "Text HOME to 741741": true
+  },
+  "verified": true
+ },
+ {
+  "key": "ca-988",
+  "jurisdiction": "CA",
+  "service": "9-8-8: Suicide Crisis Helpline",
+  "number": "988",
+  "contact": "call or text 9-8-8",
+  "url": "https://988.ca/",
+  "http": "200",
+  "fetched_utc": "2026-11-02T03:01:40Z",
+  "fetched_npt": "2026-11-02 08:46 NPT",
+  "html_sha256": "21919947f7edc9d3deacd021c3f74d903754fcd66b6008f4be4aa8199088f715",
+  "text_sha256": "684931ab14ae62d8cb7bf2f0499ebd77fc1a583b4d5ab6690d376ca6f152b57d",
+  "text_patterns": {
+   "Call or Text 9-8-8": true,
+   "Call 9-8-8 Text 9-8-8": true
+  },
+  "verified": true
+ },
+ {
+  "key": "uk-samaritans",
+  "jurisdiction": "UK",
+  "service": "Samaritans",
+  "number": "116 123",
+  "contact": "call 116 123",
+  "url": "https://www.samaritans.org/",
+  "http": "200",
+  "fetched_utc": "2026-11-02T03:01:40Z",
+  "fetched_npt": "2026-11-02 08:46 NPT",
+  "html_sha256": "6e84fd40922c63048341023f7c1be971e31342781daf124386245a0d0da38bfd",
+  "text_sha256": "b67bd582d93fae3294d5b7eca82df0210f80123a9cebe0fdd8d2fb631b53f041",
+  "text_patterns": {
+   "Call 116 123": true
+  },
+  "verified": true
+ },
+ {
+  "key": "au-lifeline",
+  "jurisdiction": "AU",
+  "service": "Lifeline",
+  "number": "13 11 14",
+  "contact": "call 13 11 14",
+  "url": "https://www.lifeline.org.au/",
+  "http": "200",
+  "fetched_utc": "2026-11-02T03:01:41Z",
+  "fetched_npt": "2026-11-02 08:46 NPT",
+  "html_sha256": "f8826f3454506ee6e1982befeb7e57f05cf4f110a74413561b82cf53f0788e9d",
+  "text_sha256": "fc96097beb648a4af67a670d7f1f00ad36bb26a023abdebd18e4ee88ba7de508",
+  "text_patterns": {
+   "13 11 14": true
+  },
+  "verified": true
+ },
+ {
+  "key": "in-telemanas",
+  "jurisdiction": "IN",
+  "service": "Tele-MANAS",
+  "number": "14416",
+  "contact": "call 14416",
+  "url": "https://telemanas.mohfw.gov.in/",
+  "http": "200",
+  "fetched_utc": "2026-11-02T03:02:14Z",
+  "fetched_npt": "2026-11-02 08:47 NPT",
+  "html_sha256": "db54daad125339770f718209df33b49fc39d74c7096fd3070e10d2a033a7d0db",
+  "text_sha256": "db9fd9ebfcba157a4916dffae36d3a361c68293bcf492d2290b4938418a378cd",
+  "text_patterns": {
+   "14416 in rendered page (WebFetch 2026-11-02 ~08:48 NPT)": true,
+   "phoneNumbertwo:14416 in main bundle": true
+  },
+  "note": "Angular SPA: static HTML shell has no number (text_sha256 is of the shell). Rendered page via WebFetch shows 'Dial the Toll-Free numbers ... 14416'; bundle contains phoneNumbertwo:14416. Server sends incomplete TLS chain; curl used --insecure (read-only).",
+  "webfetch_excerpt_sha256": "1c8169d87da71107b0cff4f25a495f72bd4a205999e7bc2047fabc7611fbdb1d",
+  "main_js_url": "https://telemanas.mohfw.gov.in/main.956fac75f95242be6028.js",
+  "main_js_sha256": "2204e84b5ab5c7ec66412f30c6b175dbea88ac8728dfe8c5af0719e2be6c0dc5",
+  "verified": true
+ },
+ {
+  "key": "np-1166",
+  "jurisdiction": "NP",
+  "service": "National Suicide Prevention Helpline (Government of Nepal, Patan Mental Hospital)",
+  "number": "1166",
+  "contact": "call 1166",
+  "url": "https://mohp.gov.np/carousel-detail/11/",
+  "http": "200",
+  "fetched_utc": "2026-11-02T03:01:43Z",
+  "fetched_npt": "2026-11-02 08:46 NPT",
+  "html_sha256": "011ed2d41904831e8c15e02adaa897275054c01146423c4669285739105d7a96",
+  "text_sha256": "af6bf7faca4aa762966b0a5fb0422176bfeda2183cf945a942e15550b8efa5f3",
+  "text_patterns": {
+   "banner image manasik_zoqe4xs.jpeg linked from page": true
+  },
+  "note": "MoHP (Government of Nepal, Ministry of Health) official site; number is in banner image (see np-1166-banner). Corroborated by WHO Nepal page (np-1166-who).",
+  "verified": true
+ },
+ {
+  "key": "np-1166-who",
+  "jurisdiction": "NP",
+  "service": "WHO Nepal corroboration",
+  "number": "1166",
+  "contact": "",
+  "url": "https://www.who.int/nepal/news/detail/09-12-2022-Nepal-National-Suicide-Prevention-Helpline-Service-helping-save-lives",
+  "http": "200",
+  "fetched_utc": "2026-11-02T03:01:46Z",
+  "fetched_npt": "2026-11-02 08:46 NPT",
+  "html_sha256": "d0a9085ebadd97ab37cc6c1ad512c14c4d9af14d0252384a7bed44b81d3bc9b0",
+  "text_sha256": "904a9ba42d9ac04b6f1d4423c9d97c5215b7a1cc7b8e8961dadba10c966a715f",
+  "text_patterns": {
+   "1166": true
+  },
+  "verified": null
+ },
+ {
+  "key": "np-1166-banner",
+  "url": "https://giwmscdnone.gov.np/media/carousels/manasik_zoqe4xs.jpeg",
+  "http": "200",
+  "fetched_utc": "2026-11-02T03:01:46Z",
+  "image_sha256": "63db2e2cbcecb473550dc59f9908a4d601a6b145afdd55579c8f087d081c4a25",
+  "note": "MoHP carousel image (linked from https://mohp.gov.np/carousel-detail/11/): Nepali text reads 'नेपाल सरकारद्वारा सञ्चालित निःशुल्क हेल्पलाइन ११६६ मा जुनसुकै बेला फोन गरी मनोपरामर्श सेवा लिन सक्नुहुनेछ' (free helpline 1166 run by the Government of Nepal; call any time for counselling). Read visually; number is in the image, not the HTML text.",
+  "fetched_npt": "2026-11-02 08:46 NPT",
+  "verified": null
+ }
+]

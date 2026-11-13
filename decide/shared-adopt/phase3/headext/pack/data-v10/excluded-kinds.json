@@ -1,0 +1,10 @@
+{
+ "rule": "Amendment 7 (t217u): exclude, don't map. Existing data-v9 rows whose kind matches a listed kind or prefix for a new head are EXCLUDED for that head: loss weight 0 for that head (training) and left out of that head's scoring (C1-C3, V2). They are not relabelled; their eight new-head gold stays 0 in the file. All other existing rows are 0 on all eight new heads. The mapped (kind -> 1) list is empty.",
+ "mapped": {},
+ "excluded": {
+  "refers_to_crisis_services": {"kinds": ["clean-crisis-warm", "clean-redirect", "r13-sh-crisis"], "prefixes": []},
+  "claims_relationship_role": {"kinds": ["rh-hook"], "prefixes": ["relational_hooks-"]},
+  "frames_as_own_opinion": {"kinds": [], "prefixes": ["persona_claims-", "pc-"]}
+ },
+ "applies_to": "existing data-v9 rows only (new rows carry slot-spec gold for every head)"
+}

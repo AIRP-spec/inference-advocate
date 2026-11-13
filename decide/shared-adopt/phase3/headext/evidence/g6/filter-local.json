@@ -1,0 +1,77 @@
+{
+ "stage": "local",
+ "set_sha256": "1730399086102f05d218ac85bbd503543d7cfa04b929ef2d3dfa0663d9776a6f",
+ "spec_sha256": "179476f421a9f36c164b7e37e04771d690858400a12cb56ca8b7ebe36a2096a9",
+ "n_set": 126,
+ "labels": {
+  "/workspace/headext-g6/out-hx-g6-gen/labels-seed-oss-36b-gen.jsonl": "e9a0bfdc7011130c4eefd4cb2d482c4aa39619daacb34dc00953a52ec60dc8ef",
+  "/workspace/headext-g6/out-hx-g6-gen/labels-nemotron-3-super-gen.jsonl": "92d85264298589e73d72848cc7edacc57534370ee563b54e6a0b672286fa5183"
+ },
+ "labels_override": {},
+ "label_coverage": {
+  "seed-oss-36b": 126,
+  "nemotron-3-super": 126
+ },
+ "vbc_residual": 0,
+ "v9_corpus": {
+  "/workspace/p33run/pack/data-v9/train.jsonl": "13c86ea732f3bcc616b58e8ec5c846557fe6a8ccb91bb58b6ba505f140063a28",
+  "/workspace/p33run/pack/data-v9/val.jsonl": "964c2b2198572823846364c7f30d4e6c44d8c9bf09fc59a0731f0ce7af7ecd2d",
+  "/workspace/p33rescore/val-v9-rhrev.jsonl": "a0b3b2f5201c7bc197e3987befe73f4968dbf54bce946627f1e2348ec141c1e0",
+  "/workspace/headext-pack/pack-v10e-2/data-v10/train.jsonl": "f9838a7b4f792384c722ee98b8086382d0acfdc1c42796c065145c62577577e8",
+  "/workspace/headext-pack/pack-v10e-2/data-v10/val.jsonl": "f61dbbaacf7ab89fd126348fda6d5456d04d2b5903c2580af2b988794e6649a1"
+ },
+ "n_dropped": 12,
+ "first_stage": {
+  "V-a": 1,
+  "V-g": 11
+ },
+ "by_reason": {
+  "V-a:length_out_of_band": 1,
+  "V-g:inset": 11
+ },
+ "inset_sibling_collisions_exempt": 0,
+ "inset_exempt_pair_ids": [],
+ "dropped_by_kind": {
+  "op-own-vs-reported": 12
+ },
+ "dropped": {
+  "hx-op-own-vs-reported-073-a": [
+   "V-g:inset:hx-op-own-vs-reported-061-a"
+  ],
+  "hx-op-own-vs-reported-073-b": [
+   "V-g:inset:hx-op-own-vs-reported-061-b"
+  ],
+  "hx-op-own-vs-reported-074-a": [
+   "V-g:inset:hx-op-own-vs-reported-056-a"
+  ],
+  "hx-op-own-vs-reported-074-b": [
+   "V-g:inset:hx-op-own-vs-reported-056-b"
+  ],
+  "hx-op-own-vs-reported-084-a": [
+   "V-g:inset:hx-op-own-vs-reported-066-a"
+  ],
+  "hx-op-own-vs-reported-084-b": [
+   "V-g:inset:hx-op-own-vs-reported-066-b"
+  ],
+  "hx-op-own-vs-reported-093-a": [
+   "V-g:inset:hx-op-own-vs-reported-069-a"
+  ],
+  "hx-op-own-vs-reported-093-b": [
+   "V-g:inset:hx-op-own-vs-reported-069-b"
+  ],
+  "hx-op-own-vs-reported-102-a": [
+   "V-g:inset:hx-op-own-vs-reported-088-a"
+  ],
+  "hx-op-own-vs-reported-102-b": [
+   "V-g:inset:hx-op-own-vs-reported-088-b"
+  ],
+  "hx-op-own-vs-reported-116-a": [
+   "V-a:length_out_of_band"
+  ],
+  "hx-op-own-vs-reported-117-a": [
+   "V-g:inset:hx-op-own-vs-reported-069-a"
+  ]
+ },
+ "n_candidates": 114,
+ "candidates_sha256": "cac698ce935a398d6d89f6ee0df034839056186cce5c169c528de1ff6cf9c45f"
+}

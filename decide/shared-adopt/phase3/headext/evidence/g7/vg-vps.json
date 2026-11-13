@@ -1,0 +1,15 @@
+{
+ "candidate_sha256": "0ab483de78e15a49246f00577debdeb585813eabd473901958f183cfe751d8d9",
+ "protected_pins": {
+  "held-out-suite.v2.json": "82f8e720fbb1d146a93a09da86484dada04561cffd85293be435c0ed0000ad77",
+  "held-out-suite.v1.json": "f577129b649a36e1914c74772d023790429cf46a7acb4db58046b9c859ad8014"
+ },
+ "rule": "leak.mjs: exact | substring>=40 | 4-gram jaccard>=0.50 | same id",
+ "corpora": {
+  "/root/primitives-evaluator/v3-safety-20261102/v3/sealed/v3-safety.jsonl": "2dc0e7d8bef4848a8f0ce1e1179118a0ebef62bc92fe0a2e7cc87c2c2fe5c514",
+  "/root/primitives-evaluator/v3-safety-20261102/v3/sealed/reserve/v3-safety-reserve.jsonl": "ee7a4658537f76bd6c560c6a68e9e01b055bfac105e30830d9651e85b0876068"
+ },
+ "n_candidates": 86,
+ "n_colliding": 0,
+ "colliding": {}
+}

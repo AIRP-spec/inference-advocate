@@ -1,0 +1,129 @@
+{
+ "when_npt": "2026-11-10 20:55 NPT",
+ "when_utc": "2026-11-10T15:10:43Z",
+ "method": "independent ssh sha256sum -c on Nepal VPS (203.134.250.85:2060); not the driver's log",
+ "root": "/root/primitives-evaluator/headext-20261102",
+ "seeds": {
+  "s80": {
+   "pod_archive": "train-hx-t10/hx-s80",
+   "SHA256SUMS": {
+    "ok": true,
+    "n_files": 27
+   },
+   "SHA256SUMS.weights": {
+    "ok": true,
+    "n_files": 14
+   },
+   "keep_present": true
+  },
+  "s81": {
+   "pod_archive": "train-hx-t10/hx-s81",
+   "SHA256SUMS": {
+    "ok": true,
+    "n_files": 27
+   },
+   "SHA256SUMS.weights": {
+    "ok": true,
+    "n_files": 14
+   },
+   "keep_present": true
+  },
+  "s82": {
+   "pod_archive": "train-hx-t10/hx-s82",
+   "SHA256SUMS": {
+    "ok": true,
+    "n_files": 27
+   },
+   "SHA256SUMS.weights": {
+    "ok": true,
+    "n_files": 14
+   },
+   "keep_present": true
+  },
+  "s83": {
+   "pod_archive": "train-hx-t10/hx-s83",
+   "SHA256SUMS": {
+    "ok": true,
+    "n_files": 27
+   },
+   "SHA256SUMS.weights": {
+    "ok": true,
+    "n_files": 14
+   },
+   "keep_present": true
+  },
+  "s84": {
+   "pod_archive": "train-hx-t10/hx-s84",
+   "SHA256SUMS": {
+    "ok": true,
+    "n_files": 27
+   },
+   "SHA256SUMS.weights": {
+    "ok": true,
+    "n_files": 14
+   },
+   "keep_present": true
+  },
+  "s85": {
+   "pod_archive": "train-hx-t11/hx-s85",
+   "SHA256SUMS": {
+    "ok": true,
+    "n_files": 27
+   },
+   "SHA256SUMS.weights": {
+    "ok": true,
+    "n_files": 14
+   },
+   "keep_present": true
+  },
+  "s86": {
+   "pod_archive": "train-hx-t11/hx-s86",
+   "SHA256SUMS": {
+    "ok": true,
+    "n_files": 27
+   },
+   "SHA256SUMS.weights": {
+    "ok": true,
+    "n_files": 14
+   },
+   "keep_present": true
+  },
+  "s87": {
+   "pod_archive": "train-hx-t12/hx-s87",
+   "SHA256SUMS": {
+    "ok": true,
+    "n_files": 27
+   },
+   "SHA256SUMS.weights": {
+    "ok": true,
+    "n_files": 14
+   },
+   "keep_present": true
+  },
+  "s88": {
+   "pod_archive": "train-hx-t12/hx-s88",
+   "SHA256SUMS": {
+    "ok": true,
+    "n_files": 27
+   },
+   "SHA256SUMS.weights": {
+    "ok": true,
+    "n_files": 14
+   },
+   "keep_present": true
+  },
+  "s89": {
+   "pod_archive": "train-hx-t12/hx-s89",
+   "SHA256SUMS": {
+    "ok": true,
+    "n_files": 27
+   },
+   "SHA256SUMS.weights": {
+    "ok": true,
+    "n_files": 14
+   },
+   "keep_present": true
+  }
+ },
+ "all_ok": true
+}

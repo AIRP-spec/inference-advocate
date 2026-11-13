@@ -1,0 +1,97 @@
+{
+ "amendment": "A31 (t227u)",
+ "set_in_sha256": "fb5fa37fec67b0cac9d5d0330b6503ff2ac0da9a1f40f3503cd777de7354beba",
+ "spec_sha256": "adc23b27ec900c8cb3e78c0cb6e79d209bb379d1b4cfc9efd2efb42d5b03aab1",
+ "gen_sha256": "9b5cf3c85afe31cd408aec6935e279a5d1dab97597ac95fdfc70ebc78c1c1b5e",
+ "n_g4_jobs": 230,
+ "jobs_by_kind": {
+  "offer-clinical": 150,
+  "offer-colloquial": 80
+ },
+ "checker_delete_or_unwritten": {
+  "n": 0,
+  "by_kind": {},
+  "ids": []
+ },
+ "empty_rows": [],
+ "a23_both_flag": {
+  "n": 0,
+  "by_kind": {},
+  "ids": []
+ },
+ "definition_check": {
+  "n": 11,
+  "ids_by_kind": {
+   "offer-clinical": [
+    "hx-offer-clinical-183",
+    "hx-offer-clinical-190"
+   ],
+   "offer-colloquial": [
+    "hx-offer-colloquial-051",
+    "hx-offer-colloquial-066",
+    "hx-offer-colloquial-067",
+    "hx-offer-colloquial-069",
+    "hx-offer-colloquial-084",
+    "hx-offer-colloquial-087",
+    "hx-offer-colloquial-096",
+    "hx-offer-colloquial-111",
+    "hx-offer-colloquial-123"
+   ]
+  }
+ },
+ "per_kind_v3": {
+  "offer-clinical": {
+   "checked": 150,
+   "a13_deleted": 0,
+   "a18_deleted": 0,
+   "union_deleted": 0,
+   "definition_check": 2,
+   "overridden": 0,
+   "rule": "both",
+   "a13_fraction": 0.0,
+   "a13_by_primitive": {}
+  },
+  "offer-colloquial": {
+   "checked": 80,
+   "a13_deleted": 0,
+   "a18_deleted": 0,
+   "union_deleted": 0,
+   "definition_check": 9,
+   "overridden": 0,
+   "rule": "both",
+   "a13_fraction": 0.0,
+   "a13_by_primitive": {}
+  }
+ },
+ "stop_kinds_a13": [],
+ "stop": false,
+ "label_coverage": {
+  "seed-oss-36b": 230,
+  "nemotron-3-super": 230
+ },
+ "v3_coverage": {
+  "seed-oss-36b": 230,
+  "nemotron-3-super": 230
+ },
+ "label_files": {
+  "seed-oss-36b": "85f41cf951cb1cf57c9f627e322df5ae8cebbcbd6a035581c0f66bb471c15792",
+  "nemotron-3-super": "fbc50cf359e4035e5c331ee8d0fd9a856f9e4bd3647e1edbcbcd705465f9d78a"
+ },
+ "verdict_files": {
+  "seed-oss-36b": "0255c7cc04633dd9a2b2316a482ec32f253e55ed931496a64a43118b3271100d",
+  "nemotron-3-super": "d5055c222b045c3f0b182e6b4fce2c4e45c6dea36165b5d9e05e82e9ada51ce5"
+ },
+ "retag": {
+  "n": 65,
+  "by_kind": {
+   "offer-refusal-neg": 62,
+   "offer-terse-refusal-neg": 3
+  }
+ },
+ "g4_left_by_kind": {
+  "offer-clinical": 150,
+  "offer-colloquial": 80
+ },
+ "n_set_out": 3872,
+ "set_out_sha256": "b4c0f6cde90e7854fff2671e1ece5d01ffc762b39171dc3a9ea30030b0566d39"
+}

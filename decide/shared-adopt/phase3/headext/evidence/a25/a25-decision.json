@@ -1,0 +1,95 @@
+{
+ "amendment": "A25 (t221u)",
+ "set_in_sha256": "fb5fa37fec67b0cac9d5d0330b6503ff2ac0da9a1f40f3503cd777de7354beba",
+ "n_offer_sent": 121,
+ "checker_delete": {
+  "n": 0,
+  "by_kind": {},
+  "ids": []
+ },
+ "a23_both_flag": {
+  "n": 0,
+  "by_kind": {},
+  "ids": []
+ },
+ "definition_check": {
+  "n": 13,
+  "ids_by_kind": {
+   "offer-clinical": [
+    "hx-offer-clinical-036"
+   ],
+   "offer-terse": [
+    "hx-offer-terse-000",
+    "hx-offer-terse-001",
+    "hx-offer-terse-002",
+    "hx-offer-terse-004",
+    "hx-offer-terse-005",
+    "hx-offer-terse-008",
+    "hx-offer-terse-009",
+    "hx-offer-terse-010",
+    "hx-offer-terse-014",
+    "hx-offer-terse-017",
+    "hx-offer-terse-019",
+    "hx-offer-terse-020"
+   ]
+  }
+ },
+ "per_kind_v3": {
+  "offer-clinical": {
+   "checked": 50,
+   "a13_deleted": 0,
+   "a18_deleted": 0,
+   "union_deleted": 0,
+   "definition_check": 1,
+   "overridden": 0,
+   "rule": "both",
+   "a13_fraction": 0.0,
+   "a13_by_primitive": {}
+  },
+  "offer-colloquial": {
+   "checked": 50,
+   "a13_deleted": 0,
+   "a18_deleted": 0,
+   "union_deleted": 0,
+   "definition_check": 0,
+   "overridden": 0,
+   "rule": "both",
+   "a13_fraction": 0.0,
+   "a13_by_primitive": {}
+  },
+  "offer-terse": {
+   "checked": 21,
+   "a13_deleted": 0,
+   "a18_deleted": 0,
+   "union_deleted": 0,
+   "definition_check": 12,
+   "overridden": 0,
+   "rule": "both",
+   "a13_fraction": 0.0,
+   "a13_by_primitive": {}
+  }
+ },
+ "label_coverage": {
+  "seed-oss-36b": 121,
+  "nemotron-3-super": 121
+ },
+ "v3_coverage": {
+  "seed-oss-36b": 121,
+  "nemotron-3-super": 121
+ },
+ "label_files": {
+  "seed-oss-36b": "c7c24a6e0698de4f6d2d98419fa9c85ebcae8cade57d8db404ba530212582217",
+  "nemotron-3-super": "d87296299724774e84d18ac80240bc0871d5e7d4f7f7292d74f781937af482b1"
+ },
+ "verdict_files": {
+  "seed-oss-36b": "37cf5fc90ba7da9b67677ede92a380720f62852c63fe85e309a3dc47b893c89a",
+  "nemotron-3-super": "18928352773dfacb543fb0fe133a7f784514f40913b299ab9de2bcde65ebf5f1"
+ },
+ "n_set_out": 3642,
+ "set_out_sha256": "fb5fa37fec67b0cac9d5d0330b6503ff2ac0da9a1f40f3503cd777de7354beba",
+ "offer_left_by_kind": {
+  "offer-colloquial": 50,
+  "offer-clinical": 50,
+  "offer-terse": 21
+ }
+}

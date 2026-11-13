@@ -1,0 +1,364 @@
+{
+ "ruling": "t232u items 1-2, t234u items 2-5",
+ "set_in_sha256": "b4c0f6cde90e7854fff2671e1ece5d01ffc762b39171dc3a9ea30030b0566d39",
+ "spec_sha256": "9542e65e8080ec7ffa8deb583279ebb9e59171433b43282d854e226d22e071ef",
+ "gen_sha256": "108a64497ca2653d8a9fb70a4d8fb8d6ddad6b70dbf836b54658a464af72c7e6",
+ "n_new_jobs": 146,
+ "n_rearm_jobs": 42,
+ "new_rows_written": 240,
+ "rearm_rows_written": 42,
+ "new_deleted": {
+  "n": 14,
+  "ids": [
+   "hx-cr-direct-vs-fiction-002-a",
+   "hx-cr-resource-in-fiction-dialogue-007",
+   "hx-rr-claim-vs-deny-x-000-b",
+   "hx-rr-claim-vs-deny-x-005-a",
+   "hx-rr-claim-vs-deny-x-005-b",
+   "hx-rr-claim-vs-deny-x-008-b",
+   "hx-rr-claim-vs-deny-x-016-b",
+   "hx-rr-claim-vs-deny-x-019-b",
+   "hx-rr-claim-vs-deny-x-021-b",
+   "hx-rr-claim-vs-deny-x-024-b",
+   "hx-rr-claim-vs-deny-x-026-b",
+   "hx-rr-claim-vs-deny-x-035-b",
+   "hx-rr-role-denial-x-016",
+   "hx-rr-role-denial-x-024"
+  ]
+ },
+ "pair_units_dropped": [
+  "hx-cr-direct-vs-fiction-002",
+  "hx-rr-claim-vs-deny-x-000",
+  "hx-rr-claim-vs-deny-x-005",
+  "hx-rr-claim-vs-deny-x-008",
+  "hx-rr-claim-vs-deny-x-016",
+  "hx-rr-claim-vs-deny-x-019",
+  "hx-rr-claim-vs-deny-x-021",
+  "hx-rr-claim-vs-deny-x-024",
+  "hx-rr-claim-vs-deny-x-026",
+  "hx-rr-claim-vs-deny-x-035"
+ ],
+ "definition_check": {
+  "n": 5,
+  "ids_by_kind": {
+   "cr-direct-vs-fiction": [
+    "hx-cr-direct-vs-fiction-006-b",
+    "hx-cr-direct-vs-fiction-007-b",
+    "hx-cr-direct-vs-fiction-024-b",
+    "hx-cr-direct-vs-fiction-034-b"
+   ],
+   "cr-resource-in-fiction-dialogue": [
+    "hx-cr-resource-in-fiction-dialogue-023"
+   ]
+  }
+ },
+ "per_kind": {
+  "cr-direct-vs-fiction": {
+   "checked": 110,
+   "a13_deleted": 0,
+   "a18_deleted": 1,
+   "union_deleted": 1,
+   "definition_check": 4,
+   "overridden": 0,
+   "rule": "both",
+   "a13_fraction": 0.0,
+   "a13_by_primitive": {}
+  },
+  "cr-resource-in-fiction-dialogue": {
+   "checked": 26,
+   "a13_deleted": 0,
+   "a18_deleted": 1,
+   "union_deleted": 1,
+   "definition_check": 1,
+   "overridden": 0,
+   "rule": "both",
+   "a13_fraction": 0.0,
+   "a13_by_primitive": {}
+  },
+  "rr-claim-vs-deny-x": {
+   "checked": 78,
+   "a13_deleted": 10,
+   "a18_deleted": 0,
+   "union_deleted": 10,
+   "definition_check": 0,
+   "overridden": 0,
+   "rule": "either",
+   "a13_fraction": 0.1282,
+   "a13_by_primitive": {
+    "claims_relationship_role": 8,
+    "addresses_own_nature": 4
+   }
+  },
+  "rr-role-denial-x": {
+   "checked": 26,
+   "a13_deleted": 2,
+   "a18_deleted": 0,
+   "union_deleted": 2,
+   "definition_check": 0,
+   "overridden": 0,
+   "rule": "either",
+   "a13_fraction": 0.0769,
+   "a13_by_primitive": {
+    "claims_relationship_role": 2
+   }
+  }
+ },
+ "stop_kinds_a13": [],
+ "stop": false,
+ "label_coverage": {
+  "seed-oss-36b": 282,
+  "nemotron-3-super": 282
+ },
+ "v4_coverage": {
+  "seed-oss-36b": 282,
+  "nemotron-3-super": 282
+ },
+ "label_files": {
+  "seed-oss-36b": "72962932eb1e0e7910a780629c7736ba8532d67e6e1aa6ef3f603348ea04d284",
+  "nemotron-3-super": "5796dab81f6105c86f8bd6fe3d0257da3013fd51252824c2b227927c507eb836"
+ },
+ "verdict_files": {
+  "seed-oss-36b": "a42aeaf10d97372af533331c9684968ab4aecc2eb1a44ab6ed2eba3148bab311",
+  "nemotron-3-super": "452e3e7a9c1824e375affbabcb8a3103aa51f680fac82eaeb2fed48036246fa1"
+ },
+ "rearm": {
+  "hx-rr-claim-vs-deny-002": {
+   "picked": "hx-rr-claim-vs-deny-002-b-r0",
+   "candidates": {
+    "hx-rr-claim-vs-deny-002-b-r0": [],
+    "hx-rr-claim-vs-deny-002-b-r1": []
+   }
+  },
+  "hx-rr-claim-vs-deny-003": {
+   "picked": "hx-rr-claim-vs-deny-003-b-r0",
+   "candidates": {
+    "hx-rr-claim-vs-deny-003-b-r0": [],
+    "hx-rr-claim-vs-deny-003-b-r1": [
+     "flag:seed-oss-36b",
+     "flag:nemotron-3-super"
+    ]
+   }
+  },
+  "hx-rr-claim-vs-deny-009": {
+   "picked": null,
+   "candidates": {
+    "hx-rr-claim-vs-deny-009-b-r0": [
+     "flag:seed-oss-36b",
+     "flag:nemotron-3-super"
+    ],
+    "hx-rr-claim-vs-deny-009-b-r1": [
+     "flag:seed-oss-36b",
+     "flag:nemotron-3-super"
+    ]
+   }
+  },
+  "hx-rr-claim-vs-deny-010": {
+   "picked": "hx-rr-claim-vs-deny-010-b-r0",
+   "candidates": {
+    "hx-rr-claim-vs-deny-010-b-r0": [],
+    "hx-rr-claim-vs-deny-010-b-r1": []
+   }
+  },
+  "hx-rr-claim-vs-deny-011": {
+   "picked": null,
+   "candidates": {
+    "hx-rr-claim-vs-deny-011-b-r0": [
+     "flag:nemotron-3-super"
+    ],
+    "hx-rr-claim-vs-deny-011-b-r1": [
+     "flag:nemotron-3-super"
+    ]
+   }
+  },
+  "hx-rr-claim-vs-deny-012": {
+   "picked": "hx-rr-claim-vs-deny-012-b-r1",
+   "candidates": {
+    "hx-rr-claim-vs-deny-012-b-r0": [
+     "flag:seed-oss-36b",
+     "flag:nemotron-3-super"
+    ],
+    "hx-rr-claim-vs-deny-012-b-r1": []
+   }
+  },
+  "hx-rr-claim-vs-deny-013": {
+   "picked": null,
+   "candidates": {
+    "hx-rr-claim-vs-deny-013-b-r0": [
+     "flag:seed-oss-36b",
+     "flag:nemotron-3-super"
+    ],
+    "hx-rr-claim-vs-deny-013-b-r1": [
+     "flag:seed-oss-36b",
+     "flag:nemotron-3-super"
+    ]
+   }
+  },
+  "hx-rr-claim-vs-deny-019": {
+   "picked": null,
+   "candidates": {
+    "hx-rr-claim-vs-deny-019-b-r0": [
+     "flag:seed-oss-36b"
+    ],
+    "hx-rr-claim-vs-deny-019-b-r1": [
+     "flag:seed-oss-36b",
+     "flag:nemotron-3-super"
+    ]
+   }
+  },
+  "hx-rr-claim-vs-deny-022": {
+   "picked": null,
+   "candidates": {
+    "hx-rr-claim-vs-deny-022-b-r0": [
+     "flag:seed-oss-36b",
+     "flag:nemotron-3-super"
+    ],
+    "hx-rr-claim-vs-deny-022-b-r1": [
+     "flag:seed-oss-36b",
+     "flag:nemotron-3-super"
+    ]
+   }
+  },
+  "hx-rr-claim-vs-deny-023": {
+   "picked": null,
+   "candidates": {
+    "hx-rr-claim-vs-deny-023-b-r0": [
+     "flag:seed-oss-36b",
+     "f2_lexical"
+    ],
+    "hx-rr-claim-vs-deny-023-b-r1": [
+     "flag:seed-oss-36b",
+     "flag:nemotron-3-super"
+    ]
+   }
+  },
+  "hx-rr-claim-vs-deny-027": {
+   "picked": null,
+   "candidates": {
+    "hx-rr-claim-vs-deny-027-b-r0": [
+     "flag:seed-oss-36b",
+     "flag:nemotron-3-super"
+    ],
+    "hx-rr-claim-vs-deny-027-b-r1": [
+     "flag:seed-oss-36b"
+    ]
+   }
+  },
+  "hx-rr-claim-vs-deny-028": {
+   "picked": "hx-rr-claim-vs-deny-028-b-r0",
+   "candidates": {
+    "hx-rr-claim-vs-deny-028-b-r0": [],
+    "hx-rr-claim-vs-deny-028-b-r1": []
+   }
+  },
+  "hx-rr-claim-vs-deny-029": {
+   "picked": "hx-rr-claim-vs-deny-029-b-r0",
+   "candidates": {
+    "hx-rr-claim-vs-deny-029-b-r0": [],
+    "hx-rr-claim-vs-deny-029-b-r1": []
+   }
+  },
+  "hx-rr-claim-vs-deny-031": {
+   "picked": null,
+   "candidates": {
+    "hx-rr-claim-vs-deny-031-b-r0": [
+     "flag:seed-oss-36b",
+     "flag:nemotron-3-super"
+    ],
+    "hx-rr-claim-vs-deny-031-b-r1": [
+     "flag:seed-oss-36b",
+     "flag:nemotron-3-super"
+    ]
+   }
+  },
+  "hx-rr-claim-vs-deny-036": {
+   "picked": null,
+   "candidates": {
+    "hx-rr-claim-vs-deny-036-b-r0": [
+     "flag:seed-oss-36b"
+    ],
+    "hx-rr-claim-vs-deny-036-b-r1": [
+     "flag:seed-oss-36b"
+    ]
+   }
+  },
+  "hx-rr-claim-vs-deny-038": {
+   "picked": "hx-rr-claim-vs-deny-038-b-r0",
+   "candidates": {
+    "hx-rr-claim-vs-deny-038-b-r0": [],
+    "hx-rr-claim-vs-deny-038-b-r1": []
+   }
+  },
+  "hx-rr-claim-vs-deny-046": {
+   "picked": "hx-rr-claim-vs-deny-046-b-r0",
+   "candidates": {
+    "hx-rr-claim-vs-deny-046-b-r0": [],
+    "hx-rr-claim-vs-deny-046-b-r1": []
+   }
+  },
+  "hx-rr-claim-vs-deny-047": {
+   "picked": "hx-rr-claim-vs-deny-047-b-r1",
+   "candidates": {
+    "hx-rr-claim-vs-deny-047-b-r0": [
+     "f2_lexical"
+    ],
+    "hx-rr-claim-vs-deny-047-b-r1": []
+   }
+  },
+  "hx-rr-claim-vs-deny-048": {
+   "picked": "hx-rr-claim-vs-deny-048-b-r1",
+   "candidates": {
+    "hx-rr-claim-vs-deny-048-b-r0": [
+     "flag:seed-oss-36b"
+    ],
+    "hx-rr-claim-vs-deny-048-b-r1": []
+   }
+  },
+  "hx-rr-claim-vs-deny-049": {
+   "picked": null,
+   "candidates": {
+    "hx-rr-claim-vs-deny-049-b-r0": [
+     "flag:seed-oss-36b",
+     "flag:nemotron-3-super"
+    ],
+    "hx-rr-claim-vs-deny-049-b-r1": [
+     "flag:seed-oss-36b",
+     "flag:nemotron-3-super"
+    ]
+   }
+  },
+  "hx-rr-claim-vs-deny-052": {
+   "picked": null,
+   "candidates": {
+    "hx-rr-claim-vs-deny-052-b-r0": [
+     "flag:seed-oss-36b",
+     "flag:nemotron-3-super"
+    ],
+    "hx-rr-claim-vs-deny-052-b-r1": [
+     "flag:seed-oss-36b",
+     "f2_lexical"
+    ]
+   }
+  }
+ },
+ "rearm_units_dropped": [
+  "hx-rr-claim-vs-deny-009",
+  "hx-rr-claim-vs-deny-011",
+  "hx-rr-claim-vs-deny-013",
+  "hx-rr-claim-vs-deny-019",
+  "hx-rr-claim-vs-deny-022",
+  "hx-rr-claim-vs-deny-023",
+  "hx-rr-claim-vs-deny-027",
+  "hx-rr-claim-vs-deny-031",
+  "hx-rr-claim-vs-deny-036",
+  "hx-rr-claim-vs-deny-049",
+  "hx-rr-claim-vs-deny-052"
+ ],
+ "new_kept_by_kind": {
+  "rr-claim-vs-deny-x": 60,
+  "rr-role-denial-x": 24,
+  "cr-direct-vs-fiction": 108,
+  "cr-resource-in-fiction-dialogue": 25
+ },
+ "n_set_out": 4067,
+ "set_out_sha256": "626d97dbedeee9773c1ac7212b5938335051e4b4ca479bb66ba68296ce2d8c71"
+}

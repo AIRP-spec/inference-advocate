@@ -1,0 +1,245 @@
+{
+ "seeds": [
+  45,
+  46,
+  47,
+  48,
+  49
+ ],
+ "shipped_seed": 48,
+ "macro_f1_per_seed": {
+  "45": 0.799885166863731,
+  "46": 0.8002525034401636,
+  "47": 0.7903176605000961,
+  "48": 0.8620532161969531,
+  "49": 0.8254233635576572
+ },
+ "fp_rate_max": 0.005,
+ "pos_floor": 60,
+ "classes": {
+  "child_sexual_exploitation": {
+   "n_pos": 40,
+   "n_in_distribution": 0,
+   "n_held_out": 40,
+   "n_neg": 779,
+   "gated_on": "in_distribution",
+   "in_distribution_ge_floor": false,
+   "n_gated": 0,
+   "fp_count_limit": 3.895,
+   "per_seed": {
+    "45": {
+     "miss_in_distribution": 0,
+     "miss_in_distribution_upper95": 1.0,
+     "miss_held_out": 1,
+     "miss_held_out_upper95": 0.1132,
+     "miss_gated": 0,
+     "miss_gated_upper95": 1.0,
+     "fp": 0,
+     "fp_rate": 0.0,
+     "fp_upper95": 0.00384,
+     "fp_hate_eliminationist": 0,
+     "fp_hate_eliminationist_of": 20,
+     "fp_outside_hate_eliminationist": 0
+    },
+    "46": {
+     "miss_in_distribution": 0,
+     "miss_in_distribution_upper95": 1.0,
+     "miss_held_out": 1,
+     "miss_held_out_upper95": 0.1132,
+     "miss_gated": 0,
+     "miss_gated_upper95": 1.0,
+     "fp": 0,
+     "fp_rate": 0.0,
+     "fp_upper95": 0.00384,
+     "fp_hate_eliminationist": 0,
+     "fp_hate_eliminationist_of": 20,
+     "fp_outside_hate_eliminationist": 0
+    },
+    "47": {
+     "miss_in_distribution": 0,
+     "miss_in_distribution_upper95": 1.0,
+     "miss_held_out": 1,
+     "miss_held_out_upper95": 0.1132,
+     "miss_gated": 0,
+     "miss_gated_upper95": 1.0,
+     "fp": 0,
+     "fp_rate": 0.0,
+     "fp_upper95": 0.00384,
+     "fp_hate_eliminationist": 0,
+     "fp_hate_eliminationist_of": 20,
+     "fp_outside_hate_eliminationist": 0
+    },
+    "48": {
+     "miss_in_distribution": 0,
+     "miss_in_distribution_upper95": 1.0,
+     "miss_held_out": 2,
+     "miss_held_out_upper95": 0.1492,
+     "miss_gated": 0,
+     "miss_gated_upper95": 1.0,
+     "fp": 1,
+     "fp_rate": 0.00128,
+     "fp_upper95": 0.00608,
+     "fp_hate_eliminationist": 0,
+     "fp_hate_eliminationist_of": 20,
+     "fp_outside_hate_eliminationist": 1
+    },
+    "49": {
+     "miss_in_distribution": 0,
+     "miss_in_distribution_upper95": 1.0,
+     "miss_held_out": 3,
+     "miss_held_out_upper95": 0.1826,
+     "miss_gated": 0,
+     "miss_gated_upper95": 1.0,
+     "fp": 0,
+     "fp_rate": 0.0,
+     "fp_upper95": 0.00384,
+     "fp_hate_eliminationist": 0,
+     "fp_hate_eliminationist_of": 20,
+     "fp_outside_hate_eliminationist": 0
+    }
+   },
+   "rules": {
+    "C1_median_miss_le_1": true,
+    "C2_worst_miss_le_3": true,
+    "C3_shipped_miss_le_1": true,
+    "C4_fp_rate_le_0.5pct": true
+   },
+   "pass": true,
+   "median_miss_gated": 0,
+   "worst_miss_gated": 0,
+   "shipped_miss_gated": 0,
+   "shipped_miss_gated_upper95": 1.0,
+   "held_out_hits_per_seed": {
+    "45": 39,
+    "46": 39,
+    "47": 39,
+    "48": 38,
+    "49": 37
+   },
+   "shipped_held_out_hits": 38,
+   "shipped_held_out_miss_upper95": 0.1492,
+   "median_fp": 0,
+   "shipped_fp": 1,
+   "shipped_fp_upper95": 0.00608
+  },
+  "self_harm": {
+   "n_pos": 16,
+   "n_in_distribution": 0,
+   "n_held_out": 16,
+   "n_neg": 803,
+   "gated_on": "in_distribution",
+   "in_distribution_ge_floor": false,
+   "n_gated": 0,
+   "fp_count_limit": 4.015,
+   "per_seed": {
+    "45": {
+     "miss_in_distribution": 0,
+     "miss_in_distribution_upper95": 1.0,
+     "miss_held_out": 10,
+     "miss_held_out_upper95": 0.8222,
+     "miss_gated": 0,
+     "miss_gated_upper95": 1.0,
+     "fp": 1,
+     "fp_rate": 0.00125,
+     "fp_upper95": 0.00589,
+     "fp_hate_eliminationist": 1,
+     "fp_hate_eliminationist_of": 20,
+     "fp_outside_hate_eliminationist": 0
+    },
+    "46": {
+     "miss_in_distribution": 0,
+     "miss_in_distribution_upper95": 1.0,
+     "miss_held_out": 5,
+     "miss_held_out_upper95": 0.5483,
+     "miss_gated": 0,
+     "miss_gated_upper95": 1.0,
+     "fp": 2,
+     "fp_rate": 0.00249,
+     "fp_upper95": 0.00782,
+     "fp_hate_eliminationist": 2,
+     "fp_hate_eliminationist_of": 20,
+     "fp_outside_hate_eliminationist": 0
+    },
+    "47": {
+     "miss_in_distribution": 0,
+     "miss_in_distribution_upper95": 1.0,
+     "miss_held_out": 13,
+     "miss_held_out_upper95": 0.9469,
+     "miss_gated": 0,
+     "miss_gated_upper95": 1.0,
+     "fp": 0,
+     "fp_rate": 0.0,
+     "fp_upper95": 0.00372,
+     "fp_hate_eliminationist": 0,
+     "fp_hate_eliminationist_of": 20,
+     "fp_outside_hate_eliminationist": 0
+    },
+    "48": {
+     "miss_in_distribution": 0,
+     "miss_in_distribution_upper95": 1.0,
+     "miss_held_out": 9,
+     "miss_held_out_upper95": 0.7733,
+     "miss_gated": 0,
+     "miss_gated_upper95": 1.0,
+     "fp": 0,
+     "fp_rate": 0.0,
+     "fp_upper95": 0.00372,
+     "fp_hate_eliminationist": 0,
+     "fp_hate_eliminationist_of": 20,
+     "fp_outside_hate_eliminationist": 0
+    },
+    "49": {
+     "miss_in_distribution": 0,
+     "miss_in_distribution_upper95": 1.0,
+     "miss_held_out": 8,
+     "miss_held_out_upper95": 0.7214,
+     "miss_gated": 0,
+     "miss_gated_upper95": 1.0,
+     "fp": 7,
+     "fp_rate": 0.00872,
+     "fp_upper95": 0.01631,
+     "fp_hate_eliminationist": 7,
+     "fp_hate_eliminationist_of": 20,
+     "fp_outside_hate_eliminationist": 0
+    }
+   },
+   "rules": {
+    "C1_median_miss_le_1": true,
+    "C2_worst_miss_le_3": true,
+    "C3_shipped_miss_le_1": true,
+    "C4_fp_rate_le_0.5pct": true
+   },
+   "pass": true,
+   "median_miss_gated": 0,
+   "worst_miss_gated": 0,
+   "shipped_miss_gated": 0,
+   "shipped_miss_gated_upper95": 1.0,
+   "held_out_hits_per_seed": {
+    "45": 6,
+    "46": 11,
+    "47": 3,
+    "48": 7,
+    "49": 8
+   },
+   "shipped_held_out_hits": 7,
+   "shipped_held_out_miss_upper95": 0.7733,
+   "median_fp": 1,
+   "shipped_fp": 0,
+   "shipped_fp_upper95": 0.00372
+  }
+ },
+ "outcome": "PASS",
+ "hindsight_note": "P3-2 H1 artifacts on data-v8 val; not a run; in-distribution sets as listed",
+ "in_distribution_counts": {
+  "child_sexual_exploitation": 0,
+  "self_harm": 0
+ },
+ "held_out_groups": {
+  "child_sexual_exploitation": [
+   "cse-framing-vs-enact"
+  ],
+  "self_harm": [
+   "self-harm-named-method-offer"
+  ]
+ }
+}

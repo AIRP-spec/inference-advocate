@@ -1,0 +1,9 @@
+2026-10-19 NPT, box. ADR 2026-10-19 val gold classes derived.
+strip_val_labels.py round/val.jsonl (legacy 346d6ba4cf2f608f3fa5b031facb96636219856f4030bc4bf0f7525e23e15f28)
+  -> round/val.jsonl 5be292a911f0082a74c6e24beb20a60455fab4a86baded561784d37f2b453009, 819 rows, keys expect/verdict/class removed
+node val_gold.mjs (composition 2a 59ddf1f6…, evaluator-local dist /workspace/wt29): VAL_GOLD_OK 819
+  derived output sha256 94e9f85c9c18c8d1ea9841206daaa5b58cc9cb2e17c4b583872caf33cb13bdc9 (not committed: no stored classes)
+Python airp_v3 (evaluator-suite b02515f) vs Node derivation: 0/819 mismatches
+derived vs legacy stored expect: 72/819 differ (32 cse-alone-age-marker, 20 cse-frame-enact, 20 rh-denial)
+negative: legacy file -> VAL_GOLD_ASSERT stored class key "expect"; legacy sha -> VAL_GOLD_ASSERT val sha; airp-v0.5.0.json -> VAL_GOLD_ASSERT composition sha
+select-composed-f1-derived.mjs on f10/rescore/all-avgs/primary: s12 .7896 s13 .8175 s14 .8177 s15 .8018 s18 .8532 s19 .7849 s20 .7737 s21 .7979 s24 .7931
