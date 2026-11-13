@@ -168,3 +168,27 @@ def test_g7_d7_jobs_train_only_and_cells():
     assert plan["n_jobs"] == 64 and plan["n_candidate_rows"] == 96  # 32*2 + 32
     # no new val jobs
     assert all(j["pool"] == "train" for j in jobs)
+
+
+def test_g7x_four_pair_jobs_distinct_seeds():
+    """t242u: four train pair units, samples 232-235, seeds distinct from g7 and each other."""
+    s = spec()
+    pair = next(x for x in s["kinds"] if x["id"] == "cr-direct-vs-fiction")
+    assert pair["g7x_train_start"] == 232 and pair["g7x_train_quota"] == 4
+    jobs = hs.build_jobs(s, "g7x")
+    assert len(jobs) == 4
+    assert [j["sample"] for j in jobs] == [232, 233, 234, 235]
+    assert all(j["pair"] is True and j["phase"] == "g7x" and j["pool"] == "train" and j["kind"] == "cr-direct-vs-fiction" for j in jobs)
+    seeds = [j["seed"] for j in jobs]
+    assert len(set(seeds)) == 4
+    g7_pair_seeds = {j["seed"] for j in hs.build_jobs(s, "g7") if j["kind"] == "cr-direct-vs-fiction"}
+    assert set(seeds).isdisjoint(g7_pair_seeds)
+    # services vary across the four (assignment cycles call_services)
+    services = [j["assign"]["service"] for j in jobs]
+    assert len(set(services)) == 4
+    assert all("service" in j["assign"] for j in jobs)
+    plan = hs.plan(s, "g7x")
+    assert plan["n_jobs"] == 4 and plan["n_candidate_rows"] == 8
+    # ids do not collide with g7
+    g7_ids = {j["id"] for j in hs.build_jobs(s, "g7")}
+    assert {j["id"] for j in jobs}.isdisjoint(g7_ids)

@@ -1,8 +1,8 @@
 {
  "spec": "headext-slot-spec",
- "version": "v10-7",
+ "version": "v10-8",
  "addendum": "decide/shared-adopt/phase3/DRAFT-HEAD-EXTENSION-SIZING-ADDENDUM.md (signed t217u; amendments t218u A13-A16, t219u A17-A20, t220u A21-A24, t221u A25-A29, t226u/t227u A30-A31); t237u F6 (op-own-vs-reported val 24 / train 60, missed-shape pairs)",
- "supersedes_spec_sha256": "179476f421a9f36c164b7e37e04771d690858400a12cb56ca8b7ebe36a2096a9",
+ "supersedes_spec_sha256": "70679095f9cbc51018cc21d32329e886e25a7f35d35243443bba56751fa18fdf",
  "f2_rule": "claims_relationship_role is positive when the text asserts the role in its own voice, by stating it or by taking it up after denying it; a bare denial is negative; 'not a person' names no role and is off-spec (t232u item 1; LABELING-GUIDE rule 10, guide d0710e92)",
  "rerun_declaration": "decide/shared-adopt/phase3/DECLARATION-HEAD-EXTENSION-REDECLARATION-t241u.md",
  "generator": {
@@ -1908,7 +1908,32 @@
      "medium"
     ]
    ],
-   "g7_cell_note": "D7 as drafted: short/medium clinical/colloquial, in proportion to cells that still fire (t241u: no single shared parameter; include 040 in the proportion). Not hand-selected. Train only."
+   "g7_cell_note": "D7 as drafted: short/medium clinical/colloquial, in proportion to cells that still fire (t241u: no single shared parameter; include 040 in the proportion). Not hand-selected. Train only.",
+   "g7x_train_start": 232,
+   "g7x_train_quota": 4,
+   "g7x_cells": [
+    [
+     "clinical",
+     "short"
+    ],
+    [
+     "colloquial",
+     "short"
+    ],
+    [
+     "colloquial",
+     "short"
+    ],
+    [
+     "colloquial",
+     "medium"
+    ],
+    [
+     "colloquial",
+     "medium"
+    ]
+   ],
+   "g7x_cell_note": "t242u extra generation: four train pair units, samples 232-235, distinct scenario seeds, same D7 cell weights. Train only."
   },
   {
    "id": "cr-resource-in-fiction-dialogue",

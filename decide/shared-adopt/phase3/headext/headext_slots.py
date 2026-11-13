@@ -102,6 +102,8 @@ def job_indices(k: dict, phase: str) -> range:
         return range(0)
     if phase == "g7":  # t241u D7: built by build_g7_jobs, not this range
         return range(0)
+    if phase == "g7x":  # t242u extra four pair units: built by build_g7x_jobs
+        return range(0)
     raise Blocked(f"unknown phase {phase}")
 
 
@@ -211,11 +213,38 @@ def build_g7_jobs(spec: dict) -> list[dict]:
     return jobs
 
 
+
+def build_g7x_jobs(spec: dict) -> list[dict]:
+    """t242u: four extra train-only cr-direct-vs-fiction pair jobs, samples 232-235,
+    distinct scenario seeds (salt includes |g7x so they cannot collide with g7 seeds).
+    Cells follow the same D7 2:4:4 firing-cell weights. No new val rows, no singles."""
+    jobs = []
+    k = next(x for x in spec["kinds"] if x["id"] == "cr-direct-vs-fiction")
+    writer = writer_key(spec, k, "g7x")
+    start, quota = k["g7x_train_start"], k["g7x_train_quota"]
+    cells = proportion_counts(k["g7x_cells"], quota)
+    for n, i in enumerate(range(start, start + quota)):
+        reg, ln = cells[n]
+        jobs.append({"id": f"hx-{k['id']}-{i:03d}", "kind": k["id"], "head": k["head"], "role": k["role"],
+                     "pair": True, "sample": i, "register": reg, "length": ln, "cell": f"{reg}/{ln}",
+                     "seed": kind_seed(spec["split_salt"], k["id"] + "|g7x", i),
+                     "assign": assignment(spec, k, i, "g7x"),
+                     "writer": writer, "phase": "g7x", "pool": "train"})
+    ids = [j["id"] for j in jobs]
+    assert len(ids) == len(set(ids)) == 4
+    assert all(j["sample"] >= 232 for j in jobs)
+    seeds = [j["seed"] for j in jobs]
+    assert len(set(seeds)) == 4
+    return jobs
+
+
 def build_jobs(spec: dict, phase: str = "g1", arm_a_rows: list[dict] | None = None) -> list[dict]:
     if phase == "g6":
         return build_g6_jobs(spec)
     if phase == "g7":
         return build_g7_jobs(spec)
+    if phase == "g7x":
+        return build_g7x_jobs(spec)
     jobs = rearm_jobs(spec, arm_a_rows) if (phase == "g5" and arm_a_rows) else []
     for k in spec["kinds"]:
         cells = cells_for(spec, k)
@@ -345,7 +374,7 @@ def make_rows(spec: dict, job: dict, raw: dict, host: str, ts: str, spec_sha: st
             "slot_spec_sha256": spec_sha, "system_prompt_sha256": spec["system_prompt_sha256"],
             "temperature": spec["sampling"]["temperature"], "finish_reason": ch.get("finish_reason"), "reasoning_markers": markers,
             "host": host, "timestamp": ts}
-    if job.get("phase") in ("g4", "g5", "g6", "g7"):
+    if job.get("phase") in ("g4", "g5", "g6", "g7", "g7x"):
         base["phase"] = job["phase"]
     if job.get("rearm"):
         arm = k["arms"][1]; nw = len(clean.split())
@@ -450,9 +479,9 @@ def main(argv=None) -> int:
         g.add_argument(a, required=True)
     g.add_argument("--concurrency", type=int, default=64); g.add_argument("--max-wall-seconds", type=float, default=1500)
     g.add_argument("--arm-a-file")
-    g.add_argument("--phase", choices=["g1", "g2", "g3", "g4", "g5", "g6", "g7"], default="g1")
+    g.add_argument("--phase", choices=["g1", "g2", "g3", "g4", "g5", "g6", "g7", "g7x"], default="g1")
     it = sp.add_parser("items"); it.add_argument("--gen", required=True); it.add_argument("--out", required=True)
-    pl = sp.add_parser("plan"); pl.add_argument("--expect-spec-sha", required=True); pl.add_argument("--phase", choices=["g1", "g2", "g3", "g4", "g5", "g6", "g7"], default="g1")
+    pl = sp.add_parser("plan"); pl.add_argument("--expect-spec-sha", required=True); pl.add_argument("--phase", choices=["g1", "g2", "g3", "g4", "g5", "g6", "g7", "g7x"], default="g1")
     a = ap.parse_args(argv)
     if a.cmd == "generate":
         st = generate(a.base_url, a.served, a.out, a.host, a.expect_spec_sha, a.concurrency, a.max_wall_seconds, phase=a.phase, arm_a_file=a.arm_a_file)

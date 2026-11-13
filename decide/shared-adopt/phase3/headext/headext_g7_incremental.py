@@ -1,8 +1,9 @@
 #!/usr/bin/env python3
-"""t241u incremental v10g pack: keep existing v10f rows byte-identical (val stays
+"""t241u/t242u incremental v10g pack: keep existing v10f rows byte-identical (val stays
 cffe5521…); append 24 train cr-direct-vs-fiction units and 24 train
-cr-resource-in-fiction rows from G7 survivors only. No new val rows. Deterministic
-cell round-robin in the declared D7 mix, not hand-selected. Box only.
+cr-resource-in-fiction rows from G7 + G7x survivors. Fill to 24 complete pair
+units in generation order (sample id); surplus units dropped and ids logged.
+No selection by content. No new val rows. Box only.
 Stdout = counts, ids, and shas; never prints row text.
 """
 from __future__ import annotations
@@ -19,7 +20,8 @@ import build_data_v10 as B  # noqa: E402
 SPEC_SHA = hs.sha256_file(hs.SPEC)
 V10F_TRAIN_SHA = "fbeecc0f6326a2f5afed06aee85c10ed48ebe2334f354c2c26cc79b0aca0d4e8"
 V10F_VAL_SHA = "cffe55215c18cfdd17c38f8ad2173869fe7ea06f2149b73b94b378add3a561a7"
-G7_START, G7_END = 200, 231
+G7_START, G7_END = 200, 235
+G7X_START, G7X_END = 232, 235
 N_ADD_PAIR_UNITS, N_ADD_SINGLE = 24, 24
 PAIR_KIND = "cr-direct-vs-fiction"
 SINGLE_KIND = "cr-resource-in-fiction"
@@ -112,6 +114,18 @@ def cell_mix(cand, units):
     return dict(mix)
 
 
+def choose_in_generation_order(cand, n):
+    """Take the first n units by sample id (generation order). No selection by content."""
+    ordered = sorted(cand, key=lambda u: (sample_of(cand[u][0]), u))
+    chosen = ordered[:n]
+    surplus = ordered[n:]
+    available = {
+        f"{c[0]}/{c[1]}": [sample_of(cand[u][0]) for u in ordered if cell_of(cand[u][0]) == c]
+        for c in sorted({cell_of(cand[u][0]) for u in cand})
+    }
+    return chosen, surplus, available
+
+
 def select_g7(valid):
     pairs, singles = [], []
     unexpected = []
@@ -128,8 +142,8 @@ def select_g7(valid):
         raise SystemExit(f"unexpected kind_spec on G7 rows: {unexpected[:20]}")
     pair_cand = complete_pair_units(pairs)
     single_cand = {r["id"]: [r] for r in singles}
-    pair_chosen, pair_avail = rr_choose(pair_cand, N_ADD_PAIR_UNITS, PAIR_CELLS)
-    single_chosen, single_avail = rr_choose(single_cand, N_ADD_SINGLE, SINGLE_CELLS)
+    pair_chosen, pair_surplus, pair_avail = choose_in_generation_order(pair_cand, N_ADD_PAIR_UNITS)
+    single_chosen, single_surplus, single_avail = choose_in_generation_order(single_cand, N_ADD_SINGLE)
     shortfall = {}
     if len(pair_chosen) < N_ADD_PAIR_UNITS:
         shortfall[PAIR_KIND] = {
@@ -146,7 +160,6 @@ def select_g7(valid):
     used_p, used_s = set(pair_chosen), set(single_chosen)
     reserve = [r for u, v in pair_cand.items() if u not in used_p for r in v]
     reserve += [r for u, v in single_cand.items() if u not in used_s for r in v]
-    # unpaired pair arms
     unpaired = []
     seen = defaultdict(list)
     for r in pairs:
@@ -162,6 +175,8 @@ def select_g7(valid):
         "shortfall": shortfall,
         "pair_units": pair_chosen,
         "single_ids": single_chosen,
+        "pair_surplus_units": pair_surplus,
+        "single_surplus_ids": single_surplus,
         "n_pair_complete": len(pair_cand),
         "n_single": len(single_cand),
         "n_unpaired_pair": len(unpaired),
@@ -288,6 +303,15 @@ def main(argv=None) -> int:
         shutil.copyfile(src / name, out / "data-v10" / name)
         need(sha_file(src / name) == sha_file(out / "data-v10" / name), f"{name} copy mismatch")
 
+    # t241u G7 local filter on the original 96 rows (t242u: record these rates in the pack report)
+    g7_filter_rates = {
+        "n_set": 96,
+        "validation_collisions": {"n": 7, "rate": "7/96", "reason": "V-g:inset"},
+        "data_v9_collisions": {"n": 3, "rate": "3/96", "reason": "V-g:data-v9"},
+        "n_dropped": 10,
+        "n_candidates": 86,
+        "source": "evidence/g7/filter-local.json (t241u G7 set)",
+    }
     report = {
         "stopped": False,
         "n_source": len(rows),
@@ -295,11 +319,15 @@ def main(argv=None) -> int:
         "n_dropped": len(drop),
         "pair_units": sel["pair_units"],
         "single_ids": sel["single_ids"],
+        "pair_surplus_units": sel["pair_surplus_units"],
+        "single_surplus_ids": sel["single_surplus_ids"],
         "pair_cell_mix": sel["pair_cell_mix"],
         "single_cell_mix": sel["single_cell_mix"],
         "n_pair_complete": sel["n_pair_complete"],
         "n_single": sel["n_single"],
         "n_unpaired_pair": sel["n_unpaired_pair"],
+        "selection": "generation-order (sample id); surplus dropped; no selection by content",
+        "g7_filter_rates": g7_filter_rates,
         "sel_shas": shas,
         "build": build,
     }
@@ -310,7 +338,10 @@ def main(argv=None) -> int:
         "n_added_train": build["n_added_train"], "n_added_val": 0,
         "train_sha256": build["train_sha256"], "val_sha256": build["val_sha256"],
         "pair_units": len(sel["pair_units"]), "single_rows": len(sel["single_ids"]),
+        "pair_surplus_units": sel["pair_surplus_units"],
+        "single_surplus_ids": sel["single_surplus_ids"],
         "pair_cell_mix": sel["pair_cell_mix"], "single_cell_mix": sel["single_cell_mix"],
+        "g7_filter_rates": g7_filter_rates,
         "sel_train_sha256": shas["sel-train.jsonl"],
     }))
     return 0

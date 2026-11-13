@@ -305,3 +305,20 @@ Signed declaration is already on the branch (`DECLARATION-HEAD-EXTENSION-REDECLA
 ## t241u (2026-11-10 23:04 NPT; G7 generation completed; data-v10g pack shortfall; no training)
 
 Generation pod `hx-g7-gen` / `6fdilfyu6y53fh` completed under `--signed` `2ffdd75` (v10-7). 96 rows, both checkers clean, checker-delete 0, VPS `sha256sum -c` 13/13 OK, $0.878, cumulative $49.284. Incremental pack stopped: after local V-g drops (10 rows; 9 pair arms + 1 single) only 23 complete `cr-direct-vs-fiction` units remain vs the declared 24. No v10g pack was written. No training pods. Evidence `evidence/g7/pack-shortfall-t241u.json`. Report `REPORT-HEAD-EXT-G7-PACK-SHORTFALL-t241u.md`.
+
+## t242u (2026-11-13 08:00 NPT; extra generation of four cr-direct-vs-fiction units, cap $1)
+
+Justin approved a $1 extra-generation top-up after the t241u pack shortfall (23/24 complete pair units). Signed t241u declaration unchanged. Slot spec **v10-8** supersedes v10-7 `70679095…`. Four train-only `cr-direct-vs-fiction` pair jobs, samples 232–235, distinct scenario seeds (`kind|g7x`), same D7 2:4:4 cell weights. No new val rows, no new singles.
+
+| file | sha256 |
+|---|---|
+| `headext-slot-spec.json` | `cd08dd2d9ef0778af8a016ea464da07ff2aa05a9d21967cd15878a30a61ca4e2` |
+| `headext_slots.py` | `57b337a12ef5243ac51bc48d80f9c099b98b0f65c11d9dc4f38d32a090f996cc` |
+| `headext_pod_g7x.py` | `4fe60a66fc6d169e21749ed86aa42939e133ae4f412a12ee1d302086a68f960f` |
+| `headext_g7x_budget.py` | `ff5d642650ebb036c19ca471ec7a0b7db250dc297e5a89194ed1ffc625a9d594` |
+| `headext_g7_incremental.py` | `d073bacdc1bb716849e512b44d2f32ba33f764eda8783cdf9a46d3bb7fd6649d` |
+
+- Extra-generation cap $1; training $4 per pod; seeds 90–99. `headext_g7x_budget` estimate 24 min / $0.996 at $2.49/h (G7-actual envelope: Nemotron load 8, CHECK_WINDOW 2).
+- Packer fills to 24 complete pair units in generation order (sample id); surplus unit ids are logged; no selection by content. Sample range 200–235.
+- Pack report records the t241u G7 filter rates: 7-of-96 validation collisions (`V-g:inset`) and 3 data-v9 collisions (`V-g:data-v9`).
+- Leak filter for the combined set must run against validation and all prior packs. No generation in this commit. The extra-generation pod uses this commit as `--signed`.

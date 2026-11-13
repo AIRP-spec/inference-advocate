@@ -19,7 +19,7 @@
   "evidence/crisis-services/uk-samaritans.txt": "b67bd582d93fae3294d5b7eca82df0210f80123a9cebe0fdd8d2fb631b53f041",
   "evidence/crisis-services/us-988.txt": "cd2b22990e1ff1ac974a22cca8da845cf1ee2095eb0a5dd02c8d90960ae387d1",
   "evidence/crisis-services/us-ctl.txt": "7d946ca01d61f4b047a331424435cb199f29e8ada33323bd5958f7b8c8fbf49b",
-  "headext-slot-spec.json": "70679095f9cbc51018cc21d32329e886e25a7f35d35243443bba56751fa18fdf",
+  "headext-slot-spec.json": "cd08dd2d9ef0778af8a016ea464da07ff2aa05a9d21967cd15878a30a61ca4e2",
   "headext-system-prompt.txt": "20b8f0cdd78d1b4f5e48b21c51a0262d0ca178fe245732252323f388bc0411a3",
   "headext_contradict.py": "19fa356f260d5f4f2171b4caec2d7d375b965bf92a6e5d60f08ee915bf56617a",
   "headext_filter.py": "57099844a730118a5f0a97ec8a478e7b9869815ce0f24a2b1a41222f2d786efe",
@@ -28,7 +28,7 @@
   "headext_pod_g2.py": "7aebf0f3c1e1288b4a6f5ee10948ff4f4fb59aa2c349b965bef7f8f40e268b42",
   "headext_pod_g3.py": "83a0d5d69e7cdbc3d5c46b2c1c4773077eb059a789827ccb477ebd95e15e1909",
   "headext_scoring.py": "1a212a98d34798c88e2ab8f4265cf3e48b69924dd42371c31a8c5d5ce1c44601",
-  "headext_slots.py": "7b0aa5a31c45c7b35a955fb1f4638b06bfdc26938d5b70b99993d7127b8a2b43",
+  "headext_slots.py": "57b337a12ef5243ac51bc48d80f9c099b98b0f65c11d9dc4f38d32a090f996cc",
   "make_slot_spec.py": "2f7de5cfbeb96c8a6515958f7bde4bec4a048c62e9500d9bfbb90d9a59a6dba7",
   "pack/common_shared.py": "0e2c8674f456e2f71e1b00d3dc40eef2a9a3979e6a169180a87022aeff19c6a2",
   "pack/data-v10/excluded-kinds.json": "48314280ab55fdbabd64958a08a463a76640a65f647f8d6824dadeb9424361f4",
@@ -49,7 +49,7 @@
   "tests/test_g2.py": "5bae275bf2409a423d5d39d783b04b7df13a61b2c5d5dfebd0e4c044d74cbf4d",
   "tests/test_review_sample.py": "c9b8376666c0ad60c1673dab2d6baa04142e737df6aa782fe16cd8990408708e",
   "tests/test_scoring.py": "c8fd3aa7be656e375f4e8aafa8e6b21b076c8dab3be7c8174e101817788a88d5",
-  "tests/test_slots.py": "bc0dd13f0c90cea3bbf6f665a4db115ccdfba2d2cdf7c8bce283e5894a845d05",
+  "tests/test_slots.py": "b248957e42931ed161a6e4543b1c1c60f6c740a9beb379e8e049ad34a89af6ab",
   "tests/test_t219.py": "6904b687cfe49b8fd0895b953f2f9e2cf76692afc67552bfceb11430fcfc1f63",
   "tests/test_t220.py": "7584d9893233e0b66b5fc1f5bcb1c5970f4dc6b3078b2914e4f975a0e17e6ba4",
   "headext_pack.py": "c86addfe7dc41d1a706352eda47e4cfc81598a659d4e4d62b285b3db1abd9f40",
@@ -128,9 +128,12 @@
   "../REPORT-HEAD-EXT-T11-FAILURE-t238u.md": "1ecf9b02f4c817042dc78bb38af562af7005fc5397f7b75dde3af70eaaa24fdf",
   "headext_pod_g7.py": "b96e352341bb58c4a06b214a738a4aad6ebb62d6dafeb6cf38124649fee06e54",
   "headext_g7_budget.py": "80e9f8947f1191c3dd9e9d19d05e113ef306cb1c29e899f35987e5ec653cda74",
-  "headext_g7_incremental.py": "7c9e2fce2e9d4ae78bfbb3d6189ea5f74168b29ebccb32c336e86fb205916a7d",
+  "headext_g7_incremental.py": "d073bacdc1bb716849e512b44d2f32ba33f764eda8783cdf9a46d3bb7fd6649d",
   "tests/test_g7_budget.py": "5bbe40304ef4b8309d5a85a7a63de186f12671ea25783fc368cd13474324530c",
-  "tests/test_g7_incremental.py": "a1709abf2822f83e2b71ba96b711d7980edf788ae93faa98b076ec884d562bd9"
+  "tests/test_g7_incremental.py": "c686073b30c9091acdba36915f01c30cd1fe9f3b8bfed89dba6674b11db5e02f",
+  "headext_pod_g7x.py": "4fe60a66fc6d169e21749ed86aa42939e133ae4f412a12ee1d302086a68f960f",
+  "headext_g7x_budget.py": "ff5d642650ebb036c19ca471ec7a0b7db250dc297e5a89194ed1ffc625a9d594",
+  "tests/test_g7x_budget.py": "181a1f69c99eec9f61e0846f2043cf5275434b1eee78dcd7287e25459576d43d"
  },
  "external": {
   "generator": {

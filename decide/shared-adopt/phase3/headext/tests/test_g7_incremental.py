@@ -1,4 +1,4 @@
-"""t241u: G7 incremental select is deterministic, train-only, and leaves val untouched."""
+"""t241u/t242u: G7 incremental select is deterministic, train-only, generation-order, val untouched."""
 from __future__ import annotations
 
 import sys
@@ -9,8 +9,8 @@ sys.path.insert(0, str(HERE))
 import headext_g7_incremental as g  # noqa: E402
 import headext_slots as hs  # noqa: E402
 
-# packer pins the live v10-7 spec
 assert g.SPEC_SHA == hs.sha256_file(hs.SPEC)
+assert g.G7_END == 235 and g.G7X_START == 232
 
 
 def _pair(sample, arm, register, length):
@@ -48,72 +48,79 @@ def _single(sample, register, length):
     }
 
 
-def _full_surplus():
+def _rows_for(pair_samples, single_samples=None, pair_cells=None, single_cells=None):
+    pair_cells = pair_cells or g.PAIR_CELLS
+    single_cells = single_cells or g.SINGLE_CELLS
     rows = []
-    # same cell cycle as build_g7_jobs
-    pair_cells = g.PAIR_CELLS
-    single_cells = g.SINGLE_CELLS
-    for n, i in enumerate(range(g.G7_START, g.G7_END + 1)):
+    for n, i in enumerate(pair_samples):
         pr, pln = pair_cells[n % len(pair_cells)]
         for arm in "AB":
             rows.append(_pair(i, arm, pr, pln))
+    if single_samples is None:
+        single_samples = range(g.G7_START, 232)  # original 32 singles, 200-231
+    for n, i in enumerate(single_samples):
         sr, sln = single_cells[n % len(single_cells)]
         rows.append(_single(i, sr, sln))
     return rows
 
 
-def test_g7_select_fills_24_and_24_with_declared_mix():
-    sel = g.select_g7(_full_surplus())
+def test_g7_select_fills_24_in_generation_order_and_logs_surplus():
+    # full g7 surplus (200-231) all complete
+    rows = _rows_for(range(200, 232))
+    sel = g.select_g7(rows)
     assert not sel["shortfall"]
     assert len(sel["pair_units"]) == 24
     assert len(sel["single_ids"]) == 24
     assert len(sel["train"]) == 24 * 2 + 24
     assert sel["val"] == []
     assert sel["n_pair_complete"] == 32 and sel["n_single"] == 32
-    assert sel["n_unpaired_pair"] == 0
-    # 24 through a 5-slot 2:4:4 cycle -> 5 / 10 / 9
-    assert sel["pair_cell_mix"] == {
-        "clinical/short": 5, "colloquial/short": 10, "colloquial/medium": 9,
-    }
-    assert sel["single_cell_mix"] == {
-        "clinical/short": 6, "clinical/medium": 6,
-        "colloquial/short": 6, "colloquial/medium": 6,
-    }
-    assert all(g.G7_START <= int(u.rsplit("-", 1)[-1]) <= g.G7_END for u in sel["pair_units"])
-    # first 24 pair samples in cycle order are 200-223
-    samples = [int(u.rsplit("-", 1)[-1]) for u in sel["pair_units"]]
-    assert samples == list(range(200, 224))
+    # generation order: first 24 samples, not cell RR
+    assert sel["pair_units"] == [f"hx-cr-direct-vs-fiction-{i:03d}" for i in range(200, 224)]
+    assert sel["pair_surplus_units"] == [f"hx-cr-direct-vs-fiction-{i:03d}" for i in range(224, 232)]
+    assert sel["single_ids"] == [f"hx-cr-resource-in-fiction-{i:03d}" for i in range(200, 224)]
+    assert sel["single_surplus_ids"] == [f"hx-cr-resource-in-fiction-{i:03d}" for i in range(224, 232)]
 
 
-def test_g7_select_after_drops_still_fills():
-    rows = _full_surplus()
-    # drop two complete pair units and two singles, all in well-stocked cells
-    drop = {
-        "hx-cr-direct-vs-fiction-201",  # colloquial/short
-        "hx-cr-direct-vs-fiction-202",  # colloquial/short
-        "hx-cr-resource-in-fiction-200",
-        "hx-cr-resource-in-fiction-201",
-    }
-    rows = [r for r in rows if r.get("pair_unit") not in drop and r["id"] not in drop]
+def test_g7x_fills_shortfall_in_generation_order():
+    """23 complete units from 200-231 plus 4 extra (232-235): take 23 + 232, surplus 233-235."""
+    # drop 9 units like the real t241u filter (207,209,210,213,222,224,227,228,230) → 23 remain
+    broken = {207, 209, 210, 213, 222, 224, 227, 228, 230}
+    pair_samples = [i for i in range(200, 232) if i not in broken] + [232, 233, 234, 235]
+    # one single dropped (228) as in the real filter
+    single_samples = [i for i in range(200, 232) if i != 228]
+    rows = _rows_for(pair_samples, single_samples)
     sel = g.select_g7(rows)
     assert not sel["shortfall"]
-    assert len(sel["pair_units"]) == 24 and len(sel["single_ids"]) == 24
-    assert "hx-cr-direct-vs-fiction-201" not in sel["pair_units"]
-    assert "hx-cr-resource-in-fiction-200" not in sel["single_ids"]
-    # unpaired arm is reserve, not selected
-    rows2 = _full_surplus()
-    rows2 = [r for r in rows2 if not (r.get("pair_unit") == "hx-cr-direct-vs-fiction-200" and r["arm"] == "B")]
-    sel2 = g.select_g7(rows2)
-    assert not sel2["shortfall"]
-    assert "hx-cr-direct-vs-fiction-200" not in sel2["pair_units"]
-    assert sel2["n_unpaired_pair"] == 1
+    assert len(sel["pair_units"]) == 24
+    assert sel["n_pair_complete"] == 27  # 23 + 4
+    expected = [f"hx-cr-direct-vs-fiction-{i:03d}" for i in range(200, 232) if i not in broken] + [
+        "hx-cr-direct-vs-fiction-232"
+    ]
+    assert sel["pair_units"] == expected
+    assert sel["pair_surplus_units"] == [
+        "hx-cr-direct-vs-fiction-233",
+        "hx-cr-direct-vs-fiction-234",
+        "hx-cr-direct-vs-fiction-235",
+    ]
+    assert len(sel["single_ids"]) == 24
+    assert "hx-cr-resource-in-fiction-228" not in sel["single_ids"]
+    assert "hx-cr-resource-in-fiction-228" not in sel["single_surplus_ids"]
 
 
-def test_g7_shortfall_when_surplus_exhausted():
-    rows = _full_surplus()
-    # keep only 20 complete pair units
-    keep_pair = {f"hx-cr-direct-vs-fiction-{i:03d}" for i in range(200, 220)}
-    rows = [r for r in rows if (r.get("pair_unit") in keep_pair) or r["kind"] == "cr-resource-in-fiction"]
+def test_g7_select_after_unpaired_arm_skips_unit():
+    rows = _rows_for(range(200, 232))
+    rows = [r for r in rows if not (r.get("pair_unit") == "hx-cr-direct-vs-fiction-200" and r["arm"] == "B")]
+    sel = g.select_g7(rows)
+    assert not sel["shortfall"]
+    assert "hx-cr-direct-vs-fiction-200" not in sel["pair_units"]
+    assert sel["pair_units"][0] == "hx-cr-direct-vs-fiction-201"
+    assert sel["n_unpaired_pair"] == 1
+    # still 24: 31 complete minus this one, take 201-224
+    assert sel["pair_units"] == [f"hx-cr-direct-vs-fiction-{i:03d}" for i in range(201, 225)]
+
+
+def test_g7_shortfall_when_fewer_than_24_complete():
+    rows = _rows_for(range(200, 223))  # 23 complete, no g7x
     sel = g.select_g7(rows)
     assert "cr-direct-vs-fiction" in sel["shortfall"]
-    assert sel["shortfall"]["cr-direct-vs-fiction"]["train_got"] == 20
+    assert sel["shortfall"]["cr-direct-vs-fiction"]["train_got"] == 23
