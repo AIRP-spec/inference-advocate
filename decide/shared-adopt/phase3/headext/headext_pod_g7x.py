@@ -4,8 +4,8 @@ train pair units (samples 232-235, slot spec v10-8). Both checkers label the new
 and run the v4 contradiction check on them only. Checker-delete (CSE / eck / invalid / missing), unviewed,
 before any archive. These rows are safety-adjacent: never print or read generated safety-class text; logs
 are ids and counts only.
-Box + in-pod watchdogs. On-demand SECURE only. Cap $1; do not cut row counts; stop and report at cap.
-  python3 headext_pod_g7x.py --signed <commit> --cap-usd 1"""
+Box + in-pod watchdogs. On-demand SECURE only. Cap $1.50 (R-1); do not cut row counts; stop and report at cap. State fixed overhead in precheck (brief 3.7).
+  python3 headext_pod_g7x.py --signed <commit> --cap-usd 1.50"""
 import argparse, hashlib, json, os, shlex, subprocess, sys, threading, time, urllib.request
 
 sys.path.insert(0, "/workspace/airp/decide/step4/scripts")
@@ -19,8 +19,8 @@ ROOT = "/workspace/headext-g7x"; NAME = None
 GPU = "NVIDIA RTX PRO 6000 Blackwell Server Edition"
 cap, CAP_MIN = None, 90.0
 import headext_g7x_budget as B
-LISTED_RATE = 2.49  # RTX PRO 6000 Blackwell SECURE on-demand, as billed on G4/G5; t242u extra-gen cap $1
-STOP_LINE, CEILING = 45.0, 60.0
+LISTED_RATE = 2.49  # RTX PRO 6000 Blackwell SECURE on-demand, as billed on G4/G5; t243u / R-1 top-up cap $1.50; last billed rate $2.69/h
+STOP_LINE, CEILING = 85.0, 100.0  # R-3: stop-and-report $85, ceiling $100 GPU
 WRITER = "qwen3-30b-a3b-2507"
 CHECKERS = [("seed-oss-36b", "bytedance-seed"), ("nemotron-3-super", "nvidia-nemotron")]
 GUIDE = "/workspace/xside/guide-d0710e92.md"
@@ -65,8 +65,17 @@ def ssh_base(ip, port):
     return ["ssh", "-i", KEY, "-o", "StrictHostKeyChecking=no", "-o", "UserKnownHostsFile=/dev/null", "-o", "LogLevel=ERROR",
             "-o", "ServerAliveInterval=30", "-o", "ConnectTimeout=20", "-p", str(port), f"root@{ip}"]
 def rest_pods():
-    req = urllib.request.Request("https://rest.runpod.io/v1/pods", headers={"Authorization": "Bearer " + rp.key(), "User-Agent": "Mozilla/5.0 airp-hx"})
-    return [p.get("id") for p in json.loads(urllib.request.urlopen(req, timeout=60).read())]
+    """Return (ids, status) where status is 'ok' or 'unreachable'."""
+    last = None
+    for i in range(6):
+        try:
+            req = urllib.request.Request("https://rest.runpod.io/v1/pods", headers={"Authorization": "Bearer " + rp.key(), "User-Agent": "Mozilla/5.0 airp-hx"})
+            ids = [p.get("id") for p in json.loads(urllib.request.urlopen(req, timeout=60).read())]
+            return ids, "ok"
+        except Exception as e:
+            last = f"{type(e).__name__}: {e}"
+            time.sleep(5)
+    return [], f"unreachable:{last}"
 
 
 def arch():
@@ -91,18 +100,24 @@ def arch():
 def precheck(signed, cap):
     pins = json.load(open(PINS))
     pods = gq("query { myself { pods { id name } } }")["myself"]["pods"]
-    rpods = rest_pods()
+    rpods, rest_st = rest_pods()
     box = int(sh("df -BG --output=avail /workspace | tail -1").stdout.strip().rstrip("G"))
     vfree = int(vps("df -BG --output=avail / | tail -1").stdout.strip().rstrip("G"))
     b = balance(); spent = ledger_spent(); cum = SPENT_BEFORE_LEDGER + spent
     anc = sh(f"cd {REPO_WT} && git fetch -q origin plan/phase3-recipe-stability && git merge-base --is-ancestor {signed} origin/plan/phase3-recipe-stability", check=False).returncode == 0
     clean = sh(f"cd {REPO_WT} && git diff --quiet {signed} -- {REL} tools/evaluator-training/primitives/kind-label-table.json", check=False).returncode == 0
     files_ok = {f: sha(os.path.join(HERE, f)) == s for f, s in pins["files"].items()}
-    log(f"PRECHECK: pods(gql)={len(pods)} pods(rest)={rpods} box_free={box}G vps_free={vfree}G balance=${b['clientBalance']:.2f} "
-        f"cumulative=${cum:.2f} +cap ${cap} stop_line=${STOP_LINE} signed_on_remote={anc} code_clean={clean} pins_ok={all(files_ok.values())}")
-    if pods or rpods: raise SystemExit("ABORT: a pod is already running")
-    if cum + cap > CEILING: raise SystemExit("ABORT: would pass the $60 pre-authorised ceiling (t232u item 4)")
-    if cum + cap > STOP_LINE: log(f"NOTE: cumulative may pass the $45 report line (t232u item 4: one-line note, continue)")
+    oh_min, oh_usd = B.fixed_overhead_minutes(), B.fixed_overhead_usd(B.CURRENT_RATE)
+    log(f"PRECHECK: pods(gql)={len(pods)} pods(rest)={rpods} rest_status={rest_st} box_free={box}G vps_free={vfree}G balance=${b['clientBalance']:.2f} "
+        f"cumulative=${cum:.2f} +cap ${cap} stop_line=${STOP_LINE} ceiling=${CEILING} signed_on_remote={anc} code_clean={clean} pins_ok={all(files_ok.values())}")
+    log(f"OVERHEAD (brief 3.7): setup+load {B.OBSERVED_SETUP_LOAD_MIN} min (last observed) + AFTER_GEN reserve {B.AFTER_GEN} min = {oh_min} min / ${oh_usd} at ${B.CURRENT_RATE}/h; cap ${cap}")
+    if pods: raise SystemExit("ABORT: a pod is already running")
+    if rest_st == "ok" and rpods: raise SystemExit("ABORT: a pod is already running")
+    if rest_st != "ok":
+        log(f"NOTE: REST pods API unreachable ({rest_st}); proceeding on empty gql pod list only")
+    if cum + cap > CEILING: raise SystemExit("ABORT: would pass the $100 GPU ceiling (R-3)")
+    if cum + cap > STOP_LINE: log(f"NOTE: cumulative may pass the $85 stop-and-report line (R-3); continuing only if still at or under $100")
+    if cap + 1e-9 < oh_usd: raise SystemExit(f"ABORT: cap ${cap} would be breached by fixed overhead ${oh_usd} (brief 3.7); stopped before launch")
     if not anc or not clean: raise SystemExit("ABORT: signed commit not on remote or working tree differs")
     if not all(files_ok.values()): raise SystemExit(f"ABORT: pinned file sha mismatch {[f for f, v in files_ok.items() if not v]}")
     if box < 5 or vfree < 10: raise SystemExit("ABORT: low disk")
@@ -125,7 +140,7 @@ def main():
     os.makedirs(f"{ROOT}/logs", exist_ok=True); os.makedirs(f"{OUT}/logs", exist_ok=True)
     LOG = open(f"{ROOT}/logs/{NAME}.log", "a")
     cap = a.cap_usd
-    if cap > 1.0: raise SystemExit("ABORT: extra-generation cap is $1")
+    if cap > 1.50: raise SystemExit("ABORT: extra-generation cap is $1.50 (R-1)")
     mf = {m["key"]: m for m in json.load(open(f"{V3}/collect/models.selfhost.json"))["models"]}
     bal0, cum0, pins = precheck(a.signed, cap)
     spec_sha = pins["files"]["headext-slot-spec.json"]
@@ -359,7 +374,9 @@ def main():
                 log("terminate retry", repr(e)[:200]); time.sleep(10)
         t1 = time.time(); time.sleep(25)
         allp = gq("query { myself { pods { id name } } }")["myself"]["pods"]
-        try: rpods = rest_pods()
+        try:
+            rids, rst = rest_pods()
+            rpods = rids if rst == "ok" else f"rest {rst}"
         except Exception as e: rpods = f"rest error {repr(e)[:100]}"
         bal1 = balance()["clientBalance"]
         cost = max(rate * (t1 - t0) / 3600, bal0 - bal1)
@@ -370,7 +387,7 @@ def main():
         elif a.stage == "seedcheck":
             what = ("headext rerun (t235u) G5 seedcheck: Seed-OSS-only v4 check + labels on 11 author-written denial arms")
         else:
-            what = f"headext t242u G7x extra gen: qwen3-30b four cr-direct-vs-fiction train units (samples 232-235) + seed-oss/nemotron labels + v4 check on new rows; rows:{gen_st.get('n_rows_written')}"
+            what = f"headext t243u R-1 G7x top-up: qwen3-30b four cr-direct-vs-fiction train units (samples 232-235) + seed-oss/nemotron labels + v4 check on new rows; rows:{gen_st.get('n_rows_written')}"
         row = "\t".join(str(x) for x in [NAME, pid, GPU, rate, time.strftime("%Y-%m-%dT%H:%M:%S%z", time.localtime(t0)),
             time.strftime("%Y-%m-%dT%H:%M:%S%z", time.localtime(t1)), f"{bal0:.3f}", f"{bal1:.3f}", f"{cost:.3f}",
             f"{what} checker_delete_rc:{results.get('checker_delete_rc')} failure:{bool(results.get('failure'))}"])

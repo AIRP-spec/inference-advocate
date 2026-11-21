@@ -328,3 +328,19 @@ Justin approved a $1 extra-generation top-up after the t241u pack shortfall (23/
 ## t242u (2026-11-13 08:13 NPT; G7x extra generation failed, no rows, no pack, no training)
 
 Pod `hx-g7x-gen` / `vuhrghm9wbq04h` under `--signed` `cf2f468`. Qwen came up at t+10.9; the 14-min AFTER_GEN reserve exceeded the 11.4 min remaining under the $1 / 22.3 min wall at $2.69/h. No rows written. VPS `sha256sum -c` 2/2 OK, terminated, $0.504, cumulative $49.788. Complete pair units still 23/24. No retry under the same $1 cap. Report `REPORT-HEAD-EXT-G7X-FAIL-t242u.md`.
+
+## t243u / R-1 (2026-11-21 ~09:12 NPT; G7x top-up cap $1.50, ceiling $100 / stop $85; no generation in this commit)
+
+Reviewer rulings R-1, R-2, R-3 on PR #35. Signed t241u declaration unchanged. This commit only raises the G7x cap and records overhead, and updates the training-pod ceiling.
+
+- G7x cap $1.50 (R-1). Budget 33 min / $1.480 at $2.69/h. Fixed overhead (brief 3.7): last observed setup+load 10.9 min + AFTER_GEN reserve 16 min = 26.9 min / $1.206 at $2.69/h. Driver states this in precheck and stops before launch if the cap would be breached.
+- GPU ceiling $100, stop-and-report $85 (R-3), in `headext_pod_g7x.py` and `headext_pod_train.py`.
+- REST pod list: retries, then proceed on empty gql list if REST TLS is unreachable (noted in the precheck log).
+
+| file | sha256 |
+|---|---|
+| `headext_g7x_budget.py` | `62abee872259ac7b0d156bd7ddd67974e1055fd1522c7445bcb29ec2bb28320b` |
+| `headext_pod_g7x.py` | `9c032456297f0a6dc65b03cc795abd7f96b13c4a176e366f652b8fad1689bb87` |
+| `headext_pod_train.py` | `fee6989a81f08f0288ede95365b98d1e236552374bb90f251831c5000bfaf678` |
+
+Generation uses this commit as `--signed`.

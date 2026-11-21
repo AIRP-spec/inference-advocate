@@ -57,10 +57,10 @@
   "headext_a25.py": "1040adb587329795ad15b984dc6295a7f6e662eda231692f9c5baeffe34bdb1f",
   "headext_pod_a25.py": "d90fcbf00698d1b116178d4eed66be5930e35ccf6567b0db8dcd2d6636ee8922",
   "tests/test_a25.py": "b8bb021e9bf1ee38856dab31aa5c80f5cf4b4103cb2e772c136598edec5363f0",
-  "headext_pod_train.py": "64e59364185d037e789bb5ae3eb8d712b646cc7b39949032a59a069534a3ab57",
+  "headext_pod_train.py": "fee6989a81f08f0288ede95365b98d1e236552374bb90f251831c5000bfaf678",
   "make_train_pack.py": "d7c1f96460b1d9df02d18f78f229294ff73493d84fae71f8c9343a8494d85c84",
   "pack/pod_pipeline_hx.sh": "115bd9a73b59810753eff14b8a04a1ed2d6f8c6f3e092ae0f036b5a22046a866",
-  "tests/test_train_pod.py": "764404870bd48930db67beb8f8b4aa10b4d70d8093c5cd5d384429979e4e6e69",
+  "tests/test_train_pod.py": "48938bc17e982c2afd9ec794bcf71c7130d965e50de21e15d070b77e53fc3adb",
   "evidence/a25/a25-decision.json": "abd8ebb142ff5fd4b725dd7c4af8ce16404a0d9186f733cc3063e04857368d13",
   "evidence/a25/pack-report-v10c.json": "34b56330ff2adc2748856189020b876d8362958f1333c331e55b9921585fcd7a",
   "evidence/a25/pack-v10c.SHA256SUMS": "32fff494737388b79480e91db0956bcbe1ac58b8991f4d8f6241497deb4cb719",
@@ -131,9 +131,9 @@
   "headext_g7_incremental.py": "d073bacdc1bb716849e512b44d2f32ba33f764eda8783cdf9a46d3bb7fd6649d",
   "tests/test_g7_budget.py": "5bbe40304ef4b8309d5a85a7a63de186f12671ea25783fc368cd13474324530c",
   "tests/test_g7_incremental.py": "c686073b30c9091acdba36915f01c30cd1fe9f3b8bfed89dba6674b11db5e02f",
-  "headext_pod_g7x.py": "4fe60a66fc6d169e21749ed86aa42939e133ae4f412a12ee1d302086a68f960f",
-  "headext_g7x_budget.py": "4ed0d2fc0cec22558017f4b2d15ffcb1a452e1c8438278db3e9351816005d682",
-  "tests/test_g7x_budget.py": "87a6480c7846881fca411a68893bbd613a0817c926ab15f126834d8b182a737a"
+  "headext_pod_g7x.py": "9c032456297f0a6dc65b03cc795abd7f96b13c4a176e366f652b8fad1689bb87",
+  "headext_g7x_budget.py": "62abee872259ac7b0d156bd7ddd67974e1055fd1522c7445bcb29ec2bb28320b",
+  "tests/test_g7x_budget.py": "28d61872e97d331fc5320438117e965794c9d6881fff5ef8419b9ab364287afc"
  },
  "external": {
   "generator": {

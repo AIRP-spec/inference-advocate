@@ -19,7 +19,7 @@ CAP_USD, CAP_MIN = 6.0, 105.0         # t227u item 4 ($6 per pod); t228u item 3:
 DC = "EU-RO-1"            # t228u item 2: the only datacenter with SECURE RTX 4090 stock (2026-11-04); network volume lives here
 VOL_MOUNT = "/vol"
 CREATE_MUTATION = "podFindAndDeployOnDemand"   # t228u item 1: on-demand only, never interruptible / spot / bid
-STOP_LINE, CEILING = 45.0, 60.0       # t227u item 5: $45 = one-line note, continue; abort only past $60
+STOP_LINE, CEILING = 85.0, 100.0       # R-3: stop-and-report $85, ceiling $100 GPU
 TRAIN_SHA = None; VAL_SHA = None
 CREATE_TRIES = 30       # one try a minute for up to 30 min (no pod, no bill while supply-constrained)
 CLOSE_S = 8 * 60          # stop the pipeline this long before the deadline to archive the last seed and terminate
@@ -73,8 +73,8 @@ def precheck(signed, pack_sha):
         f"cumulative=${cum:.2f} +cap ${CAP_USD} -> ${cum + CAP_USD:.2f} (stop line ${STOP_LINE}) signed_on_remote={anc} code_clean={clean} "
         f"pins_ok={all(files_ok.values())} pack_sha_ok={pack_sha} tracked_out={len(out_files)}/{len(TRACKED_PRIMITIVES_OUT)}")
     if pods or rpods: raise SystemExit("ABORT: a pod is already running")
-    if cum + CAP_USD > CEILING: raise SystemExit("ABORT: would pass the $60 ceiling")
-    if cum + CAP_USD > STOP_LINE: log(f"NOTE ($45 line, t227u item 5): cumulative ${cum:.2f} + cap ${CAP_USD} may pass $45; pre-authorized through $60; continuing")
+    if cum + CAP_USD > CEILING: raise SystemExit("ABORT: would pass the $100 GPU ceiling (R-3)")
+    if cum + CAP_USD > STOP_LINE: log(f"NOTE ($85 line, R-3): cumulative ${cum:.2f} + cap ${CAP_USD} may pass $85 stop-and-report; pre-authorized through $100; continuing")
     if not anc or not clean: raise SystemExit("ABORT: signed commit not on remote or working tree differs")
     if not all(files_ok.values()): raise SystemExit(f"ABORT: pinned file sha mismatch {[f for f, v in files_ok.items() if not v]}")
     if box < 20 or vfree < 20: raise SystemExit("ABORT: disk headroom < 20 GB")
