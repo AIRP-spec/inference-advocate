@@ -9,3 +9,5 @@ After the s90–s99 V0–V3 pass (`REPORT-HEAD-EXT-V0-V3-s90-s99-t243u.md`). All
 | `DRAFT-MERGE-PLAN-t243u.md` | `decide/shared-adopt` into `main`, then PR #35 — Justin merges |
 | `DRAFT-CERTIFICATION-RUN-DECLARATION-t243u.md` | Phase 5 run procedure, unsigned |
 | `docs/decisions/2026-11-21-rate-based-gate-DRAFT-UNSIGNED.md` | Rate-based gate ADR, unsigned; ship bars blank for Justin |
+
+Renamed 2026-11-21 (R-9 step 1, signed by Justin in comment 7063712036): `section7/DRAFT-CERTIFICATION-RUN-DECLARATION-t243u.md` -> `section7/CERTIFICATION-RUN-DECLARATION-t243u.md`; `docs/decisions/2026-11-21-rate-based-gate-DRAFT-UNSIGNED.md` -> `docs/decisions/2026-11-21-rate-based-gate-t243u.md`.
