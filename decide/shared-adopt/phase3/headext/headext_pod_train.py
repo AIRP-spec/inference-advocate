@@ -56,6 +56,7 @@ def ensure_tracked_primitives_out(repo_wt=None):
 import re as _re
 VOL_DELETE_RE = _re.compile(r"^/vol/hx-t\d+/hx-s\d\d$")
 VOL_MIN_TOTAL_GB, VOL_MIN_PER_SEED_GB = 20, 4
+VOL_QUOTA_GB = 60   # jq8pseh4f0 quota; `df` inside the pod reports the host filesystem (~480 TB), so free = min(df, quota - du)
 
 
 def parse_delete_list(path):
@@ -87,7 +88,9 @@ def vol_prep_script(entries, n_seeds, mount=VOL_MOUNT):
     for e in entries:
         q = shlex.quote(e)
         lines.append(f"if [ -d {q} ]; then sz=$(du -sh {q} | cut -f1); rm -rf {q}; echo \"VOL_DEL {e} $sz\"; else echo \"VOL_DEL_ABSENT {e}\"; fi")
-    lines += ["sync", f"free=$(df -BG --output=avail {mount} | tail -1 | tr -dc 0-9)", 'echo VOL_FREE_AFTER $free',
+    lines += ["sync", f"dffree=$(df -BG --output=avail {mount} | tail -1 | tr -dc 0-9)",
+              f"used=$(du -sBG {mount} | cut -f1 | tr -dc 0-9)", f"echo VOL_DF_FREE_AFTER $dffree VOL_USED_GB $used VOL_QUOTA_GB {VOL_QUOTA_GB}",
+              f"est=$(( {VOL_QUOTA_GB} - used ))", 'free=$(( dffree < est ? dffree : est ))', 'echo VOL_FREE_AFTER $free',
               f"if [ \"$free\" -lt {need} ]; then echo VOL_LOW_STOP $free; exit 3; fi", "echo VOL_PREP_OK"]
     return "\n".join(lines)
 

@@ -116,9 +116,27 @@ def test_r5_vol_prune_and_free_space_refusal(tmp_path):
     import subprocess
     stub = tmp_path / "bin"; stub.mkdir()
     (stub / "mountpoint").write_text("#!/bin/sh\nexit 0\n"); (stub / "df").write_text("#!/bin/sh\necho Avail\necho 12G\n")
-    for n in ("mountpoint", "df"): (stub / n).chmod(0o755)
+    (stub / "du").write_text("#!/bin/sh\nprintf '5G\\t/vol\\n'\n")
+    for n in ("mountpoint", "df", "du"): (stub / n).chmod(0o755)
     r = subprocess.run(["bash", "-c", tr.vol_prep_script([], 1)], capture_output=True, text=True, env={"PATH": f"{stub}:/usr/bin:/bin"})
     assert r.returncode == 3 and "VOL_LOW_STOP 12" in r.stdout and "VOL_PREP_OK" not in r.stdout
     (stub / "df").write_text("#!/bin/sh\necho Avail\necho 30G\n")
     r = subprocess.run(["bash", "-c", tr.vol_prep_script([], 5)], capture_output=True, text=True, env={"PATH": f"{stub}:/usr/bin:/bin"})
     assert r.returncode == 0 and "VOL_PREP_OK" in r.stdout
+
+
+def test_r5_quota_aware_free_space(tmp_path):
+    """df in the pod reports the host fs (hundreds of TB); the guard must use quota - du, so a nearly full quota refuses."""
+    import sys, subprocess
+    sys.path.insert(0, str(H))
+    import headext_pod_train as tr
+    stub = tmp_path / "bin"; stub.mkdir()
+    (stub / "mountpoint").write_text("#!/bin/sh\nexit 0\n"); (stub / "df").write_text("#!/bin/sh\necho Avail\necho 480256G\n")
+    (stub / "du").write_text("#!/bin/sh\nprintf '55G\\t/vol\\n'\n")
+    for n in ("mountpoint", "df", "du"): (stub / n).chmod(0o755)
+    env = {"PATH": f"{stub}:/usr/bin:/bin"}
+    r = subprocess.run(["bash", "-c", tr.vol_prep_script([], 5)], capture_output=True, text=True, env=env)
+    assert r.returncode == 3 and "VOL_LOW_STOP 5" in r.stdout and "VOL_USED_GB 55" in r.stdout
+    (stub / "du").write_text("#!/bin/sh\nprintf '24G\\t/vol\\n'\n")
+    r = subprocess.run(["bash", "-c", tr.vol_prep_script([], 5)], capture_output=True, text=True, env=env)
+    assert r.returncode == 0 and "VOL_FREE_AFTER 36" in r.stdout and "VOL_PREP_OK" in r.stdout
