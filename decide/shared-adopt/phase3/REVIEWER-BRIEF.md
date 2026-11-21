@@ -54,6 +54,7 @@ All traffic is on PR #35 (`plan/phase3-recipe-stability`) as issue comments, unt
 - **V3 (c) denominator:** the 12 validation rows of kind `cr-resource-in-fiction`; rate per seed is reported alongside the count.
 - **Current declaration:** head extension, 25 heads, seeds 90–99, pack v10g, bars V0–V3 unchanged from the signed declaration, D7 train-only data fix. This is the last cycle under the all-must-pass design; if V3 (c) fails again on the same rows, no D8: draft the rate-based mention-guard declaration (option b) for Justin.
 - **Open cap:** the `cr-direct-vs-fiction` top-up pod is capped at $1.50 (R-1). Training pods $4 each.
+- **Spend ceiling (R-3):** $100 GPU cumulative, stop-and-report at $85. Pod caps are still set per section 3.7; the ceiling is not a cap.
 
 ## 5. Justin-only (the reviewer escalates, never decides)
 
@@ -61,7 +62,7 @@ All traffic is on PR #35 (`plan/phase3-recipe-stability`) as issue comments, unt
 - Merging to `main`. Closing PRs.
 - Publishing anything (Hugging Face, releases, v3 or v3-safety going public).
 - Any change to tryairp.com or dev.tryairp.com.
-- Spend past the program ceiling ($60 GPU; $50 OpenRouter), or any RunPod top-up.
+- Spend past the program ceiling, or any RunPod top-up. Ceiling as of 2026-11-21: $100 GPU cumulative (raised from $60 by Justin), stop-and-report at $85; $50 OpenRouter unchanged.
 - Any doubt about a provider's terms.
 - Anything that would require CSE-exhibiting content to exist anywhere. There is no such case.
 - Anything the reviewer is not confident it understands from the report. Uncertainty escalates; it does not guess.
