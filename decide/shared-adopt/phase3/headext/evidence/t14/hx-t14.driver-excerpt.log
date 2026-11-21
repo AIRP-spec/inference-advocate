@@ -1,0 +1,33 @@
+05:32:30 PRECHECK (headroom): pods(gql)=0 pods(rest)=[] rest_status=unreachable:URLError: <urlopen error [SSL: UNEXPECTED_EOF_WHILE_READING] EOF occurred in violation of protocol (_ssl.c:1029)> box_free=73G vps_free=109G balance=$35.02 cumulative=$51.67 +cap $1.5 -> $53.17 (stop line $85.0) signed_on_remote=True code_clean=True pins_ok=True pack_sha_ok=True tracked_out=4/4
+05:32:31 POD CREATED w1kbdvljmsmgry gpu=NVIDIA GeForce RTX 4090 rate=$0.89/h cap=101.1min ($1.5) seeds=[94]
+05:32:31 ON-DEMAND CHECK OK podType=RESERVED secureCloud=True dc=EU-RO-1 volume=jq8pseh4f0
+05:33:03 VOLPREP: VOL_FREE_BEFORE 480256
+05:33:03 VOLPREP: VOL_DEL /vol/hx-t5/hx-s60 1.7G
+05:33:03 VOLPREP: VOL_DEL /vol/hx-t5/hx-s61 1.7G
+05:33:03 VOLPREP: VOL_DEL /vol/hx-t5/hx-s62 1.7G
+05:33:03 VOLPREP: VOL_DEL /vol/hx-t5/hx-s63 1.7G
+05:33:03 VOLPREP: VOL_DEL /vol/hx-t5/hx-s64 1.7G
+05:33:03 VOLPREP: VOL_DEL /vol/hx-t6/hx-s65 1.7G
+05:33:03 VOLPREP: VOL_DEL /vol/hx-t6/hx-s66 1.7G
+05:33:03 VOLPREP: VOL_DEL /vol/hx-t6/hx-s67 1.7G
+05:33:03 VOLPREP: VOL_DEL /vol/hx-t6/hx-s68 1.7G
+05:33:03 VOLPREP: VOL_DEL /vol/hx-t6/hx-s69 1.7G
+05:33:03 VOLPREP: VOL_DEL /vol/hx-t7/hx-s70 1.7G
+05:33:03 VOLPREP: VOL_DEL /vol/hx-t7/hx-s71 1.7G
+05:33:03 VOLPREP: VOL_DEL /vol/hx-t7/hx-s72 1.7G
+05:33:03 VOLPREP: VOL_DEL /vol/hx-t7/hx-s73 1.7G
+05:33:03 VOLPREP: VOL_DEL /vol/hx-t7/hx-s74 1.7G
+05:33:03 VOLPREP: VOL_DEL /vol/hx-t8/hx-s75 1.7G
+05:33:03 VOLPREP: VOL_DEL /vol/hx-t8/hx-s76 1.7G
+05:33:03 VOLPREP: VOL_DEL /vol/hx-t8/hx-s77 1.7G
+05:33:03 VOLPREP: VOL_DEL /vol/hx-t8/hx-s78 1.7G
+05:33:03 VOLPREP: VOL_DEL /vol/hx-t9/hx-s79 1.7G
+05:33:03 VOLPREP: VOL_DEL /vol/hx-t13/hx-s94 790M
+05:33:03 VOLPREP: VOL_FREE_AFTER 480258
+05:33:03 VOLPREP: VOL_PREP_OK
+05:58:55 POD: VOL_OK_hx-s94 43 files 3dae6a5f656045b3890f1c6401b07a4a43d5b65ac58b19095a92eea59aadc771
+05:58:55 POD: PIPE_EXIT 0
+06:01:06 ARCHIVED hx-s94: box 43 files sha256sum -c OK; VPS outputs+predictions 29 files sha256sum -c OK -> /root/primitives-evaluator/headext-20261102/train-hx-t14/hx-s94; weights queued
+06:06:12 WEIGHTS hx-s94 -> VPS sha256sum -c OK
+06:06:16 ALL SEEDS VPS-VERIFIED (outputs + weights): ['hx-s94']
+06:07:26 TERMINATED w1kbdvljmsmgry pod_list_after(gql)=[] rest=([], 'unreachable:URLError: <urlopen error [SSL: UNEXPECTED_EOF_WHILE_READING] EOF occurred in violation of protocol (_ssl.c:1029)>') minutes=34.0 balance 35.025->34.508 cost=$0.516

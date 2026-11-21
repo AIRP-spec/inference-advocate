@@ -1,0 +1,49 @@
+{
+ "pod": "w1kbdvljmsmgry",
+ "rate": 0.89,
+ "cost": 0.5164741110000008,
+ "bal0": 35.0245132592,
+ "bal1": 34.5080391482,
+ "pod_list_after": [],
+ "rest_pods_after": [
+  [],
+  "unreachable:URLError: <urlopen error [SSL: UNEXPECTED_EOF_WHILE_READING] EOF occurred in violation of protocol (_ssl.c:1029)>"
+ ],
+ "cumulative": 52.18499999999999,
+ "minutes": 33.979898846149446,
+ "signed": "c39a265b642b1f34495da58f323d80f5b34e7996",
+ "t0": 1795239151.015973,
+ "t1": 1795241189.8099039,
+ "seeds": {
+  "94": "done_archived"
+ },
+ "vol_prep": [
+  "VOL_FREE_BEFORE 480256",
+  "VOL_DEL /vol/hx-t5/hx-s60 1.7G",
+  "VOL_DEL /vol/hx-t5/hx-s61 1.7G",
+  "VOL_DEL /vol/hx-t5/hx-s62 1.7G",
+  "VOL_DEL /vol/hx-t5/hx-s63 1.7G",
+  "VOL_DEL /vol/hx-t5/hx-s64 1.7G",
+  "VOL_DEL /vol/hx-t6/hx-s65 1.7G",
+  "VOL_DEL /vol/hx-t6/hx-s66 1.7G",
+  "VOL_DEL /vol/hx-t6/hx-s67 1.7G",
+  "VOL_DEL /vol/hx-t6/hx-s68 1.7G",
+  "VOL_DEL /vol/hx-t6/hx-s69 1.7G",
+  "VOL_DEL /vol/hx-t7/hx-s70 1.7G",
+  "VOL_DEL /vol/hx-t7/hx-s71 1.7G",
+  "VOL_DEL /vol/hx-t7/hx-s72 1.7G",
+  "VOL_DEL /vol/hx-t7/hx-s73 1.7G",
+  "VOL_DEL /vol/hx-t7/hx-s74 1.7G",
+  "VOL_DEL /vol/hx-t8/hx-s75 1.7G",
+  "VOL_DEL /vol/hx-t8/hx-s76 1.7G",
+  "VOL_DEL /vol/hx-t8/hx-s77 1.7G",
+  "VOL_DEL /vol/hx-t8/hx-s78 1.7G",
+  "VOL_DEL /vol/hx-t9/hx-s79 1.7G",
+  "VOL_DEL /vol/hx-t13/hx-s94 790M",
+  "VOL_FREE_AFTER 480258",
+  "VOL_PREP_OK"
+ ],
+ "weights_vps_verified": {
+  "hx-s94": true
+ }
+}
