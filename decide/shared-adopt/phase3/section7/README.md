@@ -1,0 +1,11 @@
+# Brief §7 drafts (t243u, 2026-11-21)
+
+After the s90–s99 V0–V3 pass (`REPORT-HEAD-EXT-V0-V3-s90-s99-t243u.md`). All of these are drafts or records except the candidate declaration, which is Zimmer's declared selection (Justin still promotes). Nothing is signed. No v3 or v3-safety score was run.
+
+| file | role |
+|---|---|
+| `DECLARATION-CANDIDATE-HX-s91-t243u.md` | Candidate on validation macro-F1: `avg-hx-s91-ge2.0` |
+| `SEALED-HASHES-v3-v3-safety-t243u.md` | Recorded v3-safety seal and reserve hashes; main v3 is not sealed |
+| `DRAFT-MERGE-PLAN-t243u.md` | `decide/shared-adopt` into `main`, then PR #35 — Justin merges |
+| `DRAFT-CERTIFICATION-RUN-DECLARATION-t243u.md` | Phase 5 run procedure, unsigned |
+| `docs/decisions/2026-11-21-rate-based-gate-DRAFT-UNSIGNED.md` | Rate-based gate ADR, unsigned; ship bars blank for Justin |
