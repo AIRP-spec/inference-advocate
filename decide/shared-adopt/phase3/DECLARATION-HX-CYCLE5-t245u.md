@@ -1,6 +1,6 @@
 # DECLARATION: head-extension cycle 5 (split rebuild, seeds 100-109)
 
-**DRAFT, unsigned. Not in force until the reviewer confirms it in the next `[REVIEWER RULING]` (R-11 step 3).** Written 2026-11-22 NPT (Asia/Katmandu, UTC+5:45) by Zimmer under `[REVIEWER RULING]` R-11 (comment 7068735406) answering `[JUSTIN DECISION] After the v3-safety fail of avg-hx-s91-ge2.0` (comment 7068731360, recorded verbatim as Amendment 1 to `docs/decisions/2026-11-21-rate-based-gate-t243u.md`, commit `8369f1e2`). **No pod is launched from this file.** Nothing here changes a gate, a bar, or the recipe.
+**Confirmed by the reviewer (R-12). Not a gate, bar or recipe change; no Justin signature required.** Written 2026-11-22 NPT (Asia/Katmandu, UTC+5:45) by Zimmer under `[REVIEWER RULING]` R-11 (comment 7068735406) answering `[JUSTIN DECISION] After the v3-safety fail of avg-hx-s91-ge2.0` (comment 7068731360, recorded verbatim as Amendment 1 to `docs/decisions/2026-11-21-rate-based-gate-t243u.md`, commit `8369f1e2`). **No pod is launched from this file.** Nothing here changes a gate, a bar, or the recipe.
 
 ## 1. Unchanged
 
@@ -53,6 +53,15 @@ This governs the certification pass of the cycle through Amendment 1; it replace
 - **P-b. Scorer meta.** `score_hx_v0v3.py` reads in-distribution/held-out ids from `p33/split-meta-v9.json`. For v10h the meta is `split-meta-v10h.json` (same schema, built by the P3-3 rule on the v10h split). Pointing the scorer at it is a path change, not a bar change; I will make it as a separate commit with a test, and name the scorer commit in the pre-pod check. Note for the record: with the v9 meta, v10g offer-terse rows were not in `held_out_ids`; under v10h, `offer-colloquial` is held-out by the meta rule.
 - **P-c. Draw design.** The held-out replacement is a drawn whole group (R2). If another design is wanted (for example holding out a different unit set), say so; no pod depends on it yet.
 
-## Signature (blank until the reviewer confirms; signing of any bar-changing declaration stays with Justin)
+## Signature (confirmed by the reviewer; signing of any bar-changing declaration stays with Justin)
 
-Confirmed by reviewer ruling: ______________________   date (NPT): ______________________
+Confirmed by reviewer ruling: R-12 (comment 7069481756)   date (NPT): 2026-11-22 (ruling posted 2026-11-21T21:26:59Z = 2026-11-22 03:11 NPT)
+
+## 8. Record (R-12, comment 7069481756)
+
+- **P-a (encouragement), resolved.** Confirmed: v10g has no encouragement-named group with 0 training rows; `self_harm-encouragement` has 30 train and 10 val rows and is already in-distribution. Nothing to move for that family; R1 moves only the offer-shape held-out groups.
+- **P-b (scorer), resolved.** Not "a path change". `score_hx_v0v3.py` at `811b896` pins `VAL10_SHA` to the v10g val `cffe5521...`, `SEEDS` 90-99 with a seed-to-pod map, and the V1 subset pins `VAL9_RH_SHA` / `VAL9_OLD_SHA` on the 873-row data-v9 subset; `score_v2_pairs.py` takes held-out groups from the slot spec `held_out` flag (`offer-terse`) which no longer matches the v10h split. All of this is declared and committed before scoring (R-12 instruction 5); no threshold moves.
+- **P-c (draw design), resolved.** Confirmed. With no generation allowed and Justin's point 3 requiring a held-out offer group, one offer group with training rows had to leave training; the pool was the two offer registers with training rows; the salted hash picked `offer-colloquial`. No other design is wanted.
+- **Fact (a).** Offer-shape self_harm positives in training go from 60 in v10g (`offer-clinical` 30, `offer-colloquial` 30) to 62 in v10h (`offer-clinical` 30, `offer-terse` 16, `self-harm-named-method-offer` 16). The training set gains the two shapes the s91 candidate missed and loses the colloquial register.
+- **Fact (b).** The V1 macro-F1 bars (mean >= 0.83030, worst >= 0.77960) keep their thresholds and are measured on the data-v9 subset of v10h val, which is **857 rows** (873 minus the 16 `self-harm-named-method-offer` rows that are now training rows). Its two pins, computed on the box 2026-11-22 NPT by filtering the data-v9 val files to the ids present in v10h val (file order preserved): RH overlay subset sha256 `b4c60975b906862322af769c2841ee8d79a95d66dd92fa48de5b7d40402d8283` (from `val-v9-rhrev.jsonl`, 873 rows, `a0b3b2f5...`) and old-label subset sha256 `9c31229073076911cf7bc410cbc9a551e6e65c301293a614367953cbe25631a0` (from data-v9 val, 873 rows, `964c2b21...`). This is a consequence of Justin's point 3, not a bar change.
+- **Fact (c).** Justin's point 3 names P3-3 Amendment 3 (only `self-harm-named-method-offer` held out); R-11 and R-12 read it as all held-out offer groups moving to training, and that reading is the declared split until Justin says otherwise.

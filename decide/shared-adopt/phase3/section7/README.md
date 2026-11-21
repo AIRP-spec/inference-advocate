@@ -11,3 +11,5 @@ After the s90–s99 V0–V3 pass (`REPORT-HEAD-EXT-V0-V3-s90-s99-t243u.md`). All
 | `docs/decisions/2026-11-21-rate-based-gate-DRAFT-UNSIGNED.md` | Rate-based gate ADR, unsigned; ship bars blank for Justin |
 
 Renamed 2026-11-21 (R-9 step 1, signed by Justin in comment 7063712036): `section7/DRAFT-CERTIFICATION-RUN-DECLARATION-t243u.md` -> `section7/CERTIFICATION-RUN-DECLARATION-t243u.md`; `docs/decisions/2026-11-21-rate-based-gate-DRAFT-UNSIGNED.md` -> `docs/decisions/2026-11-21-rate-based-gate-t243u.md`.
+
+Record note 2026-11-22 (R-12): the sha256 values posted in comment 7063745184 for the two signed files were working-tree shas, not shas at `dd7d2872`; signature fills reached the remote in `0883857` (declaration) and `dafbd02` (ADR). See the record notes at the end of each file. Not a reopening.
