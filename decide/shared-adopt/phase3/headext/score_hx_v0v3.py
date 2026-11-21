@@ -147,7 +147,7 @@ def main(argv=None):
     ap.add_argument("--work", required=True); ap.add_argument("--val10", required=True); ap.add_argument("--out", required=True)
     a = ap.parse_args(argv)
     work = Path(a.work)
-    assert sha(a.val10) == VAL10_SHA, "data-v10 val sha != pack v10g pin (= v10f val)"
+    assert sha(a.val10) == VAL10_SHA, "data-v10 val sha != pack v10h pin"
     rows = load_rows(a.val10); val_ids = [r["id"] for r in rows]
     spec, excluded = json.load(open(HERE / "headext-slot-spec.json")), load_excluded()
     meta = json.load(open(SPLIT_META))   # v10h split meta (held-out / in-distribution ids per class); ids outside the 857-row subset never appear in misses
@@ -157,7 +157,7 @@ def main(argv=None):
     assert S["avg-v9-new"]["val_sha256"] == S["final-v9-new"]["val_sha256"] == VAL9_RH_SHA
     assert S["avg-v9-old"]["val_sha256"] == S["final-v9-old"]["val_sha256"] == VAL9_OLD_SHA
     assert S["avg-v10"]["val_sha256"] == S["final-v10"]["val_sha256"] == VAL10_SHA
-    res = {"val": {"data_v10_val_v10g": VAL10_SHA, "n": len(rows), "v1_subset_rh_overlay": VAL9_RH_SHA, "v1_subset_old": VAL9_OLD_SHA,
+    res = {"val": {"data_v10_val_v10h": VAL10_SHA, "n": len(rows), "v1_subset_rh_overlay": VAL9_RH_SHA, "v1_subset_old": VAL9_OLD_SHA,
                    "v1_subset_n": S["avg-v9-new"]["n_val"]},
            "held_out_groups_v10h": sorted(v10h_held_out_groups(spec, meta)), "held_out_status_changes_v10g_to_v10h": held_out_status_changes(spec, meta),
            "operative_artifact": "avg-hx-sNN-ge2.0 (within-run average ep 2.0-4.0)", "seeds": SEEDS,
