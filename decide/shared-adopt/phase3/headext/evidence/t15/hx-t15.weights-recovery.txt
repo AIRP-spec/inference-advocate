@@ -1,0 +1,8 @@
+Driver exit weights_vps_verified (result.json): hx-s95 true, hx-s96 true, hx-s97 false, hx-s98 false, hx-s99 true.
+Driver WEIGHTS hx-s97 FAILED 2026-11-21T07:49:40Z after 5 VPS-pipe retries (Timeout, server not responding).
+Driver WEIGHTS hx-s98 FAILED 2026-11-21T08:36:04Z after 5 VPS-pipe retries.
+Driver WEIGHTS hx-s99 OK 2026-11-21T08:44:59Z.
+Manual recovery (same as driver: cd box out/hx-sNN && tar cf - keep SHA256SUMS.weights | ssh ... 'cd VPS/.../hx-sNN && tar xf -', then sha256sum -c --quiet SHA256SUMS.weights). No deletions.
+2026-11-21T08:47:52Z pushing hx-s97; PUSH_OK attempt=1; VPS_WEIGHTS_OK_hx-s97
+2026-11-21T08:53:26Z pushing hx-s98; PUSH_OK attempt=1; VPS_WEIGHTS_OK_hx-s98
+2026-11-21T08:58:08Z ALL_PUSHES_DONE

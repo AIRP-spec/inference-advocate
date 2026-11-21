@@ -1,0 +1,76 @@
+06:08:27 CAP_USD override -> 4.0
+06:09:09 PRECHECK (headroom): pods(gql)=0 pods(rest)=[] rest_status=unreachable:URLError: <urlopen error [SSL: UNEXPECTED_EOF_WHILE_READING] EOF occurred in violation of protocol (_ssl.c:1029)> box_free=71G vps_free=107G balance=$34.51 cumulative=$52.18 +cap $4.0 -> $56.18 (stop line $85.0) signed_on_remote=True code_clean=True pins_ok=True pack_sha_ok=True tracked_out=4/4
+06:09:09 NOTE: REST pods API unreachable (unreachable:URLError: <urlopen error [SSL: UNEXPECTED_EOF_WHILE_READING] EOF occurred in violation of protocol (_ssl.c:1029)>); proceeding on empty gql pod list only
+06:09:10 POD CREATED ah0hs2laiaw99b gpu=NVIDIA GeForce RTX 4090 rate=$0.89/h cap=105.0min ($4.0) seeds=[95 96 97 98 99]
+06:09:10 ON-DEMAND CHECK OK podType=RESERVED secureCloud=True dc=EU-RO-1 volume=jq8pseh4f0
+06:09:31 IN-POD WATCHDOG + GPU: wd_running | has_pod_id | has_runpodctl | NVIDIA GeForce RTX 4090, 24564 MiB |   60G | 
+06:09:35 PACK UPLOADED PACK_OK 41a77e4624e21f8d0d56d9a36f9d8dec99917cf1b71e06d8bfe8d3b2f9fe1a76  PACK.sha256 
+06:09:38 VOLPREP: VOL_FREE_BEFORE 480469
+06:09:38 VOLPREP: VOL_DF_FREE_AFTER 480469 VOL_USED_GB 26 VOL_QUOTA_GB 60
+06:09:38 VOLPREP: VOL_FREE_AFTER 34
+06:09:38 VOLPREP: VOL_PREP_OK
+06:11:08 start ssh timed out after 90 s; checking the pipeline directly
+06:11:14 PIPELINE STARTED
+06:11:46 POD: ALL 6 PASS
+06:11:46 POD: [train] 9355 items, truncated 0, mean len 37.4 (2.6s)
+06:11:46 POD: [val] 1884 items, truncated 0, mean len 72.5 (0.6s)
+06:11:46 POD: PREPROCESS_DONE
+06:11:46 POD: SMOKE_BF16_MIXED PASS {"sdpa": false, "eager": true}
+06:11:46 POD: RUN_START hx-s95 2026-11-21T06:10:16Z
+06:11:46 POD: ENCODER_ATTN eager
+06:19:11 POD: + grep -q SKIPPED_NONFINITE logs/train-hx-s95.log
+06:19:11 POD: HEADINIT_OK hx-s95 base17=10a35c7911392632d212b188849fae39fd9fe583252eb07ba27873d0c17106c5 head25=0a85cc3bb576cb6a9ead6902284be5908b1866e6dfb1d7ba05d741ddcfa5d429
+06:22:20 POD: VOL_OK_hx-s95 43 files 74bc07507aaed4f8322fd8964ba63e371fc4f853e05f54b935cfef0954c3dcbb
+06:22:20 POD: RUN_DONE_hx-s95 2026-11-21T06:22:16Z
+06:22:20 POD: RUN_START hx-s96 2026-11-21T06:22:16Z
+06:24:32 ARCHIVED hx-s95: box 43 files sha256sum -c OK; VPS outputs+predictions 29 files sha256sum -c OK -> /root/primitives-evaluator/headext-20261102/train-hx-t15/hx-s95; weights queued
+06:27:19 VPS pipe retry 1/4 rc=255: Timeout, server 203.134.250.85 not responding. 
+06:29:59 POD: + grep -q SKIPPED_NONFINITE logs/train-hx-s96.log
+06:29:59 POD: HEADINIT_OK hx-s96 base17=10a35c7911392632d212b188849fae39fd9fe583252eb07ba27873d0c17106c5 head25=0a85cc3bb576cb6a9ead6902284be5908b1866e6dfb1d7ba05d741ddcfa5d429
+06:33:00 WEIGHTS hx-s95 -> VPS sha256sum -c OK
+06:34:43 POD: VOL_OK_hx-s96 43 files 1cd9ab01e3a6b3207e1343d1b3d3935c67177bf86575fe64cafb6f07137406cf
+06:34:43 POD: RUN_DONE_hx-s96 2026-11-21T06:34:37Z
+06:34:43 POD: RUN_START hx-s97 2026-11-21T06:34:37Z
+06:39:00 VPS pipe retry 1/4 rc=255: Timeout, server 203.134.250.85 not responding. 
+06:39:46 ARCHIVED hx-s96: box 43 files sha256sum -c OK; VPS outputs+predictions 29 files sha256sum -c OK -> /root/primitives-evaluator/headext-20261102/train-hx-t15/hx-s96; weights queued
+06:41:53 POD: + grep -q SKIPPED_NONFINITE logs/train-hx-s97.log
+06:41:53 POD: HEADINIT_OK hx-s97 base17=10a35c7911392632d212b188849fae39fd9fe583252eb07ba27873d0c17106c5 head25=0a85cc3bb576cb6a9ead6902284be5908b1866e6dfb1d7ba05d741ddcfa5d429
+06:47:10 POD: VOL_OK_hx-s97 43 files 53e0680d65decfc0c36291635ba4d3896f3c5ae32bd142f840ff593de48e7136
+06:47:10 POD: RUN_DONE_hx-s97 2026-11-21T06:46:46Z
+06:47:10 POD: RUN_START hx-s98 2026-11-21T06:46:46Z
+06:48:08 VPS pipe retry 1/4 rc=255: Timeout, server 203.134.250.85 not responding. 
+06:49:31 ARCHIVED hx-s97: box 43 files sha256sum -c OK; VPS outputs+predictions 29 files sha256sum -c OK -> /root/primitives-evaluator/headext-20261102/train-hx-t15/hx-s97; weights queued
+06:55:26 POD: + grep -q SKIPPED_NONFINITE logs/train-hx-s98.log
+06:55:26 POD: HEADINIT_OK hx-s98 base17=10a35c7911392632d212b188849fae39fd9fe583252eb07ba27873d0c17106c5 head25=0a85cc3bb576cb6a9ead6902284be5908b1866e6dfb1d7ba05d741ddcfa5d429
+06:57:01 VPS pipe retry 2/4 rc=255: Timeout, server 203.134.250.85 not responding. 
+06:59:07 POD: VOL_OK_hx-s98 43 files 5c9359dde4952db0913615aeab48c2295ece710b61edc7d67d69d5e011e9a6b2
+06:59:07 POD: RUN_DONE_hx-s98 2026-11-21T06:58:51Z
+06:59:07 POD: RUN_START hx-s99 2026-11-21T06:58:51Z
+07:01:25 ARCHIVED hx-s98: box 43 files sha256sum -c OK; VPS outputs+predictions 29 files sha256sum -c OK -> /root/primitives-evaluator/headext-20261102/train-hx-t15/hx-s98; weights queued
+07:03:11 WEIGHTS hx-s96 -> VPS sha256sum -c OK
+07:06:41 POD: + grep -q SKIPPED_NONFINITE logs/train-hx-s99.log
+07:06:41 POD: HEADINIT_OK hx-s99 base17=10a35c7911392632d212b188849fae39fd9fe583252eb07ba27873d0c17106c5 head25=0a85cc3bb576cb6a9ead6902284be5908b1866e6dfb1d7ba05d741ddcfa5d429
+07:11:38 POD: VOL_OK_hx-s99 43 files e505ca82977f13ad6606e2c426f54e753b6083499eafb216bc6b999255a4f7f1
+07:11:38 POD: RUN_DONE_hx-s99 2026-11-21T07:11:17Z
+07:11:38 POD: PIPELINE_DONE 2026-11-21T07:11:17Z
+07:11:38 POD: PIPE_EXIT 0
+07:11:54 VPS pipe retry 1/4 rc=255: Timeout, server 203.134.250.85 not responding. 
+07:15:11 VPS pipe retry 2/4 rc=255: Timeout, server 203.134.250.85 not responding. 
+07:15:12 FAILURE: RuntimeError('cmd failed rc=2: ssh -i /home/box/.ssh/runpod_airp -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -o LogLevel=ERROR -o ServerAliveInterval=30 -o ConnectTimeout=20 - :: tar: Unexpected EOF in archive\ntar: Unexpected EOF in archive\ntar: Error is not recoverable: exiting now\n')
+07:18:46 ARCHIVED hx-s99: box 43 files sha256sum -c OK; VPS outputs+predictions 29 files sha256sum -c OK -> /root/primitives-evaluator/headext-20261102/train-hx-t15/hx-s99; weights queued
+07:18:57 ARCHIVE logs: OK
+07:22:01 TERMINATED ah0hs2laiaw99b pod_list_after(gql)=[] rest=([], 'unreachable:URLError: <urlopen error [SSL: UNEXPECTED_EOF_WHILE_READING] EOF occurred in violation of protocol (_ssl.c:1029)>') minutes=69.8 balance 34.508->33.451 cost=$1.057 terminate_after_failure=3.8min
+07:23:46 VPS pipe retry 3/4 rc=255: Timeout, server 203.134.250.85 not responding. 
+07:32:29 VPS pipe retry 4/4 rc=255: Timeout, server 203.134.250.85 not responding. 
+07:41:40 VPS pipe retry 5/4 rc=255: Timeout, server 203.134.250.85 not responding. 
+07:49:40 weights push hx-s97 failed: RuntimeError('VPS pipe failed 5x: cd /workspace/headext-train/hx-t15/out/hx-s97 && tar cf - keep SHA256SUMS.weights | ssh -p 2060 -i /home/box/.ssh/nepal_')
+07:49:40 WEIGHTS hx-s97 -> VPS sha256sum -c FAILED
+07:54:39 VPS pipe retry 1/4 rc=255: Timeout, server 203.134.250.85 not responding. 
+08:03:51 VPS pipe retry 2/4 rc=255: Timeout, server 203.134.250.85 not responding. 
+08:11:35 VPS pipe retry 3/4 rc=255: Timeout, server 203.134.250.85 not responding. 
+08:19:14 VPS pipe retry 4/4 rc=255: Timeout, server 203.134.250.85 not responding. 
+08:28:04 VPS pipe retry 5/4 rc=255: Timeout, server 203.134.250.85 not responding. 
+08:36:04 weights push hx-s98 failed: RuntimeError('VPS pipe failed 5x: cd /workspace/headext-train/hx-t15/out/hx-s98 && tar cf - keep SHA256SUMS.weights | ssh -p 2060 -i /home/box/.ssh/nepal_')
+08:36:04 WEIGHTS hx-s98 -> VPS sha256sum -c FAILED
+08:40:14 VPS pipe retry 1/4 rc=255: Timeout, server 203.134.250.85 not responding. 
+08:44:59 WEIGHTS hx-s99 -> VPS sha256sum -c OK
