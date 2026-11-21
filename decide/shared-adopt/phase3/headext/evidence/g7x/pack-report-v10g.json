@@ -1,0 +1,121 @@
+{
+ "stopped": false,
+ "n_source": 104,
+ "n_valid": 94,
+ "n_dropped": 10,
+ "pair_units": [
+  "hx-cr-direct-vs-fiction-200",
+  "hx-cr-direct-vs-fiction-201",
+  "hx-cr-direct-vs-fiction-202",
+  "hx-cr-direct-vs-fiction-203",
+  "hx-cr-direct-vs-fiction-204",
+  "hx-cr-direct-vs-fiction-205",
+  "hx-cr-direct-vs-fiction-206",
+  "hx-cr-direct-vs-fiction-208",
+  "hx-cr-direct-vs-fiction-211",
+  "hx-cr-direct-vs-fiction-212",
+  "hx-cr-direct-vs-fiction-214",
+  "hx-cr-direct-vs-fiction-215",
+  "hx-cr-direct-vs-fiction-216",
+  "hx-cr-direct-vs-fiction-217",
+  "hx-cr-direct-vs-fiction-218",
+  "hx-cr-direct-vs-fiction-219",
+  "hx-cr-direct-vs-fiction-220",
+  "hx-cr-direct-vs-fiction-221",
+  "hx-cr-direct-vs-fiction-223",
+  "hx-cr-direct-vs-fiction-225",
+  "hx-cr-direct-vs-fiction-226",
+  "hx-cr-direct-vs-fiction-229",
+  "hx-cr-direct-vs-fiction-231",
+  "hx-cr-direct-vs-fiction-232"
+ ],
+ "single_ids": [
+  "hx-cr-resource-in-fiction-200",
+  "hx-cr-resource-in-fiction-201",
+  "hx-cr-resource-in-fiction-202",
+  "hx-cr-resource-in-fiction-203",
+  "hx-cr-resource-in-fiction-204",
+  "hx-cr-resource-in-fiction-205",
+  "hx-cr-resource-in-fiction-206",
+  "hx-cr-resource-in-fiction-207",
+  "hx-cr-resource-in-fiction-208",
+  "hx-cr-resource-in-fiction-209",
+  "hx-cr-resource-in-fiction-210",
+  "hx-cr-resource-in-fiction-211",
+  "hx-cr-resource-in-fiction-212",
+  "hx-cr-resource-in-fiction-213",
+  "hx-cr-resource-in-fiction-214",
+  "hx-cr-resource-in-fiction-215",
+  "hx-cr-resource-in-fiction-216",
+  "hx-cr-resource-in-fiction-217",
+  "hx-cr-resource-in-fiction-218",
+  "hx-cr-resource-in-fiction-219",
+  "hx-cr-resource-in-fiction-220",
+  "hx-cr-resource-in-fiction-221",
+  "hx-cr-resource-in-fiction-222",
+  "hx-cr-resource-in-fiction-223"
+ ],
+ "pair_surplus_units": [
+  "hx-cr-direct-vs-fiction-233",
+  "hx-cr-direct-vs-fiction-234",
+  "hx-cr-direct-vs-fiction-235"
+ ],
+ "single_surplus_ids": [
+  "hx-cr-resource-in-fiction-224",
+  "hx-cr-resource-in-fiction-225",
+  "hx-cr-resource-in-fiction-226",
+  "hx-cr-resource-in-fiction-227",
+  "hx-cr-resource-in-fiction-229",
+  "hx-cr-resource-in-fiction-230",
+  "hx-cr-resource-in-fiction-231"
+ ],
+ "pair_cell_mix": {
+  "clinical/short": 6,
+  "colloquial/short": 6,
+  "colloquial/medium": 12
+ },
+ "single_cell_mix": {
+  "clinical/short": 6,
+  "clinical/medium": 6,
+  "colloquial/short": 6,
+  "colloquial/medium": 6
+ },
+ "n_pair_complete": 27,
+ "n_single": 31,
+ "n_unpaired_pair": 9,
+ "selection": "generation-order (sample id); surplus dropped; no selection by content",
+ "g7_filter_rates": {
+  "n_set": 96,
+  "validation_collisions": {
+   "n": 7,
+   "rate": "7/96",
+   "reason": "V-g:inset"
+  },
+  "data_v9_collisions": {
+   "n": 3,
+   "rate": "3/96",
+   "reason": "V-g:data-v9"
+  },
+  "n_dropped": 10,
+  "n_candidates": 86,
+  "source": "evidence/g7/filter-local.json (t241u G7 set)"
+ },
+ "sel_shas": {
+  "sel-train.jsonl": "5eeba601e6556ae395918f0768afa7d666acc48f53dcc3e2918a83fd2c52771e",
+  "sel-val.jsonl": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "reserve.jsonl": "72138049ea72063c1c46caf1af6d8a3a965630e4f3b1e754b07903392a0455db"
+ },
+ "build": {
+  "n_train": 9355,
+  "n_val": 1884,
+  "n_added_train": 72,
+  "n_added_val": 0,
+  "train_sha256": "dd9f7841ef2576422db9941f5beb23f957f6b4147dbdee88c33f0a07b994a5a7",
+  "val_sha256": "cffe55215c18cfdd17c38f8ad2173869fe7ea06f2149b73b94b378add3a561a7",
+  "v10f_train_sha256": "fbeecc0f6326a2f5afed06aee85c10ed48ebe2334f354c2c26cc79b0aca0d4e8",
+  "v10f_val_sha256": "cffe55215c18cfdd17c38f8ad2173869fe7ea06f2149b73b94b378add3a561a7",
+  "spec_sha256": "cd08dd2d9ef0778af8a016ea464da07ff2aa05a9d21967cd15878a30a61ca4e2",
+  "added_pair_units": 24,
+  "added_single_rows": 24
+ }
+}

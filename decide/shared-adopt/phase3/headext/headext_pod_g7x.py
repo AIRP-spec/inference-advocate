@@ -58,7 +58,10 @@ def ledger_spent():
     tot = 0.0
     for line in vps(f"cat {LEDGER}").stdout.splitlines()[1:]:
         f = line.split("\t")
-        if len(f) > 8 and f[8] not in ("", "cost_usd"): tot += float(f[8])
+        if len(f) > 8 and f[8] not in ("", "cost_usd"):
+            if len(f) > 2 and f[2] == "network-volume-storage":
+                continue
+            tot += float(f[8])
     return tot
 def sha(p): return hashlib.sha256(open(p, "rb").read()).hexdigest()
 def ssh_base(ip, port):

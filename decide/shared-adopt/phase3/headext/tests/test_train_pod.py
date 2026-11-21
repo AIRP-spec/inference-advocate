@@ -48,7 +48,7 @@ def test_tracked_primitives_out_precheck_source():
     assert "ABORT: tracked primitives/out files still missing after checkout" in DRV
     # called from precheck, before a pod is created
     assert DRV.index("def ensure_tracked_primitives_out") < DRV.index("def precheck")
-    assert "out_files = ensure_tracked_primitives_out" in DRV[DRV.index("def precheck"):DRV.index("if pods or rpods")]
+    assert "out_files = ensure_tracked_primitives_out" in DRV[DRV.index("def precheck"):DRV.index("if pods:")]
 
 
 def test_ensure_tracked_primitives_out_restores_and_rejects_missing(tmp_path):

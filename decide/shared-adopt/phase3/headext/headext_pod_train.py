@@ -62,17 +62,20 @@ def status(msg): subprocess.run(["/workspace/xside/status.sh", msg], capture_out
 def precheck(signed, pack_sha):
     out_files = ensure_tracked_primitives_out(A.REPO_WT)
     pins = json.load(open(A.PINS))
-    pods = A.gq("query { myself { pods { id name } } }")["myself"]["pods"]; rpods = A.rest_pods()
+    pods = A.gq("query { myself { pods { id name } } }")["myself"]["pods"]; rpods, rest_st = A.rest_pods()
     box = int(A.sh("df -BG --output=avail /workspace | tail -1").stdout.strip().rstrip("G"))
     vfree = int(A.vps("df -BG --output=avail / | tail -1").stdout.strip().rstrip("G"))
     b = A.balance(); cum = A.SPENT_BEFORE_LEDGER + A.ledger_spent()
     anc = A.sh(f"cd {A.REPO_WT} && git fetch -q origin plan/phase3-recipe-stability && git merge-base --is-ancestor {signed} origin/plan/phase3-recipe-stability", check=False).returncode == 0
     clean = A.sh(f"cd {A.REPO_WT} && git diff --quiet {signed} -- {A.REL}", check=False).returncode == 0
     files_ok = {f: A.sha(os.path.join(HERE, f)) == s for f, s in pins["files"].items()}
-    log(f"PRECHECK (headroom): pods(gql)={len(pods)} pods(rest)={rpods} box_free={box}G vps_free={vfree}G balance=${b['clientBalance']:.2f} "
+    log(f"PRECHECK (headroom): pods(gql)={len(pods)} pods(rest)={rpods} rest_status={rest_st} box_free={box}G vps_free={vfree}G balance=${b['clientBalance']:.2f} "
         f"cumulative=${cum:.2f} +cap ${CAP_USD} -> ${cum + CAP_USD:.2f} (stop line ${STOP_LINE}) signed_on_remote={anc} code_clean={clean} "
         f"pins_ok={all(files_ok.values())} pack_sha_ok={pack_sha} tracked_out={len(out_files)}/{len(TRACKED_PRIMITIVES_OUT)}")
-    if pods or rpods: raise SystemExit("ABORT: a pod is already running")
+    if pods: raise SystemExit("ABORT: a pod is already running")
+    if rest_st == "ok" and rpods: raise SystemExit("ABORT: a pod is already running")
+    if rest_st != "ok":
+        log(f"NOTE: REST pods API unreachable ({rest_st}); proceeding on empty gql pod list only")
     if cum + CAP_USD > CEILING: raise SystemExit("ABORT: would pass the $100 GPU ceiling (R-3)")
     if cum + CAP_USD > STOP_LINE: log(f"NOTE ($85 line, R-3): cumulative ${cum:.2f} + cap ${CAP_USD} may pass $85 stop-and-report; pre-authorized through $100; continuing")
     if not anc or not clean: raise SystemExit("ABORT: signed commit not on remote or working tree differs")

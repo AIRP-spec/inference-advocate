@@ -52,18 +52,31 @@ def gq(*a):
             time.sleep(5)
 def balance(): return gq("query { myself { clientBalance currentSpendPerHr } }")["myself"]
 def ledger_spent():
+    """GPU cost sum only. Rows with gpu/type network-volume-storage are excluded (t243u R-1)."""
     tot = 0.0
     for line in vps(f"cat {LEDGER}").stdout.splitlines()[1:]:
         f = line.split("\t")
-        if len(f) > 8 and f[8] not in ("", "cost_usd"): tot += float(f[8])
+        if len(f) > 8 and f[8] not in ("", "cost_usd"):
+            if len(f) > 2 and f[2] == "network-volume-storage":
+                continue
+            tot += float(f[8])
     return tot
 def sha(p): return hashlib.sha256(open(p, "rb").read()).hexdigest()
 def ssh_base(ip, port):
     return ["ssh", "-i", KEY, "-o", "StrictHostKeyChecking=no", "-o", "UserKnownHostsFile=/dev/null", "-o", "LogLevel=ERROR",
             "-o", "ServerAliveInterval=30", "-o", "ConnectTimeout=20", "-p", str(port), f"root@{ip}"]
 def rest_pods():
-    req = urllib.request.Request("https://rest.runpod.io/v1/pods", headers={"Authorization": "Bearer " + rp.key(), "User-Agent": "Mozilla/5.0 airp-hx"})
-    return [p.get("id") for p in json.loads(urllib.request.urlopen(req, timeout=60).read())]
+    """Return (ids, status) where status is 'ok' or 'unreachable'."""
+    last = None
+    for i in range(6):
+        try:
+            req = urllib.request.Request("https://rest.runpod.io/v1/pods", headers={"Authorization": "Bearer " + rp.key(), "User-Agent": "Mozilla/5.0 airp-hx"})
+            ids = [p.get("id") for p in json.loads(urllib.request.urlopen(req, timeout=60).read())]
+            return ids, "ok"
+        except Exception as e:
+            last = f"{type(e).__name__}: {e}"
+            time.sleep(5)
+    return [], f"unreachable:{last}"
 
 
 def arch():

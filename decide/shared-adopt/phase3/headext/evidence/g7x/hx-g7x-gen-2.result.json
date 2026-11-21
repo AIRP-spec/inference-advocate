@@ -1,0 +1,64 @@
+{
+ "pod": "wp2m68s0ue0add",
+ "results": {
+  "generate": {
+   "phase": "g7x",
+   "n_jobs": 4,
+   "n_resumed": 0,
+   "n_jobs_written": 4,
+   "n_rows_written": 8,
+   "n_errors": 0,
+   "stop_reason": "complete",
+   "elapsed_seconds": 1.7,
+   "out_sha256": "3c74073a4ce099eac5e610b967ac7dc683f6b3f7c3f5cc782724a52f711a6f9b",
+   "error_ids": []
+  },
+  "items": {
+   "n_rows": 8,
+   "n_empty": 0,
+   "n_items": 8,
+   "items_sha256": "abbafb46a2a90a0f2c8e72941e74e7ae95554b5a5792e15cff5a1133a9caa3c4"
+  },
+  "label-seed-oss-36b-items-gen.jsonl": "complete",
+  "contradict-seed-oss-36b": {
+   "checker": "seed-oss-36b",
+   "prompt": "v4",
+   "n_rows": 8,
+   "n_todo": 8,
+   "n_written": 8,
+   "n_invalid": 0,
+   "n_error": 0,
+   "stop_reason": "complete",
+   "elapsed_seconds": 1.2,
+   "n_true": 0
+  },
+  "label-nemotron-3-super-items-gen.jsonl": "complete",
+  "contradict-nemotron-3-super": {
+   "checker": "nemotron-3-super",
+   "prompt": "v4",
+   "n_rows": 8,
+   "n_todo": 8,
+   "n_written": 8,
+   "n_invalid": 0,
+   "n_error": 0,
+   "stop_reason": "complete",
+   "elapsed_seconds": 0.7,
+   "n_true": 0
+  },
+  "checker_delete_rc": 0,
+  "archive_pre_terminate": [
+   12,
+   12
+  ]
+ },
+ "cost": 0.9632444360999983,
+ "bal0": 36.9334530424,
+ "bal1": 35.9702086063,
+ "pod_list_after": [],
+ "rest_pods_after": "rest unreachable:URLError: <urlopen error [SSL: UNEXPECTED_EOF_WHILE_READING] EOF occurred in violation of protocol (_ssl.c:1029)>",
+ "cumulative": 50.75099999999999,
+ "minutes": 21.173860184351604,
+ "signed": "23494c49cdcbd25b292f19122d5692c5edde037a",
+ "t0": 1795231766.2458074,
+ "t1": 1795233036.6774185
+}
