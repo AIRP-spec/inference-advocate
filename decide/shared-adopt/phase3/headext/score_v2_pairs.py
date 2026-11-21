@@ -54,8 +54,8 @@ def group_of(r):
     return r.get("contrastGroup") or r.get("kind") or r.get("family")
 
 
-def score_seed(preds, rows, spec, excluded):
-    ho = held_out_groups(spec)
+def score_seed(preds, rows, spec, excluded, held_out=None):
+    ho = held_out_groups(spec) if held_out is None else set(held_out)   # cycle 5: caller passes the v10h split-meta set
     res = {}
     for h in EXT_HEADS:
         pr = pairs_for(rows, spec, h)

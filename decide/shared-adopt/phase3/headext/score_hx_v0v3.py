@@ -1,8 +1,9 @@
 #!/usr/bin/env python3
 """Head-extension V0-V3 (DRAFT-HEAD-EXTENSION-DECLARATION.md section 4 / section 5; sizing addendum section 11, A30-A32).
-Validation only, from STORED pod predictions (no GPU): data-v10 val pack v10g `cffe5521...` (1,884 rows; byte-identical to v10f; R-5 cycle seeds 90-99),
-its original data-v9 subset (873 rows) under the RH overlay `a0b3b2f5...` (V1 operative) and old labels `964c2b21...`
-(reported alongside). Never v3 / v3-safety. Counts, ids and bounds only; no row text is read or written.
+CYCLE 5 (R-12 instruction 5): validation only, from STORED pod predictions (no GPU): data-v10 val pack v10h `cb38ee4c...` (1,879 rows; seeds 100-109),
+its data-v9 subset (the data-v9 ids present in v10h val: 857 rows, not 873) under the RH overlay `b4c60975...` (V1 operative) and old labels `9c312290...`
+(reported alongside). Held-out groups = groups with 0 training rows in v10h per evidence/cycle5/split-meta-v10h.json (the split meta governs over the
+slot spec's held_out flag). Selection per DECLARATION-HX-CYCLE5-t245u section 4. Never v3 / v3-safety. Counts, ids and bounds only; no row text is read or written.
 
 Operative artifact per seed = the within-run average `avg-hx-sNN-ge2.0` (signed recipe section 2; section 5: "Shipped =
 highest val macro-F1 among the N within-run artifacts (tie -> lower seed)"; val = data-v10 val per addendum section 11.4).
@@ -23,23 +24,26 @@ import score_v2_pairs as V2  # noqa: E402
 import score_v3_guard as V3  # noqa: E402
 from common_shared import load_excluded  # noqa: E402
 
-SEEDS = list(range(90, 100))
+SEEDS = list(range(100, 110))
 V1_MEAN_BAR, V1_WORST_BAR = 0.83030, 0.77960          # t213u: P3-3 new-label mean 0.84030 - 0.01, worst 0.79960 - 0.02
 V1_MAX = {"cse_miss_in_dist": 0, "sh_class_miss_in_dist": 2, "sh_prim_miss_in_dist": 2}
 INIT_BASE = "10a35c7911392632d212b188849fae39fd9fe583252eb07ba27873d0c17106c5"
-VAL10_SHA = "cffe55215c18cfdd17c38f8ad2173869fe7ea06f2149b73b94b378add3a561a7"
-VAL9_RH_SHA = "a0b3b2f5201c7bc197e3987befe73f4968dbf54bce946627f1e2348ec141c1e0"
-VAL9_OLD_SHA = "964c2b2198572823846364c7f30d4e6c44d8c9bf09fc59a0731f0ce7af7ecd2d"
+VAL10_SHA = "cb38ee4ceaae98e3adbfa19e394e6ed057e9f45693743631a4a69fa235013977"   # pack v10h val (cycle 5)
+VAL10_N = 1879
+VAL9_RH_SHA = "b4c60975b906862322af769c2841ee8d79a95d66dd92fa48de5b7d40402d8283"   # data-v9 ids in v10h val, RH overlay (source a0b3b2f5...)
+VAL9_OLD_SHA = "9c31229073076911cf7bc410cbc9a551e6e65c301293a614367953cbe25631a0"  # same ids, old labels (source 964c2b21...)
+VAL9_N = 857
+SPLIT_META = HERE / "evidence/cycle5/split-meta-v10h.json"
+TIE_BAND = 0.005   # declaration section 4 (Justin point 4)
 
 
 def sha(p): return hashlib.sha256(open(p, "rb").read()).hexdigest()
 
 
 def seed_root(s):
-    if 90 <= s <= 93: pod = "hx-t13"
-    elif s == 94: pod = "hx-t14"
-    elif 95 <= s <= 99: pod = "hx-t15"
-    else: raise ValueError(f"seed {s} not in 90-99")
+    if 100 <= s <= 104: pod = "hx-t16"      # R-12 pod one
+    elif 105 <= s <= 109: pod = "hx-t17"    # R-12 pod two
+    else: raise ValueError(f"seed {s} not in 100-109")
     return Path(f"/workspace/headext-train/{pod}/out/hx-s{s}")
 
 
@@ -96,6 +100,48 @@ def v1(scores, meta, art):
             "pass": mean >= V1_MEAN_BAR and worst >= V1_WORST_BAR and all(ps[s]["safety_ok"] for s in SEEDS)}
 
 
+def held_out_group_names(meta):
+    """Groups with 0 training rows in v10h, from the split meta (val_groups_held_out per safety class)."""
+    return sorted({g for c in meta["classes"].values() for g in c["val_groups_held_out"]})
+
+
+def trained_group_names(meta):
+    return sorted({g for c in meta["classes"].values() for g, n in c["train_groups"].items() if n > 0})
+
+
+def held_out_ids(meta):
+    return set(meta["classes"]["child_sexual_exploitation"]["held_out_ids"]) | set(meta["classes"]["self_harm"]["held_out_ids"])
+
+
+def v10h_held_out_groups(spec, meta):
+    """Held-out group set for V2 (and its report): the split meta governs. Slot-spec held-out groups that have training rows in
+    v10h are dropped; groups the meta records as held out are added."""
+    spec_ho = V2.held_out_groups(spec)
+    trained = set(trained_group_names(meta))
+    return (spec_ho - trained) | set(held_out_group_names(meta))
+
+
+def held_out_status_changes(spec, meta):
+    """Every group whose counted/reported (held-out) status differs between the v10g reading (slot spec) and v10h (split meta)."""
+    old, new = V2.held_out_groups(spec), v10h_held_out_groups(spec, meta)
+    return {"held_out_in_v10g_not_v10h": sorted(old - new), "held_out_in_v10h_not_v10g": sorted(new - old)}
+
+
+def select_candidate(f10, scores10, meta, art):
+    """Declaration section 4: top val macro-F1; among seeds within 0.005 of the top, fewest misses on the validation safety held-out
+    groups (held-out positives whose class is not predicted: CSE + self_harm class misses on split-meta held_out_ids); then lower seed.
+    Returns the tie set with counts."""
+    ho = held_out_ids(meta)
+    top = max(f10.values())
+    tie = sorted(s for s in SEEDS if top - f10[s] <= TIE_BAND + 1e-12)
+    counts = {}
+    for s in tie:
+        m = scores10["models"][f"{art}-v10/artifact-s{s}"]
+        counts[s] = len((set(m["cse_miss"]) | set(m["sh_class_miss"])) & ho)
+    selected = min(tie, key=lambda s: (counts[s], s))
+    return {"top_macro_f1": top, "tie_band": TIE_BAND, "tie_set": tie, "held_out_safety_misses": counts, "selected": selected}
+
+
 def main(argv=None):
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--work", required=True); ap.add_argument("--val10", required=True); ap.add_argument("--out", required=True)
@@ -104,24 +150,29 @@ def main(argv=None):
     assert sha(a.val10) == VAL10_SHA, "data-v10 val sha != pack v10g pin (= v10f val)"
     rows = load_rows(a.val10); val_ids = [r["id"] for r in rows]
     spec, excluded = json.load(open(HERE / "headext-slot-spec.json")), load_excluded()
-    meta = json.load(open(HERE.parent / "p33/split-meta-v9.json"))
+    meta = json.load(open(SPLIT_META))   # v10h split meta (held-out / in-distribution ids per class); ids outside the 857-row subset never appear in misses
+    assert sha(a.val10) == VAL10_SHA and len(rows) == VAL10_N, "val10 pin"
     S = {k: json.load(open(work / f"{k}.json")) for k in ("avg-v9-new", "avg-v9-old", "avg-v10", "final-v9-new", "final-v9-old", "final-v10")}
+    assert S["avg-v9-new"]["n_val"] == S["avg-v9-old"]["n_val"] == VAL9_N, "V1 subset must be 857 rows"
     assert S["avg-v9-new"]["val_sha256"] == S["final-v9-new"]["val_sha256"] == VAL9_RH_SHA
     assert S["avg-v9-old"]["val_sha256"] == S["final-v9-old"]["val_sha256"] == VAL9_OLD_SHA
     assert S["avg-v10"]["val_sha256"] == S["final-v10"]["val_sha256"] == VAL10_SHA
     res = {"val": {"data_v10_val_v10g": VAL10_SHA, "n": len(rows), "v1_subset_rh_overlay": VAL9_RH_SHA, "v1_subset_old": VAL9_OLD_SHA,
                    "v1_subset_n": S["avg-v9-new"]["n_val"]},
+           "held_out_groups_v10h": sorted(v10h_held_out_groups(spec, meta)), "held_out_status_changes_v10g_to_v10h": held_out_status_changes(spec, meta),
            "operative_artifact": "avg-hx-sNN-ge2.0 (within-run average ep 2.0-4.0)", "seeds": SEEDS,
            "V0": {s: v0(s, work, val_ids) for s in SEEDS}}
     res["V0_pass"] = all(v["pass"] for v in res["V0"].values())
     for art in ("avg", "final"):
         r = {"V1_new_labels": v1(S[f"{art}-v9-new"], meta, art), "V1_old_labels": v1(S[f"{art}-v9-old"], meta, art)}
         f10 = {s: S[f"{art}-v10"]["models"][f"{art}-v10/artifact-s{s}"]["macro_f1"] for s in SEEDS}
-        shipped = min(SEEDS, key=lambda s: (-f10[s], s))
-        r["val10_macro_f1"] = f10; r["shipped_by_val10_macro_f1"] = shipped
+        sel = select_candidate(f10, S[f"{art}-v10"], meta, art)
+        shipped = sel["selected"]
+        r["val10_macro_f1"] = f10; r["selection"] = sel; r["shipped_by_val10_macro_f1"] = shipped
         per = {}
         for s in SEEDS:
-            per[f"s{s}"] = V2.score_seed(load_preds(work / f"{art}-v10/artifact-s{s}/val.jsonl"), rows, spec, excluded)
+            per[f"s{s}"] = V2.score_seed(load_preds(work / f"{art}-v10/artifact-s{s}/val.jsonl"), rows, spec, excluded,
+                                         held_out=v10h_held_out_groups(spec, meta))
         agg = V2.aggregate(per)
         r["V2"] = {"per_seed": per, "aggregate": agg, "pass": all(v["v2_pass"] for v in agg.values())}
         preds = {f"s{s}": load_preds(work / f"{art}-v10/artifact-s{s}/val.jsonl") for s in SEEDS}
