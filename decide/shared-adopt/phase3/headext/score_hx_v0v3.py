@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """Head-extension V0-V3 (DRAFT-HEAD-EXTENSION-DECLARATION.md section 4 / section 5; sizing addendum section 11, A30-A32).
-Validation only, from STORED pod predictions (no GPU): data-v10 val pack v10f `cffe5521...` (1,884 rows; t237u/t238u adopt),
+Validation only, from STORED pod predictions (no GPU): data-v10 val pack v10g `cffe5521...` (1,884 rows; byte-identical to v10f; R-5 cycle seeds 90-99),
 its original data-v9 subset (873 rows) under the RH overlay `a0b3b2f5...` (V1 operative) and old labels `964c2b21...`
 (reported alongside). Never v3 / v3-safety. Counts, ids and bounds only; no row text is read or written.
 
@@ -23,7 +23,7 @@ import score_v2_pairs as V2  # noqa: E402
 import score_v3_guard as V3  # noqa: E402
 from common_shared import load_excluded  # noqa: E402
 
-SEEDS = list(range(80, 90))
+SEEDS = list(range(90, 100))
 V1_MEAN_BAR, V1_WORST_BAR = 0.83030, 0.77960          # t213u: P3-3 new-label mean 0.84030 - 0.01, worst 0.79960 - 0.02
 V1_MAX = {"cse_miss_in_dist": 0, "sh_class_miss_in_dist": 2, "sh_prim_miss_in_dist": 2}
 INIT_BASE = "10a35c7911392632d212b188849fae39fd9fe583252eb07ba27873d0c17106c5"
@@ -36,10 +36,10 @@ def sha(p): return hashlib.sha256(open(p, "rb").read()).hexdigest()
 
 
 def seed_root(s):
-    if 80 <= s <= 84: pod = "hx-t10"
-    elif 85 <= s <= 86: pod = "hx-t11"
-    elif 87 <= s <= 89: pod = "hx-t12"
-    else: raise ValueError(f"seed {s} not in 80-89")
+    if 90 <= s <= 93: pod = "hx-t13"
+    elif s == 94: pod = "hx-t14"
+    elif 95 <= s <= 99: pod = "hx-t15"
+    else: raise ValueError(f"seed {s} not in 90-99")
     return Path(f"/workspace/headext-train/{pod}/out/hx-s{s}")
 
 
@@ -101,7 +101,7 @@ def main(argv=None):
     ap.add_argument("--work", required=True); ap.add_argument("--val10", required=True); ap.add_argument("--out", required=True)
     a = ap.parse_args(argv)
     work = Path(a.work)
-    assert sha(a.val10) == VAL10_SHA, "data-v10 val sha != pack v10f pin"
+    assert sha(a.val10) == VAL10_SHA, "data-v10 val sha != pack v10g pin (= v10f val)"
     rows = load_rows(a.val10); val_ids = [r["id"] for r in rows]
     spec, excluded = json.load(open(HERE / "headext-slot-spec.json")), load_excluded()
     meta = json.load(open(HERE.parent / "p33/split-meta-v9.json"))
@@ -109,7 +109,7 @@ def main(argv=None):
     assert S["avg-v9-new"]["val_sha256"] == S["final-v9-new"]["val_sha256"] == VAL9_RH_SHA
     assert S["avg-v9-old"]["val_sha256"] == S["final-v9-old"]["val_sha256"] == VAL9_OLD_SHA
     assert S["avg-v10"]["val_sha256"] == S["final-v10"]["val_sha256"] == VAL10_SHA
-    res = {"val": {"data_v10_val_v10f": VAL10_SHA, "n": len(rows), "v1_subset_rh_overlay": VAL9_RH_SHA, "v1_subset_old": VAL9_OLD_SHA,
+    res = {"val": {"data_v10_val_v10g": VAL10_SHA, "n": len(rows), "v1_subset_rh_overlay": VAL9_RH_SHA, "v1_subset_old": VAL9_OLD_SHA,
                    "v1_subset_n": S["avg-v9-new"]["n_val"]},
            "operative_artifact": "avg-hx-sNN-ge2.0 (within-run average ep 2.0-4.0)", "seeds": SEEDS,
            "V0": {s: v0(s, work, val_ids) for s in SEEDS}}
