@@ -90,3 +90,35 @@ def test_ensure_tracked_primitives_out_restores_and_rejects_missing(tmp_path):
 if __name__ == "__main__":
     fs = [test_recipe_flags, test_average_window_and_headinit, test_validation_only_no_scoring, test_caps_and_gpu, test_a30_eager_smoke_and_skip_guard, test_tracked_primitives_out_precheck_source]
     for f in fs: f(); print("PASS", f.__name__)
+
+
+def test_r5_vol_prune_and_free_space_refusal(tmp_path):
+    """R-5: deletion list is validated, each entry du -sh + rm -rf + logged; pipeline refused unless >=4 GB/seed and >=20 GB free."""
+    import sys
+    sys.path.insert(0, str(H))
+    import pytest
+    import headext_pod_train as tr
+    # refusal rule
+    assert tr.vol_required_gb(1) == 20 and tr.vol_required_gb(5) == 20 and tr.vol_required_gb(7) == 28
+    assert not tr.vol_free_ok(19, 1) and tr.vol_free_ok(20, 1) and not tr.vol_free_ok(19, 5) and not tr.vol_free_ok(27, 7)
+    # list validation: only /vol/<pod>/hx-s<NN>
+    good = tmp_path / "good.txt"; good.write_text("# c\n/vol/hx-t5/hx-s60\n\n/vol/hx-t13/hx-s94\n")
+    assert tr.parse_delete_list(str(good)) == ["/vol/hx-t5/hx-s60", "/vol/hx-t13/hx-s94"]
+    for bad in ("/vol", "/vol/hx-t5", "/vol/hx-t5/hx-s60/keep", "/vol/../root/hx-s60", "/vol/hx-t5/*", "/root/hx-t5/hx-s60"):
+        f = tmp_path / "bad.txt"; f.write_text(bad + "\n")
+        with pytest.raises(SystemExit): tr.parse_delete_list(str(f))
+    script = tr.vol_prep_script(["/vol/hx-t5/hx-s60"], 1)
+    assert "du -sh" in script and "rm -rf" in script and "VOL_DEL " in script and "VOL_LOW_STOP" in script and "-lt 20" in script
+    assert script.index("mountpoint -q /vol") < script.index("rm -rf") < script.index("VOL_LOW_STOP")
+    # the driver raises into the normal terminate path when the prep script refuses, before the pipeline starts
+    assert DRV.index("vol_prep_script(del_entries") < DRV.index("PIPELINE STARTED") and "VOL_LOW_STOP / volume prep failed" in DRV
+    # behaviour of the generated shell on a fake mount: df reads 'free' via a stub
+    import subprocess
+    stub = tmp_path / "bin"; stub.mkdir()
+    (stub / "mountpoint").write_text("#!/bin/sh\nexit 0\n"); (stub / "df").write_text("#!/bin/sh\necho Avail\necho 12G\n")
+    for n in ("mountpoint", "df"): (stub / n).chmod(0o755)
+    r = subprocess.run(["bash", "-c", tr.vol_prep_script([], 1)], capture_output=True, text=True, env={"PATH": f"{stub}:/usr/bin:/bin"})
+    assert r.returncode == 3 and "VOL_LOW_STOP 12" in r.stdout and "VOL_PREP_OK" not in r.stdout
+    (stub / "df").write_text("#!/bin/sh\necho Avail\necho 30G\n")
+    r = subprocess.run(["bash", "-c", tr.vol_prep_script([], 5)], capture_output=True, text=True, env={"PATH": f"{stub}:/usr/bin:/bin"})
+    assert r.returncode == 0 and "VOL_PREP_OK" in r.stdout

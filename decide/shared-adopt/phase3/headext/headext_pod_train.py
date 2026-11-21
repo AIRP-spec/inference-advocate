@@ -51,6 +51,47 @@ def ensure_tracked_primitives_out(repo_wt=None):
 
 
 
+# R-5 (2026-11-21): the network volume jq8pseh4f0 filled up (seed 94 lost to "Disk quota exceeded"). Box-side driver
+# prunes a supplied deletion list on the volume inside the pod and refuses to start unless free space is enough.
+import re as _re
+VOL_DELETE_RE = _re.compile(r"^/vol/hx-t\d+/hx-s\d\d$")
+VOL_MIN_TOTAL_GB, VOL_MIN_PER_SEED_GB = 20, 4
+
+
+def parse_delete_list(path):
+    """One /vol/<pod>/hx-s<NN> per line (blank lines and #-comments ignored). Anything else is refused."""
+    out = []
+    for ln in open(path).read().splitlines():
+        ln = ln.split("#")[0].strip()
+        if not ln: continue
+        if not VOL_DELETE_RE.match(ln): raise SystemExit(f"ABORT: deletion entry not of the form /vol/<pod>/hx-s<NN>: {ln!r}")
+        out.append(ln)
+    return out
+
+
+def vol_required_gb(n_seeds):
+    return max(VOL_MIN_TOTAL_GB, VOL_MIN_PER_SEED_GB * n_seeds)
+
+
+def vol_free_ok(free_gb, n_seeds):
+    """True when the volume has >= 4 GB per seed and >= 20 GB in total free; otherwise the pipeline must not start."""
+    return free_gb >= vol_required_gb(n_seeds)
+
+
+def vol_prep_script(entries, n_seeds, mount=VOL_MOUNT):
+    """Shell run in the pod after `mountpoint -q /vol` and before the pipeline: (a) du -sh + rm -rf + log each entry,
+    (b) df -BG avail; print VOL_LOW_STOP <free> and exit 3 unless vol_free_ok."""
+    need = vol_required_gb(n_seeds)
+    lines = [f"mountpoint -q {mount} || {{ echo VOL_NOT_MOUNTED; exit 4; }}",
+             f"echo VOL_FREE_BEFORE $(df -BG --output=avail {mount} | tail -1 | tr -dc 0-9)"]
+    for e in entries:
+        q = shlex.quote(e)
+        lines.append(f"if [ -d {q} ]; then sz=$(du -sh {q} | cut -f1); rm -rf {q}; echo \"VOL_DEL {e} $sz\"; else echo \"VOL_DEL_ABSENT {e}\"; fi")
+    lines += ["sync", f"free=$(df -BG --output=avail {mount} | tail -1 | tr -dc 0-9)", 'echo VOL_FREE_AFTER $free',
+              f"if [ \"$free\" -lt {need} ]; then echo VOL_LOW_STOP $free; exit 3; fi", "echo VOL_PREP_OK"]
+    return "\n".join(lines)
+
+
 def log(*a):
     s = time.strftime("%H:%M:%S") + " " + " ".join(str(x) for x in a)
     print(s, flush=True); LOG.write(s + "\n"); LOG.flush()
@@ -127,6 +168,7 @@ def main():
                     "artifacts + MANIFEST.sha256 are written there by the pipeline as the seed finishes")
     ap.add_argument("--label", default="training pod", help="ledger description prefix")
     ap.add_argument("--cap-usd", type=float, default=None, help="override CAP_USD (short pod headroom); default module CAP_USD")
+    ap.add_argument("--delete-list", default=None, help="R-5: file of /vol/<pod>/hx-s<NN> entries to rm -rf inside the pod before the pipeline")
     ap.add_argument("--attach", action="store_true", help="re-attach to the running pod in state.json (driver restart): "
                     "no create, no upload, no launch; verify both watchdogs, then monitor / archive / terminate")
     ap.add_argument("--local-pull-test", help="box test of the per-seed archive path on a finished local work dir; no pod")
@@ -135,6 +177,7 @@ def main():
     if a.cap_usd is not None:
         if not (0.5 <= a.cap_usd <= CAP_USD): raise SystemExit(f"ABORT: --cap-usd {a.cap_usd} out of range")
         CAP_USD = float(a.cap_usd); log(f"CAP_USD override -> {CAP_USD}")
+    del_entries = parse_delete_list(a.delete_list) if a.delete_list else []
     PODW = a.local_pull_test or "/root/hx"
     NAME = a.name; ROOT = f"/workspace/headext-train/{NAME}"; OUT = f"{ROOT}/out"; VD = f"{A.VPSDIR}/train-{NAME}"
     os.makedirs(f"{OUT}/logs", exist_ok=True)
@@ -250,6 +293,12 @@ def main():
             if "wd_running" not in wd or "has_runpodctl" not in wd: raise RuntimeError("in-pod watchdog not running")
             A.sh(f"cat {shlex.quote(a.pack)} | " + " ".join(shlex.quote(x) for x in S) + " 'mkdir -p /root/hx && tar xzf - -C /root/hx'")
             log("PACK UPLOADED", A.sh(S + ["cd /root/hx && sha256sum -c --quiet PACK.sha256 && echo PACK_OK; sha256sum PACK.sha256"]).stdout.replace("\n", " "))
+            # R-5: volume prune (optional list) + free-space refusal, after the mount check and before the pipeline
+            prep = A.sh(S + [f"bash -s <<'PREP'\n{vol_prep_script(del_entries, len(seeds))}\nPREP"], check=False, timeout=1800)
+            res["vol_prep"] = [ln[:300] for ln in (prep.stdout or "").splitlines()]
+            for ln in res["vol_prep"]: log("VOLPREP:", ln)
+            if prep.returncode != 0 or "VOL_PREP_OK" not in (prep.stdout or ""):
+                raise RuntimeError(f"VOL_LOW_STOP / volume prep failed rc={prep.returncode}: {(prep.stdout or '')[-300:]!r}")
             # hx-t4: this ssh hung (pipeline ran); bounded now, then the pipeline is checked directly
             try:
                 A.sh(S[:1] + ["-n"] + S[1:] + [f"cd /root/hx && mountpoint -q {VOL_MOUNT} && mkdir -p {VOL_MOUNT}/{NAME} && setsid nohup sh -c 'SEEDS=\"{a.seeds}\" TRAIN_SHA={a.train_sha} VAL_SHA={a.val_sha} VOL={VOL_MOUNT}/{NAME} W=/root/hx bash pod_pipeline_hx.sh "

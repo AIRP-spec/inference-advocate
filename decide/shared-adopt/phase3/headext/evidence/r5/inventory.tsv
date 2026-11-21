@@ -1,0 +1,36 @@
+pod	seed	cycle	vol_dir	vps_archive_exists	fresh_check_utc	SHA256SUMS	SHA256SUMS.weights	est_size_mib	on_deletion_list
+hx-t5	hx-s60	1	/vol/hx-t5/hx-s60	yes	2026-11-21T05:26:51Z	OK(27)	OK(14)	1660	yes
+hx-t5	hx-s61	1	/vol/hx-t5/hx-s61	yes	2026-11-21T05:26:54Z	OK(27)	OK(14)	1660	yes
+hx-t5	hx-s62	1	/vol/hx-t5/hx-s62	yes	2026-11-21T05:26:57Z	OK(27)	OK(14)	1660	yes
+hx-t5	hx-s63	1	/vol/hx-t5/hx-s63	yes	2026-11-21T05:27:00Z	OK(27)	OK(14)	1660	yes
+hx-t5	hx-s64	1	/vol/hx-t5/hx-s64	yes	2026-11-21T05:27:02Z	OK(27)	OK(14)	1660	yes
+hx-t6	hx-s65	1	/vol/hx-t6/hx-s65	yes	2026-11-21T05:27:05Z	OK(27)	OK(14)	1660	yes
+hx-t6	hx-s66	1	/vol/hx-t6/hx-s66	yes	2026-11-21T05:27:08Z	OK(27)	OK(14)	1660	yes
+hx-t6	hx-s67	1	/vol/hx-t6/hx-s67	yes	2026-11-21T05:27:11Z	OK(27)	OK(14)	1660	yes
+hx-t6	hx-s68	1	/vol/hx-t6/hx-s68	yes	2026-11-21T05:27:14Z	OK(27)	OK(14)	1660	yes
+hx-t6	hx-s69	1	/vol/hx-t6/hx-s69	yes	2026-11-21T05:27:17Z	OK(27)	OK(14)	1660	yes
+hx-t7	hx-s70	2	/vol/hx-t7/hx-s70	yes	2026-11-21T05:27:20Z	OK(27)	OK(14)	1660	yes
+hx-t7	hx-s71	2	/vol/hx-t7/hx-s71	yes	2026-11-21T05:27:23Z	OK(27)	OK(14)	1660	yes
+hx-t7	hx-s72	2	/vol/hx-t7/hx-s72	yes	2026-11-21T05:27:26Z	OK(27)	OK(14)	1660	yes
+hx-t7	hx-s73	2	/vol/hx-t7/hx-s73	yes	2026-11-21T05:27:29Z	OK(27)	OK(14)	1660	yes
+hx-t7	hx-s74	2	/vol/hx-t7/hx-s74	yes	2026-11-21T05:27:31Z	OK(27)	OK(14)	1660	yes
+hx-t8	hx-s75	2	/vol/hx-t8/hx-s75	yes	2026-11-21T05:27:34Z	OK(27)	OK(14)	1660	yes
+hx-t8	hx-s76	2	/vol/hx-t8/hx-s76	yes	2026-11-21T05:27:37Z	OK(27)	OK(14)	1660	yes
+hx-t8	hx-s77	2	/vol/hx-t8/hx-s77	yes	2026-11-21T05:27:40Z	OK(27)	OK(14)	1660	yes
+hx-t8	hx-s78	2	/vol/hx-t8/hx-s78	yes	2026-11-21T05:27:43Z	OK(27)	OK(14)	1660	yes
+hx-t9	hx-s79	2	/vol/hx-t9/hx-s79	yes	2026-11-21T05:27:46Z	OK(27)	OK(14)	1660	yes
+hx-t10	hx-s80	3	/vol/hx-t10/hx-s80	yes	-	not_run(cycle not on list)	not_run	1661	no
+hx-t10	hx-s81	3	/vol/hx-t10/hx-s81	yes	-	not_run(cycle not on list)	not_run	1661	no
+hx-t10	hx-s82	3	/vol/hx-t10/hx-s82	yes	-	not_run(cycle not on list)	not_run	1661	no
+hx-t10	hx-s83	3	/vol/hx-t10/hx-s83	yes	-	not_run(cycle not on list)	not_run	1661	no
+hx-t10	hx-s84	3	/vol/hx-t10/hx-s84	yes	-	not_run(cycle not on list)	not_run	1661	no
+hx-t11	hx-s85	3	/vol/hx-t11/hx-s85	yes	-	not_run(cycle not on list)	not_run	1661	no
+hx-t11	hx-s86	3	/vol/hx-t11/hx-s86	yes	-	not_run(cycle not on list)	not_run	1661	no
+hx-t12	hx-s87	3	/vol/hx-t12/hx-s87	yes	-	not_run(cycle not on list)	not_run	1661	no
+hx-t12	hx-s88	3	/vol/hx-t12/hx-s88	yes	-	not_run(cycle not on list)	not_run	1661	no
+hx-t12	hx-s89	3	/vol/hx-t12/hx-s89	yes	-	not_run(cycle not on list)	not_run	1661	no
+hx-t13	hx-s90	4	/vol/hx-t13/hx-s90	yes	2026-11-21T05:27:49Z	OK(29)	OK(14)	1666	no
+hx-t13	hx-s91	4	/vol/hx-t13/hx-s91	yes	2026-11-21T05:27:52Z	OK(29)	OK(14)	1666	no
+hx-t13	hx-s92	4	/vol/hx-t13/hx-s92	yes	2026-11-21T05:27:55Z	OK(29)	OK(14)	1666	no
+hx-t13	hx-s93	4	/vol/hx-t13/hx-s93	yes	2026-11-21T05:27:58Z	OK(29)	OK(14)	1666	no
+hx-t13	hx-s94	partial	/vol/hx-t13/hx-s94	no (never VOL_OK, VOL_WRITE_FAILED)	-	-	-	partial(<=1666)	yes
