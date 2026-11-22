@@ -11,6 +11,7 @@ import argparse, hashlib, json, os, shlex, subprocess, sys, threading, time, url
 sys.path.insert(0, "/workspace/airp/decide/step4/scripts")
 import rp  # noqa: E402
 import headext_pod_a25 as A  # shared helpers (sh, vps, gq, balance, ledger_spent, ssh_base, rest_pods, sha)
+import pod_guard as PG  # R-16 item 3: driver-side hard cap + bounded subprocess runner
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 GPU = "NVIDIA GeForce RTX 4090"
@@ -22,6 +23,8 @@ CREATE_MUTATION = "podFindAndDeployOnDemand"   # t228u item 1: on-demand only, n
 STOP_LINE, CEILING = 85.0, 100.0       # R-3: stop-and-report $85, ceiling $100 GPU
 TRAIN_SHA = None; VAL_SHA = None
 CREATE_TRIES = 30       # one try a minute for up to 30 min (no pod, no bill while supply-constrained)
+PULL_MARGIN_S = 60        # R-16: pod->box->VPS pulls on the main thread never run past deadline - this
+GUARD = [None]            # the PodGuard thread (None for --local-pull-test)
 CLOSE_S = 8 * 60          # stop the pipeline this long before the deadline to archive the last seed and terminate
 
 # t238u: four tracked primitives/out files have been removed from the checkout by a host-side
@@ -130,12 +133,32 @@ def precheck(signed, pack_sha):
     return b["clientBalance"], cum
 
 
-def vps_pipe(cmd, **kw):
-    """box -> VPS tar pipe with retry: a transient 'server not responding' on the VPS failed hx-t5 (t228u) after 5 seeds."""
+def csh(cmd, check=True, timeout=600, final=False, **kw):
+    """R-16: bounded replacement for A.sh on the main thread. Total time incl. retries <= deadline - PULL_MARGIN_S (final=True: the
+    post-failure archive path, 300 s per call). Without a guard (--local-pull-test) falls back to a per-call timeout only."""
+    g = GUARD[0]
+    limit = None if (final or g is None) else g.deadline - PULL_MARGIN_S
+    return PG.run_capped(cmd, limit, per_call=min(timeout, 300) if final else timeout, check=check, **kw)
+
+
+def cvps(cmd, check=True, **kw): return csh(A.VPSH + [cmd], check=check, **kw)
+
+
+def vps_pipe(cmd, capped=True, **kw):
+    """box -> VPS tar pipe with retry: a transient 'server not responding' on the VPS failed hx-t5 (t228u) after 5 seeds.
+    capped=True (main thread, pull()): every attempt and backoff is bounded by the pod deadline (R-16; hx-t16 sat here for ~3 h).
+    capped=False: the background weights pusher, which is allowed to run after the pod is gone."""
+    g = GUARD[0]
     for i in range(5):
-        r = A.sh(cmd, check=False, **kw)
+        if capped:
+            if g is not None and g.remaining(PULL_MARGIN_S) <= 0: raise PG.CapExceeded(f"cap reached before VPS pipe attempt {i + 1}")
+            r = csh(cmd, check=False, timeout=kw.get("timeout", 900))
+        else: r = A.sh(cmd, check=False, **kw)
         if r.returncode == 0: return r
-        log(f"VPS pipe retry {i + 1}/4 rc={r.returncode}:", r.stderr[-160:].replace("\n", " ")); time.sleep(30 * 2 ** i)  # 30, 60, 120, 240 s backoff
+        log(f"VPS pipe retry {i + 1}/4 rc={r.returncode}:", r.stderr[-160:].replace("\n", " "))
+        back = 30 * 2 ** i
+        if capped and g is not None: back = min(back, max(0, g.remaining(PULL_MARGIN_S)))
+        time.sleep(back)  # 30, 60, 120, 240 s backoff
     raise RuntimeError(f"VPS pipe failed 5x: {cmd[:120]}")
 
 
@@ -224,6 +247,8 @@ def main():
         subprocess.Popen(["nohup", "python3", "/workspace/v3collect/watchdog.py", pid, str(deadline)],
                          stdout=open(f"{ROOT}/watchdog.log", "a"), stderr=subprocess.STDOUT, start_new_session=True)
         status(f"headext training {NAME} POD {pid} created ({GPU}, ${rate}/h, SECURE); seeds {a.seeds}; cap {cap_s/60:.0f} min / ${CAP_USD}; box watchdog started")
+    if pid != "local":   # R-16 item 3: driver-side hard cap, independent of the main thread (the box watchdog.py and in-pod wd.sh stay)
+        GUARD[0] = PG.PodGuard(pid, deadline, rp.terminate, rp.pods, log=log).start()
     res = {"seeds": {s: "not_started" for s in a.seeds.split()}}; t_fail = None
     pulled = set(); seeds = a.seeds.split()
     S = None
@@ -233,17 +258,17 @@ def main():
         d = f"{OUT}/{R}"; os.makedirs(d, exist_ok=True)
         paths = f"out/raw/{R} out/raw-avg/{R} out/avg-meta/avg-{R}-ge2.0.average-meta.json out/{R}.sha256 keep/{R}-final keep/avg-{R}-ge2.0 keep/{R}-final.sha256"
         logs = f"logs/train-{R}.log logs/training-meta-{R}.json logs/loss_curve-{R}.jsonl logs/infer-{R}.log logs/avg-{R}.log logs/infer-avg-{R}.log"
-        A.sh(" ".join(shlex.quote(x) for x in S) + f" 'cd {PODW} && tar cf - {paths} {logs}' | tar xf - -C {d}")
-        r1 = A.sh(f"cd {d} && sha256sum -c --quiet out/{R}.sha256 && cd keep && sha256sum -c --quiet {R}-final.sha256", check=False)
+        csh(" ".join(shlex.quote(x) for x in S) + f" 'cd {PODW} && tar cf - {paths} {logs}' | tar xf - -C {d}", timeout=900)
+        r1 = csh(f"cd {d} && sha256sum -c --quiet out/{R}.sha256 && cd keep && sha256sum -c --quiet {R}-final.sha256", check=False)
         if r1.returncode: raise RuntimeError(f"box sha256sum -c failed for {R}")
         files = sorted(os.path.relpath(os.path.join(dp, f), d) for dp, _, fs in os.walk(d) for f in fs if not f.startswith("SHA256SUMS"))
         small = [f for f in files if not f.startswith("keep/")]; big = [f for f in files if f.startswith("keep/")]
         open(f"{d}/SHA256SUMS", "w").write("".join(f"{A.sha(f'{d}/{f}')}  {f}\n" for f in small))
         open(f"{d}/SHA256SUMS.weights", "w").write("".join(f"{A.sha(f'{d}/{f}')}  {f}\n" for f in big))
-        A.vps(f"mkdir -p {VD}/{R}")
+        cvps(f"mkdir -p {VD}/{R}")
         # predictions, logs, meta, sha files -> VPS now (verified); weights (box-verified) -> VPS in the background queue
         vps_pipe(f"cd {d} && tar cf - --exclude=./keep . | " + " ".join(shlex.quote(x) for x in A.VPSH) + f" 'cd {VD}/{R} && tar xf -'")
-        r = A.vps(f"cd {VD}/{R} && sha256sum -c --quiet SHA256SUMS && echo ALLOK", check=False)
+        r = cvps(f"cd {VD}/{R} && sha256sum -c --quiet SHA256SUMS && echo ALLOK", check=False)
         if "ALLOK" not in r.stdout: raise RuntimeError(f"VPS sha256sum -c failed for {R}")
         log(f"ARCHIVED {R}: box {len(files)} files sha256sum -c OK; VPS outputs+predictions {len(small)} files sha256sum -c OK -> {VD}/{R}; weights queued")
         pulled.add(R); res["seeds"][R[4:]] = "done_archived"; WQ.append(R)
@@ -255,7 +280,7 @@ def main():
             if WQ:
                 R = WQ.pop(0); d = f"{OUT}/{R}"
                 try:
-                    vps_pipe(f"cd {d} && tar cf - keep SHA256SUMS.weights | " + " ".join(shlex.quote(x) for x in A.VPSH) + f" 'cd {VD}/{R} && tar xf -'", timeout=3600)
+                    vps_pipe(f"cd {d} && tar cf - keep SHA256SUMS.weights | " + " ".join(shlex.quote(x) for x in A.VPSH) + f" 'cd {VD}/{R} && tar xf -'", capped=False, timeout=3600)
                     r = A.vps(f"cd {VD}/{R} && sha256sum -c --quiet SHA256SUMS.weights && echo ALLOK", check=False)
                     WDONE[R] = "ALLOK" in r.stdout
                 except Exception as e: WDONE[R] = False; log(f"weights push {R} failed:", repr(e)[:200])
@@ -314,7 +339,8 @@ def main():
         seen = set()
         while True:
             time.sleep(30)
-            st = A.sh(S + ["grep -aE '^(RUN_START|RUN_DONE_|VOL_OK_|HEADINIT_OK|PIPELINE_DONE|PIPE_EXIT|PREPROCESS_DONE|ALL [0-9]+ PASS|ENCODER_ATTN|SMOKE_BF16_MIXED|\\[(train|val)\\])|STOP|FAIL|BAD|SKIPPED|skip nonfinite' /root/hx/pipe.log"], check=False).stdout
+            if GUARD[0] is not None and GUARD[0].gone_at: raise RuntimeError(f"pod {pid} gone (guard) before PIPELINE_DONE")
+            st = csh(S + ["grep -aE '^(RUN_START|RUN_DONE_|VOL_OK_|HEADINIT_OK|PIPELINE_DONE|PIPE_EXIT|PREPROCESS_DONE|ALL [0-9]+ PASS|ENCODER_ATTN|SMOKE_BF16_MIXED|\\[(train|val)\\])|STOP|FAIL|BAD|SKIPPED|skip nonfinite' /root/hx/pipe.log"], check=False, timeout=120).stdout
             for ln in st.splitlines():
                 if ln not in seen: seen.add(ln); log("POD:", ln[:300])
             for sd in seeds:
@@ -347,7 +373,7 @@ def main():
     finally:
         try:
             if S:
-                A.sh(" ".join(shlex.quote(x) for x in S) + f" 'cd /root/hx && tar cf - pipe.log logs/preprocess.log pre/preprocess-meta.json 2>/dev/null' | tar xf - -C {OUT}/logs", check=False, timeout=300)
+                csh(" ".join(shlex.quote(x) for x in S) + f" 'cd /root/hx && tar cf - pipe.log logs/preprocess.log pre/preprocess-meta.json 2>/dev/null' | tar xf - -C {OUT}/logs", check=False, timeout=300, final=True)
         except Exception as e: log("log pull failed:", repr(e)[:200])
         for sd in seeds:  # a seed that finished just before a failure: still try to archive it (time permitting)
             R = f"hx-s{sd}"
@@ -360,26 +386,30 @@ def main():
         try:
             files = sorted(os.path.relpath(os.path.join(dp, f), f"{OUT}/logs") for dp, _, fs in os.walk(f"{OUT}/logs") for f in fs if f != "SHA256SUMS")
             open(f"{OUT}/logs/SHA256SUMS", "w").write("".join(f"{A.sha(f'{OUT}/logs/{f}')}  {f}\n" for f in files))
-            A.vps(f"mkdir -p {VD}/logs"); A.sh(f"cd {OUT}/logs && tar cf - . | " + " ".join(shlex.quote(x) for x in A.VPSH) + f" 'cd {VD}/logs && tar xf -'")
-            r = A.vps(f"cd {VD}/logs && sha256sum -c --quiet SHA256SUMS && echo ALLOK", check=False); log("ARCHIVE logs:", "OK" if "ALLOK" in r.stdout else "FAILED")
+            cvps(f"mkdir -p {VD}/logs", final=True); csh(f"cd {OUT}/logs && tar cf - . | " + " ".join(shlex.quote(x) for x in A.VPSH) + f" 'cd {VD}/logs && tar xf -'", final=True)
+            r = cvps(f"cd {VD}/logs && sha256sum -c --quiet SHA256SUMS && echo ALLOK", check=False, final=True); log("ARCHIVE logs:", "OK" if "ALLOK" in r.stdout else "FAILED")
         except Exception as e: log("log archive failed:", repr(e)[:200])
         for i in range(5):
             try: rp.terminate(pid); break
-            except Exception as e: log("terminate retry", repr(e)[:200]); time.sleep(10)
+            except Exception as e:
+                if "POD_NOT_FOUND" in repr(e): log("terminate: pod already gone (POD_NOT_FOUND)"); break   # hx-t16: pod was gone ~2.5 h earlier
+                log("terminate retry", repr(e)[:200]); time.sleep(10)
         t1 = time.time(); time.sleep(25)
+        g = GUARD[0]; t_gone = (g.gone_at if g is not None and g.gone_at else None)
         allp = A.gq("query { myself { pods { id name } } }")["myself"]["pods"]
         try: rpods = A.rest_pods()
         except Exception as e: rpods = f"rest error {repr(e)[:100]}"
-        bal1 = A.balance()["clientBalance"]; cost = max(rate * (t1 - t0) / 3600, bal0 - bal1)
-        log(f"TERMINATED {pid} pod_list_after(gql)={allp} rest={rpods} minutes={(t1-t0)/60:.1f} balance {bal0:.3f}->{bal1:.3f} cost=${cost:.3f}"
+        bal1 = A.balance()["clientBalance"]; t_end = t_gone or t1   # R-16: bill to the moment the pod was seen gone, not to the driver's own wall clock (hx-t16: $3.752 vs $1.60 real)
+        cost = max(rate * (t_end - t0) / 3600, bal0 - bal1)
+        log(f"TERMINATED {pid} pod_list_after(gql)={allp} rest={rpods} minutes={(t_end-t0)/60:.1f} driver_minutes={(t1-t0)/60:.1f} balance {bal0:.3f}->{bal1:.3f} cost=${cost:.3f}"
             + (f" terminate_after_failure={(t1 - t_fail)/60:.1f}min" if t_fail else ""))
         row = "\t".join(str(x) for x in [NAME, pid, GPU, rate, time.strftime("%Y-%m-%dT%H:%M:%S%z", time.localtime(t0)),
             time.strftime("%Y-%m-%dT%H:%M:%S%z", time.localtime(t1)), f"{bal0:.3f}", f"{bal1:.3f}", f"{cost:.3f}",
             f"headext {a.label} (t228u, eager, vol {a.volume_id}) seeds {a.seeds} data-v10 25 heads; seeds_archived:{len(pulled)} failure:{bool(res.get('failure'))}"])
-        A.vps(f"echo {shlex.quote(row)} >> {A.LEDGER}")
+        cvps(f"echo {shlex.quote(row)} >> {A.LEDGER}", final=True)
         tot = A.SPENT_BEFORE_LEDGER + A.ledger_spent()
         out = {"pod": pid, "rate": rate, "cost": cost, "bal0": bal0, "bal1": bal1, "pod_list_after": allp, "rest_pods_after": rpods,
-               "cumulative": tot, "minutes": (t1 - t0) / 60, "signed": a.signed, "t0": t0, "t1": t1, **res}
+               "cumulative": tot, "minutes": (t_end - t0) / 60, "driver_minutes": (t1 - t0) / 60, "pod_gone_at": t_gone, "signed": a.signed, "t0": t0, "t1": t1, **res}
         json.dump(out, open(f"{ROOT}/result.json", "w"), indent=1, default=str)
         STOPW[0] = True; wt.join(timeout=3 * 3600)
         out["weights_vps_verified"] = WDONE; json.dump(out, open(f"{ROOT}/result.json", "w"), indent=1, default=str)

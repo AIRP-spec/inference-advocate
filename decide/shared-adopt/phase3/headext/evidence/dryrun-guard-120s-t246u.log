@@ -1,0 +1,15 @@
+[  110.1s] main thread: cap reached during sleep 3600
+[  120.0s] GUARD: hard deadline reached, terminating FAKEPOD
+[  120.0s] GUARD: pod FAKEPOD confirmed gone
+{
+ "main_raised_cap_at": 110.10227346420288,
+ "main": "CapExceeded",
+ "terminate_called": 120.0002269744873,
+ "pod_gone_at_s": 120.00023651123047,
+ "cap_s": 120.0,
+ "PASS": true
+}
+
+real	2m8.061s
+user	0m0.046s
+sys	0m0.020s

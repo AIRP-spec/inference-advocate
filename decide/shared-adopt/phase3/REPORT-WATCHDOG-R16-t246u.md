@@ -1,0 +1,28 @@
+# R-16 item 3: why hx-t16 ran "253 minutes" under a 105-minute cap, and the fix ($0, no pod)
+
+Evidence: `/workspace/headext-train/hx-t16/{driver.log,watchdog.log,state.json,result.json}` and `/workspace/headext-train-hx-t16.out` on the box, the Nepal VPS `SPEND-LEDGER.tsv` and `train-hx-t16/`. Log clocks are UTC (ledger rows say +0000).
+
+## Finding that changes the premise: the pod was NOT running 253 minutes
+- Pod created 21:33:50Z, cap 105 min, hard deadline 23:18:50Z. Box `watchdog.py` log: `23:20:57 pod gone; watchdog exits` (its 30 s poll no longer found the pod, so the in-pod `wd.sh` `runpodctl remove pod` fired at about 23:17:50Z).
+- The driver's own terminate at 01:45:55Z got `POD_NOT_FOUND` five times, and GraphQL pods were empty. Balance 33.315 to 31.718 = **$1.597** (105 min x $0.89/h = $1.558, plus volume/storage drift). The ledger row says **$3.752** because the driver costs `rate x its own wall minutes` (252.9 min), which is the time until the driver noticed, not the time the pod existed.
+- So both watchdogs worked. The defect is in the driver.
+
+## (a) What s104 was doing
+Last observation by the driver: `RUN_START hx-s104 2026-11-21T22:34:47Z` (logged 22:37:09Z, in the same poll that showed `RUN_DONE_hx-s103`). The driver never polled the pod again after 22:37:09Z, so there is no observation of s104 after its start. Earlier seeds took about 11 min each (s103: 22:23:54 to 22:34:47), so a healthy s104 would have finished near 22:46Z; the pod's `pipe.log` died with the pod and the log archive failed, so whether s104 stalled, or finished (outputs would be on network volume `jq8pseh4f0` under `/vol/hx-t16/hx-s104`) cannot be determined at $0. It is not a "stall" we observed; it is an observation gap of 2h40m. Phase is therefore unknown; I will not claim training, averaging, volume write or VPS pipe.
+
+## (b) Why the cap "did not fire"
+It did, on the pod. In the driver, the main thread entered `pull(hx-s103)` at 22:37:09Z and stayed in it until 01:44:39Z. Inside, `vps_pipe` (5 attempts, 30..240 s sleeps) calls `A.sh`, which retries ssh rc 255 six times, with no subprocess timeout and no deadline check; `A.vps` calls (`mkdir`, `sha256sum -c`) are the same. The VPS link was starved (box->VPS about 4 MB/s, shared with the background weights pusher) and the log shows five `Timeout, server 203.134.250.85 not responding` retries spread over 3 h. The monitor loop's only deadline test (`time.time() > deadline - CLOSE_S`) sits after `pull()`, so it was not reached until 01:44:39Z.
+
+## (c) Why the log archive failed
+At 01:45:54Z the finally block ran `A.vps mkdir` + `A.sh tar | ssh` to the same unresponsive VPS (partial result: `train-hx-t16/logs/SHA256SUMS` exists on the VPS without the tarred files), then `sha256sum -c` failed, logged `ARCHIVE logs: FAILED`. Pod-side `pipe.log` could not be pulled either way: the pod was gone, and the earlier `log pull` ran against a dead ssh endpoint.
+
+## Fix (commit in this PR branch)
+- `headext/pod_guard.py` (new): `PodGuard`, a daemon thread independent of the main thread. It terminates at the hard deadline (retrying until GraphQL no longer lists the pod; `POD_NOT_FOUND` counts as gone) and records `gone_at` when the pod is first seen absent. `run_capped()` bounds a subprocess including all retries and sleeps by an absolute deadline (`CapExceeded`).
+- `headext_pod_train.py`: guard started right after pod creation and on `--attach`; `pull()`, the monitor poll and the VPS tar pipe on the main thread use `csh/cvps/vps_pipe(capped=True)`, bounded by `deadline - 60 s`; the weights pusher stays uncapped (`capped=False`, it is allowed to finish after the pod is gone); the post-failure archive path uses bounded `final=True` calls (300 s each); the monitor loop stops at once when the guard saw the pod gone; terminate treats `POD_NOT_FOUND` as success; **cost is computed to `pod_gone_at`** (`max(rate x minutes-to-gone, balance drop)`), with `driver_minutes` kept separately in `result.json` and the log.
+- Tests: `tests/test_pod_guard.py` 11 tests (guard fires with the main thread blocked, retries until gone, gone-before-deadline does not terminate, poll error is not gone, `POD_NOT_FOUND`, `run_capped` bounds incl. 255 retries, a `vps_pipe("sleep 600")` hx-t16 reproduction that raises at the cap, source assertions). Full headext suite: 138 passed. section7: 34 passed.
+- **2-minute dry run on the box, no pod** (`tests/dryrun_guard.py 120`, log `headext/evidence/dryrun-guard-120s-t246u.log`): main thread in `vps_pipe("sleep 3600")` plus a second thread in an unbounded sleep; the main thread raised `CapExceeded` at 110.1 s (cap 120 s minus the 10 s margin) and the guard called terminate at 120.0 s and recorded `pod_gone_at` 120.0 s. PASS.
+- Cannot be tested without a pod: the in-pod `wd.sh` (`runpodctl remove pod`), real RunPod GraphQL terminate semantics, and ssh behaviour against a real half-dead pod. Evidence they work: hx-t16 itself (pod removed at the cap, `POD_NOT_FOUND` after).
+- Not changed (flag for the reviewer): the VPS uplink contention between the weights pusher and the per-seed pull; a follow-up could pause the weights pusher while a pull runs.
+
+## Spend reconciliation
+Driver ledger (`SPEND-LEDGER.tsv`, GPU rows only, excluding the volume row) plus the pre-ledger $4.75 gives the $56.994 reported (53.242 + 3.752). The hx-t16 row overstates by about $2.15: its true cost is the balance drop **$1.597**, giving **$54.839** of $100. I did not edit the ledger (append-only record on the VPS); a correction row is proposed for the reviewer to approve. Balance now $31.562 (GraphQL), no pods, spend rate $0.01/h (the network volume).
