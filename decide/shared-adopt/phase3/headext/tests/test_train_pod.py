@@ -104,7 +104,10 @@ def test_r5_vol_prune_and_free_space_refusal(tmp_path):
     # list validation: only /vol/<pod>/hx-s<NN>
     good = tmp_path / "good.txt"; good.write_text("# c\n/vol/hx-t5/hx-s60\n\n/vol/hx-t13/hx-s94\n")
     assert tr.parse_delete_list(str(good)) == ["/vol/hx-t5/hx-s60", "/vol/hx-t13/hx-s94"]
-    for bad in ("/vol", "/vol/hx-t5", "/vol/hx-t5/hx-s60/keep", "/vol/../root/hx-s60", "/vol/hx-t5/*", "/root/hx-t5/hx-s60"):
+    s104 = tmp_path / "s104.txt"; s104.write_text("/vol/hx-t16/hx-s104\n")
+    assert tr.parse_delete_list(str(s104)) == ["/vol/hx-t16/hx-s104"]
+    for bad in ("/vol", "/vol/hx-t5", "/vol/hx-t5/hx-s60/keep", "/vol/../root/hx-s60", "/vol/hx-t5/*", "/root/hx-t5/hx-s60",
+                "/vol/hx-t16/hx-s1040", "/vol/hx-t16/hx-s104/x", "/vol/hx-t16/hx-s1"):
         f = tmp_path / "bad.txt"; f.write_text(bad + "\n")
         with pytest.raises(SystemExit): tr.parse_delete_list(str(f))
     script = tr.vol_prep_script(["/vol/hx-t5/hx-s60"], 1)

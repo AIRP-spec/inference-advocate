@@ -57,18 +57,18 @@ def ensure_tracked_primitives_out(repo_wt=None):
 # R-5 (2026-11-21): the network volume jq8pseh4f0 filled up (seed 94 lost to "Disk quota exceeded"). Box-side driver
 # prunes a supplied deletion list on the volume inside the pod and refuses to start unless free space is enough.
 import re as _re
-VOL_DELETE_RE = _re.compile(r"^/vol/hx-t\d+/hx-s\d\d$")
+VOL_DELETE_RE = _re.compile(r"^/vol/hx-t\d+/hx-s\d{2,3}$")
 VOL_MIN_TOTAL_GB, VOL_MIN_PER_SEED_GB = 20, 4
 VOL_QUOTA_GB = 60   # jq8pseh4f0 quota; `df` inside the pod reports the host filesystem (~480 TB), so free = min(df, quota - du)
 
 
 def parse_delete_list(path):
-    """One /vol/<pod>/hx-s<NN> per line (blank lines and #-comments ignored). Anything else is refused."""
+    """One /vol/<pod>/hx-s<NN|NNN> per line (blank lines and #-comments ignored). Anything else is refused."""
     out = []
     for ln in open(path).read().splitlines():
         ln = ln.split("#")[0].strip()
         if not ln: continue
-        if not VOL_DELETE_RE.match(ln): raise SystemExit(f"ABORT: deletion entry not of the form /vol/<pod>/hx-s<NN>: {ln!r}")
+        if not VOL_DELETE_RE.match(ln): raise SystemExit(f"ABORT: deletion entry not of the form /vol/<pod>/hx-s<NN|NNN>: {ln!r}")
         out.append(ln)
     return out
 
@@ -194,7 +194,7 @@ def main():
                     "artifacts + MANIFEST.sha256 are written there by the pipeline as the seed finishes")
     ap.add_argument("--label", default="training pod", help="ledger description prefix")
     ap.add_argument("--cap-usd", type=float, default=None, help="override CAP_USD (short pod headroom); default module CAP_USD")
-    ap.add_argument("--delete-list", default=None, help="R-5: file of /vol/<pod>/hx-s<NN> entries to rm -rf inside the pod before the pipeline")
+    ap.add_argument("--delete-list", default=None, help="R-5: file of /vol/<pod>/hx-s<NN|NNN> entries to rm -rf inside the pod before the pipeline")
     ap.add_argument("--attach", action="store_true", help="re-attach to the running pod in state.json (driver restart): "
                     "no create, no upload, no launch; verify both watchdogs, then monitor / archive / terminate")
     ap.add_argument("--local-pull-test", help="box test of the per-seed archive path on a finished local work dir; no pod")
