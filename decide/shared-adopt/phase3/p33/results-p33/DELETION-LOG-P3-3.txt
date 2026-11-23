@@ -1,0 +1,39 @@
+VPS_P31_OK 619 246aadf4ea9ba833
+VPS_P32_OK 444 0600ca01ddab898c
+mfs#euro-3.runpod.net:9421  2.2P  1.8P  486T  79% /workspace
+DU_BEFORE 25732059653
+OUT_FILES 370 370
+VOLUME_SUBSET_OK 475
+DELETE p31/keep/p31-A0-s40-final 850980007
+DELETE p31/keep/p31-A0-s41-final 850980007
+DELETE p31/keep/p31-A0-s42-final 850980007
+DELETE p31/keep/p31-A0-s43-final 850980007
+DELETE p31/keep/p31-A0-s44-final 850980007
+DELETE p31/keep/p31-A1-s40-final 850980007
+DELETE p31/keep/p31-A1-s41-final 850980007
+DELETE p31/keep/p31-A1-s42-final 850980007
+DELETE p31/keep/p31-A1-s43-final 850980007
+DELETE p31/keep/p31-A1-s44-final 850980007
+DELETE p31/keep/p31-A2-s40-final 850980007
+DELETE p31/keep/p31-A2-s41-final 850980007
+DELETE p31/keep/p31-A2-s42-final 850980007
+DELETE p31/keep/p31-A2-s43-final 850980007
+DELETE p31/keep/p31-A2-s44-final 850980007
+DELETE p31/out 769764384
+DELETE p31/keep/p31-A0-s40-final.sha256
+DELETE p31/keep/p31-A0-s41-final.sha256
+DELETE p31/keep/p31-A0-s42-final.sha256
+DELETE p31/keep/p31-A0-s43-final.sha256
+DELETE p31/keep/p31-A0-s44-final.sha256
+DELETE p31/keep/p31-A1-s40-final.sha256
+DELETE p31/keep/p31-A1-s41-final.sha256
+DELETE p31/keep/p31-A1-s42-final.sha256
+DELETE p31/keep/p31-A1-s43-final.sha256
+DELETE p31/keep/p31-A1-s44-final.sha256
+DELETE p31/keep/p31-A2-s40-final.sha256
+DELETE p31/keep/p31-A2-s41-final.sha256
+DELETE p31/keep/p31-A2-s42-final.sha256
+DELETE p31/keep/p31-A2-s43-final.sha256
+DELETE p31/keep/p31-A2-s44-final.sha256
+DU_AFTER 12193584319 FREE_G 28
+0

@@ -1,0 +1,22 @@
+# R-5 instruction 3: cycles 1 and 2 (oldest first) + partial hx-t13/hx-s94
+/vol/hx-t5/hx-s60
+/vol/hx-t5/hx-s61
+/vol/hx-t5/hx-s62
+/vol/hx-t5/hx-s63
+/vol/hx-t5/hx-s64
+/vol/hx-t6/hx-s65
+/vol/hx-t6/hx-s66
+/vol/hx-t6/hx-s67
+/vol/hx-t6/hx-s68
+/vol/hx-t6/hx-s69
+/vol/hx-t7/hx-s70
+/vol/hx-t7/hx-s71
+/vol/hx-t7/hx-s72
+/vol/hx-t7/hx-s73
+/vol/hx-t7/hx-s74
+/vol/hx-t8/hx-s75
+/vol/hx-t8/hx-s76
+/vol/hx-t8/hx-s77
+/vol/hx-t8/hx-s78
+/vol/hx-t9/hx-s79
+/vol/hx-t13/hx-s94

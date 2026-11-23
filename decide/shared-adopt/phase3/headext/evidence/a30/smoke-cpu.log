@@ -1,0 +1,7 @@
+SMOKE sdpa B1_1short_7long seq_lens=[5, 361, 368, 372, 375, 390, 408, 435] nonfinite_rows=3 loss_finite=False grads_finite=False
+SMOKE sdpa B2_4short_4long seq_lens=[5, 5, 5, 6, 375, 390, 408, 435] nonfinite_rows=4 loss_finite=False grads_finite=False
+SMOKE sdpa B3_spread seq_lens=[5, 12, 16, 18, 22, 26, 39, 435] nonfinite_rows=7 loss_finite=False grads_finite=False
+SMOKE eager B1_1short_7long seq_lens=[5, 361, 368, 372, 375, 390, 408, 435] nonfinite_rows=0 loss_finite=True grads_finite=True
+SMOKE eager B2_4short_4long seq_lens=[5, 5, 5, 6, 375, 390, 408, 435] nonfinite_rows=0 loss_finite=True grads_finite=True
+SMOKE eager B3_spread seq_lens=[5, 12, 16, 18, 22, 26, 39, 435] nonfinite_rows=0 loss_finite=True grads_finite=True
+SMOKE_BF16_MIXED PASS {"sdpa": false, "eager": true}

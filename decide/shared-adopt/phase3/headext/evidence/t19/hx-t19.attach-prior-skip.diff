@@ -1,0 +1,18 @@
+diff --git a/decide/shared-adopt/phase3/headext/headext_pod_train.py b/decide/shared-adopt/phase3/headext/headext_pod_train.py
+index b1d4a3e..2883999 100644
+--- a/decide/shared-adopt/phase3/headext/headext_pod_train.py
++++ b/decide/shared-adopt/phase3/headext/headext_pod_train.py
+@@ -288,6 +288,13 @@ def main():
+             elif STOPW[0]: return
+             else: time.sleep(5)
+     STOPW = [False]; wt = threading.Thread(target=weights_pusher, daemon=True); wt.start()
++    if a.attach:   # t247u: supervisor lost; seeds whose outputs AND weights pass a fresh VPS sha256sum -c are left alone (no re-pull)
++        for sd in seeds:
++            R = f"hx-s{sd}"
++            r = cvps(f"cd {VD}/{R} 2>/dev/null && sha256sum -c --quiet SHA256SUMS && sha256sum -c --quiet SHA256SUMS.weights && echo ALLOK", check=False, timeout=900)
++            if "ALLOK" in (r.stdout or ""):
++                pulled.add(R); WDONE[R] = True; res["seeds"][sd] = "done_archived"
++                log(f"ATTACH PRIOR {R}: VPS outputs+weights sha256sum -c OK -> left alone")
+ 
+     if a.local_pull_test:
+         S = ["bash", "-c"]

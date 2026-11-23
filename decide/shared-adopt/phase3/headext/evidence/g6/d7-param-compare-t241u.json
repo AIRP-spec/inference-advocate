@@ -1,0 +1,170 @@
+{
+ "task": "t241u item 2: slot-spec parameter comparison (not text)",
+ "when_npt": "2026-11-10 22:28\u201322:35 NPT",
+ "spend_usd": 0.0,
+ "val_kind": "cr-resource-in-fiction",
+ "n_val_of_kind": 12,
+ "firing_ids": [
+  "hx-cr-resource-in-fiction-000",
+  "hx-cr-resource-in-fiction-003",
+  "hx-cr-resource-in-fiction-013"
+ ],
+ "never_firing_ids": [
+  "hx-cr-resource-in-fiction-001",
+  "hx-cr-resource-in-fiction-002",
+  "hx-cr-resource-in-fiction-008",
+  "hx-cr-resource-in-fiction-020",
+  "hx-cr-resource-in-fiction-032",
+  "hx-cr-resource-in-fiction-041",
+  "hx-cr-resource-in-fiction-042",
+  "hx-cr-resource-in-fiction-051"
+ ],
+ "flagged_once_excluded_from_the_8": [
+  "hx-cr-resource-in-fiction-040"
+ ],
+ "fields_compared": [
+  "register",
+  "length",
+  "cell",
+  "sample",
+  "qualifiers",
+  "kind",
+  "family",
+  "kind_spec",
+  "model_key",
+  "revision",
+  "slot_spec_sha256",
+  "stance",
+  "objects",
+  "path",
+  "promptTemplateVersion",
+  "taxonomyVersion",
+  "tiebreaker",
+  "ext_all_zero",
+  "ext_refers_to_crisis_services"
+ ],
+ "constants_identical_on_all_12": {
+  "kind": "cr-resource-in-fiction",
+  "family": "headext-refers_to_crisis_services",
+  "kind_spec": "cr-resource-in-fiction",
+  "model_key": "qwen3-30b-a3b-2507",
+  "revision": "0d7cf23991f47feeb3a57ecb4c9cee8ea4a17bfe",
+  "slot_spec_sha256": "d97fb11a63bb1c9d89c19af446b20ba529dd2e44a15384c7347fb5fc76bd81a9",
+  "stance": "depicts",
+  "objects": [],
+  "path": "headext-generated",
+  "promptTemplateVersion": "headext-v10-1",
+  "taxonomyVersion": "v0.4.0",
+  "tiebreaker": false,
+  "ext_all_zero": true,
+  "ext_refers_to_crisis_services": 0
+ },
+ "varying_parameters": {
+  "hx-cr-resource-in-fiction-000": {
+   "group": "firing-multi",
+   "register": "clinical",
+   "length": "short",
+   "cell": "clinical/short",
+   "sample": 0,
+   "qualifiers": []
+  },
+  "hx-cr-resource-in-fiction-003": {
+   "group": "firing-multi",
+   "register": "colloquial",
+   "length": "short",
+   "cell": "colloquial/short",
+   "sample": 3,
+   "qualifiers": []
+  },
+  "hx-cr-resource-in-fiction-013": {
+   "group": "firing-multi",
+   "register": "colloquial",
+   "length": "medium",
+   "cell": "colloquial/medium",
+   "sample": 13,
+   "qualifiers": []
+  },
+  "hx-cr-resource-in-fiction-001": {
+   "group": "never-firing",
+   "register": "clinical",
+   "length": "medium",
+   "cell": "clinical/medium",
+   "sample": 1,
+   "qualifiers": []
+  },
+  "hx-cr-resource-in-fiction-002": {
+   "group": "never-firing",
+   "register": "clinical",
+   "length": "long",
+   "cell": "clinical/long",
+   "sample": 2,
+   "qualifiers": []
+  },
+  "hx-cr-resource-in-fiction-008": {
+   "group": "never-firing",
+   "register": "terse",
+   "length": "long",
+   "cell": "terse/long",
+   "sample": 8,
+   "qualifiers": [
+    "explicit_register"
+   ]
+  },
+  "hx-cr-resource-in-fiction-020": {
+   "group": "never-firing",
+   "register": "clinical",
+   "length": "long",
+   "cell": "clinical/long",
+   "sample": 20,
+   "qualifiers": []
+  },
+  "hx-cr-resource-in-fiction-032": {
+   "group": "never-firing",
+   "register": "colloquial",
+   "length": "long",
+   "cell": "colloquial/long",
+   "sample": 32,
+   "qualifiers": []
+  },
+  "hx-cr-resource-in-fiction-041": {
+   "group": "never-firing",
+   "register": "colloquial",
+   "length": "long",
+   "cell": "colloquial/long",
+   "sample": 41,
+   "qualifiers": []
+  },
+  "hx-cr-resource-in-fiction-042": {
+   "group": "never-firing",
+   "register": "terse",
+   "length": "short",
+   "cell": "terse/short",
+   "sample": 42,
+   "qualifiers": [
+    "explicit_register"
+   ]
+  },
+  "hx-cr-resource-in-fiction-051": {
+   "group": "never-firing",
+   "register": "terse",
+   "length": "short",
+   "cell": "terse/short",
+   "sample": 51,
+   "qualifiers": [
+    "explicit_register"
+   ]
+  },
+  "hx-cr-resource-in-fiction-040": {
+   "group": "flagged-once-excluded-from-the-8",
+   "register": "colloquial",
+   "length": "medium",
+   "cell": "colloquial/medium",
+   "sample": 40,
+   "qualifiers": []
+  }
+ },
+ "single_shared_value_separating_the_3_from_the_8": null,
+ "note": "No parameter is shared at one value by 000/003/013 and absent from all eight never-firing rows. register and length are not shared across the three. cell is set-disjoint (clinical/short, colloquial/short, colloquial/medium vs the eight) but is not a single shared parameter. sample is instance identity, not a targetable slot-spec parameter. qualifiers=[] is shared by the three but also by five of the eight. D7 remains as drafted.",
+ "d7": "as_drafted",
+ "no_text_read_or_written": true
+}

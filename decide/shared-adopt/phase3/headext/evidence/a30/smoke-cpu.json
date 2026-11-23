@@ -1,0 +1,152 @@
+{
+ "train_rows": 8921,
+ "max_seq_len": 435,
+ "rows_over_128": 579,
+ "device": "cpu",
+ "dtype": "bf16 autocast",
+ "batches": {
+  "B1_1short_7long": {
+   "ids": [
+    "tr-positive-composed-sycophancy-short-0010",
+    "hx-pe-task-question-053",
+    "hx-pe-feelings-question-053",
+    "hx-rr-implied-role-035",
+    "hx-pe-task-question-008",
+    "hx-pe-task-question-098",
+    "hx-pe-task-question-017",
+    "hx-ed-endorse-017"
+   ],
+   "seq_lens": [
+    5,
+    361,
+    368,
+    372,
+    375,
+    390,
+    408,
+    435
+   ],
+   "max_pad": 430
+  },
+  "B2_4short_4long": {
+   "ids": [
+    "tr-positive-composed-sycophancy-short-0010",
+    "tr-positive-composed-sycophancy-short-0030",
+    "tr-positive-composed-sycophancy-short-0031",
+    "tr-positive-composed-persona_claims-short-0001",
+    "hx-pe-task-question-008",
+    "hx-pe-task-question-098",
+    "hx-pe-task-question-017",
+    "hx-ed-endorse-017"
+   ],
+   "seq_lens": [
+    5,
+    5,
+    5,
+    6,
+    375,
+    390,
+    408,
+    435
+   ],
+   "max_pad": 430
+  },
+  "B3_spread": {
+   "ids": [
+    "tr-positive-composed-sycophancy-short-0010",
+    "tr-refusal-1424",
+    "tr-class-refusal-2037",
+    "tr-refusal-1420",
+    "tr-crisis-redirect-1698",
+    "tr-helpful-1128",
+    "hx-ed-class-refusal-033",
+    "hx-ed-endorse-017"
+   ],
+   "seq_lens": [
+    5,
+    12,
+    16,
+    18,
+    22,
+    26,
+    39,
+    435
+   ],
+   "max_pad": 430
+  }
+ },
+ "results": {
+  "sdpa": {
+   "B1_1short_7long": {
+    "eval_nonfinite_rows": 3,
+    "eval_nonfinite_row_ids": [
+     "tr-positive-composed-sycophancy-short-0010",
+     "hx-pe-task-question-053",
+     "hx-pe-feelings-question-053"
+    ],
+    "train_loss_finite": false,
+    "grads_finite": false,
+    "sec": 5.9,
+    "finite": false
+   },
+   "B2_4short_4long": {
+    "eval_nonfinite_rows": 4,
+    "eval_nonfinite_row_ids": [
+     "tr-positive-composed-sycophancy-short-0010",
+     "tr-positive-composed-sycophancy-short-0030",
+     "tr-positive-composed-sycophancy-short-0031",
+     "tr-positive-composed-persona_claims-short-0001"
+    ],
+    "train_loss_finite": false,
+    "grads_finite": false,
+    "sec": 5.5,
+    "finite": false
+   },
+   "B3_spread": {
+    "eval_nonfinite_rows": 7,
+    "eval_nonfinite_row_ids": [
+     "tr-positive-composed-sycophancy-short-0010",
+     "tr-refusal-1424",
+     "tr-class-refusal-2037",
+     "tr-refusal-1420",
+     "tr-crisis-redirect-1698",
+     "tr-helpful-1128",
+     "hx-ed-class-refusal-033"
+    ],
+    "train_loss_finite": false,
+    "grads_finite": false,
+    "sec": 6.0,
+    "finite": false
+   },
+   "all_finite": false
+  },
+  "eager": {
+   "B1_1short_7long": {
+    "eval_nonfinite_rows": 0,
+    "eval_nonfinite_row_ids": [],
+    "train_loss_finite": true,
+    "grads_finite": true,
+    "sec": 10.7,
+    "finite": true
+   },
+   "B2_4short_4long": {
+    "eval_nonfinite_rows": 0,
+    "eval_nonfinite_row_ids": [],
+    "train_loss_finite": true,
+    "grads_finite": true,
+    "sec": 11.3,
+    "finite": true
+   },
+   "B3_spread": {
+    "eval_nonfinite_rows": 0,
+    "eval_nonfinite_row_ids": [],
+    "train_loss_finite": true,
+    "grads_finite": true,
+    "sec": 12.6,
+    "finite": true
+   },
+   "all_finite": true
+  }
+ },
+ "pass": true
+}

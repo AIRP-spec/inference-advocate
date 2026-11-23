@@ -1,0 +1,92 @@
+{
+ "pod": "3lr2lemxd7rc9r",
+ "name": "hx-t6",
+ "type": "on-demand SECURE (podType RESERVED), EU-RO-1, volume jq8pseh4f0",
+ "signed": "1add3eac7e269e9ecb032caf10fed37d16a6cb8f",
+ "created_utc": "2026-11-04T07:59:57Z",
+ "pipeline_done_utc": "2026-11-04T09:07:40Z",
+ "pipe_exit": 0,
+ "terminated_utc": "2026-11-04T09:26:13Z",
+ "terminated_by": "hand (driver stuck in box->VPS weights-push timeouts; all 5 seeds box sha256sum -c OK and on volume first)",
+ "minutes": 86.3,
+ "cost_usd": 1.311,
+ "balance": [
+  24.291,
+  22.98
+ ],
+ "pods_after": {
+  "gql": [],
+  "rest": []
+ },
+ "seeds_cut_by_cap": [],
+ "seeds": {
+  "hx-s65": {
+   "skips": [
+    "0"
+   ],
+   "SKIPPED_NONFINITE": 0,
+   "avg_model_safetensors": "4c124a21c5486a0c3563f904e901c2cf4857bbc0b6376bde050d041f38ff07d0",
+   "SHA256SUMS": "38af5b09e0a9a766abbcbd29aa7a2c4627c6b40bc24fa7b1129919577968cf95",
+   "SHA256SUMS.weights": "0b3c7a0ca11fadc78867abcc58588956cb757bfd28d9406f4801ee42c28a1901",
+   "vol_ok_manifest": "7ee14795ce6166ecc54a67c61edcd5e5143cc0a58e3c8b2fbea3140a2dc450b4",
+   "out_sha256_manifest": "8aa1aef12eadceca6806be2312db14b3d6ce2473a191d0fb367f0c3dc4968f82"
+  },
+  "hx-s66": {
+   "skips": [
+    "0"
+   ],
+   "SKIPPED_NONFINITE": 0,
+   "avg_model_safetensors": "ad4c373bff662f270b8a19be6db0dac666568eefd8e044b7c84f031a9ad4b5d6",
+   "SHA256SUMS": "913ae0d5f3d7e1975a31078f6ba6b9876f49d5e8581001604a1b11da9d095a79",
+   "SHA256SUMS.weights": "aa0d680609ae49d4b4f630d886a5377021fd1d7639561087df524054cf197c5b",
+   "vol_ok_manifest": "252755cee3dd5df1c277c9821bd7047a8405d52c733cdc6383097a4e1c288269",
+   "out_sha256_manifest": "8b3d8f30ff116fdbc3b9605a78051173ea1e771ca1a824210eccf88243f8916b"
+  },
+  "hx-s67": {
+   "skips": [
+    "0"
+   ],
+   "SKIPPED_NONFINITE": 0,
+   "avg_model_safetensors": "231f382789a0aac1aa8a3c8f26dab78a7ea241009b1c18dea332e295933476ca",
+   "SHA256SUMS": "8f68135270169fc470e7aecf5337855a11107ec8ecaa899aaaba15a124be2f34",
+   "SHA256SUMS.weights": "1e4f5dd0fd8bd2bdbd05d0d7dc48e637773cc235c3a950f63a9ee186e53fe62e",
+   "vol_ok_manifest": "ad0a79d02cd9057c30d721522fae0478cd088819939d19db07ff574614fc6f58",
+   "out_sha256_manifest": "ad4b36741e65b4fda6ed9908c603a249d3381aede89cfb6d375f1dff1650f375"
+  },
+  "hx-s68": {
+   "skips": [
+    "0"
+   ],
+   "SKIPPED_NONFINITE": 0,
+   "avg_model_safetensors": "2ac971698188f118493d60e4dd4805d9b950b8b57ae60ba57d7d2837335d7ee0",
+   "SHA256SUMS": "b73e979efe6304b1d614ab3cf2c7f648317b53bf9f32f81e782bb90dc58165ec",
+   "SHA256SUMS.weights": "9c5660b794a4cf1cafa77676e300cb2987c57155d23dcb085eb0b59a8d8c4ffb",
+   "vol_ok_manifest": "77df6ffec903e2eee56bbcf4e6afbcfeb99e2b09fc506d9afc4052c8f67fedb2",
+   "out_sha256_manifest": "8d1cf497e558ba51fdba97ea651b240821d03e1978fcc40dd2a7497b058a39bf"
+  },
+  "hx-s69": {
+   "skips": [
+    "0"
+   ],
+   "SKIPPED_NONFINITE": 0,
+   "avg_model_safetensors": "0baa3d4f2e7a4853422129db3f1778b554a8a7b54ac8dc3ea598b84b0212bd97",
+   "SHA256SUMS": "ff483265943197f22d6dcd901561d3a7bb16dd9777c61d1c004623910cc8c5d7",
+   "SHA256SUMS.weights": "1c8f2bd23f3acf1f96dac353ebc425a67d29b830e642261ffca3cda9fcb368ac",
+   "vol_ok_manifest": "44dc876df68efc913b87eb64ab719d1a6906cf2848b5dc5358959d634b7d1549",
+   "out_sha256_manifest": "1a64f473c6a714f30c1bad29b82fda8920ad92847718b253571db6636c704cd1"
+  }
+ },
+ "vps": {
+  "dir": "/root/primitives-evaluator/headext-20261102/train-hx-t6",
+  "MANIFEST.sha256": "8b19bb761b14dbda92ec99e7ab6fb06a9659ed4e1fdb7042406a6e8beb5231d8",
+  "manifest_files": 220,
+  "all_seeds_SHA256SUMS_and_weights_ok": true,
+  "weights_verified_utc": {
+   "hx-s65": "09:29:02",
+   "hx-s66": "09:36:24",
+   "hx-s67": "10:03:26",
+   "hx-s68": "10:35:35",
+   "hx-s69": "10:44:44"
+  }
+ }
+}

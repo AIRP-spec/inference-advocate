@@ -1,0 +1,19 @@
+{
+ "when_npt": "2026-11-10 20:05 NPT",
+ "vps": "/root/primitives-evaluator/headext-20261102/train-hx-t11",
+ "hx-s85": {
+  "outputs": "SHA256SUMS sha256sum -c OK (27 files)",
+  "weights": "SHA256SUMS.weights sha256sum -c OK (14 files)",
+  "note": "driver weights push failed 5x at 13:19Z leaving a partial keep/ (11 files, checksums failed). Hand-push from box-verified /workspace/headext-train/hx-t11/out/hx-s85 (keep + SHA256SUMS.weights) via staged tar (14:05-14:10Z); rmdir keep.staging failed because the staged manifest remained, but the keep/ swap had already completed. Independent sha256sum -c at 20:05 NPT: all 14 weight files OK. Leftover keep.staging and keep.prev removed after that check."
+ },
+ "hx-s86": {
+  "outputs": "SHA256SUMS sha256sum -c OK (27 files)",
+  "weights": "SHA256SUMS.weights sha256sum -c OK (14 files)",
+  "note": "driver weights push succeeded 14:00Z; re-checked OK at 20:05 NPT"
+ },
+ "box_source_s85": {
+  "path": "/workspace/headext-train/hx-t11/out/hx-s85",
+  "outputs": "OK 27",
+  "weights": "OK 14"
+ }
+}

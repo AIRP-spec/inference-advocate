@@ -1,0 +1,7 @@
+# Fresh sha256sum -c after hx-t20 terminate. Checksums and counts only.
+# VPS session UTC_START 2026-11-23T05:59:06Z
+2026-11-23T05:59:12Z vps hx-t20 hx-s109 SUMS_ok=29 bad=0 WEIGHTS_ok=14 bad=0 path=/root/primitives-evaluator/headext-20261102/train-hx-t20/hx-s109
+# VPS session UTC_END 2026-11-23T05:59:12Z
+# Box session UTC_START 2026-11-23T05:59:12Z
+2026-11-23T05:59:16Z box out hx-s109 SUMS_ok=29 bad=0 WEIGHTS_ok=14 bad=0
+# Box session UTC_END 2026-11-23T05:59:16Z

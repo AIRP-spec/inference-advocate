@@ -1,0 +1,50 @@
+{
+ "job": "t242u",
+ "stage": "g7x-extra-generation-failed-no-rows",
+ "stopped": true,
+ "rule": "extra generation cap $1; both checkers required; stop if cap is hit or fewer than 24 complete units",
+ "signed": "cf2f468b90a9cdb0982fee9bad31f4df3ef0205e",
+ "first_create_abort": {
+  "when_npt": "2026-11-13 08:00 NPT",
+  "reason": "post-create estimate at billed rate $2.69/h * 24/60 = $1.076 > $1 cap",
+  "cost_usd": 0.0,
+  "pod_left_running": false
+ },
+ "pod": {
+  "name": "hx-g7x-gen",
+  "id": "vuhrghm9wbq04h",
+  "gpu": "NVIDIA RTX PRO 6000 Blackwell Server Edition",
+  "cloud": "SECURE on-demand",
+  "rate_usd_per_h": 2.69,
+  "cap_usd": 1.0,
+  "cap_min": 22.3,
+  "t0_utc": "2026-11-13T02:16:36Z",
+  "t1_utc": "2026-11-13T02:27:51Z",
+  "minutes": 11.3,
+  "cost_usd": 0.504,
+  "bal0": 19.321,
+  "bal1": 18.878,
+  "n_rows_written": null,
+  "failure": "not enough time left for generation + checkers",
+  "archive_sha256sum_c": "2/2 OK",
+  "pods_after_empty": true
+ },
+ "timeline": {
+  "watchdog": "t+3.1 (02:19:39Z)",
+  "install_done": "t+4.5 (02:21:03Z)",
+  "prefetch_start": "t+4.5 (02:21:05Z)",
+  "qwen_serving": "t+10.9 after 4.3 min load (02:27:28Z)",
+  "remaining_at_qwen_up_min": 11.4,
+  "AFTER_GEN_reserve_min": 14,
+  "generate_started": false
+ },
+ "complete_pair_units_available": 23,
+ "declared_need": 24,
+ "g7_filter_rates": {
+  "validation_collisions": "7/96",
+  "data_v9_collisions": "3/96"
+ },
+ "no_retry": "already spent $0.504 of the $1 extra-generation cap; a second pod at $2.69/h would exceed $1",
+ "cumulative": 49.788,
+ "recorded_at_npt": "2026-11-13 08:14 NPT"
+}

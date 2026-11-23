@@ -1,0 +1,20 @@
+{
+ "event": "hx-t8-attach-after-box-reboot",
+ "npt_approx": "16:05 NPT",
+ "box_boot": "2026-11-05 10:13 UTC",
+ "pod": "vd291adnf7hvkn",
+ "createdAt": "2026-11-05T10:13:41.497Z",
+ "rate": 0.89,
+ "deadline_utc": "2026-11-05T11:58:41Z",
+ "attach_pid": 8794,
+ "state_reconstructed": true,
+ "attach_check": "wd_running | pipe_running",
+ "seed_in_progress": "hx-s75",
+ "git_deletions_restored": [
+  "tools/evaluator-training/primitives/out/primitives-labels.jsonl",
+  "tools/evaluator-training/primitives/out/sft-primitives-v4.jsonl",
+  "tools/evaluator-training/primitives/out/test-labels.jsonl",
+  "tools/evaluator-training/primitives/out/test-sft-v4.jsonl"
+ ],
+ "git_deletions_cause": "box reboot at 10:13 UTC; tracked files restored via git checkout; not committed as deletions"
+}

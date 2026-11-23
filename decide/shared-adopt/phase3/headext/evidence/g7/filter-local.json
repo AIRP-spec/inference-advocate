@@ -1,0 +1,71 @@
+{
+ "stage": "local",
+ "set_sha256": "e2585abdf1d7340dfaa71f0644c49bece62ccba506a3641aed61784dcf3118e0",
+ "spec_sha256": "70679095f9cbc51018cc21d32329e886e25a7f35d35243443bba56751fa18fdf",
+ "n_set": 96,
+ "labels": {
+  "/workspace/headext-g7/out-hx-g7-gen/labels-seed-oss-36b-gen.jsonl": "84d2c24ab43f8de63acbf7bab2607580e35dadbc416fc74184020bc4ae6a2d58",
+  "/workspace/headext-g7/out-hx-g7-gen/labels-nemotron-3-super-gen.jsonl": "0cb8e45ecf239823aef51a659d60dde824e6d9be9382c12aff6bd3a976418a49"
+ },
+ "labels_override": {},
+ "label_coverage": {
+  "seed-oss-36b": 96,
+  "nemotron-3-super": 96
+ },
+ "vbc_residual": 0,
+ "v9_corpus": {
+  "/workspace/p33run/pack/data-v9/train.jsonl": "13c86ea732f3bcc616b58e8ec5c846557fe6a8ccb91bb58b6ba505f140063a28",
+  "/workspace/p33run/pack/data-v9/val.jsonl": "964c2b2198572823846364c7f30d4e6c44d8c9bf09fc59a0731f0ce7af7ecd2d",
+  "/workspace/p33rescore/val-v9-rhrev.jsonl": "a0b3b2f5201c7bc197e3987befe73f4968dbf54bce946627f1e2348ec141c1e0",
+  "/workspace/headext-pack/pack-v10f-2/data-v10/train.jsonl": "fbeecc0f6326a2f5afed06aee85c10ed48ebe2334f354c2c26cc79b0aca0d4e8",
+  "/workspace/headext-pack/pack-v10f-2/data-v10/val.jsonl": "cffe55215c18cfdd17c38f8ad2173869fe7ea06f2149b73b94b378add3a561a7"
+ },
+ "n_dropped": 10,
+ "first_stage": {
+  "V-g": 10
+ },
+ "by_reason": {
+  "V-g:inset": 7,
+  "V-g:data-v9": 3
+ },
+ "inset_sibling_collisions_exempt": 0,
+ "inset_exempt_pair_ids": [],
+ "dropped_by_kind": {
+  "cr-direct-vs-fiction": 9,
+  "cr-resource-in-fiction": 1
+ },
+ "dropped": {
+  "hx-cr-direct-vs-fiction-207-a": [
+   "V-g:data-v9"
+  ],
+  "hx-cr-direct-vs-fiction-209-b": [
+   "V-g:inset:hx-cr-direct-vs-fiction-203-b"
+  ],
+  "hx-cr-direct-vs-fiction-210-a": [
+   "V-g:data-v9"
+  ],
+  "hx-cr-direct-vs-fiction-213-a": [
+   "V-g:inset:hx-cr-direct-vs-fiction-201-a"
+  ],
+  "hx-cr-direct-vs-fiction-222-a": [
+   "V-g:inset:hx-cr-direct-vs-fiction-210-a"
+  ],
+  "hx-cr-direct-vs-fiction-224-a": [
+   "V-g:inset:hx-cr-direct-vs-fiction-218-a"
+  ],
+  "hx-cr-direct-vs-fiction-227-a": [
+   "V-g:inset:hx-cr-direct-vs-fiction-221-a"
+  ],
+  "hx-cr-direct-vs-fiction-228-a": [
+   "V-g:inset:hx-cr-direct-vs-fiction-204-a"
+  ],
+  "hx-cr-direct-vs-fiction-230-a": [
+   "V-g:inset:hx-cr-direct-vs-fiction-218-a"
+  ],
+  "hx-cr-resource-in-fiction-228": [
+   "V-g:data-v9"
+  ]
+ },
+ "n_candidates": 86,
+ "candidates_sha256": "0ab483de78e15a49246f00577debdeb585813eabd473901958f183cfe751d8d9"
+}

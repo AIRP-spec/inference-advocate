@@ -1,0 +1,38 @@
+{
+ "pod": "ah0hs2laiaw99b",
+ "rate": 0.89,
+ "cost": 1.0569861720999967,
+ "bal0": 34.5080391482,
+ "bal1": 33.4510529761,
+ "pod_list_after": [],
+ "rest_pods_after": [
+  [],
+  "unreachable:URLError: <urlopen error [SSL: UNEXPECTED_EOF_WHILE_READING] EOF occurred in violation of protocol (_ssl.c:1029)>"
+ ],
+ "cumulative": 53.24199999999999,
+ "minutes": 69.79861277341843,
+ "signed": "74ca4621e830afc5b527a4f085d552e89a8df2ba",
+ "t0": 1795241350.507245,
+ "t1": 1795245538.4240115,
+ "seeds": {
+  "95": "done_archived",
+  "96": "done_archived",
+  "97": "done_archived",
+  "98": "done_archived",
+  "99": "done_archived"
+ },
+ "vol_prep": [
+  "VOL_FREE_BEFORE 480469",
+  "VOL_DF_FREE_AFTER 480469 VOL_USED_GB 26 VOL_QUOTA_GB 60",
+  "VOL_FREE_AFTER 34",
+  "VOL_PREP_OK"
+ ],
+ "failure": "RuntimeError('cmd failed rc=2: ssh -i /home/box/.ssh/runpod_airp -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -o LogLevel=ERROR -o ServerAliveInterval=30 -o ConnectTimeout=20 - :: tar: Unexpected EOF in archive\\ntar: Unexpected EOF in archive\\ntar: Error is not recoverable: exiting no",
+ "weights_vps_verified": {
+  "hx-s95": true,
+  "hx-s96": true,
+  "hx-s97": false,
+  "hx-s98": false,
+  "hx-s99": true
+ }
+}

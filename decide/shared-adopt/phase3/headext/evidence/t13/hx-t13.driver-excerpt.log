@@ -1,0 +1,19 @@
+04:02:08 PRECHECK (headroom): pods(gql)=0 pods(rest)=[] rest_status=unreachable:URLError: <urlopen error [SSL: UNEXPECTED_EOF_WHILE_READING] EOF occurred in violation of protocol (_ssl.c:1029)> box_free=80G vps_free=115G balance=$35.97 cumulative=$50.75 +cap $4.0 -> $54.75 (stop line $85.0) signed_on_remote=True code_clean=True pins_ok=True pack_sha_ok=True tracked_out=4/4
+04:02:09 POD CREATED szwmwm1ypync76 gpu=NVIDIA GeForce RTX 4090 rate=$0.89/h cap=105.0min ($4.0) seeds=[90 91 92 93 94]
+04:02:09 ON-DEMAND CHECK OK podType=RESERVED secureCloud=True dc=EU-RO-1 volume=jq8pseh4f0
+04:15:36 POD: VOL_OK_hx-s90 43 files 01caa72d15b05551968158d71dfebe2cb49b64c0522edb749cc90808fada01b3
+04:17:54 ARCHIVED hx-s90: box 43 files sha256sum -c OK; VPS outputs+predictions 29 files sha256sum -c OK -> /root/primitives-evaluator/headext-20261102/train-hx-t13/hx-s90; weights queued
+04:27:14 POD: VOL_OK_hx-s91 43 files 8fbec5cccb7d40bdc41006460ab995cb3bcd929629b72bfd25275e3b74298821
+04:29:33 ARCHIVED hx-s91: box 43 files sha256sum -c OK; VPS outputs+predictions 29 files sha256sum -c OK -> /root/primitives-evaluator/headext-20261102/train-hx-t13/hx-s91; weights queued
+04:38:47 POD: VOL_OK_hx-s92 43 files 804b0bd409565c16bfc125bd4a9b16d94ea8ed1f0522df97759b0b548bde8229
+04:41:05 ARCHIVED hx-s92: box 43 files sha256sum -c OK; VPS outputs+predictions 29 files sha256sum -c OK -> /root/primitives-evaluator/headext-20261102/train-hx-t13/hx-s92; weights queued
+04:50:51 POD: VOL_OK_hx-s93 43 files 0c7c9f06a2fe10fc3b219c30cc8bf257bce0022e6a1befa2ea377edf45919f2a
+04:52:08 WEIGHTS hx-s90 -> VPS sha256sum -c OK
+04:53:04 ARCHIVED hx-s93: box 43 files sha256sum -c OK; VPS outputs+predictions 29 files sha256sum -c OK -> /root/primitives-evaluator/headext-20261102/train-hx-t13/hx-s93; weights queued
+05:02:14 WEIGHTS hx-s91 -> VPS sha256sum -c OK
+05:02:34 POD: + echo VOL_WRITE_FAILED_hx-s94
+05:02:34 POD: VOL_WRITE_FAILED_hx-s94
+05:02:34 POD: PIPE_EXIT 16
+05:04:57 TERMINATED szwmwm1ypync76 pod_list_after(gql)=[] rest=([], 'unreachable:URLError: <urlopen error [SSL: UNEXPECTED_EOF_WHILE_READING] EOF occurred in violation of protocol (_ssl.c:1029)>') minutes=61.9 balance 35.970->35.064 cost=$0.918 terminate_after_failure=1.5min
+05:07:27 WEIGHTS hx-s92 -> VPS sha256sum -c OK
+05:12:35 WEIGHTS hx-s93 -> VPS sha256sum -c OK

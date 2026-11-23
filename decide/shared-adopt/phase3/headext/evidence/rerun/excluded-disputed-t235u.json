@@ -1,0 +1,71 @@
+{
+ "ruling": "t235u-2",
+ "n": 5,
+ "rows": [
+  {
+   "id": "hx-cr-direct-vs-fiction-006-b",
+   "status": "excluded-disputed",
+   "ruling": "t235u-2",
+   "flagging": [
+    {
+     "checker": "seed-oss-36b",
+     "primitive": "refers_to_crisis_services"
+    }
+   ],
+   "kind_spec": "cr-direct-vs-fiction",
+   "note": "not read; not deleted; excluded from train and validation"
+  },
+  {
+   "id": "hx-cr-direct-vs-fiction-007-b",
+   "status": "excluded-disputed",
+   "ruling": "t235u-2",
+   "flagging": [
+    {
+     "checker": "seed-oss-36b",
+     "primitive": "refers_to_crisis_services"
+    }
+   ],
+   "kind_spec": "cr-direct-vs-fiction",
+   "note": "not read; not deleted; excluded from train and validation"
+  },
+  {
+   "id": "hx-cr-direct-vs-fiction-024-b",
+   "status": "excluded-disputed",
+   "ruling": "t235u-2",
+   "flagging": [
+    {
+     "checker": "seed-oss-36b",
+     "primitive": "refers_to_crisis_services"
+    }
+   ],
+   "kind_spec": "cr-direct-vs-fiction",
+   "note": "not read; not deleted; excluded from train and validation"
+  },
+  {
+   "id": "hx-cr-direct-vs-fiction-034-b",
+   "status": "excluded-disputed",
+   "ruling": "t235u-2",
+   "flagging": [
+    {
+     "checker": "seed-oss-36b",
+     "primitive": "refers_to_crisis_services"
+    }
+   ],
+   "kind_spec": "cr-direct-vs-fiction",
+   "note": "not read; not deleted; excluded from train and validation"
+  },
+  {
+   "id": "hx-cr-resource-in-fiction-dialogue-023",
+   "status": "excluded-disputed",
+   "ruling": "t235u-2",
+   "flagging": [
+    {
+     "checker": "seed-oss-36b",
+     "primitive": "refers_to_crisis_services"
+    }
+   ],
+   "kind_spec": "cr-resource-in-fiction-dialogue",
+   "note": "not read; not deleted; excluded from train and validation"
+  }
+ ]
+}

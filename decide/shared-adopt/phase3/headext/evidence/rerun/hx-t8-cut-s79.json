@@ -1,0 +1,21 @@
+{
+ "ruling": "t235u item 4 / standing cut-seed rule",
+ "pod": "hx-t8",
+ "cost_usd": 1.474,
+ "cumulative_after": 44.75,
+ "seeds_done": [
+  75,
+  76,
+  77,
+  78
+ ],
+ "seed_cut": 79,
+ "failure": "time cap reached before PIPELINE_DONE",
+ "next": "hx-t9 short pod for seed 79 only",
+ "box_reboot_attach": true,
+ "deviations": [
+  "box reboot ~10:13Z killed original driver; reconstructed state.json and --attach",
+  "s79 incomplete; third short pod required",
+  "balance ~$15.66 leaves <\\$10 after \\$6 cap; short pod will use --cap-usd 5.5 (still >>1-seed cost) to clear headroom floor"
+ ]
+}

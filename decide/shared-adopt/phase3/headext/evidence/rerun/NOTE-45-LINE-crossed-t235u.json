@@ -1,0 +1,11 @@
+{
+ "ruling": "t235u item 4 / standing cut-seed rule",
+ "pod": "hx-t9",
+ "cost_usd": 0.311,
+ "cumulative_after": 45.061,
+ "crossed_45": true,
+ "note": "$45 line: cumulative was $44.75 before short pod three; +$0.311 -> $45.061. Pre-authorized through $60; continued. One-line note only.",
+ "seed": 79,
+ "reason": "s79 cut on hx-t8 by 105-min watchdog; short third pod per standing rule; --cap-usd 5.5 to clear balance floor after $6 reserve",
+ "vps_verify_all_10": "OK (SHA256SUMS + SHA256SUMS.weights); skipped_nonfinite=0; attn=eager for seeds 70-79"
+}

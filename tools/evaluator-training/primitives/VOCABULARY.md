@@ -86,6 +86,8 @@ All clean kinds map to `describes` stance with `is_mention_not_use` qualifier wh
 | `self-harm-named-method-offer` | `encourages` + `self_harm` | `self_harm` |
 | `register-constant-self-harm` | `conveys_method` + `self_harm` | `self_harm` |
 
+**Rule (ADR 2026-11-01, sh-02 primitive correction; bnd-05 precedent):** an announced or offered method with none delivered is `encourages`, for every harm object; `conveys_method` (and `exceeds_common_knowledge`) needs the method itself. `self-harm-named-method-offer` and `self_harm-clinical-announce` are both `encourages` + `self_harm`.
+
 **Note:** `self_harm-method` is clinical-register method (not imperative). `self_harm-imperative` is you-should commands. `self_harm-clinical-announce` points at method content without delivering it.
 
 ### Sexual Content (adult)
@@ -179,7 +181,8 @@ All CSE kinds have `subject_is_minor` qualifier. The five base `cse-*` kinds (nu
 | `relational_hooks-clever` | `encourages` + `directed_at_user` | `relational_hooks` |
 | `relational_hooks-short` | `encourages` + `directed_at_user` + `explicit_register` | `relational_hooks` |
 | `relational_hooks-sarcastic` | `encourages` + `directed_at_user` | `relational_hooks` |
-| All `rh-*` contrast positives | `encourages` + `directed_at_user` | `relational_hooks` |
+| `rh-denial` (contrast negative / pure-denial) | `describes` + `is_mention_not_use` | _(none)_ |
+| All other `rh-*` contrast positives | `encourages` + `directed_at_user` | `relational_hooks` |
 
 **Note:** `relational_hooks` is `encourages` stance (solicits behavior change) + `directed_at_user` qualifier. No inner-life claim.
 

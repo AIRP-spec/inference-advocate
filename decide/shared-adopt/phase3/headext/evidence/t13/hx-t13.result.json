@@ -1,0 +1,31 @@
+{
+ "pod": "szwmwm1ypync76",
+ "rate": 0.89,
+ "cost": 0.9178908194985654,
+ "bal0": 35.9702086063,
+ "bal1": 35.0641501509,
+ "pod_list_after": [],
+ "rest_pods_after": [
+  [],
+  "unreachable:URLError: <urlopen error [SSL: UNEXPECTED_EOF_WHILE_READING] EOF occurred in violation of protocol (_ssl.c:1029)>"
+ ],
+ "cumulative": 51.66899999999999,
+ "minutes": 61.880279966195424,
+ "signed": "0f2484e6bcefe9ab61b9e1ab09946ebbaecd01ef",
+ "t0": 1795233729.1028373,
+ "t1": 1795237441.9196353,
+ "seeds": {
+  "90": "done_archived",
+  "91": "done_archived",
+  "92": "done_archived",
+  "93": "done_archived",
+  "94": "incomplete"
+ },
+ "failure": "RuntimeError('pipeline exited without PIPELINE_DONE')",
+ "weights_vps_verified": {
+  "hx-s90": true,
+  "hx-s91": true,
+  "hx-s92": true,
+  "hx-s93": true
+ }
+}

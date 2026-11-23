@@ -1,0 +1,47 @@
+{
+ "ruling": "t235u",
+ "set_in_sha256": "626d97dbedeee9773c1ac7212b5938335051e4b4ca479bb66ba68296ce2d8c71",
+ "set_out_sha256": "002fa5d5236d4fbee6e3ad55ecd57d7e6a3364fd46d37d2d223cc36aa8b75343",
+ "n_set_in": 4067,
+ "n_set_out": 4089,
+ "n_restored_pair_rows": 22,
+ "n_unpaired_positives": 5,
+ "n_excluded_disputed": 5,
+ "authored_denial_units": [
+  "hx-rr-claim-vs-deny-009",
+  "hx-rr-claim-vs-deny-011",
+  "hx-rr-claim-vs-deny-019",
+  "hx-rr-claim-vs-deny-027",
+  "hx-rr-claim-vs-deny-036",
+  "hx-rr-claim-vs-deny-052",
+  "hx-rr-claim-vs-deny-013",
+  "hx-rr-claim-vs-deny-022",
+  "hx-rr-claim-vs-deny-023",
+  "hx-rr-claim-vs-deny-031",
+  "hx-rr-claim-vs-deny-049"
+ ],
+ "unpaired_positive_ids": [
+  "hx-rr-claim-vs-deny-013-b-r0",
+  "hx-rr-claim-vs-deny-022-b-r0",
+  "hx-rr-claim-vs-deny-023-b-r0",
+  "hx-rr-claim-vs-deny-031-b-r0",
+  "hx-rr-claim-vs-deny-049-b-r0"
+ ],
+ "bare_denial_candidates_dropped": [
+  "hx-rr-claim-vs-deny-009",
+  "hx-rr-claim-vs-deny-011",
+  "hx-rr-claim-vs-deny-019",
+  "hx-rr-claim-vs-deny-027",
+  "hx-rr-claim-vs-deny-036",
+  "hx-rr-claim-vs-deny-052"
+ ],
+ "excluded_disputed_ids": [
+  "hx-cr-direct-vs-fiction-006-b",
+  "hx-cr-direct-vs-fiction-007-b",
+  "hx-cr-direct-vs-fiction-024-b",
+  "hx-cr-direct-vs-fiction-034-b",
+  "hx-cr-resource-in-fiction-dialogue-023"
+ ],
+ "checker_deletions_accepted": true,
+ "reading": "All 11 units get author-written denial B (A from set-t227). Five uptake candidates kept as unpaired positives under kind rr-role-claim. Six bare-denial candidates dropped. Five one-checker flags excluded-disputed."
+}

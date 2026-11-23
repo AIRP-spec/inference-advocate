@@ -1,0 +1,31 @@
+{
+ "pod": "j1jjx81fqm3j7h",
+ "rate": 0.89,
+ "cost": 0.43642853988342817,
+ "bal0": 29.4236941411,
+ "bal1": 28.9975114772,
+ "pod_list_after": [],
+ "rest_pods_after": [
+  [],
+  "unreachable:URLError: <urlopen error [SSL: UNEXPECTED_EOF_WHILE_READING] EOF occurred in violation of protocol (_ssl.c:1029)>"
+ ],
+ "cumulative": 57.280999999999985,
+ "minutes": 29.422148756186168,
+ "driver_minutes": 29.417315185070038,
+ "pod_gone_at": 1795413436.1343765,
+ "signed": "1da05897e013f38885dd438ba9769da98f55c3a7",
+ "t0": 1795411670.8054512,
+ "t1": 1795413435.8443623,
+ "seeds": {
+  "109": "done_archived"
+ },
+ "vol_prep": [
+  "VOL_FREE_BEFORE 481905",
+  "VOL_DF_FREE_AFTER 481906 VOL_USED_GB 32 VOL_QUOTA_GB 60",
+  "VOL_FREE_AFTER 28",
+  "VOL_PREP_OK"
+ ],
+ "weights_vps_verified": {
+  "hx-s109": true
+ }
+}

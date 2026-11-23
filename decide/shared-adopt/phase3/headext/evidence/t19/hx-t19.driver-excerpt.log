@@ -1,0 +1,77 @@
+01:45:40 CAP_USD override -> 4.0
+01:46:22 PRECHECK (headroom): pods(gql)=0 pods(rest)=[] rest_status=unreachable:URLError: <urlopen error [SSL: UNEXPECTED_EOF_WHILE_READING] EOF occurred in violation of protocol (_ssl.c:1029)> box_free=54G vps_free=91G balance=$31.02 cumulative=$55.30 +cap $4.0 -> $59.30 (stop line $85.0) signed_on_remote=True code_clean=True pins_ok=True pack_sha_ok=True tracked_out=4/4
+01:46:22 NOTE: REST pods API unreachable (unreachable:URLError: <urlopen error [SSL: UNEXPECTED_EOF_WHILE_READING] EOF occurred in violation of protocol (_ssl.c:1029)>); proceeding on empty gql pod list only
+01:46:23 POD CREATED z6lfqb4qfrjdpe gpu=NVIDIA GeForce RTX 4090 rate=$0.89/h cap=105.0min ($4.0) seeds=[105 106 107 108 109]
+01:46:23 ON-DEMAND CHECK OK podType=RESERVED secureCloud=True dc=EU-RO-1 volume=jq8pseh4f0
+01:47:05 IN-POD WATCHDOG + GPU: wd_running | has_pod_id | has_runpodctl | NVIDIA GeForce RTX 4090, 24564 MiB |   60G | 
+01:47:10 PACK UPLOADED PACK_OK e0ceb28d0eeb1b2742ba336e49ef199d7819a0e83e5da15c6abea96cf3537a64  PACK.sha256 
+01:47:13 VOLPREP: VOL_FREE_BEFORE 482549
+01:47:13 VOLPREP: VOL_DF_FREE_AFTER 482549 VOL_USED_GB 26 VOL_QUOTA_GB 60
+01:47:13 VOLPREP: VOL_FREE_AFTER 34
+01:47:13 VOLPREP: VOL_PREP_OK
+01:48:43 start ssh timed out after 90 s; checking the pipeline directly
+01:48:49 PIPELINE STARTED
+01:49:21 POD: ALL 6 PASS
+01:49:21 POD: [train] 9360 items, truncated 0, mean len 37.3 (5.6s)
+01:49:21 POD: [val] 1879 items, truncated 0, mean len 72.8 (1.3s)
+01:49:21 POD: PREPROCESS_DONE
+01:49:21 POD: SMOKE_BF16_MIXED PASS {"sdpa": false, "eager": true}
+01:49:21 POD: RUN_START hx-s105 2026-11-23T01:48:15Z
+01:49:21 POD: ENCODER_ATTN eager
+02:02:01 POD: + grep -q SKIPPED_NONFINITE logs/train-hx-s105.log
+02:02:01 POD: HEADINIT_OK hx-s105 base17=10a35c7911392632d212b188849fae39fd9fe583252eb07ba27873d0c17106c5 head25=0a85cc3bb576cb6a9ead6902284be5908b1866e6dfb1d7ba05d741ddcfa5d429
+02:13:05 POD: VOL_OK_hx-s105 43 files 9954cea5a11b16c1d72dda3f8ca7c84e8c15927758e1a0347996c2f9b33b4d77
+02:13:05 POD: RUN_DONE_hx-s105 2026-11-23T02:12:42Z
+02:13:05 POD: RUN_START hx-s106 2026-11-23T02:12:42Z
+02:16:47 ARCHIVED hx-s105: box 43 files sha256sum -c OK; VPS outputs+predictions 29 files sha256sum -c OK -> /root/primitives-evaluator/headext-20261102/train-hx-t19/hx-s105; weights queued
+02:21:11 WEIGHTS hx-s105 -> VPS sha256sum -c OK
+02:26:49 POD: + grep -q SKIPPED_NONFINITE logs/train-hx-s106.log
+02:26:49 POD: HEADINIT_OK hx-s106 base17=10a35c7911392632d212b188849fae39fd9fe583252eb07ba27873d0c17106c5 head25=0a85cc3bb576cb6a9ead6902284be5908b1866e6dfb1d7ba05d741ddcfa5d429
+02:37:22 POD: VOL_OK_hx-s106 43 files 708dacefcf649e3ad021a23f51b65189a87e5a7cfd59e96d3d074436efeb700c
+02:37:22 POD: RUN_DONE_hx-s106 2026-11-23T02:37:09Z
+02:37:22 POD: RUN_START hx-s107 2026-11-23T02:37:09Z
+02:39:32 ARCHIVED hx-s106: box 43 files sha256sum -c OK; VPS outputs+predictions 29 files sha256sum -c OK -> /root/primitives-evaluator/headext-20261102/train-hx-t19/hx-s106; weights queued
+02:44:11 WEIGHTS hx-s106 -> VPS sha256sum -c OK
+02:50:50 CAP_USD override -> 4.0
+02:50:50 ATTACH z6lfqb4qfrjdpe rate=$0.89/h deadline=03:31:23
+02:50:55 ATTACH PRIOR hx-s105: VPS outputs+weights sha256sum -c OK -> left alone
+02:51:00 ATTACH PRIOR hx-s106: VPS outputs+weights sha256sum -c OK -> left alone
+02:51:14 ATTACH CHECK: wd_running | pipe_running | 
+02:51:46 POD: ALL 6 PASS
+02:51:46 POD: [train] 9360 items, truncated 0, mean len 37.3 (5.6s)
+02:51:46 POD: [val] 1879 items, truncated 0, mean len 72.8 (1.3s)
+02:51:46 POD: PREPROCESS_DONE
+02:51:46 POD: SMOKE_BF16_MIXED PASS {"sdpa": false, "eager": true}
+02:51:46 POD: RUN_START hx-s105 2026-11-23T01:48:15Z
+02:51:46 POD: ENCODER_ATTN eager
+02:51:46 POD: + grep -q SKIPPED_NONFINITE logs/train-hx-s105.log
+02:51:46 POD: HEADINIT_OK hx-s105 base17=10a35c7911392632d212b188849fae39fd9fe583252eb07ba27873d0c17106c5 head25=0a85cc3bb576cb6a9ead6902284be5908b1866e6dfb1d7ba05d741ddcfa5d429
+02:51:46 POD: VOL_OK_hx-s105 43 files 9954cea5a11b16c1d72dda3f8ca7c84e8c15927758e1a0347996c2f9b33b4d77
+02:51:46 POD: RUN_DONE_hx-s105 2026-11-23T02:12:42Z
+02:51:46 POD: RUN_START hx-s106 2026-11-23T02:12:42Z
+02:51:46 POD: + grep -q SKIPPED_NONFINITE logs/train-hx-s106.log
+02:51:46 POD: HEADINIT_OK hx-s106 base17=10a35c7911392632d212b188849fae39fd9fe583252eb07ba27873d0c17106c5 head25=0a85cc3bb576cb6a9ead6902284be5908b1866e6dfb1d7ba05d741ddcfa5d429
+02:51:46 POD: VOL_OK_hx-s106 43 files 708dacefcf649e3ad021a23f51b65189a87e5a7cfd59e96d3d074436efeb700c
+02:51:46 POD: RUN_DONE_hx-s106 2026-11-23T02:37:09Z
+02:51:46 POD: RUN_START hx-s107 2026-11-23T02:37:09Z
+02:51:46 POD: + grep -q SKIPPED_NONFINITE logs/train-hx-s107.log
+02:51:46 POD: HEADINIT_OK hx-s107 base17=10a35c7911392632d212b188849fae39fd9fe583252eb07ba27873d0c17106c5 head25=0a85cc3bb576cb6a9ead6902284be5908b1866e6dfb1d7ba05d741ddcfa5d429
+03:02:33 POD: VOL_OK_hx-s107 43 files a4d36b944a3a95aa5effdcaeeb437d3ae80133c42474bcae50000aceb52aaf18
+03:02:33 POD: RUN_DONE_hx-s107 2026-11-23T03:01:39Z
+03:02:33 POD: RUN_START hx-s108 2026-11-23T03:01:39Z
+03:04:42 ARCHIVED hx-s107: box 43 files sha256sum -c OK; VPS outputs+predictions 29 files sha256sum -c OK -> /root/primitives-evaluator/headext-20261102/train-hx-t19/hx-s107; weights queued
+03:17:02 POD: + grep -q SKIPPED_NONFINITE logs/train-hx-s108.log
+03:17:02 POD: HEADINIT_OK hx-s108 base17=10a35c7911392632d212b188849fae39fd9fe583252eb07ba27873d0c17106c5 head25=0a85cc3bb576cb6a9ead6902284be5908b1866e6dfb1d7ba05d741ddcfa5d429
+03:18:59 VPS pipe retry 1/4 rc=255: Timeout, server 203.134.250.85 not responding. 
+03:26:31 POD: VOL_OK_hx-s108 43 files f5cc49ace3f871c0a0cff32cac88e2ab8bac912cc09d8787b98154e6f6fb022d
+03:26:31 POD: RUN_DONE_hx-s108 2026-11-23T03:25:54Z
+03:26:31 POD: RUN_START hx-s109 2026-11-23T03:25:54Z
+03:28:01 VPS pipe retry 2/4 rc=255: Timeout, server 203.134.250.85 not responding. 
+03:28:46 ARCHIVED hx-s108: box 43 files sha256sum -c OK; VPS outputs+predictions 29 files sha256sum -c OK -> /root/primitives-evaluator/headext-20261102/train-hx-t19/hx-s108; weights queued
+03:28:46 FAILURE: RuntimeError('time cap reached before PIPELINE_DONE')
+03:30:13 ARCHIVE logs: OK
+03:30:14 GUARD: pod z6lfqb4qfrjdpe gone at 03:30:14
+03:31:10 TERMINATED z6lfqb4qfrjdpe pod_list_after(gql)=[] rest=([], 'unreachable:URLError: <urlopen error [SSL: UNEXPECTED_EOF_WHILE_READING] EOF occurred in violation of protocol (_ssl.c:1029)>') minutes=103.8 driver_minutes=103.8 balance 31.017->29.501 cost=$1.540 terminate_after_failure=1.5min
+03:35:34 VPS pipe retry 3/4 rc=255: Timeout, server 203.134.250.85 not responding. 
+03:43:05 WEIGHTS hx-s107 -> VPS sha256sum -c OK
+03:47:49 WEIGHTS hx-s108 -> VPS sha256sum -c OK

@@ -1,0 +1,22 @@
+{
+ "train_sha256": "dd9f7841ef2576422db9941f5beb23f957f6b4147dbdee88c33f0a07b994a5a7",
+ "val_sha256": "cffe55215c18cfdd17c38f8ad2173869fe7ea06f2149b73b94b378add3a561a7",
+ "n_train": 9355,
+ "n_val": 1884,
+ "pack_sha256": "41a77e4624e21f8d0d56d9a36f9d8dec99917cf1b71e06d8bfe8d3b2f9fe1a76",
+ "tgz_sha256": "3fb6b208db4a775b0c862c0605dbb836b75c31ac83eb4cc79e012480b425a88f",
+ "vps": "/root/primitives-evaluator/headext-20261102/pack-v10g",
+ "v10f_train_sha256": "fbeecc0f6326a2f5afed06aee85c10ed48ebe2334f354c2c26cc79b0aca0d4e8",
+ "v10f_val_sha256": "cffe55215c18cfdd17c38f8ad2173869fe7ea06f2149b73b94b378add3a561a7",
+ "spec_sha256": "cd08dd2d9ef0778af8a016ea464da07ff2aa05a9d21967cd15878a30a61ca4e2",
+ "set_sha256": "67527792f2cd8337bf5b6a255170dd9b29de421aee0b89460e9048b694d237e1",
+ "n_pair_complete": 27,
+ "n_pair_filled": 24,
+ "pair_surplus_units": [
+  "hx-cr-direct-vs-fiction-233",
+  "hx-cr-direct-vs-fiction-234",
+  "hx-cr-direct-vs-fiction-235"
+ ],
+ "known_thin": false,
+ "note": "incremental data-v10g: v10f prefix + G7/G7x fill to 24 pair units in generation order (232 taken; 233-235 surplus). Two independent rebuilds byte-identical on train/val/sel/tgz/PACK.sha256. Val byte-identical to v10f. 0 G7x filter drops."
+}

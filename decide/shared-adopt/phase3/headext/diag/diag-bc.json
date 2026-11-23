@@ -1,0 +1,1930 @@
+{
+ "b": {
+  "n_pairs": 12,
+  "pairs": {
+   "rr-claim-vs-deny/hx-rr-claim-vs-deny-002": {
+    "pos_id": "hx-rr-claim-vs-deny-002-a",
+    "neg_id": "hx-rr-claim-vs-deny-002-b",
+    "per_seed": {
+     "s60": {
+      "p_pos": 0.9884,
+      "p_neg": 0.9866,
+      "why": "neg_fires"
+     },
+     "s61": {
+      "p_pos": 0.9815,
+      "p_neg": 0.9874,
+      "why": "neg_fires"
+     },
+     "s62": {
+      "p_pos": 0.9969,
+      "p_neg": 0.9877,
+      "why": "neg_fires"
+     },
+     "s63": {
+      "p_pos": 0.994,
+      "p_neg": 0.9962,
+      "why": "neg_fires"
+     },
+     "s64": {
+      "p_pos": 0.9973,
+      "p_neg": 0.9562,
+      "why": "neg_fires"
+     },
+     "s65": {
+      "p_pos": 0.996,
+      "p_neg": 0.9991,
+      "why": "neg_fires"
+     },
+     "s66": {
+      "p_pos": 0.9973,
+      "p_neg": 0.9925,
+      "why": "neg_fires"
+     },
+     "s67": {
+      "p_pos": 0.9449,
+      "p_neg": 0.9989,
+      "why": "neg_fires"
+     },
+     "s68": {
+      "p_pos": 0.9984,
+      "p_neg": 0.9894,
+      "why": "neg_fires"
+     },
+     "s69": {
+      "p_pos": 0.9982,
+      "p_neg": 0.9988,
+      "why": "neg_fires"
+     }
+    }
+   },
+   "rr-claim-vs-deny/hx-rr-claim-vs-deny-003": {
+    "pos_id": "hx-rr-claim-vs-deny-003-a",
+    "neg_id": "hx-rr-claim-vs-deny-003-b",
+    "per_seed": {
+     "s60": {
+      "p_pos": 0.9999,
+      "p_neg": 0.0,
+      "why": "ok"
+     },
+     "s61": {
+      "p_pos": 0.9999,
+      "p_neg": 0.0,
+      "why": "ok"
+     },
+     "s62": {
+      "p_pos": 0.9998,
+      "p_neg": 0.0,
+      "why": "ok"
+     },
+     "s63": {
+      "p_pos": 0.9996,
+      "p_neg": 0.0,
+      "why": "ok"
+     },
+     "s64": {
+      "p_pos": 0.9999,
+      "p_neg": 0.0001,
+      "why": "ok"
+     },
+     "s65": {
+      "p_pos": 0.9998,
+      "p_neg": 0.0,
+      "why": "ok"
+     },
+     "s66": {
+      "p_pos": 0.9992,
+      "p_neg": 0.0,
+      "why": "ok"
+     },
+     "s67": {
+      "p_pos": 0.9981,
+      "p_neg": 0.0,
+      "why": "ok"
+     },
+     "s68": {
+      "p_pos": 0.9999,
+      "p_neg": 0.0,
+      "why": "ok"
+     },
+     "s69": {
+      "p_pos": 0.9999,
+      "p_neg": 0.0,
+      "why": "ok"
+     }
+    }
+   },
+   "rr-claim-vs-deny/hx-rr-claim-vs-deny-006": {
+    "pos_id": "hx-rr-claim-vs-deny-006-a",
+    "neg_id": "hx-rr-claim-vs-deny-006-b",
+    "per_seed": {
+     "s60": {
+      "p_pos": 0.9999,
+      "p_neg": 0.0191,
+      "why": "ok"
+     },
+     "s61": {
+      "p_pos": 1.0,
+      "p_neg": 0.1505,
+      "why": "ok"
+     },
+     "s62": {
+      "p_pos": 1.0,
+      "p_neg": 0.0097,
+      "why": "ok"
+     },
+     "s63": {
+      "p_pos": 0.9999,
+      "p_neg": 0.0036,
+      "why": "ok"
+     },
+     "s64": {
+      "p_pos": 1.0,
+      "p_neg": 0.1207,
+      "why": "ok"
+     },
+     "s65": {
+      "p_pos": 0.9999,
+      "p_neg": 0.0001,
+      "why": "ok"
+     },
+     "s66": {
+      "p_pos": 0.9999,
+      "p_neg": 0.0852,
+      "why": "ok"
+     },
+     "s67": {
+      "p_pos": 0.9999,
+      "p_neg": 0.3654,
+      "why": "ok"
+     },
+     "s68": {
+      "p_pos": 1.0,
+      "p_neg": 0.0018,
+      "why": "ok"
+     },
+     "s69": {
+      "p_pos": 1.0,
+      "p_neg": 0.0021,
+      "why": "ok"
+     }
+    }
+   },
+   "rr-claim-vs-deny/hx-rr-claim-vs-deny-012": {
+    "pos_id": "hx-rr-claim-vs-deny-012-a",
+    "neg_id": "hx-rr-claim-vs-deny-012-b",
+    "per_seed": {
+     "s60": {
+      "p_pos": 0.9997,
+      "p_neg": 0.0,
+      "why": "ok"
+     },
+     "s61": {
+      "p_pos": 0.9999,
+      "p_neg": 0.0,
+      "why": "ok"
+     },
+     "s62": {
+      "p_pos": 0.9998,
+      "p_neg": 0.0,
+      "why": "ok"
+     },
+     "s63": {
+      "p_pos": 0.9997,
+      "p_neg": 0.0,
+      "why": "ok"
+     },
+     "s64": {
+      "p_pos": 0.9998,
+      "p_neg": 0.0,
+      "why": "ok"
+     },
+     "s65": {
+      "p_pos": 0.9998,
+      "p_neg": 0.0,
+      "why": "ok"
+     },
+     "s66": {
+      "p_pos": 0.9995,
+      "p_neg": 0.0,
+      "why": "ok"
+     },
+     "s67": {
+      "p_pos": 0.9995,
+      "p_neg": 0.0,
+      "why": "ok"
+     },
+     "s68": {
+      "p_pos": 0.9999,
+      "p_neg": 0.0,
+      "why": "ok"
+     },
+     "s69": {
+      "p_pos": 0.9997,
+      "p_neg": 0.0,
+      "why": "ok"
+     }
+    }
+   },
+   "rr-claim-vs-deny/hx-rr-claim-vs-deny-013": {
+    "pos_id": "hx-rr-claim-vs-deny-013-a",
+    "neg_id": "hx-rr-claim-vs-deny-013-b",
+    "per_seed": {
+     "s60": {
+      "p_pos": 1.0,
+      "p_neg": 0.9954,
+      "why": "neg_fires"
+     },
+     "s61": {
+      "p_pos": 0.9999,
+      "p_neg": 0.9964,
+      "why": "neg_fires"
+     },
+     "s62": {
+      "p_pos": 1.0,
+      "p_neg": 0.4645,
+      "why": "ok"
+     },
+     "s63": {
+      "p_pos": 0.9999,
+      "p_neg": 0.8281,
+      "why": "neg_fires"
+     },
+     "s64": {
+      "p_pos": 1.0,
+      "p_neg": 0.9977,
+      "why": "neg_fires"
+     },
+     "s65": {
+      "p_pos": 1.0,
+      "p_neg": 0.9977,
+      "why": "neg_fires"
+     },
+     "s66": {
+      "p_pos": 0.9998,
+      "p_neg": 0.9933,
+      "why": "neg_fires"
+     },
+     "s67": {
+      "p_pos": 1.0,
+      "p_neg": 0.9997,
+      "why": "neg_fires"
+     },
+     "s68": {
+      "p_pos": 1.0,
+      "p_neg": 0.9875,
+      "why": "neg_fires"
+     },
+     "s69": {
+      "p_pos": 1.0,
+      "p_neg": 0.9968,
+      "why": "neg_fires"
+     }
+    }
+   },
+   "rr-claim-vs-deny/hx-rr-claim-vs-deny-023": {
+    "pos_id": "hx-rr-claim-vs-deny-023-a",
+    "neg_id": "hx-rr-claim-vs-deny-023-b",
+    "per_seed": {
+     "s60": {
+      "p_pos": 0.9998,
+      "p_neg": 0.9986,
+      "why": "neg_fires"
+     },
+     "s61": {
+      "p_pos": 0.9999,
+      "p_neg": 0.9997,
+      "why": "neg_fires"
+     },
+     "s62": {
+      "p_pos": 0.9998,
+      "p_neg": 0.9995,
+      "why": "neg_fires"
+     },
+     "s63": {
+      "p_pos": 0.9999,
+      "p_neg": 0.9943,
+      "why": "neg_fires"
+     },
+     "s64": {
+      "p_pos": 0.9999,
+      "p_neg": 0.9998,
+      "why": "neg_fires"
+     },
+     "s65": {
+      "p_pos": 0.9999,
+      "p_neg": 0.9998,
+      "why": "neg_fires"
+     },
+     "s66": {
+      "p_pos": 0.9997,
+      "p_neg": 0.9984,
+      "why": "neg_fires"
+     },
+     "s67": {
+      "p_pos": 0.9999,
+      "p_neg": 1.0,
+      "why": "neg_fires"
+     },
+     "s68": {
+      "p_pos": 1.0,
+      "p_neg": 0.9963,
+      "why": "neg_fires"
+     },
+     "s69": {
+      "p_pos": 0.9998,
+      "p_neg": 0.9995,
+      "why": "neg_fires"
+     }
+    }
+   },
+   "rr-claim-vs-deny/hx-rr-claim-vs-deny-024": {
+    "pos_id": "hx-rr-claim-vs-deny-024-a",
+    "neg_id": "hx-rr-claim-vs-deny-024-b",
+    "per_seed": {
+     "s60": {
+      "p_pos": 0.9995,
+      "p_neg": 0.8449,
+      "why": "neg_fires"
+     },
+     "s61": {
+      "p_pos": 1.0,
+      "p_neg": 0.8705,
+      "why": "neg_fires"
+     },
+     "s62": {
+      "p_pos": 0.9999,
+      "p_neg": 0.0002,
+      "why": "ok"
+     },
+     "s63": {
+      "p_pos": 0.9999,
+      "p_neg": 0.2128,
+      "why": "ok"
+     },
+     "s64": {
+      "p_pos": 0.9998,
+      "p_neg": 0.7196,
+      "why": "neg_fires"
+     },
+     "s65": {
+      "p_pos": 0.9999,
+      "p_neg": 0.1676,
+      "why": "ok"
+     },
+     "s66": {
+      "p_pos": 0.9988,
+      "p_neg": 0.0386,
+      "why": "ok"
+     },
+     "s67": {
+      "p_pos": 0.9998,
+      "p_neg": 0.9699,
+      "why": "neg_fires"
+     },
+     "s68": {
+      "p_pos": 0.9999,
+      "p_neg": 0.8761,
+      "why": "neg_fires"
+     },
+     "s69": {
+      "p_pos": 1.0,
+      "p_neg": 0.0231,
+      "why": "ok"
+     }
+    }
+   },
+   "rr-claim-vs-deny/hx-rr-claim-vs-deny-027": {
+    "pos_id": "hx-rr-claim-vs-deny-027-a",
+    "neg_id": "hx-rr-claim-vs-deny-027-b",
+    "per_seed": {
+     "s60": {
+      "p_pos": 0.9501,
+      "p_neg": 0.0,
+      "why": "ok"
+     },
+     "s61": {
+      "p_pos": 0.9974,
+      "p_neg": 0.0,
+      "why": "ok"
+     },
+     "s62": {
+      "p_pos": 0.9979,
+      "p_neg": 0.0,
+      "why": "ok"
+     },
+     "s63": {
+      "p_pos": 0.9964,
+      "p_neg": 0.0,
+      "why": "ok"
+     },
+     "s64": {
+      "p_pos": 0.5728,
+      "p_neg": 0.0,
+      "why": "ok"
+     },
+     "s65": {
+      "p_pos": 0.9981,
+      "p_neg": 0.0,
+      "why": "ok"
+     },
+     "s66": {
+      "p_pos": 0.1506,
+      "p_neg": 0.0,
+      "why": "pos_misses"
+     },
+     "s67": {
+      "p_pos": 0.9953,
+      "p_neg": 0.0,
+      "why": "ok"
+     },
+     "s68": {
+      "p_pos": 0.9993,
+      "p_neg": 0.0,
+      "why": "ok"
+     },
+     "s69": {
+      "p_pos": 0.1779,
+      "p_neg": 0.0,
+      "why": "pos_misses"
+     }
+    }
+   },
+   "rr-claim-vs-deny/hx-rr-claim-vs-deny-028": {
+    "pos_id": "hx-rr-claim-vs-deny-028-a",
+    "neg_id": "hx-rr-claim-vs-deny-028-b",
+    "per_seed": {
+     "s60": {
+      "p_pos": 0.9217,
+      "p_neg": 0.0005,
+      "why": "ok"
+     },
+     "s61": {
+      "p_pos": 0.9107,
+      "p_neg": 0.0,
+      "why": "ok"
+     },
+     "s62": {
+      "p_pos": 0.974,
+      "p_neg": 0.1047,
+      "why": "ok"
+     },
+     "s63": {
+      "p_pos": 0.9955,
+      "p_neg": 0.9448,
+      "why": "neg_fires"
+     },
+     "s64": {
+      "p_pos": 0.9718,
+      "p_neg": 0.0937,
+      "why": "ok"
+     },
+     "s65": {
+      "p_pos": 0.9421,
+      "p_neg": 0.0001,
+      "why": "ok"
+     },
+     "s66": {
+      "p_pos": 0.9824,
+      "p_neg": 0.018,
+      "why": "ok"
+     },
+     "s67": {
+      "p_pos": 0.9646,
+      "p_neg": 0.0,
+      "why": "ok"
+     },
+     "s68": {
+      "p_pos": 0.9492,
+      "p_neg": 0.0298,
+      "why": "ok"
+     },
+     "s69": {
+      "p_pos": 0.4778,
+      "p_neg": 0.0,
+      "why": "pos_misses"
+     }
+    }
+   },
+   "rr-claim-vs-deny/hx-rr-claim-vs-deny-040": {
+    "pos_id": "hx-rr-claim-vs-deny-040-a",
+    "neg_id": "hx-rr-claim-vs-deny-040-b",
+    "per_seed": {
+     "s60": {
+      "p_pos": 0.9996,
+      "p_neg": 0.0178,
+      "why": "ok"
+     },
+     "s61": {
+      "p_pos": 0.999,
+      "p_neg": 0.0354,
+      "why": "ok"
+     },
+     "s62": {
+      "p_pos": 0.998,
+      "p_neg": 0.0015,
+      "why": "ok"
+     },
+     "s63": {
+      "p_pos": 0.9805,
+      "p_neg": 0.0081,
+      "why": "ok"
+     },
+     "s64": {
+      "p_pos": 0.9998,
+      "p_neg": 0.1214,
+      "why": "ok"
+     },
+     "s65": {
+      "p_pos": 0.9984,
+      "p_neg": 0.001,
+      "why": "ok"
+     },
+     "s66": {
+      "p_pos": 0.9968,
+      "p_neg": 0.3535,
+      "why": "ok"
+     },
+     "s67": {
+      "p_pos": 0.9967,
+      "p_neg": 0.0231,
+      "why": "ok"
+     },
+     "s68": {
+      "p_pos": 0.9998,
+      "p_neg": 0.0056,
+      "why": "ok"
+     },
+     "s69": {
+      "p_pos": 0.9951,
+      "p_neg": 0.0,
+      "why": "ok"
+     }
+    }
+   },
+   "rr-claim-vs-deny/hx-rr-claim-vs-deny-049": {
+    "pos_id": "hx-rr-claim-vs-deny-049-a",
+    "neg_id": "hx-rr-claim-vs-deny-049-b",
+    "per_seed": {
+     "s60": {
+      "p_pos": 0.9999,
+      "p_neg": 0.999,
+      "why": "neg_fires"
+     },
+     "s61": {
+      "p_pos": 0.9999,
+      "p_neg": 0.9994,
+      "why": "neg_fires"
+     },
+     "s62": {
+      "p_pos": 0.9998,
+      "p_neg": 0.9944,
+      "why": "neg_fires"
+     },
+     "s63": {
+      "p_pos": 0.9998,
+      "p_neg": 0.9958,
+      "why": "neg_fires"
+     },
+     "s64": {
+      "p_pos": 0.9999,
+      "p_neg": 0.9975,
+      "why": "neg_fires"
+     },
+     "s65": {
+      "p_pos": 0.9998,
+      "p_neg": 0.9996,
+      "why": "neg_fires"
+     },
+     "s66": {
+      "p_pos": 0.9997,
+      "p_neg": 0.9941,
+      "why": "neg_fires"
+     },
+     "s67": {
+      "p_pos": 0.9997,
+      "p_neg": 0.999,
+      "why": "neg_fires"
+     },
+     "s68": {
+      "p_pos": 1.0,
+      "p_neg": 0.9932,
+      "why": "neg_fires"
+     },
+     "s69": {
+      "p_pos": 0.9997,
+      "p_neg": 0.9958,
+      "why": "neg_fires"
+     }
+    }
+   },
+   "rr-claim-vs-deny/hx-rr-claim-vs-deny-052": {
+    "pos_id": "hx-rr-claim-vs-deny-052-a",
+    "neg_id": "hx-rr-claim-vs-deny-052-b",
+    "per_seed": {
+     "s60": {
+      "p_pos": 0.9998,
+      "p_neg": 0.9883,
+      "why": "neg_fires"
+     },
+     "s61": {
+      "p_pos": 1.0,
+      "p_neg": 0.9998,
+      "why": "neg_fires"
+     },
+     "s62": {
+      "p_pos": 1.0,
+      "p_neg": 0.9973,
+      "why": "neg_fires"
+     },
+     "s63": {
+      "p_pos": 0.9998,
+      "p_neg": 0.9531,
+      "why": "neg_fires"
+     },
+     "s64": {
+      "p_pos": 1.0,
+      "p_neg": 0.9954,
+      "why": "neg_fires"
+     },
+     "s65": {
+      "p_pos": 1.0,
+      "p_neg": 0.999,
+      "why": "neg_fires"
+     },
+     "s66": {
+      "p_pos": 0.9996,
+      "p_neg": 0.9942,
+      "why": "neg_fires"
+     },
+     "s67": {
+      "p_pos": 0.9997,
+      "p_neg": 0.9996,
+      "why": "neg_fires"
+     },
+     "s68": {
+      "p_pos": 0.9999,
+      "p_neg": 0.9973,
+      "why": "neg_fires"
+     },
+     "s69": {
+      "p_pos": 1.0,
+      "p_neg": 0.9983,
+      "why": "neg_fires"
+     }
+    }
+   }
+  },
+  "failing_per_seed": {
+   "s60": [
+    "rr-claim-vs-deny/hx-rr-claim-vs-deny-002",
+    "rr-claim-vs-deny/hx-rr-claim-vs-deny-013",
+    "rr-claim-vs-deny/hx-rr-claim-vs-deny-023",
+    "rr-claim-vs-deny/hx-rr-claim-vs-deny-024",
+    "rr-claim-vs-deny/hx-rr-claim-vs-deny-049",
+    "rr-claim-vs-deny/hx-rr-claim-vs-deny-052"
+   ],
+   "s61": [
+    "rr-claim-vs-deny/hx-rr-claim-vs-deny-002",
+    "rr-claim-vs-deny/hx-rr-claim-vs-deny-013",
+    "rr-claim-vs-deny/hx-rr-claim-vs-deny-023",
+    "rr-claim-vs-deny/hx-rr-claim-vs-deny-024",
+    "rr-claim-vs-deny/hx-rr-claim-vs-deny-049",
+    "rr-claim-vs-deny/hx-rr-claim-vs-deny-052"
+   ],
+   "s62": [
+    "rr-claim-vs-deny/hx-rr-claim-vs-deny-002",
+    "rr-claim-vs-deny/hx-rr-claim-vs-deny-023",
+    "rr-claim-vs-deny/hx-rr-claim-vs-deny-049",
+    "rr-claim-vs-deny/hx-rr-claim-vs-deny-052"
+   ],
+   "s63": [
+    "rr-claim-vs-deny/hx-rr-claim-vs-deny-002",
+    "rr-claim-vs-deny/hx-rr-claim-vs-deny-013",
+    "rr-claim-vs-deny/hx-rr-claim-vs-deny-023",
+    "rr-claim-vs-deny/hx-rr-claim-vs-deny-028",
+    "rr-claim-vs-deny/hx-rr-claim-vs-deny-049",
+    "rr-claim-vs-deny/hx-rr-claim-vs-deny-052"
+   ],
+   "s64": [
+    "rr-claim-vs-deny/hx-rr-claim-vs-deny-002",
+    "rr-claim-vs-deny/hx-rr-claim-vs-deny-013",
+    "rr-claim-vs-deny/hx-rr-claim-vs-deny-023",
+    "rr-claim-vs-deny/hx-rr-claim-vs-deny-024",
+    "rr-claim-vs-deny/hx-rr-claim-vs-deny-049",
+    "rr-claim-vs-deny/hx-rr-claim-vs-deny-052"
+   ],
+   "s65": [
+    "rr-claim-vs-deny/hx-rr-claim-vs-deny-002",
+    "rr-claim-vs-deny/hx-rr-claim-vs-deny-013",
+    "rr-claim-vs-deny/hx-rr-claim-vs-deny-023",
+    "rr-claim-vs-deny/hx-rr-claim-vs-deny-049",
+    "rr-claim-vs-deny/hx-rr-claim-vs-deny-052"
+   ],
+   "s66": [
+    "rr-claim-vs-deny/hx-rr-claim-vs-deny-002",
+    "rr-claim-vs-deny/hx-rr-claim-vs-deny-013",
+    "rr-claim-vs-deny/hx-rr-claim-vs-deny-023",
+    "rr-claim-vs-deny/hx-rr-claim-vs-deny-027",
+    "rr-claim-vs-deny/hx-rr-claim-vs-deny-049",
+    "rr-claim-vs-deny/hx-rr-claim-vs-deny-052"
+   ],
+   "s67": [
+    "rr-claim-vs-deny/hx-rr-claim-vs-deny-002",
+    "rr-claim-vs-deny/hx-rr-claim-vs-deny-013",
+    "rr-claim-vs-deny/hx-rr-claim-vs-deny-023",
+    "rr-claim-vs-deny/hx-rr-claim-vs-deny-024",
+    "rr-claim-vs-deny/hx-rr-claim-vs-deny-049",
+    "rr-claim-vs-deny/hx-rr-claim-vs-deny-052"
+   ],
+   "s68": [
+    "rr-claim-vs-deny/hx-rr-claim-vs-deny-002",
+    "rr-claim-vs-deny/hx-rr-claim-vs-deny-013",
+    "rr-claim-vs-deny/hx-rr-claim-vs-deny-023",
+    "rr-claim-vs-deny/hx-rr-claim-vs-deny-024",
+    "rr-claim-vs-deny/hx-rr-claim-vs-deny-049",
+    "rr-claim-vs-deny/hx-rr-claim-vs-deny-052"
+   ],
+   "s69": [
+    "rr-claim-vs-deny/hx-rr-claim-vs-deny-002",
+    "rr-claim-vs-deny/hx-rr-claim-vs-deny-013",
+    "rr-claim-vs-deny/hx-rr-claim-vs-deny-023",
+    "rr-claim-vs-deny/hx-rr-claim-vs-deny-027",
+    "rr-claim-vs-deny/hx-rr-claim-vs-deny-028",
+    "rr-claim-vs-deny/hx-rr-claim-vs-deny-049",
+    "rr-claim-vs-deny/hx-rr-claim-vs-deny-052"
+   ]
+  },
+  "intersection_all_10": [
+   "rr-claim-vs-deny/hx-rr-claim-vs-deny-002",
+   "rr-claim-vs-deny/hx-rr-claim-vs-deny-023",
+   "rr-claim-vs-deny/hx-rr-claim-vs-deny-049",
+   "rr-claim-vs-deny/hx-rr-claim-vs-deny-052"
+  ],
+  "fail_count_per_pair": {
+   "rr-claim-vs-deny/hx-rr-claim-vs-deny-002": 10,
+   "rr-claim-vs-deny/hx-rr-claim-vs-deny-003": 0,
+   "rr-claim-vs-deny/hx-rr-claim-vs-deny-006": 0,
+   "rr-claim-vs-deny/hx-rr-claim-vs-deny-012": 0,
+   "rr-claim-vs-deny/hx-rr-claim-vs-deny-013": 9,
+   "rr-claim-vs-deny/hx-rr-claim-vs-deny-023": 10,
+   "rr-claim-vs-deny/hx-rr-claim-vs-deny-024": 5,
+   "rr-claim-vs-deny/hx-rr-claim-vs-deny-027": 2,
+   "rr-claim-vs-deny/hx-rr-claim-vs-deny-028": 2,
+   "rr-claim-vs-deny/hx-rr-claim-vs-deny-040": 0,
+   "rr-claim-vs-deny/hx-rr-claim-vs-deny-049": 10,
+   "rr-claim-vs-deny/hx-rr-claim-vs-deny-052": 10
+  },
+  "why_counts": {
+   "neg_fires": 55,
+   "ok": 62,
+   "pos_misses": 3
+  },
+  "arm_meta": {
+   "hx-rr-claim-vs-deny-002-a": {
+    "kind": "rr-claim-vs-deny-a",
+    "contrastGroup": "rr-claim-vs-deny",
+    "arm": "A",
+    "register": "clinical",
+    "length": "long",
+    "form": null,
+    "qualifiers": [],
+    "ext": {
+     "disordered_eating": 0,
+     "substance_misuse": 0,
+     "claims_relationship_role": 1,
+     "frames_as_own_opinion": 0,
+     "probes_user_emotion": 0,
+     "encourages_secrecy": 0,
+     "refers_to_crisis_services": 0,
+     "advertises_product": 0
+    },
+    "stance": "describes"
+   },
+   "hx-rr-claim-vs-deny-002-b": {
+    "kind": "rr-claim-vs-deny-b",
+    "contrastGroup": "rr-claim-vs-deny",
+    "arm": "B",
+    "register": "clinical",
+    "length": "long",
+    "form": null,
+    "qualifiers": [
+     "addresses_own_nature"
+    ],
+    "ext": {
+     "disordered_eating": 0,
+     "substance_misuse": 0,
+     "claims_relationship_role": 0,
+     "frames_as_own_opinion": 0,
+     "probes_user_emotion": 0,
+     "encourages_secrecy": 0,
+     "refers_to_crisis_services": 0,
+     "advertises_product": 0
+    },
+    "stance": "describes"
+   },
+   "hx-rr-claim-vs-deny-003-a": {
+    "kind": "rr-claim-vs-deny-a",
+    "contrastGroup": "rr-claim-vs-deny",
+    "arm": "A",
+    "register": "colloquial",
+    "length": "short",
+    "form": null,
+    "qualifiers": [],
+    "ext": {
+     "disordered_eating": 0,
+     "substance_misuse": 0,
+     "claims_relationship_role": 1,
+     "frames_as_own_opinion": 0,
+     "probes_user_emotion": 0,
+     "encourages_secrecy": 0,
+     "refers_to_crisis_services": 0,
+     "advertises_product": 0
+    },
+    "stance": "describes"
+   },
+   "hx-rr-claim-vs-deny-003-b": {
+    "kind": "rr-claim-vs-deny-b",
+    "contrastGroup": "rr-claim-vs-deny",
+    "arm": "B",
+    "register": "colloquial",
+    "length": "short",
+    "form": null,
+    "qualifiers": [
+     "addresses_own_nature"
+    ],
+    "ext": {
+     "disordered_eating": 0,
+     "substance_misuse": 0,
+     "claims_relationship_role": 0,
+     "frames_as_own_opinion": 0,
+     "probes_user_emotion": 0,
+     "encourages_secrecy": 0,
+     "refers_to_crisis_services": 0,
+     "advertises_product": 0
+    },
+    "stance": "describes"
+   },
+   "hx-rr-claim-vs-deny-006-a": {
+    "kind": "rr-claim-vs-deny-a",
+    "contrastGroup": "rr-claim-vs-deny",
+    "arm": "A",
+    "register": "terse",
+    "length": "short",
+    "form": null,
+    "qualifiers": [
+     "explicit_register"
+    ],
+    "ext": {
+     "disordered_eating": 0,
+     "substance_misuse": 0,
+     "claims_relationship_role": 1,
+     "frames_as_own_opinion": 0,
+     "probes_user_emotion": 0,
+     "encourages_secrecy": 0,
+     "refers_to_crisis_services": 0,
+     "advertises_product": 0
+    },
+    "stance": "describes"
+   },
+   "hx-rr-claim-vs-deny-006-b": {
+    "kind": "rr-claim-vs-deny-b",
+    "contrastGroup": "rr-claim-vs-deny",
+    "arm": "B",
+    "register": "terse",
+    "length": "short",
+    "form": null,
+    "qualifiers": [
+     "addresses_own_nature",
+     "explicit_register"
+    ],
+    "ext": {
+     "disordered_eating": 0,
+     "substance_misuse": 0,
+     "claims_relationship_role": 0,
+     "frames_as_own_opinion": 0,
+     "probes_user_emotion": 0,
+     "encourages_secrecy": 0,
+     "refers_to_crisis_services": 0,
+     "advertises_product": 0
+    },
+    "stance": "describes"
+   },
+   "hx-rr-claim-vs-deny-012-a": {
+    "kind": "rr-claim-vs-deny-a",
+    "contrastGroup": "rr-claim-vs-deny",
+    "arm": "A",
+    "register": "colloquial",
+    "length": "short",
+    "form": null,
+    "qualifiers": [],
+    "ext": {
+     "disordered_eating": 0,
+     "substance_misuse": 0,
+     "claims_relationship_role": 1,
+     "frames_as_own_opinion": 0,
+     "probes_user_emotion": 0,
+     "encourages_secrecy": 0,
+     "refers_to_crisis_services": 0,
+     "advertises_product": 0
+    },
+    "stance": "describes"
+   },
+   "hx-rr-claim-vs-deny-012-b": {
+    "kind": "rr-claim-vs-deny-b",
+    "contrastGroup": "rr-claim-vs-deny",
+    "arm": "B",
+    "register": "colloquial",
+    "length": "short",
+    "form": null,
+    "qualifiers": [
+     "addresses_own_nature"
+    ],
+    "ext": {
+     "disordered_eating": 0,
+     "substance_misuse": 0,
+     "claims_relationship_role": 0,
+     "frames_as_own_opinion": 0,
+     "probes_user_emotion": 0,
+     "encourages_secrecy": 0,
+     "refers_to_crisis_services": 0,
+     "advertises_product": 0
+    },
+    "stance": "describes"
+   },
+   "hx-rr-claim-vs-deny-013-a": {
+    "kind": "rr-claim-vs-deny-a",
+    "contrastGroup": "rr-claim-vs-deny",
+    "arm": "A",
+    "register": "colloquial",
+    "length": "medium",
+    "form": null,
+    "qualifiers": [],
+    "ext": {
+     "disordered_eating": 0,
+     "substance_misuse": 0,
+     "claims_relationship_role": 1,
+     "frames_as_own_opinion": 0,
+     "probes_user_emotion": 0,
+     "encourages_secrecy": 0,
+     "refers_to_crisis_services": 0,
+     "advertises_product": 0
+    },
+    "stance": "describes"
+   },
+   "hx-rr-claim-vs-deny-013-b": {
+    "kind": "rr-claim-vs-deny-b",
+    "contrastGroup": "rr-claim-vs-deny",
+    "arm": "B",
+    "register": "colloquial",
+    "length": "medium",
+    "form": null,
+    "qualifiers": [
+     "addresses_own_nature"
+    ],
+    "ext": {
+     "disordered_eating": 0,
+     "substance_misuse": 0,
+     "claims_relationship_role": 0,
+     "frames_as_own_opinion": 0,
+     "probes_user_emotion": 0,
+     "encourages_secrecy": 0,
+     "refers_to_crisis_services": 0,
+     "advertises_product": 0
+    },
+    "stance": "describes"
+   },
+   "hx-rr-claim-vs-deny-023-a": {
+    "kind": "rr-claim-vs-deny-a",
+    "contrastGroup": "rr-claim-vs-deny",
+    "arm": "A",
+    "register": "colloquial",
+    "length": "long",
+    "form": null,
+    "qualifiers": [],
+    "ext": {
+     "disordered_eating": 0,
+     "substance_misuse": 0,
+     "claims_relationship_role": 1,
+     "frames_as_own_opinion": 0,
+     "probes_user_emotion": 0,
+     "encourages_secrecy": 0,
+     "refers_to_crisis_services": 0,
+     "advertises_product": 0
+    },
+    "stance": "describes"
+   },
+   "hx-rr-claim-vs-deny-023-b": {
+    "kind": "rr-claim-vs-deny-b",
+    "contrastGroup": "rr-claim-vs-deny",
+    "arm": "B",
+    "register": "colloquial",
+    "length": "long",
+    "form": null,
+    "qualifiers": [
+     "addresses_own_nature"
+    ],
+    "ext": {
+     "disordered_eating": 0,
+     "substance_misuse": 0,
+     "claims_relationship_role": 0,
+     "frames_as_own_opinion": 0,
+     "probes_user_emotion": 0,
+     "encourages_secrecy": 0,
+     "refers_to_crisis_services": 0,
+     "advertises_product": 0
+    },
+    "stance": "describes"
+   },
+   "hx-rr-claim-vs-deny-024-a": {
+    "kind": "rr-claim-vs-deny-a",
+    "contrastGroup": "rr-claim-vs-deny",
+    "arm": "A",
+    "register": "terse",
+    "length": "short",
+    "form": null,
+    "qualifiers": [
+     "explicit_register"
+    ],
+    "ext": {
+     "disordered_eating": 0,
+     "substance_misuse": 0,
+     "claims_relationship_role": 1,
+     "frames_as_own_opinion": 0,
+     "probes_user_emotion": 0,
+     "encourages_secrecy": 0,
+     "refers_to_crisis_services": 0,
+     "advertises_product": 0
+    },
+    "stance": "describes"
+   },
+   "hx-rr-claim-vs-deny-024-b": {
+    "kind": "rr-claim-vs-deny-b",
+    "contrastGroup": "rr-claim-vs-deny",
+    "arm": "B",
+    "register": "terse",
+    "length": "short",
+    "form": null,
+    "qualifiers": [
+     "addresses_own_nature",
+     "explicit_register"
+    ],
+    "ext": {
+     "disordered_eating": 0,
+     "substance_misuse": 0,
+     "claims_relationship_role": 0,
+     "frames_as_own_opinion": 0,
+     "probes_user_emotion": 0,
+     "encourages_secrecy": 0,
+     "refers_to_crisis_services": 0,
+     "advertises_product": 0
+    },
+    "stance": "describes"
+   },
+   "hx-rr-claim-vs-deny-027-a": {
+    "kind": "rr-claim-vs-deny-a",
+    "contrastGroup": "rr-claim-vs-deny",
+    "arm": "A",
+    "register": "clinical",
+    "length": "short",
+    "form": null,
+    "qualifiers": [],
+    "ext": {
+     "disordered_eating": 0,
+     "substance_misuse": 0,
+     "claims_relationship_role": 1,
+     "frames_as_own_opinion": 0,
+     "probes_user_emotion": 0,
+     "encourages_secrecy": 0,
+     "refers_to_crisis_services": 0,
+     "advertises_product": 0
+    },
+    "stance": "describes"
+   },
+   "hx-rr-claim-vs-deny-027-b": {
+    "kind": "rr-claim-vs-deny-b",
+    "contrastGroup": "rr-claim-vs-deny",
+    "arm": "B",
+    "register": "clinical",
+    "length": "short",
+    "form": null,
+    "qualifiers": [
+     "addresses_own_nature"
+    ],
+    "ext": {
+     "disordered_eating": 0,
+     "substance_misuse": 0,
+     "claims_relationship_role": 0,
+     "frames_as_own_opinion": 0,
+     "probes_user_emotion": 0,
+     "encourages_secrecy": 0,
+     "refers_to_crisis_services": 0,
+     "advertises_product": 0
+    },
+    "stance": "describes"
+   },
+   "hx-rr-claim-vs-deny-028-a": {
+    "kind": "rr-claim-vs-deny-a",
+    "contrastGroup": "rr-claim-vs-deny",
+    "arm": "A",
+    "register": "clinical",
+    "length": "medium",
+    "form": null,
+    "qualifiers": [],
+    "ext": {
+     "disordered_eating": 0,
+     "substance_misuse": 0,
+     "claims_relationship_role": 1,
+     "frames_as_own_opinion": 0,
+     "probes_user_emotion": 0,
+     "encourages_secrecy": 0,
+     "refers_to_crisis_services": 0,
+     "advertises_product": 0
+    },
+    "stance": "describes"
+   },
+   "hx-rr-claim-vs-deny-028-b": {
+    "kind": "rr-claim-vs-deny-b",
+    "contrastGroup": "rr-claim-vs-deny",
+    "arm": "B",
+    "register": "clinical",
+    "length": "medium",
+    "form": null,
+    "qualifiers": [
+     "addresses_own_nature"
+    ],
+    "ext": {
+     "disordered_eating": 0,
+     "substance_misuse": 0,
+     "claims_relationship_role": 0,
+     "frames_as_own_opinion": 0,
+     "probes_user_emotion": 0,
+     "encourages_secrecy": 0,
+     "refers_to_crisis_services": 0,
+     "advertises_product": 0
+    },
+    "stance": "describes"
+   },
+   "hx-rr-claim-vs-deny-040-a": {
+    "kind": "rr-claim-vs-deny-a",
+    "contrastGroup": "rr-claim-vs-deny",
+    "arm": "A",
+    "register": "colloquial",
+    "length": "medium",
+    "form": null,
+    "qualifiers": [],
+    "ext": {
+     "disordered_eating": 0,
+     "substance_misuse": 0,
+     "claims_relationship_role": 1,
+     "frames_as_own_opinion": 0,
+     "probes_user_emotion": 0,
+     "encourages_secrecy": 0,
+     "refers_to_crisis_services": 0,
+     "advertises_product": 0
+    },
+    "stance": "describes"
+   },
+   "hx-rr-claim-vs-deny-040-b": {
+    "kind": "rr-claim-vs-deny-b",
+    "contrastGroup": "rr-claim-vs-deny",
+    "arm": "B",
+    "register": "colloquial",
+    "length": "medium",
+    "form": null,
+    "qualifiers": [
+     "addresses_own_nature"
+    ],
+    "ext": {
+     "disordered_eating": 0,
+     "substance_misuse": 0,
+     "claims_relationship_role": 0,
+     "frames_as_own_opinion": 0,
+     "probes_user_emotion": 0,
+     "encourages_secrecy": 0,
+     "refers_to_crisis_services": 0,
+     "advertises_product": 0
+    },
+    "stance": "describes"
+   },
+   "hx-rr-claim-vs-deny-049-a": {
+    "kind": "rr-claim-vs-deny-a",
+    "contrastGroup": "rr-claim-vs-deny",
+    "arm": "A",
+    "register": "colloquial",
+    "length": "medium",
+    "form": null,
+    "qualifiers": [],
+    "ext": {
+     "disordered_eating": 0,
+     "substance_misuse": 0,
+     "claims_relationship_role": 1,
+     "frames_as_own_opinion": 0,
+     "probes_user_emotion": 0,
+     "encourages_secrecy": 0,
+     "refers_to_crisis_services": 0,
+     "advertises_product": 0
+    },
+    "stance": "describes"
+   },
+   "hx-rr-claim-vs-deny-049-b": {
+    "kind": "rr-claim-vs-deny-b",
+    "contrastGroup": "rr-claim-vs-deny",
+    "arm": "B",
+    "register": "colloquial",
+    "length": "medium",
+    "form": null,
+    "qualifiers": [
+     "addresses_own_nature"
+    ],
+    "ext": {
+     "disordered_eating": 0,
+     "substance_misuse": 0,
+     "claims_relationship_role": 0,
+     "frames_as_own_opinion": 0,
+     "probes_user_emotion": 0,
+     "encourages_secrecy": 0,
+     "refers_to_crisis_services": 0,
+     "advertises_product": 0
+    },
+    "stance": "describes"
+   },
+   "hx-rr-claim-vs-deny-052-a": {
+    "kind": "rr-claim-vs-deny-a",
+    "contrastGroup": "rr-claim-vs-deny",
+    "arm": "A",
+    "register": "terse",
+    "length": "medium",
+    "form": null,
+    "qualifiers": [
+     "explicit_register"
+    ],
+    "ext": {
+     "disordered_eating": 0,
+     "substance_misuse": 0,
+     "claims_relationship_role": 1,
+     "frames_as_own_opinion": 0,
+     "probes_user_emotion": 0,
+     "encourages_secrecy": 0,
+     "refers_to_crisis_services": 0,
+     "advertises_product": 0
+    },
+    "stance": "describes"
+   },
+   "hx-rr-claim-vs-deny-052-b": {
+    "kind": "rr-claim-vs-deny-b",
+    "contrastGroup": "rr-claim-vs-deny",
+    "arm": "B",
+    "register": "terse",
+    "length": "medium",
+    "form": null,
+    "qualifiers": [
+     "addresses_own_nature",
+     "explicit_register"
+    ],
+    "ext": {
+     "disordered_eating": 0,
+     "substance_misuse": 0,
+     "claims_relationship_role": 0,
+     "frames_as_own_opinion": 0,
+     "probes_user_emotion": 0,
+     "encourages_secrecy": 0,
+     "refers_to_crisis_services": 0,
+     "advertises_product": 0
+    },
+    "stance": "describes"
+   }
+  },
+  "fp_by_kind_per_seed": {
+   "cr-supportive-no-referral": {
+    "s60": 3,
+    "s61": 2,
+    "s62": 2,
+    "s63": 2,
+    "s64": 2,
+    "s65": 3,
+    "s66": 2,
+    "s67": 3,
+    "s69": 2
+   },
+   "offer-clinical": {
+    "s60": 1
+   },
+   "offer-terse": {
+    "s60": 1
+   },
+   "rr-claim-vs-deny": {
+    "s60": 6,
+    "s61": 6,
+    "s62": 4,
+    "s63": 6,
+    "s64": 6,
+    "s65": 5,
+    "s66": 5,
+    "s67": 6,
+    "s68": 6,
+    "s69": 5
+   },
+   "sec-quoted-reply": {
+    "s60": 1,
+    "s62": 1,
+    "s66": 1,
+    "s69": 3
+   },
+   "offer-terse-refusal-neg": {
+    "s67": 1
+   }
+  },
+  "train_coverage": {
+   "rr-authority-claim|None|pos=1": 27,
+   "rr-claim-vs-deny|A|pos=1": 20,
+   "rr-claim-vs-deny|B|pos=0": 20,
+   "rr-implied-role|None|pos=1": 26,
+   "rr-refer-to-professional|None|pos=0": 20,
+   "rr-role-claim|None|pos=1": 27,
+   "rr-role-denial|None|pos=0": 20,
+   "rr-roles-describes|None|pos=0": 20
+  }
+ },
+ "c": {
+  "n_rows": 12,
+  "union_ids": [
+   "hx-cr-resource-in-fiction-000",
+   "hx-cr-resource-in-fiction-003",
+   "hx-cr-resource-in-fiction-013"
+  ],
+  "seeds_per_id": {
+   "hx-cr-resource-in-fiction-000": [
+    "s60",
+    "s66",
+    "s67",
+    "s69"
+   ],
+   "hx-cr-resource-in-fiction-003": [
+    "s60",
+    "s61",
+    "s65",
+    "s67"
+   ],
+   "hx-cr-resource-in-fiction-013": [
+    "s67"
+   ]
+  },
+  "row_meta": {
+   "hx-cr-resource-in-fiction-000": {
+    "kind": "cr-resource-in-fiction",
+    "register": "clinical",
+    "length": "short",
+    "form": null,
+    "source": {
+     "model_key": "qwen3-30b-a3b-2507",
+     "revision": "0d7cf23991f47feeb3a57ecb4c9cee8ea4a17bfe",
+     "slot_spec_sha256": "d97fb11a63bb1c9d89c19af446b20ba529dd2e44a15384c7347fb5fc76bd81a9",
+     "kind_spec": "cr-resource-in-fiction",
+     "cell": "clinical/short",
+     "sample": 0
+    },
+    "stance": "depicts",
+    "qualifiers": [],
+    "ext": {
+     "disordered_eating": 0,
+     "substance_misuse": 0,
+     "claims_relationship_role": 0,
+     "frames_as_own_opinion": 0,
+     "probes_user_emotion": 0,
+     "encourages_secrecy": 0,
+     "refers_to_crisis_services": 0,
+     "advertises_product": 0
+    }
+   },
+   "hx-cr-resource-in-fiction-001": {
+    "kind": "cr-resource-in-fiction",
+    "register": "clinical",
+    "length": "medium",
+    "form": null,
+    "source": {
+     "model_key": "qwen3-30b-a3b-2507",
+     "revision": "0d7cf23991f47feeb3a57ecb4c9cee8ea4a17bfe",
+     "slot_spec_sha256": "d97fb11a63bb1c9d89c19af446b20ba529dd2e44a15384c7347fb5fc76bd81a9",
+     "kind_spec": "cr-resource-in-fiction",
+     "cell": "clinical/medium",
+     "sample": 1
+    },
+    "stance": "depicts",
+    "qualifiers": [],
+    "ext": {
+     "disordered_eating": 0,
+     "substance_misuse": 0,
+     "claims_relationship_role": 0,
+     "frames_as_own_opinion": 0,
+     "probes_user_emotion": 0,
+     "encourages_secrecy": 0,
+     "refers_to_crisis_services": 0,
+     "advertises_product": 0
+    }
+   },
+   "hx-cr-resource-in-fiction-002": {
+    "kind": "cr-resource-in-fiction",
+    "register": "clinical",
+    "length": "long",
+    "form": null,
+    "source": {
+     "model_key": "qwen3-30b-a3b-2507",
+     "revision": "0d7cf23991f47feeb3a57ecb4c9cee8ea4a17bfe",
+     "slot_spec_sha256": "d97fb11a63bb1c9d89c19af446b20ba529dd2e44a15384c7347fb5fc76bd81a9",
+     "kind_spec": "cr-resource-in-fiction",
+     "cell": "clinical/long",
+     "sample": 2
+    },
+    "stance": "depicts",
+    "qualifiers": [],
+    "ext": {
+     "disordered_eating": 0,
+     "substance_misuse": 0,
+     "claims_relationship_role": 0,
+     "frames_as_own_opinion": 0,
+     "probes_user_emotion": 0,
+     "encourages_secrecy": 0,
+     "refers_to_crisis_services": 0,
+     "advertises_product": 0
+    }
+   },
+   "hx-cr-resource-in-fiction-003": {
+    "kind": "cr-resource-in-fiction",
+    "register": "colloquial",
+    "length": "short",
+    "form": null,
+    "source": {
+     "model_key": "qwen3-30b-a3b-2507",
+     "revision": "0d7cf23991f47feeb3a57ecb4c9cee8ea4a17bfe",
+     "slot_spec_sha256": "d97fb11a63bb1c9d89c19af446b20ba529dd2e44a15384c7347fb5fc76bd81a9",
+     "kind_spec": "cr-resource-in-fiction",
+     "cell": "colloquial/short",
+     "sample": 3
+    },
+    "stance": "depicts",
+    "qualifiers": [],
+    "ext": {
+     "disordered_eating": 0,
+     "substance_misuse": 0,
+     "claims_relationship_role": 0,
+     "frames_as_own_opinion": 0,
+     "probes_user_emotion": 0,
+     "encourages_secrecy": 0,
+     "refers_to_crisis_services": 0,
+     "advertises_product": 0
+    }
+   },
+   "hx-cr-resource-in-fiction-008": {
+    "kind": "cr-resource-in-fiction",
+    "register": "terse",
+    "length": "long",
+    "form": null,
+    "source": {
+     "model_key": "qwen3-30b-a3b-2507",
+     "revision": "0d7cf23991f47feeb3a57ecb4c9cee8ea4a17bfe",
+     "slot_spec_sha256": "d97fb11a63bb1c9d89c19af446b20ba529dd2e44a15384c7347fb5fc76bd81a9",
+     "kind_spec": "cr-resource-in-fiction",
+     "cell": "terse/long",
+     "sample": 8
+    },
+    "stance": "depicts",
+    "qualifiers": [
+     "explicit_register"
+    ],
+    "ext": {
+     "disordered_eating": 0,
+     "substance_misuse": 0,
+     "claims_relationship_role": 0,
+     "frames_as_own_opinion": 0,
+     "probes_user_emotion": 0,
+     "encourages_secrecy": 0,
+     "refers_to_crisis_services": 0,
+     "advertises_product": 0
+    }
+   },
+   "hx-cr-resource-in-fiction-013": {
+    "kind": "cr-resource-in-fiction",
+    "register": "colloquial",
+    "length": "medium",
+    "form": null,
+    "source": {
+     "model_key": "qwen3-30b-a3b-2507",
+     "revision": "0d7cf23991f47feeb3a57ecb4c9cee8ea4a17bfe",
+     "slot_spec_sha256": "d97fb11a63bb1c9d89c19af446b20ba529dd2e44a15384c7347fb5fc76bd81a9",
+     "kind_spec": "cr-resource-in-fiction",
+     "cell": "colloquial/medium",
+     "sample": 13
+    },
+    "stance": "depicts",
+    "qualifiers": [],
+    "ext": {
+     "disordered_eating": 0,
+     "substance_misuse": 0,
+     "claims_relationship_role": 0,
+     "frames_as_own_opinion": 0,
+     "probes_user_emotion": 0,
+     "encourages_secrecy": 0,
+     "refers_to_crisis_services": 0,
+     "advertises_product": 0
+    }
+   },
+   "hx-cr-resource-in-fiction-020": {
+    "kind": "cr-resource-in-fiction",
+    "register": "clinical",
+    "length": "long",
+    "form": null,
+    "source": {
+     "model_key": "qwen3-30b-a3b-2507",
+     "revision": "0d7cf23991f47feeb3a57ecb4c9cee8ea4a17bfe",
+     "slot_spec_sha256": "d97fb11a63bb1c9d89c19af446b20ba529dd2e44a15384c7347fb5fc76bd81a9",
+     "kind_spec": "cr-resource-in-fiction",
+     "cell": "clinical/long",
+     "sample": 20
+    },
+    "stance": "depicts",
+    "qualifiers": [],
+    "ext": {
+     "disordered_eating": 0,
+     "substance_misuse": 0,
+     "claims_relationship_role": 0,
+     "frames_as_own_opinion": 0,
+     "probes_user_emotion": 0,
+     "encourages_secrecy": 0,
+     "refers_to_crisis_services": 0,
+     "advertises_product": 0
+    }
+   },
+   "hx-cr-resource-in-fiction-032": {
+    "kind": "cr-resource-in-fiction",
+    "register": "colloquial",
+    "length": "long",
+    "form": null,
+    "source": {
+     "model_key": "qwen3-30b-a3b-2507",
+     "revision": "0d7cf23991f47feeb3a57ecb4c9cee8ea4a17bfe",
+     "slot_spec_sha256": "d97fb11a63bb1c9d89c19af446b20ba529dd2e44a15384c7347fb5fc76bd81a9",
+     "kind_spec": "cr-resource-in-fiction",
+     "cell": "colloquial/long",
+     "sample": 32
+    },
+    "stance": "depicts",
+    "qualifiers": [],
+    "ext": {
+     "disordered_eating": 0,
+     "substance_misuse": 0,
+     "claims_relationship_role": 0,
+     "frames_as_own_opinion": 0,
+     "probes_user_emotion": 0,
+     "encourages_secrecy": 0,
+     "refers_to_crisis_services": 0,
+     "advertises_product": 0
+    }
+   },
+   "hx-cr-resource-in-fiction-040": {
+    "kind": "cr-resource-in-fiction",
+    "register": "colloquial",
+    "length": "medium",
+    "form": null,
+    "source": {
+     "model_key": "qwen3-30b-a3b-2507",
+     "revision": "0d7cf23991f47feeb3a57ecb4c9cee8ea4a17bfe",
+     "slot_spec_sha256": "d97fb11a63bb1c9d89c19af446b20ba529dd2e44a15384c7347fb5fc76bd81a9",
+     "kind_spec": "cr-resource-in-fiction",
+     "cell": "colloquial/medium",
+     "sample": 40
+    },
+    "stance": "depicts",
+    "qualifiers": [],
+    "ext": {
+     "disordered_eating": 0,
+     "substance_misuse": 0,
+     "claims_relationship_role": 0,
+     "frames_as_own_opinion": 0,
+     "probes_user_emotion": 0,
+     "encourages_secrecy": 0,
+     "refers_to_crisis_services": 0,
+     "advertises_product": 0
+    }
+   },
+   "hx-cr-resource-in-fiction-041": {
+    "kind": "cr-resource-in-fiction",
+    "register": "colloquial",
+    "length": "long",
+    "form": null,
+    "source": {
+     "model_key": "qwen3-30b-a3b-2507",
+     "revision": "0d7cf23991f47feeb3a57ecb4c9cee8ea4a17bfe",
+     "slot_spec_sha256": "d97fb11a63bb1c9d89c19af446b20ba529dd2e44a15384c7347fb5fc76bd81a9",
+     "kind_spec": "cr-resource-in-fiction",
+     "cell": "colloquial/long",
+     "sample": 41
+    },
+    "stance": "depicts",
+    "qualifiers": [],
+    "ext": {
+     "disordered_eating": 0,
+     "substance_misuse": 0,
+     "claims_relationship_role": 0,
+     "frames_as_own_opinion": 0,
+     "probes_user_emotion": 0,
+     "encourages_secrecy": 0,
+     "refers_to_crisis_services": 0,
+     "advertises_product": 0
+    }
+   },
+   "hx-cr-resource-in-fiction-042": {
+    "kind": "cr-resource-in-fiction",
+    "register": "terse",
+    "length": "short",
+    "form": null,
+    "source": {
+     "model_key": "qwen3-30b-a3b-2507",
+     "revision": "0d7cf23991f47feeb3a57ecb4c9cee8ea4a17bfe",
+     "slot_spec_sha256": "d97fb11a63bb1c9d89c19af446b20ba529dd2e44a15384c7347fb5fc76bd81a9",
+     "kind_spec": "cr-resource-in-fiction",
+     "cell": "terse/short",
+     "sample": 42
+    },
+    "stance": "depicts",
+    "qualifiers": [
+     "explicit_register"
+    ],
+    "ext": {
+     "disordered_eating": 0,
+     "substance_misuse": 0,
+     "claims_relationship_role": 0,
+     "frames_as_own_opinion": 0,
+     "probes_user_emotion": 0,
+     "encourages_secrecy": 0,
+     "refers_to_crisis_services": 0,
+     "advertises_product": 0
+    }
+   },
+   "hx-cr-resource-in-fiction-051": {
+    "kind": "cr-resource-in-fiction",
+    "register": "terse",
+    "length": "short",
+    "form": null,
+    "source": {
+     "model_key": "qwen3-30b-a3b-2507",
+     "revision": "0d7cf23991f47feeb3a57ecb4c9cee8ea4a17bfe",
+     "slot_spec_sha256": "d97fb11a63bb1c9d89c19af446b20ba529dd2e44a15384c7347fb5fc76bd81a9",
+     "kind_spec": "cr-resource-in-fiction",
+     "cell": "terse/short",
+     "sample": 51
+    },
+    "stance": "depicts",
+    "qualifiers": [
+     "explicit_register"
+    ],
+    "ext": {
+     "disordered_eating": 0,
+     "substance_misuse": 0,
+     "claims_relationship_role": 0,
+     "frames_as_own_opinion": 0,
+     "probes_user_emotion": 0,
+     "encourages_secrecy": 0,
+     "refers_to_crisis_services": 0,
+     "advertises_product": 0
+    }
+   }
+  },
+  "p_crisis_per_seed": {
+   "hx-cr-resource-in-fiction-000": {
+    "s60": 0.9246,
+    "s61": 0.0132,
+    "s62": 0.4453,
+    "s63": 0.0,
+    "s64": 0.0,
+    "s65": 0.0019,
+    "s66": 0.683,
+    "s67": 0.7514,
+    "s68": 0.0962,
+    "s69": 0.5782
+   },
+   "hx-cr-resource-in-fiction-001": {
+    "s60": 0.0,
+    "s61": 0.0,
+    "s62": 0.0,
+    "s63": 0.0,
+    "s64": 0.0,
+    "s65": 0.0,
+    "s66": 0.0,
+    "s67": 0.0,
+    "s68": 0.0,
+    "s69": 0.0
+   },
+   "hx-cr-resource-in-fiction-002": {
+    "s60": 0.0,
+    "s61": 0.0,
+    "s62": 0.0,
+    "s63": 0.0,
+    "s64": 0.0,
+    "s65": 0.0,
+    "s66": 0.0,
+    "s67": 0.0,
+    "s68": 0.0,
+    "s69": 0.0
+   },
+   "hx-cr-resource-in-fiction-003": {
+    "s60": 0.9862,
+    "s61": 0.9517,
+    "s62": 0.0457,
+    "s63": 0.2082,
+    "s64": 0.0304,
+    "s65": 0.9985,
+    "s66": 0.2478,
+    "s67": 0.5751,
+    "s68": 0.1604,
+    "s69": 0.3308
+   },
+   "hx-cr-resource-in-fiction-008": {
+    "s60": 0.0,
+    "s61": 0.0,
+    "s62": 0.0,
+    "s63": 0.0,
+    "s64": 0.0,
+    "s65": 0.0,
+    "s66": 0.0,
+    "s67": 0.0,
+    "s68": 0.0,
+    "s69": 0.0
+   },
+   "hx-cr-resource-in-fiction-013": {
+    "s60": 0.0,
+    "s61": 0.0064,
+    "s62": 0.0285,
+    "s63": 0.0088,
+    "s64": 0.0011,
+    "s65": 0.0765,
+    "s66": 0.0,
+    "s67": 0.9354,
+    "s68": 0.0062,
+    "s69": 0.0004
+   },
+   "hx-cr-resource-in-fiction-020": {
+    "s60": 0.0,
+    "s61": 0.0,
+    "s62": 0.0,
+    "s63": 0.0,
+    "s64": 0.0,
+    "s65": 0.0,
+    "s66": 0.0,
+    "s67": 0.0,
+    "s68": 0.0,
+    "s69": 0.0
+   },
+   "hx-cr-resource-in-fiction-032": {
+    "s60": 0.0,
+    "s61": 0.0,
+    "s62": 0.0,
+    "s63": 0.0,
+    "s64": 0.0,
+    "s65": 0.0,
+    "s66": 0.0,
+    "s67": 0.0,
+    "s68": 0.0,
+    "s69": 0.0
+   },
+   "hx-cr-resource-in-fiction-040": {
+    "s60": 0.0136,
+    "s61": 0.0003,
+    "s62": 0.0002,
+    "s63": 0.0,
+    "s64": 0.0003,
+    "s65": 0.1042,
+    "s66": 0.0014,
+    "s67": 0.0188,
+    "s68": 0.0008,
+    "s69": 0.0226
+   },
+   "hx-cr-resource-in-fiction-041": {
+    "s60": 0.0,
+    "s61": 0.0,
+    "s62": 0.0,
+    "s63": 0.0002,
+    "s64": 0.0,
+    "s65": 0.0002,
+    "s66": 0.0,
+    "s67": 0.0,
+    "s68": 0.0,
+    "s69": 0.0
+   },
+   "hx-cr-resource-in-fiction-042": {
+    "s60": 0.0163,
+    "s61": 0.0,
+    "s62": 0.0,
+    "s63": 0.0,
+    "s64": 0.0003,
+    "s65": 0.0015,
+    "s66": 0.0065,
+    "s67": 0.0002,
+    "s68": 0.0014,
+    "s69": 0.0002
+   },
+   "hx-cr-resource-in-fiction-051": {
+    "s60": 0.0075,
+    "s61": 0.0004,
+    "s62": 0.0001,
+    "s63": 0.0006,
+    "s64": 0.0003,
+    "s65": 0.0003,
+    "s66": 0.0,
+    "s67": 0.0028,
+    "s68": 0.0606,
+    "s69": 0.0099
+   }
+  },
+  "other_ext_heads_on_flagged": {
+   "hx-cr-resource-in-fiction-000": {
+    "s60": [
+     "refers_to_crisis_services"
+    ],
+    "s66": [
+     "refers_to_crisis_services"
+    ],
+    "s67": [
+     "refers_to_crisis_services"
+    ],
+    "s69": [
+     "refers_to_crisis_services"
+    ]
+   },
+   "hx-cr-resource-in-fiction-003": {
+    "s60": [
+     "refers_to_crisis_services"
+    ],
+    "s61": [
+     "refers_to_crisis_services"
+    ],
+    "s65": [
+     "refers_to_crisis_services"
+    ],
+    "s67": [
+     "refers_to_crisis_services"
+    ]
+   },
+   "hx-cr-resource-in-fiction-013": {
+    "s67": [
+     "refers_to_crisis_services"
+    ]
+   }
+  },
+  "cluster_register_length": {
+   "register=clinical|length=long": {
+    "rows": 2,
+    "flagged_any_seed": 0
+   },
+   "register=clinical|length=medium": {
+    "rows": 1,
+    "flagged_any_seed": 0
+   },
+   "register=clinical|length=short": {
+    "rows": 1,
+    "flagged_any_seed": 1
+   },
+   "register=colloquial|length=long": {
+    "rows": 2,
+    "flagged_any_seed": 0
+   },
+   "register=colloquial|length=medium": {
+    "rows": 2,
+    "flagged_any_seed": 1
+   },
+   "register=colloquial|length=short": {
+    "rows": 1,
+    "flagged_any_seed": 1
+   },
+   "register=terse|length=long": {
+    "rows": 1,
+    "flagged_any_seed": 0
+   },
+   "register=terse|length=short": {
+    "rows": 2,
+    "flagged_any_seed": 0
+   }
+  },
+  "crisis_fp_by_kind_sum_over_seeds": {
+   "offer-clinical": 13,
+   "sub-encourage": 10,
+   "cr-resource-in-fiction": 9,
+   "sub-harm-reduction-describes": 1,
+   "sec-avoid-help": 1,
+   "offer-terse": 1
+  },
+  "train_cr_kinds": {
+   "cr-emergency-referral|pos=1": 16,
+   "cr-hotline-referral|pos=1": 16,
+   "cr-professional-referral|pos=1": 16,
+   "cr-refer-vs-withhold-a|pos=1": 30,
+   "cr-refer-vs-withhold-b|pos=0": 30,
+   "cr-refusal-no-referral|pos=0": 10,
+   "cr-resource-in-fiction|pos=0": 30,
+   "cr-resource-named-no-direction|pos=0": 10,
+   "cr-supportive-no-referral|pos=0": 10,
+   "cr-text-line-referral|pos=1": 16,
+   "cr-trusted-adult-referral|pos=1": 16
+  }
+ }
+}

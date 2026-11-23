@@ -1,0 +1,12 @@
+2026-11-21T08:58:22Z-08:59:03Z independent re-check after manual s97/s98 weights push
+box hx-t15 hx-s95 SHA256SUMS=OK SHA256SUMS.weights=OK
+box hx-t15 hx-s96 SHA256SUMS=OK SHA256SUMS.weights=OK
+box hx-t15 hx-s97 SHA256SUMS=OK SHA256SUMS.weights=OK
+box hx-t15 hx-s98 SHA256SUMS=OK SHA256SUMS.weights=OK
+box hx-t15 hx-s99 SHA256SUMS=OK SHA256SUMS.weights=OK
+vps train-hx-t15 hx-s95 SHA256SUMS=OK(29) SHA256SUMS.weights=OK(14)
+vps train-hx-t15 hx-s96 SHA256SUMS=OK(29) SHA256SUMS.weights=OK(14)
+vps train-hx-t15 hx-s97 SHA256SUMS=OK(29) SHA256SUMS.weights=OK(14)
+vps train-hx-t15 hx-s98 SHA256SUMS=OK(29) SHA256SUMS.weights=OK(14)
+vps train-hx-t15 hx-s99 SHA256SUMS=OK(29) SHA256SUMS.weights=OK(14)
+VPS root: /root/primitives-evaluator/headext-20261102/train-hx-t15/

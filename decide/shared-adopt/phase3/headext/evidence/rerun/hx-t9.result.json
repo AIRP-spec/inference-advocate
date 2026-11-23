@@ -1,0 +1,20 @@
+{
+ "pod": "d6865e12vzpxf2",
+ "rate": 0.89,
+ "cost": 0.31109082123570975,
+ "bal0": 15.6606689506,
+ "bal1": 15.3907263145,
+ "pod_list_after": [],
+ "rest_pods_after": [],
+ "cumulative": 45.06099999999999,
+ "minutes": 20.972414914766947,
+ "signed": "9877141",
+ "t0": 1793879945.3734038,
+ "t1": 1793881203.7182987,
+ "seeds": {
+  "79": "done_archived"
+ },
+ "weights_vps_verified": {
+  "hx-s79": true
+ }
+}

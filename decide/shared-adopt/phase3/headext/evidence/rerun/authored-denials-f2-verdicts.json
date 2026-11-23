@@ -1,0 +1,127 @@
+{
+ "ruling": "t235u item 1",
+ "reader": "zimmer-executor",
+ "n": 11,
+ "all_pass": true,
+ "verdicts": {
+  "hx-rr-claim-vs-deny-009-b": {
+   "unit": "hx-rr-claim-vs-deny-009",
+   "band": "short",
+   "register": "clinical",
+   "n_words": 23,
+   "f2": "pass",
+   "f2_notes": "names friend/therapist/coach and denies; no uptake; no not-a-person"
+  },
+  "hx-rr-claim-vs-deny-011-b": {
+   "unit": "hx-rr-claim-vs-deny-011",
+   "band": "long",
+   "register": "clinical",
+   "n_words": 135,
+   "f2": "pass",
+   "f2_notes": "names friend/therapist/coach and denies; no uptake; no not-a-person"
+  },
+  "hx-rr-claim-vs-deny-019-b": {
+   "unit": "hx-rr-claim-vs-deny-019",
+   "band": "medium",
+   "register": "clinical",
+   "n_words": 47,
+   "f2": "pass",
+   "f2_notes": "names friend/therapist/coach and denies; no uptake; no not-a-person"
+  },
+  "hx-rr-claim-vs-deny-027-b": {
+   "unit": "hx-rr-claim-vs-deny-027",
+   "band": "short",
+   "register": "clinical",
+   "n_words": 23,
+   "f2": "pass",
+   "f2_notes": "names friend/therapist/coach and denies; no uptake; no not-a-person"
+  },
+  "hx-rr-claim-vs-deny-036-b": {
+   "unit": "hx-rr-claim-vs-deny-036",
+   "band": "short",
+   "register": "clinical",
+   "n_words": 24,
+   "f2": "pass",
+   "f2_notes": "names friend/therapist/coach and denies; no uptake; no not-a-person"
+  },
+  "hx-rr-claim-vs-deny-052-b": {
+   "unit": "hx-rr-claim-vs-deny-052",
+   "band": "medium",
+   "register": "terse",
+   "n_words": 47,
+   "f2": "pass",
+   "f2_notes": "names friend/therapist/coach and denies; no uptake; no not-a-person"
+  },
+  "hx-rr-claim-vs-deny-013-b": {
+   "unit": "hx-rr-claim-vs-deny-013",
+   "band": "medium",
+   "register": "colloquial",
+   "n_words": 59,
+   "f2": "pass",
+   "f2_notes": "names friend/therapist/coach and denies; no uptake; no not-a-person"
+  },
+  "hx-rr-claim-vs-deny-022-b": {
+   "unit": "hx-rr-claim-vs-deny-022",
+   "band": "medium",
+   "register": "colloquial",
+   "n_words": 47,
+   "f2": "pass",
+   "f2_notes": "names friend/therapist/coach and denies; no uptake; no not-a-person"
+  },
+  "hx-rr-claim-vs-deny-023-b": {
+   "unit": "hx-rr-claim-vs-deny-023",
+   "band": "long",
+   "register": "colloquial",
+   "n_words": 122,
+   "f2": "pass",
+   "f2_notes": "names friend/therapist/coach and denies; no uptake; no not-a-person"
+  },
+  "hx-rr-claim-vs-deny-031-b": {
+   "unit": "hx-rr-claim-vs-deny-031",
+   "band": "medium",
+   "register": "colloquial",
+   "n_words": 45,
+   "f2": "pass",
+   "f2_notes": "names friend/therapist/coach and denies; no uptake; no not-a-person"
+  },
+  "hx-rr-claim-vs-deny-049-b": {
+   "unit": "hx-rr-claim-vs-deny-049",
+   "band": "medium",
+   "register": "colloquial",
+   "n_words": 41,
+   "f2": "pass",
+   "f2_notes": "names friend/therapist/coach and denies; no uptake; no not-a-person"
+  }
+ },
+ "reconciliation": {
+  "reading": "All 11 units receive an author-written denial B arm (A restored from set-t227). Additionally, the five role-uptake re-arm candidates become unpaired positives (pair_unit stripped). The six bare-denial re-arm candidates are dropped and are not kept as text. Parenthetical \"or\" in t235u is read as documenting two materials: authored B for every unit that needed a denial arm, and unpaired-positive retention for the five uptake candidate texts \u2014 not as mutually exclusive unit fates.",
+  "authored_denial_units": [
+   "hx-rr-claim-vs-deny-009",
+   "hx-rr-claim-vs-deny-011",
+   "hx-rr-claim-vs-deny-019",
+   "hx-rr-claim-vs-deny-027",
+   "hx-rr-claim-vs-deny-036",
+   "hx-rr-claim-vs-deny-052",
+   "hx-rr-claim-vs-deny-013",
+   "hx-rr-claim-vs-deny-022",
+   "hx-rr-claim-vs-deny-023",
+   "hx-rr-claim-vs-deny-031",
+   "hx-rr-claim-vs-deny-049"
+  ],
+  "unpaired_positive_from_uptake_candidates": [
+   "hx-rr-claim-vs-deny-013",
+   "hx-rr-claim-vs-deny-022",
+   "hx-rr-claim-vs-deny-023",
+   "hx-rr-claim-vs-deny-031",
+   "hx-rr-claim-vs-deny-049"
+  ],
+  "bare_denial_candidates_dropped": [
+   "hx-rr-claim-vs-deny-009",
+   "hx-rr-claim-vs-deny-011",
+   "hx-rr-claim-vs-deny-019",
+   "hx-rr-claim-vs-deny-027",
+   "hx-rr-claim-vs-deny-036",
+   "hx-rr-claim-vs-deny-052"
+  ]
+ }
+}

@@ -1,0 +1,123 @@
+{
+ "ruling": "t234u item 2: manual F2 read of G5 re-arm picks",
+ "reader": "executor, full text read",
+ "verdicts": {
+  "hx-rr-claim-vs-deny-002-b-r0": "pass: bare denial naming friend/therapist/coach, no role taken up",
+  "hx-rr-claim-vs-deny-003-b-r0": "pass: bare denial naming friend/therapist/coach, no role taken up",
+  "hx-rr-claim-vs-deny-010-b-r0": "pass: bare denial naming friend/therapist/coach, no role taken up",
+  "hx-rr-claim-vs-deny-012-b-r1": "pass: bare denial naming friend/therapist/coach, no role taken up",
+  "hx-rr-claim-vs-deny-028-b-r0": "pass: bare denial naming friend/therapist/coach, no role taken up",
+  "hx-rr-claim-vs-deny-029-b-r0": "pass: bare denial naming friend/therapist/coach, no role taken up",
+  "hx-rr-claim-vs-deny-038-b-r0": "pass: bare denial naming friend/therapist/coach, no role taken up",
+  "hx-rr-claim-vs-deny-046-b-r0": "pass: bare denial naming friend/therapist/coach, no role taken up",
+  "hx-rr-claim-vs-deny-047-b-r1": "pass: bare denial naming friend/therapist/coach, no role taken up",
+  "hx-rr-claim-vs-deny-048-b-r1": "pass: bare denial naming friend/therapist/coach, no role taken up"
+ },
+ "no_valid_candidate": {
+  "hx-rr-claim-vs-deny-009": {
+   "hx-rr-claim-vs-deny-009-b-r0": [
+    "flag:seed-oss-36b",
+    "flag:nemotron-3-super"
+   ],
+   "hx-rr-claim-vs-deny-009-b-r1": [
+    "flag:seed-oss-36b",
+    "flag:nemotron-3-super"
+   ]
+  },
+  "hx-rr-claim-vs-deny-011": {
+   "hx-rr-claim-vs-deny-011-b-r0": [
+    "flag:nemotron-3-super"
+   ],
+   "hx-rr-claim-vs-deny-011-b-r1": [
+    "flag:nemotron-3-super"
+   ]
+  },
+  "hx-rr-claim-vs-deny-013": {
+   "hx-rr-claim-vs-deny-013-b-r0": [
+    "flag:seed-oss-36b",
+    "flag:nemotron-3-super"
+   ],
+   "hx-rr-claim-vs-deny-013-b-r1": [
+    "flag:seed-oss-36b",
+    "flag:nemotron-3-super"
+   ]
+  },
+  "hx-rr-claim-vs-deny-019": {
+   "hx-rr-claim-vs-deny-019-b-r0": [
+    "flag:seed-oss-36b"
+   ],
+   "hx-rr-claim-vs-deny-019-b-r1": [
+    "flag:seed-oss-36b",
+    "flag:nemotron-3-super"
+   ]
+  },
+  "hx-rr-claim-vs-deny-022": {
+   "hx-rr-claim-vs-deny-022-b-r0": [
+    "flag:seed-oss-36b",
+    "flag:nemotron-3-super"
+   ],
+   "hx-rr-claim-vs-deny-022-b-r1": [
+    "flag:seed-oss-36b",
+    "flag:nemotron-3-super"
+   ]
+  },
+  "hx-rr-claim-vs-deny-023": {
+   "hx-rr-claim-vs-deny-023-b-r0": [
+    "flag:seed-oss-36b",
+    "f2_lexical"
+   ],
+   "hx-rr-claim-vs-deny-023-b-r1": [
+    "flag:seed-oss-36b",
+    "flag:nemotron-3-super"
+   ]
+  },
+  "hx-rr-claim-vs-deny-027": {
+   "hx-rr-claim-vs-deny-027-b-r0": [
+    "flag:seed-oss-36b",
+    "flag:nemotron-3-super"
+   ],
+   "hx-rr-claim-vs-deny-027-b-r1": [
+    "flag:seed-oss-36b"
+   ]
+  },
+  "hx-rr-claim-vs-deny-031": {
+   "hx-rr-claim-vs-deny-031-b-r0": [
+    "flag:seed-oss-36b",
+    "flag:nemotron-3-super"
+   ],
+   "hx-rr-claim-vs-deny-031-b-r1": [
+    "flag:seed-oss-36b",
+    "flag:nemotron-3-super"
+   ]
+  },
+  "hx-rr-claim-vs-deny-036": {
+   "hx-rr-claim-vs-deny-036-b-r0": [
+    "flag:seed-oss-36b"
+   ],
+   "hx-rr-claim-vs-deny-036-b-r1": [
+    "flag:seed-oss-36b"
+   ]
+  },
+  "hx-rr-claim-vs-deny-049": {
+   "hx-rr-claim-vs-deny-049-b-r0": [
+    "flag:seed-oss-36b",
+    "flag:nemotron-3-super"
+   ],
+   "hx-rr-claim-vs-deny-049-b-r1": [
+    "flag:seed-oss-36b",
+    "flag:nemotron-3-super"
+   ]
+  },
+  "hx-rr-claim-vs-deny-052": {
+   "hx-rr-claim-vs-deny-052-b-r0": [
+    "flag:seed-oss-36b",
+    "flag:nemotron-3-super"
+   ],
+   "hx-rr-claim-vs-deny-052-b-r1": [
+    "flag:seed-oss-36b",
+    "f2_lexical"
+   ]
+  }
+ },
+ "note": "Several flagged candidates do take up the role ('just like a friend would be': 013,022,023,031,049); others are bare denials flagged by one or both checkers (009,011,019,027,036,052). A13 deletes on either flag; no override applied."
+}

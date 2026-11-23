@@ -1,0 +1,22 @@
+{
+ "model": "local-llm@3e5d2fd83b37+v3",
+ "gguf_sha256": "3e5d2fd83b37fa620431c80e203374fe3fa8045acad7876db0049a290e267f3e",
+ "live_code": "a47c4ef",
+ "script": "p33/step744_val.mjs",
+ "script_sha256": "fb9b456fc9f506d7be5e9c8e10eb731a81478f56e54ecba46670c29c101f592a",
+ "val_sha256": "5be292a911f0082a74c6e24beb20a60455fab4a86baded561784d37f2b453009",
+ "got_sha256": "e33a81345d67b23434faf02cd63fde879deeef870467890516a8d3cb5ab276db",
+ "child_sexual_exploitation": {
+  "n_pos": 40,
+  "miss": 0,
+  "extra": 32
+ },
+ "self_harm": {
+  "n_pos": 16,
+  "miss": 15,
+  "extra": 0
+ },
+ "val_rows": 819,
+ "gold": "p32_val.load_val_derived (composition 2a)",
+ "computed_npt": "2026-11-01"
+}

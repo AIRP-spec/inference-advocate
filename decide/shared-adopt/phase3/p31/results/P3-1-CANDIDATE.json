@@ -1,0 +1,26 @@
+{
+  "winner_arm": "A2",
+  "eligible": "runs in the winning arm that are safety-clean at the artifact and every ckpt >= 2.0",
+  "ranking_by_artifact_valF1_derived_gold": [
+    {
+      "run": "p31-A2-s44",
+      "artifact": "avg-p31-A2-s44",
+      "valF1": 0.8726868207099759
+    },
+    {
+      "run": "p31-A2-s40",
+      "artifact": "avg-p31-A2-s40",
+      "valF1": 0.7919351263193353
+    },
+    {
+      "run": "p31-A2-s41",
+      "artifact": "avg-p31-A2-s41",
+      "valF1": 0.7756124737421671
+    }
+  ],
+  "candidate": "avg-p31-A2-s44",
+  "candidate_valF1": 0.8726868207099759,
+  "note": "Candidate pick (highest val composed macro-F1, derived-gold val 5be292a9) among the winner arm's fully safety-clean runs. Not part of DECLARATION-P3-1 (which selects an arm); added under the P3-1 close-out brief. Diagnostic only: no release, default or gate change. v2 E+M not computed or printed before this file was committed.",
+  "selection_file_sha": "2c2cf547f073bf35aa2db6b7419bba1de2e8a84be1dcc1607235c87c454a27e1",
+  "timestamp_utc": "2026-10-20T20:17:19Z"
+}

@@ -1,0 +1,20 @@
+{
+ "pod": "vuhrghm9wbq04h",
+ "results": {
+  "failure": "RuntimeError('not enough time left for generation + checkers')",
+  "archive_pre_terminate": [
+   1,
+   1
+  ]
+ },
+ "cost": 0.5044123086988925,
+ "bal0": 19.3213974937,
+ "bal1": 18.8776284326,
+ "pod_list_after": [],
+ "rest_pods_after": [],
+ "cumulative": 49.78799999999999,
+ "minutes": 11.250832164287567,
+ "signed": "cf2f468b90a9cdb0982fee9bad31f4df3ef0205e",
+ "t0": 1794536196.2483692,
+ "t1": 1794536871.298299
+}

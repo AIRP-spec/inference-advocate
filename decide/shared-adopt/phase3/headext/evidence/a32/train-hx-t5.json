@@ -1,0 +1,62 @@
+{
+ "pod": "v7i5sv0mmap3xy",
+ "name": "hx-t5",
+ "type": "on-demand SECURE (podType RESERVED), EU-RO-1, volume jq8pseh4f0",
+ "seeds": {
+  "hx-s60": {
+   "skips": [
+    "0"
+   ],
+   "steps": "1128",
+   "out_sha256_manifest": "95fa437c584298781e2e9956d833fd93fd0c117d25d3890841e50aa0c5c9a2a3",
+   "weights_manifest": "bc862089d5e9faa4a59a2c2a5450a2e803468ce4319da74b9a87c2e15a57524e",
+   "SHA256SUMS": "b3e32ac4f082d6b60884c89d0db477f75481b819e4114679bc34c74537f8b4a8",
+   "SHA256SUMS.weights": "0e44a1413d9c88753f7a78e9c0a29aab2d203d2f83685c959cfde93baaf8f61e"
+  },
+  "hx-s61": {
+   "skips": [
+    "0"
+   ],
+   "steps": "1128",
+   "out_sha256_manifest": "c66cb99301d1e4cf8f5a5c39ffef2f4d73aba85c3553a794adec2791691f91db",
+   "weights_manifest": "66be1809ee15b0fcfe21be8d6bad5aa3bd78cd9e1793832a49090bdd8595640c",
+   "SHA256SUMS": "52bfd785e0dbe711fb8a8bcb30a2d9b43fb234ee814e8385ab4396af46d00dd0",
+   "SHA256SUMS.weights": "f24169742bb1962ad12d323edc12905eea6c1c531ea48b84a86ee6cb391a4bfc"
+  },
+  "hx-s62": {
+   "skips": [
+    "0"
+   ],
+   "steps": "1128",
+   "out_sha256_manifest": "8fdf1dc771c5ea0f6e5e6512c6ef9858602784ddc939334b83680b92a415e98d",
+   "weights_manifest": "294bce8702fffce8ad2fe476554baa26990cd64e69ea6683e06e621be8ee1117",
+   "SHA256SUMS": "e6d929a83a1b6bcc608b5a9e198a92cccb9918161586121f898f5b5cdbb99358",
+   "SHA256SUMS.weights": "a14101f2d9b8c940c38fae2206243dd1fa8a759f9ade33394dc6b74b84599210"
+  },
+  "hx-s63": {
+   "skips": [
+    "0"
+   ],
+   "steps": "1128",
+   "out_sha256_manifest": "ee35209bb7cf889c30b58bdd6a653f234b4ec7fb24bcc6c32a9e1f0ecb9c6d7e",
+   "weights_manifest": "92d8971146f63eafd2d0bab331c9487ddb64c91842730f738f825b3825c5a9b0",
+   "SHA256SUMS": "536703d44ffdedbd6804f620f24c16c7a03d984e10dec32074e5b25906de00d2",
+   "SHA256SUMS.weights": "dc45f815e87518e5bf43cc8f2a5ff107c3966edab5a4107e17f67adc90415ea9"
+  },
+  "hx-s64": {
+   "skips": [
+    "0"
+   ],
+   "steps": "1128",
+   "out_sha256_manifest": "23355e9c01cf05e3a3345f5f0ebd682f540871d8b9523dca57e64be7f93ff05d",
+   "weights_manifest": "917840526864a43a87920b8929bc3a2f92759f53b1db2bbe1e67e2eda89ca7b5",
+   "SHA256SUMS": "36dd0c650c9839a1ff217fb14a285b58315fc803d8dbdecc37a623dd6560709d",
+   "SHA256SUMS.weights": "f152d754346d45943cdb80322f9b7992e4cb61844f3d9820de67c5a94d781626"
+  }
+ },
+ "vps": {
+  "dir": "headext-20261102/train-hx-t5",
+  "MANIFEST.sha256": "128168b3653185cd445cc34217c62e0b93da6bc6f2c71b3d26987c8feb89b320",
+  "files": 219
+ }
+}

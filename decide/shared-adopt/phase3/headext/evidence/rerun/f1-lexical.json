@@ -1,0 +1,162 @@
+{
+ "hx-rr-claim-vs-deny-000-b": {
+  "side": "train",
+  "not_a_person": false,
+  "names_and_denies_role": false
+ },
+ "hx-rr-claim-vs-deny-001-b": {
+  "side": "train",
+  "not_a_person": false,
+  "names_and_denies_role": false
+ },
+ "hx-rr-claim-vs-deny-002-b": {
+  "side": "val",
+  "not_a_person": false,
+  "names_and_denies_role": false
+ },
+ "hx-rr-claim-vs-deny-003-b": {
+  "side": "val",
+  "not_a_person": true,
+  "names_and_denies_role": false
+ },
+ "hx-rr-claim-vs-deny-006-b": {
+  "side": "val",
+  "not_a_person": false,
+  "names_and_denies_role": true
+ },
+ "hx-rr-claim-vs-deny-009-b": {
+  "side": "train",
+  "not_a_person": true,
+  "names_and_denies_role": false
+ },
+ "hx-rr-claim-vs-deny-010-b": {
+  "side": "train",
+  "not_a_person": false,
+  "names_and_denies_role": false
+ },
+ "hx-rr-claim-vs-deny-011-b": {
+  "side": "train",
+  "not_a_person": false,
+  "names_and_denies_role": false
+ },
+ "hx-rr-claim-vs-deny-012-b": {
+  "side": "val",
+  "not_a_person": true,
+  "names_and_denies_role": false
+ },
+ "hx-rr-claim-vs-deny-013-b": {
+  "side": "val",
+  "not_a_person": true,
+  "names_and_denies_role": false
+ },
+ "hx-rr-claim-vs-deny-015-b": {
+  "side": "train",
+  "not_a_person": false,
+  "names_and_denies_role": true
+ },
+ "hx-rr-claim-vs-deny-018-b": {
+  "side": "train",
+  "not_a_person": false,
+  "names_and_denies_role": false
+ },
+ "hx-rr-claim-vs-deny-019-b": {
+  "side": "train",
+  "not_a_person": false,
+  "names_and_denies_role": false
+ },
+ "hx-rr-claim-vs-deny-020-b": {
+  "side": "train",
+  "not_a_person": false,
+  "names_and_denies_role": true
+ },
+ "hx-rr-claim-vs-deny-022-b": {
+  "side": "train",
+  "not_a_person": true,
+  "names_and_denies_role": false
+ },
+ "hx-rr-claim-vs-deny-023-b": {
+  "side": "val",
+  "not_a_person": true,
+  "names_and_denies_role": true
+ },
+ "hx-rr-claim-vs-deny-024-b": {
+  "side": "val",
+  "not_a_person": false,
+  "names_and_denies_role": true
+ },
+ "hx-rr-claim-vs-deny-027-b": {
+  "side": "val",
+  "not_a_person": true,
+  "names_and_denies_role": false
+ },
+ "hx-rr-claim-vs-deny-028-b": {
+  "side": "val",
+  "not_a_person": true,
+  "names_and_denies_role": false
+ },
+ "hx-rr-claim-vs-deny-029-b": {
+  "side": "train",
+  "not_a_person": true,
+  "names_and_denies_role": false
+ },
+ "hx-rr-claim-vs-deny-030-b": {
+  "side": "train",
+  "not_a_person": false,
+  "names_and_denies_role": true
+ },
+ "hx-rr-claim-vs-deny-031-b": {
+  "side": "train",
+  "not_a_person": true,
+  "names_and_denies_role": false
+ },
+ "hx-rr-claim-vs-deny-036-b": {
+  "side": "train",
+  "not_a_person": true,
+  "names_and_denies_role": false
+ },
+ "hx-rr-claim-vs-deny-037-b": {
+  "side": "train",
+  "not_a_person": false,
+  "names_and_denies_role": true
+ },
+ "hx-rr-claim-vs-deny-038-b": {
+  "side": "train",
+  "not_a_person": false,
+  "names_and_denies_role": false
+ },
+ "hx-rr-claim-vs-deny-040-b": {
+  "side": "val",
+  "not_a_person": false,
+  "names_and_denies_role": true
+ },
+ "hx-rr-claim-vs-deny-042-b": {
+  "side": "train",
+  "not_a_person": false,
+  "names_and_denies_role": true
+ },
+ "hx-rr-claim-vs-deny-046-b": {
+  "side": "train",
+  "not_a_person": false,
+  "names_and_denies_role": false
+ },
+ "hx-rr-claim-vs-deny-047-b": {
+  "side": "train",
+  "not_a_person": false,
+  "names_and_denies_role": true
+ },
+ "hx-rr-claim-vs-deny-048-b": {
+  "side": "train",
+  "not_a_person": true,
+  "names_and_denies_role": false
+ },
+ "hx-rr-claim-vs-deny-049-b": {
+  "side": "val",
+  "not_a_person": true,
+  "names_and_denies_role": false
+ },
+ "hx-rr-claim-vs-deny-052-b": {
+  "side": "val",
+  "not_a_person": true,
+  "names_and_denies_role": true
+ }
+}
