@@ -43,7 +43,8 @@ def sha(p): return hashlib.sha256(open(p, "rb").read()).hexdigest()
 def seed_root(s):
     if 100 <= s <= 103: pod = "hx-t16"      # R-12 pod one (s100-s103)
     elif s == 104: pod = "hx-t18"           # R-20/R-22: s104 alone after hx-t17 VOL_LOW_STOP
-    elif 105 <= s <= 109: pod = "hx-t19"    # R-20 item 6 / R-22 item 4: s105-s109
+    elif 105 <= s <= 108: pod = "hx-t19"    # R-20 item 6 / R-22 item 4: s105-s108 (s109 hit the time cap)
+    elif s == 109: pod = "hx-t20"           # R-24/R-25: s109 rerun alone
     else: raise ValueError(f"seed {s} not in 100-109")
     return Path(f"/workspace/headext-train/{pod}/out/hx-s{s}")
 
