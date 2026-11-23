@@ -14,7 +14,7 @@ def test_pins_v10h():
     assert H.VAL9_N == 857 and H.VAL9_RH_SHA.startswith("b4c60975") and H.VAL9_OLD_SHA.startswith("9c312290")
     assert H.SEEDS == list(range(100, 110))
     assert META["val_sha256"] == H.VAL10_SHA and META["val_n"] == 1879
-    assert [H.seed_root(s).parent.parent.name for s in (100, 104, 105, 109)] == ["hx-t16", "hx-t16", "hx-t17", "hx-t17"]
+    assert [H.seed_root(s).parent.parent.name for s in (100, 103, 104, 105, 109)] == ["hx-t16", "hx-t16", "hx-t18", "hx-t19", "hx-t19"]
     with pytest.raises(ValueError):
         H.seed_root(99)
 
