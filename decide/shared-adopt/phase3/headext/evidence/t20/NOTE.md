@@ -1,0 +1,11 @@
+# hx-t20 (s109 alone), R-25 items 2, 3, 5, 6. Counts and ids only.
+Pod j1jjx81fqm3j7h, on-demand SECURE RTX 4090 EU-RO-1, vol jq8pseh4f0, --signed 1da05897e013f38885dd438ba9769da98f55c3a7, --cap-usd 1.5, --seeds 109, empty deletion list, no --attach. Created 2026-11-23T05:27:50Z, pod gone 05:57:16Z, 29.42 min, 29.42 driver minutes, $0.436, balance $29.424 -> $28.998, cumulative GPU $57.281 of $100.
+Seed 109: RUN_START 05:29:20Z, RUN_DONE 05:48:33Z (19.22 min; hx-t19 24.4, hx-t18 20.2). VOL_OK_hx-s109 43 files 8b2b715405b225d59eaa685c26f89b24d41181ee15b6e7d32ee7d811742d6023. Train 9360 / val 1879, truncated 0. No skipped micro-batch. ARCHIVED box 43 files and VPS 29 files sha256sum -c OK; WEIGHTS VPS sha256sum -c OK; fresh checks after terminate in hx-t20.fresh-check.txt (VPS and box SHA256SUMS OK(29), SHA256SUMS.weights OK(14), bad 0).
+VOL_FREE_BEFORE 481905; VOL_USED_GB 32 of 60; VOL_FREE_AFTER 28; VOL_PREP_OK. No VOL_DEL, no VOL_DEL_ABSENT, no VOL_LOW_STOP. One GUARD line (pod gone after terminate, not a stop).
+Driver: headext_pod_train.py sha256 ab7692164cdddd1edbed84b4cbd856a5d4a78333b99cd9e6fccee3b00e9c91ba at launch and after terminate, equal to the pin; pinned file for the whole run (R-25 item 1).
+/vol/hx-t19/hx-s109 was not listed or sized: the pinned driver has no such step and none was added; size unknown, on the R-21 list for Justin.
+
+## R-25 item 2 readings (box state, before the hx-t20 pre-pod check)
+date -u: Mon Nov 23 05:24:37 UTC 2026. TZ=UTC uptime -s: 2026-11-23 04:13:20 (/proc/uptime 4286.26 s, consistent). Surviving watchdog.py / headext_pod_train.py / pod_guard processes: none. df -h /workspace: 125G size, 46G used, 73G avail, 39%. du -sh /workspace/headext-train/hx-t19: 3.3G.
+Correction line (R-25 item 2): the R24-ITEM1-NOTE.md reading of `uptime -s` = 03:27:19Z is not reproduced. The box now reads 04:13:20Z, which is after the hx-t19 run (01:46Z to 03:50Z) and in neither segment (supervisor 01:46-02:44Z, attach 02:50-03:50Z). The two readings cannot be reconciled from the box, so the cause of the s105/s106 box-copy loss stays unexplained, as does the boot time. R24-ITEM1-NOTE.md is not edited.
+Checkout: the headext checkout is /workspace/wt-p3. /workspace/inference-advocate (HEAD 6de78d5, 4 tracked primitives/out files deleted) is a different checkout, not used for pod or evidence work.

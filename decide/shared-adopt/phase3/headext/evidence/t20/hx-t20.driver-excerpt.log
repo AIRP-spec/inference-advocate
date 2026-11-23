@@ -1,0 +1,32 @@
+05:27:07 CAP_USD override -> 1.5
+05:27:49 PRECHECK (headroom): pods(gql)=0 pods(rest)=[] rest_status=unreachable:URLError: <urlopen error [SSL: UNEXPECTED_EOF_WHILE_READING] EOF occurred in violation of protocol (_ssl.c:1029)> box_free=73G vps_free=85G balance=$29.42 cumulative=$56.84 +cap $1.5 -> $58.34 (stop line $85.0) signed_on_remote=True code_clean=True pins_ok=True pack_sha_ok=True tracked_out=4/4
+05:27:49 NOTE: REST pods API unreachable (unreachable:URLError: <urlopen error [SSL: UNEXPECTED_EOF_WHILE_READING] EOF occurred in violation of protocol (_ssl.c:1029)>); proceeding on empty gql pod list only
+05:27:50 POD CREATED j1jjx81fqm3j7h gpu=NVIDIA GeForce RTX 4090 rate=$0.89/h cap=101.1min ($1.5) seeds=[109]
+05:27:51 ON-DEMAND CHECK OK podType=RESERVED secureCloud=True dc=EU-RO-1 volume=jq8pseh4f0
+05:28:22 IN-POD WATCHDOG + GPU: wd_running | has_pod_id | has_runpodctl | NVIDIA GeForce RTX 4090, 24564 MiB |   60G | 
+05:28:26 PACK UPLOADED PACK_OK e0ceb28d0eeb1b2742ba336e49ef199d7819a0e83e5da15c6abea96cf3537a64  PACK.sha256 
+05:28:31 VOLPREP: VOL_FREE_BEFORE 481905
+05:28:31 VOLPREP: VOL_DF_FREE_AFTER 481906 VOL_USED_GB 32 VOL_QUOTA_GB 60
+05:28:31 VOLPREP: VOL_FREE_AFTER 28
+05:28:31 VOLPREP: VOL_PREP_OK
+05:30:01 start ssh timed out after 90 s; checking the pipeline directly
+05:30:08 PIPELINE STARTED
+05:30:40 POD: ALL 6 PASS
+05:30:40 POD: [train] 9360 items, truncated 0, mean len 37.3 (4.1s)
+05:30:40 POD: [val] 1879 items, truncated 0, mean len 72.8 (0.9s)
+05:30:40 POD: PREPROCESS_DONE
+05:30:40 POD: SMOKE_BF16_MIXED PASS {"sdpa": false, "eager": true}
+05:30:40 POD: RUN_START hx-s109 2026-11-23T05:29:20Z
+05:30:40 POD: ENCODER_ATTN eager
+05:40:40 POD: + grep -q SKIPPED_NONFINITE logs/train-hx-s109.log
+05:40:40 POD: HEADINIT_OK hx-s109 base17=10a35c7911392632d212b188849fae39fd9fe583252eb07ba27873d0c17106c5 head25=0a85cc3bb576cb6a9ead6902284be5908b1866e6dfb1d7ba05d741ddcfa5d429
+05:48:35 POD: VOL_OK_hx-s109 43 files 8b2b715405b225d59eaa685c26f89b24d41181ee15b6e7d32ee7d811742d6023
+05:48:35 POD: RUN_DONE_hx-s109 2026-11-23T05:48:33Z
+05:48:35 POD: PIPELINE_DONE 2026-11-23T05:48:33Z
+05:48:35 POD: PIPE_EXIT 0
+05:50:52 ARCHIVED hx-s109: box 43 files sha256sum -c OK; VPS outputs+predictions 29 files sha256sum -c OK -> /root/primitives-evaluator/headext-20261102/train-hx-t20/hx-s109; weights queued
+05:56:57 WEIGHTS hx-s109 -> VPS sha256sum -c OK
+05:57:02 ALL SEEDS VPS-VERIFIED (outputs + weights): ['hx-s109']
+05:57:15 ARCHIVE logs: OK
+05:57:16 GUARD: pod j1jjx81fqm3j7h gone at 05:57:16
+05:58:11 TERMINATED j1jjx81fqm3j7h pod_list_after(gql)=[] rest=([], 'unreachable:URLError: <urlopen error [SSL: UNEXPECTED_EOF_WHILE_READING] EOF occurred in violation of protocol (_ssl.c:1029)>') minutes=29.4 driver_minutes=29.4 balance 29.424->28.998 cost=$0.436
