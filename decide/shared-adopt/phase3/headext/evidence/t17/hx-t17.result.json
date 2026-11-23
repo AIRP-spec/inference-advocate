@@ -1,0 +1,31 @@
+{
+ "pod": "hheyjep80if9pa",
+ "rate": 0.89,
+ "cost": 0.03183799557089805,
+ "bal0": 31.5429490713,
+ "bal1": 31.5429490713,
+ "pod_list_after": [],
+ "rest_pods_after": [
+  [],
+  "unreachable:URLError: <urlopen error [SSL: UNEXPECTED_EOF_WHILE_READING] EOF occurred in violation of protocol (_ssl.c:1029)>"
+ ],
+ "cumulative": 54.87099999999999,
+ "minutes": 2.1463817238807676,
+ "driver_minutes": 2.1186057647069294,
+ "pod_gone_at": 1795375795.4764972,
+ "signed": "223e673b59f88217462552609974547066e7a8a2",
+ "t0": 1795375666.6935937,
+ "t1": 1795375793.8099396,
+ "seeds": {
+  "104": "not_started"
+ },
+ "vol_prep": [
+  "VOL_FREE_BEFORE 483381",
+  "VOL_DEL /vol/hx-t16/hx-s104 1.7G",
+  "VOL_DF_FREE_AFTER 483382 VOL_USED_GB 41 VOL_QUOTA_GB 60",
+  "VOL_FREE_AFTER 19",
+  "VOL_LOW_STOP 19"
+ ],
+ "failure": "RuntimeError(\"VOL_LOW_STOP / volume prep failed rc=3: 'VOL_FREE_BEFORE 483381\\\\nVOL_DEL /vol/hx-t16/hx-s104 1.7G\\\\nVOL_DF_FREE_AFTER 483382 VOL_USED_GB 41 VOL_QUOTA_GB 60\\\\nVOL_FREE_AFTER 19\\\\nVOL_LOW_STOP 19\\\\n'\")",
+ "weights_vps_verified": {}
+}

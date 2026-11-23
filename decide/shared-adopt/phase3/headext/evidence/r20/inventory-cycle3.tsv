@@ -1,0 +1,11 @@
+pod	seed	cycle	vol_dir	vps_archive_exists	fresh_check_utc	SHA256SUMS	SHA256SUMS.weights	est_size_mib	on_deletion_list
+hx-t10	hx-s80	3	/vol/hx-t10/hx-s80	yes	2026-11-23T01:07:55Z	OK(27)	OK(14)	1661	yes
+hx-t10	hx-s81	3	/vol/hx-t10/hx-s81	yes	2026-11-23T01:07:58Z	OK(27)	OK(14)	1661	yes
+hx-t10	hx-s82	3	/vol/hx-t10/hx-s82	yes	2026-11-23T01:08:01Z	OK(27)	OK(14)	1661	yes
+hx-t10	hx-s83	3	/vol/hx-t10/hx-s83	yes	2026-11-23T01:08:04Z	OK(27)	OK(14)	1661	yes
+hx-t10	hx-s84	3	/vol/hx-t10/hx-s84	yes	2026-11-23T01:08:07Z	OK(27)	OK(14)	1661	yes
+hx-t11	hx-s85	3	/vol/hx-t11/hx-s85	yes	2026-11-23T01:08:10Z	OK(27)	OK(14)	1661	yes
+hx-t11	hx-s86	3	/vol/hx-t11/hx-s86	yes	2026-11-23T01:08:13Z	OK(27)	OK(14)	1661	yes
+hx-t12	hx-s87	3	/vol/hx-t12/hx-s87	yes	2026-11-23T01:08:16Z	OK(27)	OK(14)	1661	yes
+hx-t12	hx-s88	3	/vol/hx-t12/hx-s88	yes	2026-11-23T01:08:19Z	OK(27)	OK(14)	1661	yes
+hx-t12	hx-s89	3	/vol/hx-t12/hx-s89	yes	2026-11-23T01:08:22Z	OK(27)	OK(14)	1661	yes

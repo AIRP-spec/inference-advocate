@@ -1,0 +1,14 @@
+UTC_START 2026-11-23T01:07:55Z
+SEED hx-s80 pod=hx-t10 path=/root/primitives-evaluator/headext-20261102/train-hx-t10/hx-s80 VPS_ARCHIVE=present SUMS=OK(27)@2026-11-23T01:07:55Z WEIGHTS=OK(14)@2026-11-23T01:07:55Z
+SEED hx-s81 pod=hx-t10 path=/root/primitives-evaluator/headext-20261102/train-hx-t10/hx-s81 VPS_ARCHIVE=present SUMS=OK(27)@2026-11-23T01:07:58Z WEIGHTS=OK(14)@2026-11-23T01:07:58Z
+SEED hx-s82 pod=hx-t10 path=/root/primitives-evaluator/headext-20261102/train-hx-t10/hx-s82 VPS_ARCHIVE=present SUMS=OK(27)@2026-11-23T01:08:01Z WEIGHTS=OK(14)@2026-11-23T01:08:01Z
+SEED hx-s83 pod=hx-t10 path=/root/primitives-evaluator/headext-20261102/train-hx-t10/hx-s83 VPS_ARCHIVE=present SUMS=OK(27)@2026-11-23T01:08:04Z WEIGHTS=OK(14)@2026-11-23T01:08:05Z
+SEED hx-s84 pod=hx-t10 path=/root/primitives-evaluator/headext-20261102/train-hx-t10/hx-s84 VPS_ARCHIVE=present SUMS=OK(27)@2026-11-23T01:08:07Z WEIGHTS=OK(14)@2026-11-23T01:08:08Z
+SEED hx-s85 pod=hx-t11 path=/root/primitives-evaluator/headext-20261102/train-hx-t11/hx-s85 VPS_ARCHIVE=present SUMS=OK(27)@2026-11-23T01:08:10Z WEIGHTS=OK(14)@2026-11-23T01:08:11Z
+SEED hx-s86 pod=hx-t11 path=/root/primitives-evaluator/headext-20261102/train-hx-t11/hx-s86 VPS_ARCHIVE=present SUMS=OK(27)@2026-11-23T01:08:13Z WEIGHTS=OK(14)@2026-11-23T01:08:13Z
+SEED hx-s87 pod=hx-t12 path=/root/primitives-evaluator/headext-20261102/train-hx-t12/hx-s87 VPS_ARCHIVE=present SUMS=OK(27)@2026-11-23T01:08:16Z WEIGHTS=OK(14)@2026-11-23T01:08:16Z
+SEED hx-s88 pod=hx-t12 path=/root/primitives-evaluator/headext-20261102/train-hx-t12/hx-s88 VPS_ARCHIVE=present SUMS=OK(27)@2026-11-23T01:08:19Z WEIGHTS=OK(14)@2026-11-23T01:08:19Z
+SEED hx-s89 pod=hx-t12 path=/root/primitives-evaluator/headext-20261102/train-hx-t12/hx-s89 VPS_ARCHIVE=present SUMS=OK(27)@2026-11-23T01:08:22Z WEIGHTS=OK(14)@2026-11-23T01:08:22Z
+UTC_END 2026-11-23T01:08:24Z
+VPS_DIR_NAMES: train-hx-t10 = hx-s80..s84 + logs; train-hx-t11 = hx-s85..s86 + logs; train-hx-t12 = hx-s87..s89 + logs. No unexpected cycle-3 partial. logs/ not on deletion list.
+JUSTIN_APPROVAL: 2026-11-23 6:51 AM NPT t246u "yes go ahead" (cycle 3 s80-s89, each only after clean VPS check)

@@ -1,0 +1,4 @@
+2026-11-23T01:43:24Z box hx-t18 hx-s104 SHA256SUMS=OK(29) SHA256SUMS.weights=OK(14)
+2026-11-23T01:43:30Z vps hx-t18 hx-s104 SHA256SUMS=OK(29) SHA256SUMS.weights=OK(14) path=/root/primitives-evaluator/headext-20261102/train-hx-t18/hx-s104
+volume VOL_OK_hx-s104 43 files fff8c97da7892cb94620db0e04e6536bb08d43d1e1009ee9d8499cc7872a3a01
+driver: box 43 files sha256sum -c OK; VPS outputs+predictions 29 files sha256sum -c OK; WEIGHTS hx-s104 -> VPS sha256sum -c OK

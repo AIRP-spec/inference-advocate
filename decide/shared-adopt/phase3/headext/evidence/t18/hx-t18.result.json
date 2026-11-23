@@ -1,0 +1,41 @@
+{
+ "pod": "ryorio74zeqsk5",
+ "rate": 0.89,
+ "cost": 0.4337873826371299,
+ "bal0": 31.4531628909,
+ "bal1": 31.0278252325,
+ "pod_list_after": [],
+ "rest_pods_after": [
+  [],
+  "unreachable:URLError: <urlopen error [SSL: UNEXPECTED_EOF_WHILE_READING] EOF occurred in violation of protocol (_ssl.c:1029)>"
+ ],
+ "cumulative": 55.304999999999986,
+ "minutes": 29.244093211491904,
+ "driver_minutes": 29.141081007321677,
+ "pod_gone_at": 1795398130.9035969,
+ "signed": "223e673b59f88217462552609974547066e7a8a2",
+ "t0": 1795396376.2580042,
+ "t1": 1795398124.7228646,
+ "seeds": {
+  "104": "done_archived"
+ },
+ "vol_prep": [
+  "VOL_FREE_BEFORE 482294",
+  "VOL_DEL /vol/hx-t10/hx-s80 1.7G",
+  "VOL_DEL /vol/hx-t10/hx-s81 1.7G",
+  "VOL_DEL /vol/hx-t10/hx-s82 1.7G",
+  "VOL_DEL /vol/hx-t10/hx-s83 1.7G",
+  "VOL_DEL /vol/hx-t10/hx-s84 1.7G",
+  "VOL_DEL /vol/hx-t11/hx-s85 1.7G",
+  "VOL_DEL /vol/hx-t11/hx-s86 1.7G",
+  "VOL_DEL /vol/hx-t12/hx-s87 1.7G",
+  "VOL_DEL /vol/hx-t12/hx-s88 1.7G",
+  "VOL_DEL /vol/hx-t12/hx-s89 1.7G",
+  "VOL_DF_FREE_AFTER 482294 VOL_USED_GB 24 VOL_QUOTA_GB 60",
+  "VOL_FREE_AFTER 36",
+  "VOL_PREP_OK"
+ ],
+ "weights_vps_verified": {
+  "hx-s104": true
+ }
+}

@@ -1,0 +1,42 @@
+01:12:12 CAP_USD override -> 2.0
+01:12:55 PRECHECK (headroom): pods(gql)=0 pods(rest)=[] rest_status=unreachable:URLError: <urlopen error [SSL: UNEXPECTED_EOF_WHILE_READING] EOF occurred in violation of protocol (_ssl.c:1029)> box_free=56G vps_free=93G balance=$31.45 cumulative=$54.87 +cap $2.0 -> $56.87 (stop line $85.0) signed_on_remote=True code_clean=True pins_ok=True pack_sha_ok=True tracked_out=4/4
+01:12:55 NOTE: REST pods API unreachable (unreachable:URLError: <urlopen error [SSL: UNEXPECTED_EOF_WHILE_READING] EOF occurred in violation of protocol (_ssl.c:1029)>); proceeding on empty gql pod list only
+01:12:56 POD CREATED ryorio74zeqsk5 gpu=NVIDIA GeForce RTX 4090 rate=$0.89/h cap=105.0min ($2.0) seeds=[104]
+01:12:56 ON-DEMAND CHECK OK podType=RESERVED secureCloud=True dc=EU-RO-1 volume=jq8pseh4f0
+01:13:38 IN-POD WATCHDOG + GPU: wd_running | has_pod_id | has_runpodctl | NVIDIA GeForce RTX 4090, 24564 MiB |   60G | 
+01:13:42 PACK UPLOADED PACK_OK e0ceb28d0eeb1b2742ba336e49ef199d7819a0e83e5da15c6abea96cf3537a64  PACK.sha256 
+01:13:47 VOLPREP: VOL_FREE_BEFORE 482294
+01:13:47 VOLPREP: VOL_DEL /vol/hx-t10/hx-s80 1.7G
+01:13:47 VOLPREP: VOL_DEL /vol/hx-t10/hx-s81 1.7G
+01:13:47 VOLPREP: VOL_DEL /vol/hx-t10/hx-s82 1.7G
+01:13:47 VOLPREP: VOL_DEL /vol/hx-t10/hx-s83 1.7G
+01:13:47 VOLPREP: VOL_DEL /vol/hx-t10/hx-s84 1.7G
+01:13:47 VOLPREP: VOL_DEL /vol/hx-t11/hx-s85 1.7G
+01:13:47 VOLPREP: VOL_DEL /vol/hx-t11/hx-s86 1.7G
+01:13:47 VOLPREP: VOL_DEL /vol/hx-t12/hx-s87 1.7G
+01:13:47 VOLPREP: VOL_DEL /vol/hx-t12/hx-s88 1.7G
+01:13:47 VOLPREP: VOL_DEL /vol/hx-t12/hx-s89 1.7G
+01:13:47 VOLPREP: VOL_DF_FREE_AFTER 482294 VOL_USED_GB 24 VOL_QUOTA_GB 60
+01:13:47 VOLPREP: VOL_FREE_AFTER 36
+01:13:47 VOLPREP: VOL_PREP_OK
+01:15:18 start ssh timed out after 90 s; checking the pipeline directly
+01:15:24 PIPELINE STARTED
+01:15:56 POD: ALL 6 PASS
+01:15:56 POD: [train] 9360 items, truncated 0, mean len 37.3 (4.1s)
+01:15:56 POD: [val] 1879 items, truncated 0, mean len 72.8 (0.9s)
+01:15:56 POD: PREPROCESS_DONE
+01:15:56 POD: SMOKE_BF16_MIXED PASS {"sdpa": false, "eager": true}
+01:15:56 POD: RUN_START hx-s104 2026-11-23T01:14:38Z
+01:15:56 POD: ENCODER_ATTN eager
+01:26:28 POD: + grep -q SKIPPED_NONFINITE logs/train-hx-s104.log
+01:26:28 POD: HEADINIT_OK hx-s104 base17=10a35c7911392632d212b188849fae39fd9fe583252eb07ba27873d0c17106c5 head25=0a85cc3bb576cb6a9ead6902284be5908b1866e6dfb1d7ba05d741ddcfa5d429
+01:34:54 POD: VOL_OK_hx-s104 43 files fff8c97da7892cb94620db0e04e6536bb08d43d1e1009ee9d8499cc7872a3a01
+01:34:54 POD: RUN_DONE_hx-s104 2026-11-23T01:34:48Z
+01:34:54 POD: PIPELINE_DONE 2026-11-23T01:34:48Z
+01:34:54 POD: PIPE_EXIT 0
+01:37:11 ARCHIVED hx-s104: box 43 files sha256sum -c OK; VPS outputs+predictions 29 files sha256sum -c OK -> /root/primitives-evaluator/headext-20261102/train-hx-t18/hx-s104; weights queued
+01:41:46 WEIGHTS hx-s104 -> VPS sha256sum -c OK
+01:41:51 ALL SEEDS VPS-VERIFIED (outputs + weights): ['hx-s104']
+01:42:04 ARCHIVE logs: OK
+01:42:10 GUARD: pod ryorio74zeqsk5 gone at 01:42:10
+01:43:00 TERMINATED ryorio74zeqsk5 pod_list_after(gql)=[] rest=([], 'unreachable:URLError: <urlopen error [SSL: UNEXPECTED_EOF_WHILE_READING] EOF occurred in violation of protocol (_ssl.c:1029)>') minutes=29.2 driver_minutes=29.1 balance 31.453->31.028 cost=$0.434

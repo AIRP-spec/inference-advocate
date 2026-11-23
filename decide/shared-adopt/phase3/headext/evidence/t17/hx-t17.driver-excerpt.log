@@ -1,0 +1,16 @@
+19:27:02 CAP_USD override -> 2.0
+19:27:45 PRECHECK (headroom): pods(gql)=0 pods(rest)=[] rest_status=unreachable:URLError: <urlopen error [SSL: UNEXPECTED_EOF_WHILE_READING] EOF occurred in violation of protocol (_ssl.c:1029)> box_free=56G vps_free=93G balance=$31.54 cumulative=$54.84 +cap $2.0 -> $56.84 (stop line $85.0) signed_on_remote=True code_clean=True pins_ok=True pack_sha_ok=True tracked_out=4/4
+19:27:45 NOTE: REST pods API unreachable (unreachable:URLError: <urlopen error [SSL: UNEXPECTED_EOF_WHILE_READING] EOF occurred in violation of protocol (_ssl.c:1029)>); proceeding on empty gql pod list only
+19:27:46 POD CREATED hheyjep80if9pa gpu=NVIDIA GeForce RTX 4090 rate=$0.89/h cap=105.0min ($2.0) seeds=[104]
+19:27:46 ON-DEMAND CHECK OK podType=RESERVED secureCloud=True dc=EU-RO-1 volume=jq8pseh4f0
+19:28:18 IN-POD WATCHDOG + GPU: wd_running | has_pod_id | has_runpodctl | NVIDIA GeForce RTX 4090, 24564 MiB |   60G | 
+19:28:22 PACK UPLOADED PACK_OK e0ceb28d0eeb1b2742ba336e49ef199d7819a0e83e5da15c6abea96cf3537a64  PACK.sha256 
+19:28:26 VOLPREP: VOL_FREE_BEFORE 483381
+19:28:26 VOLPREP: VOL_DEL /vol/hx-t16/hx-s104 1.7G
+19:28:26 VOLPREP: VOL_DF_FREE_AFTER 483382 VOL_USED_GB 41 VOL_QUOTA_GB 60
+19:28:26 VOLPREP: VOL_FREE_AFTER 19
+19:28:26 VOLPREP: VOL_LOW_STOP 19
+19:28:26 FAILURE: RuntimeError("VOL_LOW_STOP / volume prep failed rc=3: 'VOL_FREE_BEFORE 483381\\nVOL_DEL /vol/hx-t16/hx-s104 1.7G\\nVOL_DF_FREE_AFTER 483382 VOL_USED_GB 41 VOL_QUOTA_GB 60\\nVOL_FREE_AFTER 19\\nVOL_LOW_STOP 19\\n'")
+19:29:53 ARCHIVE logs: FAILED
+19:29:55 GUARD: pod hheyjep80if9pa gone at 19:29:55
+19:30:50 TERMINATED hheyjep80if9pa pod_list_after(gql)=[] rest=([], 'unreachable:URLError: <urlopen error [SSL: UNEXPECTED_EOF_WHILE_READING] EOF occurred in violation of protocol (_ssl.c:1029)>') minutes=2.1 driver_minutes=2.1 balance 31.543->31.543 cost=$0.032 terminate_after_failure=1.4min
