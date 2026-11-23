@@ -1,0 +1,14 @@
+e51d8f31d8f2df0d0fd4ba37e4342662579f2f23f64665806e40b459a86c5773  keep/avg-hx-s108-ge2.0/average-meta.json
+68b52d4dce30088a1e859073cda7385f10de045cd40600b106db40c76a3e991c  keep/avg-hx-s108-ge2.0/encoder/config.json
+043d3ba4eb3bcb78d6d403d20580a8c3749b4c54d23bb76475ee240623b818a7  keep/avg-hx-s108-ge2.0/model.safetensors
+161ca5fbc8f3d7fe256e4de24aaf5abf7cf61fa814da99bad17cf63c6c4d4431  keep/avg-hx-s108-ge2.0/shared_config.json
+ea97ecdbcc73713039d8d64dbb05e3689495c96657fbd9a18f5bed381be81049  keep/avg-hx-s108-ge2.0/tokenizer/special_tokens_map.json
+6c8aaa9a542084f2457eab775d4eeb51f92a70c0fd9de28d5edb0ddec3c08d30  keep/avg-hx-s108-ge2.0/tokenizer/tokenizer.json
+2966a59b9e9cf122279aec1249e22e5bc7ad8430c754e95031b13fd128d4e560  keep/avg-hx-s108-ge2.0/tokenizer/tokenizer_config.json
+8938b2bebae3194c9b57002af36f7fc797f8be28eadd2ea57b2c6cbcaabdadd9  keep/hx-s108-final.sha256
+68b52d4dce30088a1e859073cda7385f10de045cd40600b106db40c76a3e991c  keep/hx-s108-final/encoder/config.json
+5d550cdaf77e839a8a594ac951b4c0bd7149bc566612ce977e3f0254352141e5  keep/hx-s108-final/model.safetensors
+161ca5fbc8f3d7fe256e4de24aaf5abf7cf61fa814da99bad17cf63c6c4d4431  keep/hx-s108-final/shared_config.json
+ea97ecdbcc73713039d8d64dbb05e3689495c96657fbd9a18f5bed381be81049  keep/hx-s108-final/tokenizer/special_tokens_map.json
+6c8aaa9a542084f2457eab775d4eeb51f92a70c0fd9de28d5edb0ddec3c08d30  keep/hx-s108-final/tokenizer/tokenizer.json
+2966a59b9e9cf122279aec1249e22e5bc7ad8430c754e95031b13fd128d4e560  keep/hx-s108-final/tokenizer/tokenizer_config.json

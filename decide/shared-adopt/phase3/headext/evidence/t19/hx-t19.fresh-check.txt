@@ -1,0 +1,21 @@
+# Fresh sha256sum -c after hx-t19 terminate. Checksums and counts only.
+# VPS session UTC_START 2026-11-23T03:52:17Z UTC_END 2026-11-23T03:52:28Z
+# Box session UTC_START 2026-11-23T03:53:10Z UTC_END 2026-11-23T03:53:23Z
+2026-11-23T03:52:17Z vps hx-t19 hx-s105 SHA256SUMS=OK(29) SHA256SUMS.weights=OK(14) path=/root/primitives-evaluator/headext-20261102/train-hx-t19/hx-s105
+2026-11-23T03:52:19Z vps hx-t19 hx-s106 SHA256SUMS=OK(29) SHA256SUMS.weights=OK(14) path=/root/primitives-evaluator/headext-20261102/train-hx-t19/hx-s106
+2026-11-23T03:52:22Z vps hx-t19 hx-s107 SHA256SUMS=OK(29) SHA256SUMS.weights=OK(14) path=/root/primitives-evaluator/headext-20261102/train-hx-t19/hx-s107
+2026-11-23T03:52:25Z vps hx-t19 hx-s108 SHA256SUMS=OK(29) SHA256SUMS.weights=OK(14) path=/root/primitives-evaluator/headext-20261102/train-hx-t19/hx-s108
+2026-11-23T03:52:28Z vps hx-t19 hx-s109 ABSENT
+2026-11-23T03:53:10Z box out hx-s107 SHA256SUMS=OK(29) SHA256SUMS.weights=OK(14)
+2026-11-23T03:53:15Z box out hx-s108 SHA256SUMS=OK(29) SHA256SUMS.weights=OK(14)
+2026-11-23T03:53:18Z box boxkeep hx-s107 SHA256SUMS=OK(29) SHA256SUMS.weights=OK(14)
+2026-11-23T03:53:20Z box boxkeep hx-s108 SHA256SUMS=OK(29) SHA256SUMS.weights=OK(14)
+box out/boxkeep hx-s105 ABSENT at post-terminate (driver: box 43 files sha256sum -c OK at 02:16:47Z; WEIGHTS VPS OK 02:21:11Z)
+box out/boxkeep hx-s106 ABSENT at post-terminate (driver: box 43 files sha256sum -c OK at 02:39:32Z; WEIGHTS VPS OK 02:44:11Z)
+box out/boxkeep hx-s109 ABSENT (incomplete; time cap before RUN_DONE)
+volume VOL_OK_hx-s105 43 files 9954cea5a11b16c1d72dda3f8ca7c84e8c15927758e1a0347996c2f9b33b4d77
+volume VOL_OK_hx-s106 43 files 708dacefcf649e3ad021a23f51b65189a87e5a7cfd59e96d3d074436efeb700c
+volume VOL_OK_hx-s107 43 files a4d36b944a3a95aa5effdcaeeb437d3ae80133c42474bcae50000aceb52aaf18
+volume VOL_OK_hx-s108 43 files f5cc49ace3f871c0a0cff32cac88e2ab8bac912cc09d8787b98154e6f6fb022d
+evidence SHA256SUMS* files byte-identical to VPS copies (sha256 of the sum files match).
+VPS ledger already had hx-t18 and hx-t19 rows (driver-written); no edit this session.
